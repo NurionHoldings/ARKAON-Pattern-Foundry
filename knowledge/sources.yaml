@@ -1,0 +1,43 @@
+schema_version: apf.sources/0.1
+policy:
+  external_budget_target: 0.65
+  minimum_intent_relevance: 0.30
+  derivatives_require_license_clarity: 0.80
+sources:
+  - id: spdx
+    kind: OFFICIAL_STANDARD
+    domain: provenance-license
+    url: https://spdx.dev/use/specifications/
+    use: concepts-and-schema
+    copy_source_code: false
+  - id: openlineage
+    kind: OFFICIAL_STANDARD
+    domain: data-lineage
+    url: https://openlineage.io/docs/spec/object-model/
+    use: concepts-and-interoperability
+    copy_source_code: false
+  - id: temporal
+    kind: OFFICIAL_DOCUMENTATION
+    domain: durable-workflow
+    url: https://docs.temporal.io/
+    use: workflow-failure-patterns
+    copy_source_code: false
+  - id: opa
+    kind: OFFICIAL_DOCUMENTATION
+    domain: policy-decision
+    url: https://www.openpolicyagent.org/docs/latest/
+    use: policy-execution-separation
+    copy_source_code: false
+  - id: opentelemetry
+    kind: OFFICIAL_STANDARD
+    domain: observability
+    url: https://opentelemetry.io/docs/specs/otel/
+    use: trace-metric-log-model
+    copy_source_code: false
+  - id: openapi
+    kind: OFFICIAL_STANDARD
+    domain: api-contract
+    url: https://spec.openapis.org/oas/latest.html
+    use: api-contract-model
+    copy_source_code: false
+
