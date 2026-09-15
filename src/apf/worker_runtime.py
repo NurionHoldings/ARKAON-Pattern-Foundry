@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import PurePosixPath
 from typing import Protocol
@@ -94,6 +95,18 @@ class ArkaonWorkerRuntime:
         )
         self.receipts.record(receipt)
         return receipt
+
+
+class ArkaonWorkerPool:
+    def __init__(self, workers: tuple[ArkaonWorkerRuntime, ...]) -> None:
+        if not workers:
+            raise ValueError("at least one worker is required")
+        self.workers = workers
+
+    def run_available(self) -> tuple[ExecutionReceipt, ...]:
+        with ThreadPoolExecutor(max_workers=len(self.workers), thread_name_prefix="arkaon") as pool:
+            receipts = tuple(pool.map(lambda worker: worker.run_once(), self.workers))
+        return tuple(receipt for receipt in receipts if receipt is not None)
 
 
 def _within_scope(touched_paths: tuple[str, ...], allowed_paths: tuple[str, ...]) -> bool:
