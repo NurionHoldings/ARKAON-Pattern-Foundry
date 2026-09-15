@@ -26,10 +26,23 @@ def dna_with(*axes: str) -> IntentDNA:
 def test_complete_intent_is_lock_ready_but_not_auto_locked():
     dna = dna_with(*INTENT_AXES)
     quality = score_intent(dna)
-    assert quality.score == 1
+    assert quality.score == pytest.approx(0.9925)
     assert quality.blocking_reasons == ()
     assert can_lock_intent(quality)
     assert dna.locked is False
+
+
+def test_low_confidence_evidence_blocks_lock_even_when_references_exist():
+    dna = dna_with(*INTENT_AXES)
+    weak_statement = statement().model_copy(update={"confidence": 0.2})
+    weak_dna = dna.model_copy(
+        update={"axes": {axis: [weak_statement] for axis in INTENT_AXES}},
+        deep=True,
+    )
+    quality = score_intent(weak_dna)
+    assert quality.evidence_quality == 0.2
+    assert "EVIDENCE_QUALITY_LOW" in quality.blocking_reasons
+    assert not can_lock_intent(quality)
 
 
 def test_missing_authority_and_test_signal_block_lock():
