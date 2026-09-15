@@ -100,10 +100,15 @@ class SQLiteOrchestratorStorage:
 
     def restore_into(self, orchestrator: DevelopmentOrchestrator) -> int:
         contracts = self.load_all()
+        # Validate the complete snapshot in an isolated orchestrator first. This
+        # prevents a rejected/normalized contract from partially mutating the
+        # live orchestrator before restore reports failure.
+        staging = DevelopmentOrchestrator()
         for contract in contracts:
-            restored = orchestrator.submit(contract)
+            restored = staging.submit(contract)
             if restored != contract:
                 raise OrchestratorStorageError("RESTORED_TASK_STATE_CHANGED")
+        orchestrator.restore(staging.snapshot())
         return len(contracts)
 
     def _sign(self, payload: str) -> str:
