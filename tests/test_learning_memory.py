@@ -42,6 +42,49 @@ def test_duplicate_content_hash_is_rejected_even_if_evidence_order_changes() -> 
         memory.remember(lesson(evidence_refs=tuple(reversed(original.evidence_refs))))
 
 
+def test_semantic_duplicate_cannot_bypass_identity_with_verification_metadata() -> None:
+    memory = LearningMemory()
+    memory.remember(lesson(confidence=0.9, evidence_refs=("test:one",)))
+
+    with pytest.raises(ValueError, match="DUPLICATE_LESSON"):
+        memory.remember(
+            lesson(
+                confidence=1.0,
+                evidence_refs=("test:one", "audit:two"),
+                domain=" COLLECTION ",
+                principle="bind DEDUPLICATION to canonical source identity.",
+            )
+        )
+
+
+def test_explicit_upgrade_requires_higher_confidence_and_evidence_superset() -> None:
+    memory = LearningMemory()
+    original = lesson(confidence=0.9, evidence_refs=("test:one",))
+    identity = memory.remember(original)
+    stronger = lesson(confidence=0.96, evidence_refs=("test:one", "audit:two"))
+
+    assert memory.upgrade(stronger) == identity
+    assert memory.recall(intent_fingerprint="intent-v1", domain="collection") == (stronger,)
+    assert len(memory) == 1
+
+    with pytest.raises(ValueError, match="LESSON_UPGRADE_NOT_STRONGER"):
+        memory.upgrade(lesson(confidence=0.97, evidence_refs=("audit:different",)))
+
+
+def test_failure_family_limit_prevents_memory_flood() -> None:
+    memory = LearningMemory(failure_family_limit=2)
+    common = {
+        "failure_mode": "race condition",
+        "outcome": LessonOutcome.FAILURE,
+    }
+    memory.remember(lesson(principle="Acquire a durable lease.", **common))
+    memory.remember(lesson(principle="Fence stale lease owners.", **common))
+
+    with pytest.raises(ValueError, match="FAILURE_FAMILY_LIMIT"):
+        memory.remember(lesson(principle="Reject expired leases.", **common))
+    assert len(memory) == 2
+
+
 def test_failure_lessons_are_recalled_before_successes() -> None:
     memory = LearningMemory()
     success = lesson(confidence=1.0)
