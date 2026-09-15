@@ -68,6 +68,8 @@ def promote(
     report_sink: ConceptReportSink | None = None,
     ethernian_verifier: ConceptVerifier | None = None,
 ) -> AssetRecord:
+    if record.copied_source_code:
+        raise AssetPromotionDenied("SOURCE_CODE_COPY_BLOCKED")
     route = assetization_route(record.stage)
     if route.next_step != target:
         raise AssetPromotionDenied("NON_SEQUENTIAL_PROMOTION")
@@ -83,6 +85,10 @@ def promote(
         raise AssetPromotionDenied("INDEPENDENT_TEST_EVIDENCE_REQUIRED")
     if target == AssetLifecycle.OWNED_ASSET and not record.approval_ref:
         raise AssetPromotionDenied("HUMAN_APPROVAL_REQUIRED")
+    if target == AssetLifecycle.OWNED_ASSET and (
+        not record.principle_ref or not record.implementation_ref or not record.test_refs
+    ):
+        raise AssetPromotionDenied("COMPLETE_ASSET_EVIDENCE_REQUIRED")
     updated = replace(record, stage=target, updated_at=datetime.now(UTC))
     if target == AssetLifecycle.PRINCIPLE_ABSTRACTED:
         if report_sink is None or ethernian_verifier is None:
