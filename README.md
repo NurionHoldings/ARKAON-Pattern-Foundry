@@ -42,10 +42,11 @@ REGISTER → AUTHORIZE → SNAPSHOT → EXTRACT_INTENT_DNA → ANALYZE
 15. [안전 합성 개발과제 캠페인](docs/15-synthetic-role-campaign.md)
 16. [실전 관측 원장·파일럿 준비](docs/16-pilot-observation-ledger.md)
 17. [실전 관측 증거 번들·독립 검증](docs/17-pilot-evidence-bundle.md)
+18. [MJN 읽기 전용 분석 파일럿](docs/18-mjn-readonly-analysis-pilot.md)
 
 ## 구현 게이트
 
-현재 상태는 **#029 PILOT EVIDENCE BUNDLE IMPLEMENTED / CI VERIFICATION PENDING**입니다. 합성 증거는 실제 효율 판정에서 제외하며, 에테르니언이 서명한 실전 관측과 충분한 역할별 paired evidence만 효율 PASS 후보가 됩니다. 관측 원장은 비밀키·원문 없이 canonical bundle로 반출해 독립 검증할 수 있으며, 검증 결과가 라이브 원장을 생성하거나 변경하지 않습니다. 구현은 보호된 브랜치·PR·CI 절차로 진행하며, Intent_DNA 변경과 소유자산 승격은 사람의 최종 승인을 유지합니다.
+현재 상태는 **#030 MJN READ-ONLY ANALYSIS PILOT / ETHERNIAN REVIEW REQUIRED**입니다. MJN의 고정 snapshot에서 원문을 복제하지 않고 canonical source identity와 SHA-256 evidence ref만 남겼으며, 세 개의 추상 패턴은 모두 `CANDIDATE`입니다. Intent_DNA 변경과 `OWNED_ASSET` 승격은 금지되어 있고 에테르니언 검토가 필요합니다. 구현은 보호된 브랜치·PR·CI 절차로 진행합니다.
 
 ## 공개 저장소 정책
 
