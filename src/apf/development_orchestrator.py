@@ -142,7 +142,10 @@ class DevelopmentOrchestrator:
             task = self._tasks[task_id]
             if task.status != TaskStatus.RUNNING or task.lease_token != lease_token:
                 raise OrchestrationDenied("INVALID_OR_STALE_LEASE")
-            if task.claimed_by != worker_id:
+            # Version-1 persisted tasks predate claimed_by. Their unguessable
+            # lease token remains the completion capability; version-2 tasks
+            # additionally bind completion to the recorded worker identity.
+            if task.claimed_by is not None and task.claimed_by != worker_id:
                 raise OrchestrationDenied("WORKER_IDENTITY_MISMATCH")
             missing = set(task.expected_artifacts) - set(result.artifacts)
             if missing or result.outcome != "PASS" or not result.checks:
