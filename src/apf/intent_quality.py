@@ -44,13 +44,16 @@ def score_intent(dna: IntentDNA) -> IntentQuality:
     critical_missing = sorted(CRITICAL_AXES - present)
     disputed = sum(statement.disputed for statement in statements)
     vague = sum(len(statement.canonical_text.split()) < 3 for statement in statements)
-    evidenced = sum(bool(statement.evidence_refs) for statement in statements)
 
     completeness = _ratio(len(present), len(INTENT_AXES))
     consistency = 1.0 - _ratio(disputed, len(statements)) if statements else 0.0
     clarity = 1.0 - _ratio(vague, len(statements)) if statements else 0.0
     authority_precision = 1.0 if dna.axes.get("owner") and dna.axes.get("constraint") else 0.0
-    evidence_quality = _ratio(evidenced, len(statements))
+    evidence_quality = (
+        round(sum(statement.confidence for statement in statements) / len(statements), 4)
+        if statements
+        else 0.0
+    )
     testability = 1.0 if dna.axes.get("outcome") and dna.axes.get("signal") else 0.0
     score = round(
         completeness * 0.25
@@ -70,6 +73,8 @@ def score_intent(dna: IntentDNA) -> IntentQuality:
         blockers.append("AUTHORITY_IMPRECISE")
     if testability < 1:
         blockers.append("OUTCOME_NOT_TESTABLE")
+    if evidence_quality < 0.80:
+        blockers.append("EVIDENCE_QUALITY_LOW")
     return IntentQuality(
         completeness=completeness,
         consistency=consistency,

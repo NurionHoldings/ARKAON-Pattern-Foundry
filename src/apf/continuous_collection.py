@@ -58,6 +58,7 @@ class CollectionCandidate:
     content_hash_seen: bool = False
     explicitly_authorized: bool = False
     contains_personal_data: bool = False
+    contains_secrets: bool = False
     requires_credentials: bool = False
     robots_allowed: bool = True
     terms_allowed: bool = True
@@ -108,6 +109,8 @@ def decide_collection(
         return CollectionDecision(False, False, "LOW_INTENT_RELEVANCE")
     if candidate.contains_personal_data:
         return CollectionDecision(False, False, "PERSONAL_DATA_BLOCKED")
+    if candidate.contains_secrets:
+        return CollectionDecision(False, False, "SECRET_CONTENT_BLOCKED")
     if candidate.requires_credentials:
         return CollectionDecision(False, False, "CREDENTIAL_ACCESS_BLOCKED")
     if not candidate.robots_allowed or not candidate.terms_allowed:
