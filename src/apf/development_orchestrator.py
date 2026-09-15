@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, replace
 from enum import StrEnum
+from threading import RLock
 from uuid import UUID, uuid4
 
 
@@ -86,6 +87,7 @@ class OrchestrationDenied(ValueError):
 class DevelopmentOrchestrator:
     def __init__(self) -> None:
         self._tasks: dict[UUID, TaskContract] = {}
+        self._lock = RLock()
 
     def submit(self, contract: TaskContract) -> TaskContract:
         forbidden = PROHIBITED_OPERATIONS & set(contract.requested_operations)
@@ -95,47 +97,64 @@ class DevelopmentOrchestrator:
             raise OrchestrationDenied("INTENT_AND_SCOPE_REQUIRED")
         if contract.kind in HUMAN_ONLY and not contract.approval_ref:
             contract = replace(contract, status=TaskStatus.BLOCKED_HUMAN_APPROVAL)
-        self._tasks[contract.task_id] = contract
+        with self._lock:
+            self._tasks[contract.task_id] = contract
         return contract
 
     def claim(self, worker: Worker) -> TaskContract | None:
-        completed = {task_id for task_id, task in self._tasks.items() if task.status == TaskStatus.SUCCEEDED}
-        eligible = sorted(
-            (
-                task
-                for task in self._tasks.values()
-                if task.status == TaskStatus.QUEUED
-                and task.kind in worker.capabilities
-                and set(task.dependencies) <= completed
-            ),
-            key=lambda task: str(task.task_id),
-        )
-        if not eligible:
-            return None
-        claimed = replace(eligible[0], status=TaskStatus.RUNNING, lease_token=uuid4())
-        self._tasks[claimed.task_id] = claimed
-        return claimed
+        if worker.capabilities & HUMAN_ONLY:
+            raise OrchestrationDenied("HUMAN_ONLY_CAPABILITY_NOT_DELEGABLE")
+        with self._lock:
+            completed = {
+                task_id for task_id, task in self._tasks.items() if task.status == TaskStatus.SUCCEEDED
+            }
+            eligible = sorted(
+                (
+                    task
+                    for task in self._tasks.values()
+                    if task.status == TaskStatus.QUEUED
+                    and task.kind not in HUMAN_ONLY
+                    and task.kind in worker.capabilities
+                    and set(task.dependencies) <= completed
+                ),
+                key=lambda task: str(task.task_id),
+            )
+            if not eligible:
+                return None
+            claimed = replace(eligible[0], status=TaskStatus.RUNNING, lease_token=uuid4())
+            self._tasks[claimed.task_id] = claimed
+            return claimed
 
     def complete(self, task_id: UUID, lease_token: UUID, result: TaskResult) -> TaskContract:
-        task = self._tasks[task_id]
-        if task.status != TaskStatus.RUNNING or task.lease_token != lease_token:
-            raise OrchestrationDenied("INVALID_OR_STALE_LEASE")
-        missing = set(task.expected_artifacts) - set(result.artifacts)
-        if missing or result.outcome != "PASS" or not result.checks:
-            failed = replace(task, status=TaskStatus.FAILED, produced_artifacts=result.artifacts)
-            self._tasks[task_id] = failed
-            return failed
-        completed = replace(
-            task,
-            status=TaskStatus.SUCCEEDED,
-            produced_artifacts=result.artifacts,
-            lease_token=None,
-        )
-        self._tasks[task_id] = completed
-        return completed
+        with self._lock:
+            task = self._tasks[task_id]
+            if task.status != TaskStatus.RUNNING or task.lease_token != lease_token:
+                raise OrchestrationDenied("INVALID_OR_STALE_LEASE")
+            missing = set(task.expected_artifacts) - set(result.artifacts)
+            if missing or result.outcome != "PASS" or not result.checks:
+                failed = replace(task, status=TaskStatus.FAILED, produced_artifacts=result.artifacts)
+                self._tasks[task_id] = failed
+                return failed
+            completed = replace(
+                task,
+                status=TaskStatus.SUCCEEDED,
+                produced_artifacts=result.artifacts,
+                lease_token=None,
+            )
+            self._tasks[task_id] = completed
+            return completed
 
     def get(self, task_id: UUID) -> TaskContract:
-        return self._tasks[task_id]
+        with self._lock:
+            return self._tasks[task_id]
+
+    def snapshot(self) -> tuple[TaskContract, ...]:
+        with self._lock:
+            return tuple(self._tasks.values())
+
+    def restore(self, contracts: tuple[TaskContract, ...]) -> None:
+        with self._lock:
+            self._tasks = {contract.task_id: contract for contract in contracts}
 
 
 def task_contract(

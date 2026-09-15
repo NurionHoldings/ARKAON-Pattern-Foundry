@@ -3,6 +3,7 @@ from uuid import uuid4
 import pytest
 
 from apf.development_orchestrator import (
+    HUMAN_ONLY,
     DevelopmentOrchestrator,
     OrchestrationDenied,
     TaskKind,
@@ -39,6 +40,14 @@ def test_intent_mutation_and_owned_asset_promotion_wait_for_human():
     for kind in (TaskKind.MUTATE_INTENT, TaskKind.PROMOTE_OWNED_ASSET):
         submitted = orchestrator.submit(contract(kind))
         assert submitted.status == TaskStatus.BLOCKED_HUMAN_APPROVAL
+
+
+def test_arkaon_worker_cannot_claim_human_only_capability_even_with_approval_reference():
+    orchestrator = DevelopmentOrchestrator()
+    orchestrator.submit(contract(TaskKind.PROMOTE_OWNED_ASSET, approval_ref="approval:human"))
+    worker = Worker("arkaon", frozenset({TaskKind.PROMOTE_OWNED_ASSET}))
+    with pytest.raises(OrchestrationDenied, match="HUMAN_ONLY_CAPABILITY_NOT_DELEGABLE"):
+        orchestrator.claim(worker)
 
 
 def test_restricted_copy_and_authority_escalation_are_rejected():
@@ -120,7 +129,7 @@ def test_submitted_plan_releases_only_first_stage():
         allowed_paths=("src/",),
     )
     submit_plan(orchestrator, plan)
-    all_capabilities = Worker("arkaon", frozenset(TaskKind))
+    all_capabilities = Worker("arkaon", frozenset(set(TaskKind) - HUMAN_ONLY))
     claimed = orchestrator.claim(all_capabilities)
     assert claimed.kind == TaskKind.RESEARCH
     assert orchestrator.claim(all_capabilities) is None
