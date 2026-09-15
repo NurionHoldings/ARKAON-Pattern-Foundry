@@ -16,9 +16,10 @@
 | TEST | 순수 정수 clamp의 경계값 실행 | `synthetic/test/test-results.json` |
 | AUDIT | 가상 manifest 경로의 안전성 검사 | `synthetic/audit/audit.json` |
 
-과제 입력은 코드에 포함된 발명 자료뿐이다. 고객 원본, 개인정보, 자격증명은 입력할 수
-없으며 금지 표식이 발견되면 생성 단계에서 거부한다. 모든 산출물 범위는 `synthetic/`
-아래로 제한한다.
+과제 입력은 코드에 포함된 발명 자료뿐이다. `learning_safety.scan_learning_text`로 목적과
+모든 입력 항목의 비밀값·개인정보를 검사하며 탐지되면 내용은 보관하지 않고 fail-closed
+거부한다. Intent 변경·자산 승격 문구도 별도 거버넌스 게이트에서 차단한다. 모든 산출물
+범위는 `synthetic/` 아래로 제한한다.
 
 ## 관측과 재현성
 
@@ -26,6 +27,8 @@
 - task ID는 phase와 scenario ID로부터 UUIDv5로 결정하여 실행 쌍을 재현한다.
 - 성공과 안전 위반은 Worker Runtime 영수증에서 가져온다.
 - 개입·재작업 횟수는 `ObservationLog`의 해당 이벤트를 세어 계산한다.
+- worker는 phase를 근거로 개입 이벤트를 만들지 않는다. 외부 `ObservationPolicy`가 실제로
+  관측한 사건만 기록하며 기본 정책은 어떤 개입도 추정하지 않는다.
 - Intent 일치도는 과제가 요구한 check와 관측된 check의 교집합 비율이다.
 - 증거 참조는 시간이나 비밀값을 제외한 canonical 실행 trace의 SHA-256이다.
 - 실제 소요시간은 주입 가능한 wall clock의 시작·종료 관측값으로 계산한다.
@@ -33,6 +36,14 @@
 
 고정 점수나 `passed=True`를 캠페인 입력으로 넣지 않는다. 벤치마크 합격은 기존 #025
 threshold가 영수증과 관측값을 평가한 결과로만 정해진다.
+
+## 증거 등급 제한
+
+기본 실행은 **SYNTHETIC_PIPELINE_ONLY**이다. 기본 observer가 없으므로 효율 개선을 임의로
+추정하지 않으며, 보고서의 `eligible_for_real_world_efficiency`는 항상 `false`이다.
+`synthetic_pipeline_valid`는 역할 연결·범위·Intent check가 정상이라는 뜻일 뿐 실제 사업
+과제에서 에테르니언의 업무가 감소했다는 증거로 승격할 수 없다. 실사용 효율 판정에는
+별도의 현장 observer와 비합성 캠페인이 필요하다.
 
 ## 권한 경계
 

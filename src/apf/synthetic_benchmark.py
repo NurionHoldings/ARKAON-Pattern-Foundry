@@ -20,6 +20,7 @@ from .development_orchestrator import (
     TaskStatus,
     Worker,
 )
+from .learning_safety import LearningSafetyViolation, scan_learning_text
 from .role_benchmark import BenchmarkReport, BenchmarkRole, BenchmarkThresholds
 from .worker_runtime import (
     ArkaonWorkerRuntime,
@@ -32,15 +33,7 @@ SYNTHETIC_INTENT = hashlib.sha256(
     b"APF-027: safe deterministic synthetic development campaign v1"
 ).hexdigest()
 SAFE_ROOT = PurePosixPath("synthetic")
-_FORBIDDEN_MARKERS = (
-    "password",
-    "credential",
-    "customer",
-    "personal data",
-    "private key",
-    "intent mutation",
-    "asset promotion",
-)
+_GOVERNED_MARKERS = ("intent mutation", "asset promotion")
 
 
 class ObservationKind(StrEnum):
@@ -63,8 +56,15 @@ class SyntheticScenario:
         payload = " ".join((self.objective, *self.input_items)).casefold()
         if not self.scenario_id.strip() or not self.input_items:
             raise ValueError("SYNTHETIC_SCENARIO_CONTENT_REQUIRED")
-        if any(marker in payload for marker in _FORBIDDEN_MARKERS):
-            raise ValueError("UNSAFE_SYNTHETIC_CONTENT")
+        violations = {
+            code
+            for value in (self.objective, *self.input_items)
+            for code in scan_learning_text(value)
+        }
+        if violations:
+            raise LearningSafetyViolation(tuple(sorted(violations)))
+        if any(marker in payload for marker in _GOVERNED_MARKERS):
+            raise ValueError("GOVERNED_SYNTHETIC_OPERATION")
         path = PurePosixPath(self.expected_artifact)
         if path.is_absolute() or ".." in path.parts or SAFE_ROOT not in path.parents:
             raise ValueError("SYNTHETIC_ARTIFACT_SCOPE_REQUIRED")
@@ -95,6 +95,18 @@ class ObservationLog:
     @property
     def events(self) -> tuple[Observation, ...]:
         return tuple(self._events)
+
+
+class ObservationPolicy(Protocol):
+    """External observer for facts not knowable by the worker runtime."""
+
+    def observe(
+        self,
+        scenario: SyntheticScenario,
+        phase: CampaignPhase,
+        receipt: ExecutionReceipt,
+        log: ObservationLog,
+    ) -> None: ...
 
 
 @dataclass(frozen=True)
@@ -209,11 +221,9 @@ class SyntheticExecutor:
     def __init__(
         self,
         scenario: SyntheticScenario,
-        phase: CampaignPhase,
         observations: ObservationLog,
     ) -> None:
         self.scenario = scenario
-        self.phase = phase
         self.observations = observations
 
     def execute(self, task, *, sandbox_policy, attestation) -> WorkerExecution:
@@ -222,12 +232,6 @@ class SyntheticExecutor:
         result = self._perform_role_work()
         for check in self.scenario.required_intent_checks:
             self.observations.record(ObservationKind.INTENT_CHECK, check)
-
-        # The baseline models the same task under manual review. These events are
-        # observed control hand-offs, not values supplied to the score calculator.
-        if self.phase is CampaignPhase.BASELINE:
-            for item in self.scenario.input_items:
-                self.observations.record(ObservationKind.ETHERNIAN_INTERVENTION, item)
 
         checks = (
             "SYNTHETIC_INPUT_ONLY",
@@ -274,6 +278,7 @@ def execute_synthetic_run(
     *,
     clock: NanoClock = monotonic_ns,
     wall_clock: Callable[[], datetime] = lambda: datetime.now(UTC),
+    observer: ObservationPolicy | None = None,
 ) -> SyntheticRun:
     orchestrator = DevelopmentOrchestrator()
     task = orchestrator.submit(_task_for(scenario, phase))
@@ -282,7 +287,7 @@ def execute_synthetic_run(
     runtime = ArkaonWorkerRuntime(
         orchestrator,
         Worker(f"arkaon-{scenario.role.value.lower()}", frozenset({task.kind})),
-        SyntheticExecutor(scenario, phase, observations),
+        SyntheticExecutor(scenario, observations),
         receipts,
         worktree_root="/tmp/apf-027-synthetic",
     )
@@ -291,6 +296,8 @@ def execute_synthetic_run(
     finished_at = wall_clock()
     if receipt is None or receipt.status is not TaskStatus.SUCCEEDED:
         raise RuntimeError("SYNTHETIC_EXECUTION_FAILED")
+    if observer is not None:
+        observer.observe(scenario, phase, receipt, observations)
     trace = {
         "scenario": scenario.scenario_id,
         "phase": phase.value,
@@ -317,6 +324,17 @@ def execute_synthetic_run(
 class SyntheticCampaignResult:
     runs: tuple[SyntheticRun, ...]
     report: BenchmarkReport
+
+    @property
+    def synthetic_pipeline_valid(self) -> bool:
+        """Validate plumbing only; this is not real-world efficiency evidence."""
+
+        return all(
+            run.receipt.status is TaskStatus.SUCCEEDED
+            and run.intent_alignment == 1.0
+            and run.as_evidence().safety_violations == 0
+            for run in self.runs
+        )
 
     def to_json(self) -> str:
         """Return a canonical, machine-verifiable campaign report."""
@@ -347,7 +365,10 @@ class SyntheticCampaignResult:
 
         payload = {
             "campaign": "APF-027",
+            "evidence_class": "SYNTHETIC_PIPELINE_ONLY",
+            "eligible_for_real_world_efficiency": False,
             "intent_fingerprint": SYNTHETIC_INTENT,
+            "synthetic_pipeline_valid": self.synthetic_pipeline_valid,
             "runs": [
                 {
                     "scenario_id": run.scenario.scenario_id,
@@ -381,6 +402,7 @@ def run_synthetic_campaign(
     thresholds: BenchmarkThresholds | None = None,
     clock: NanoClock = monotonic_ns,
     wall_clock: Callable[[], datetime] = lambda: datetime.now(UTC),
+    observer: ObservationPolicy | None = None,
 ) -> SyntheticCampaignResult:
     selected = scenarios or default_scenarios()
     if {scenario.role for scenario in selected} != set(BenchmarkRole):
@@ -390,7 +412,11 @@ def run_synthetic_campaign(
     for scenario in selected:
         for phase in CampaignPhase:
             run = execute_synthetic_run(
-                scenario, phase, clock=clock, wall_clock=wall_clock
+                scenario,
+                phase,
+                clock=clock,
+                wall_clock=wall_clock,
+                observer=observer,
             )
             campaign.record(run.as_evidence())
             runs.append(run)
