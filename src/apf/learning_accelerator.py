@@ -50,7 +50,7 @@ class LearningAccelerator:
         verification_service: EthernianVerificationService,
         memory: LearningMemory | None = None,
     ) -> None:
-        self.memory = memory or LearningMemory()
+        self.memory = memory if memory is not None else LearningMemory()
         self.verification_service = verification_service
         self._records: dict[str, AccelerationRecord] = {}
 
