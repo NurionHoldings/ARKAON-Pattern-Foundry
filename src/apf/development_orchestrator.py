@@ -69,6 +69,16 @@ class TaskResult:
     outcome: str
 
 
+@dataclass(frozen=True)
+class DelegationPlan:
+    goal: str
+    tasks: tuple[TaskContract, ...]
+
+    @property
+    def final_task_id(self) -> UUID:
+        return self.tasks[-1].task_id
+
+
 class OrchestrationDenied(ValueError):
     pass
 
@@ -150,3 +160,43 @@ def task_contract(
         requested_operations=requested_operations,
         approval_ref=approval_ref,
     )
+
+
+def build_delegation_plan(
+    goal: str,
+    *,
+    intent_fingerprint: str,
+    allowed_paths: tuple[str, ...],
+) -> DelegationPlan:
+    if not goal.strip():
+        raise OrchestrationDenied("GOAL_REQUIRED")
+    stages = (
+        (TaskKind.RESEARCH, "precedents.json"),
+        (TaskKind.ANALYZE, "principles.json"),
+        (TaskKind.ARCHITECT, "architecture.md"),
+        (TaskKind.BUILD, "implementation.patch"),
+        (TaskKind.TEST, "test-results.json"),
+        (TaskKind.VERIFY, "verification.json"),
+        (TaskKind.AUDIT, "audit.json"),
+        (TaskKind.REGISTER_EVIDENCE, "evidence-registration.json"),
+        (TaskKind.REPORT, "completion-report.md"),
+    )
+    tasks: list[TaskContract] = []
+    dependency: tuple[UUID, ...] = ()
+    for kind, artifact in stages:
+        task = task_contract(
+            kind,
+            intent_fingerprint=intent_fingerprint,
+            objective=f"{goal} :: {kind.value}",
+            allowed_paths=allowed_paths,
+            expected_artifacts=(artifact,),
+            dependencies=dependency,
+        )
+        tasks.append(task)
+        dependency = (task.task_id,)
+    return DelegationPlan(goal=goal, tasks=tuple(tasks))
+
+
+def submit_plan(orchestrator: DevelopmentOrchestrator, plan: DelegationPlan) -> None:
+    for task in plan.tasks:
+        orchestrator.submit(task)
