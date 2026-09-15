@@ -29,6 +29,13 @@ class Fetcher:
         return self.payload
 
 
+class SelectiveFetcher(Fetcher):
+    def fetch(self, candidate, max_bytes):
+        if candidate.source_id == "broken":
+            raise TimeoutError("upstream detail must not enter audit")
+        return super().fetch(candidate, max_bytes)
+
+
 def candidate(**changes) -> CollectionCandidate:
     values = {
         "source_id": "standard",
@@ -86,6 +93,21 @@ def test_runtime_uses_injected_hash_store_across_instances():
     )
     assert first.run_once().collected == 1
     assert second.run_once().duplicate == 1
+
+
+def test_fetch_failure_is_audited_and_next_source_continues():
+    audit = MemoryAuditSink()
+    runtime = CollectorRuntime(
+        ContinuousCollectionPolicy(),
+        Provider(candidate(source_id="broken"), candidate(source_id="healthy")),
+        SelectiveFetcher(),
+        audit,
+    )
+    result = runtime.run_once()
+    assert result.failed == 1
+    assert result.collected == 1
+    assert audit.events[0].decision == "FETCH_FAILED:TimeoutError"
+    assert "upstream detail" not in audit.events[0].decision
 
 
 def test_oversized_response_is_not_collected():
