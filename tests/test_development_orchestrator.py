@@ -9,6 +9,8 @@ from apf.development_orchestrator import (
     TaskResult,
     TaskStatus,
     Worker,
+    build_delegation_plan,
+    submit_plan,
     task_contract,
 )
 
@@ -85,3 +87,40 @@ def test_missing_artifact_or_check_fails_task():
         TaskResult((), (), "PASS"),
     )
     assert result.status == TaskStatus.FAILED
+
+
+def test_goal_expands_into_complete_governed_delivery_chain():
+    plan = build_delegation_plan(
+        "implement reusable retry pattern",
+        intent_fingerprint="a" * 64,
+        allowed_paths=("src/", "tests/", "evidence/"),
+    )
+    assert tuple(task.kind for task in plan.tasks) == (
+        TaskKind.RESEARCH,
+        TaskKind.ANALYZE,
+        TaskKind.ARCHITECT,
+        TaskKind.BUILD,
+        TaskKind.TEST,
+        TaskKind.VERIFY,
+        TaskKind.AUDIT,
+        TaskKind.REGISTER_EVIDENCE,
+        TaskKind.REPORT,
+    )
+    assert all(
+        task.dependencies == (plan.tasks[index - 1].task_id,)
+        for index, task in enumerate(plan.tasks[1:], start=1)
+    )
+
+
+def test_submitted_plan_releases_only_first_stage():
+    orchestrator = DevelopmentOrchestrator()
+    plan = build_delegation_plan(
+        "deliver feature",
+        intent_fingerprint="b" * 64,
+        allowed_paths=("src/",),
+    )
+    submit_plan(orchestrator, plan)
+    all_capabilities = Worker("arkaon", frozenset(TaskKind))
+    claimed = orchestrator.claim(all_capabilities)
+    assert claimed.kind == TaskKind.RESEARCH
+    assert orchestrator.claim(all_capabilities) is None
