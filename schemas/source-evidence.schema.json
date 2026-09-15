@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nurion.example/schemas/source-evidence/0.1",
+  "title": "Learning Source Evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["source_id", "kind", "domain", "locator", "content_hash", "intent_relevance", "authority", "license_clarity", "derivation_allowed"],
+  "properties": {
+    "source_id": {"type": "string", "minLength": 1},
+    "kind": {"enum": ["OWNED", "OFFICIAL_STANDARD", "OFFICIAL_DOCUMENTATION", "LICENSED_OPEN_SOURCE", "CLIENT_DELEGATED"]},
+    "domain": {"type": "string", "minLength": 1},
+    "locator": {"type": "string", "format": "uri"},
+    "content_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "license_expression": {"type": ["string", "null"]},
+    "intent_relevance": {"type": "number", "minimum": 0, "maximum": 1},
+    "authority": {"type": "number", "minimum": 0, "maximum": 1},
+    "license_clarity": {"type": "number", "minimum": 0, "maximum": 1},
+    "derivation_allowed": {"type": "boolean"}
+  }
+}
+
