@@ -37,10 +37,11 @@ REGISTER → AUTHORIZE → SNAPSHOT → EXTRACT_INTENT_DNA → ANALYZE
 10. [v0.1 API·DB·화면·테스트 명세](docs/10-v0.1-product-spec.md)
 11. [Intent_DNA 기법](docs/11-intent-dna.md)
 12. [실행계획과 설계 잠금](docs/12-execution-plan.md)
+13. [ARKAON 실전 역할 검증·효율 계측](docs/13-role-benchmark.md)
 
 ## 구현 게이트
 
-현재 상태는 **DESIGN COMPLETE / IMPLEMENT HOLD**입니다. 구현은 설계 승인, 위협모델 검토, 저장소 공개범위 확인 후 시작합니다.
+현재 상태는 **#025 ROLE BENCHMARK IMPLEMENTED / CI VERIFICATION PENDING**입니다. 구현은 보호된 브랜치·PR·CI 절차로 진행하며, Intent_DNA 변경과 소유자산 승격은 사람의 최종 승인을 유지합니다.
 
 ## 공개 저장소 정책
 
