@@ -6,7 +6,12 @@ from apf.development_orchestrator import (
     Worker,
     task_contract,
 )
-from apf.worker_runtime import ArkaonWorkerRuntime, MemoryReceiptSink, WorkerExecution
+from apf.worker_runtime import (
+    ArkaonWorkerPool,
+    ArkaonWorkerRuntime,
+    MemoryReceiptSink,
+    WorkerExecution,
+)
 
 
 class Executor:
@@ -88,3 +93,36 @@ def test_worker_without_eligible_task_returns_idle():
         MemoryReceiptSink(),
     )
     assert worker.run_once() is None
+
+
+def test_worker_pool_claims_independent_tasks_without_duplicate_execution():
+    orchestrator = DevelopmentOrchestrator()
+    tasks = [
+        orchestrator.submit(
+            task_contract(
+                TaskKind.BUILD,
+                intent_fingerprint="a" * 64,
+                objective=f"build-{index}",
+                allowed_paths=("src/",),
+                expected_artifacts=("implementation.patch",),
+            )
+        )
+        for index in range(2)
+    ]
+    receipts = MemoryReceiptSink()
+    execution = WorkerExecution(
+        TaskResult(("implementation.patch",), ("pytest",), "PASS"),
+        ("src/feature.py",),
+    )
+    workers = tuple(
+        ArkaonWorkerRuntime(
+            orchestrator,
+            Worker(f"arkaon-builder-{index}", frozenset({TaskKind.BUILD})),
+            Executor(execution),
+            receipts,
+        )
+        for index in range(2)
+    )
+    completed = ArkaonWorkerPool(workers).run_available()
+    assert len(completed) == 2
+    assert {receipt.task_id for receipt in completed} == {task.task_id for task in tasks}
