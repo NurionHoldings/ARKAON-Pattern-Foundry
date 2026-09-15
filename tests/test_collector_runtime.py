@@ -1,7 +1,12 @@
 from pathlib import Path
 from threading import Event
 
-from apf.collector_runtime import CollectorRuntime, MemoryAuditSink, load_policy
+from apf.collector_runtime import (
+    CollectorRuntime,
+    MemoryAuditSink,
+    MemoryContentHashStore,
+    load_policy,
+)
 from apf.continuous_collection import CollectionCandidate, ContinuousCollectionPolicy
 from apf.external_learning import SourceKind
 
@@ -67,6 +72,20 @@ def test_runtime_deduplicates_fetched_content_and_audits_every_decision():
     assert result.duplicate == 1
     assert len(audit.events) == 2
     assert audit.events[1].decision == "DUPLICATE_CONTENT"
+
+
+def test_runtime_uses_injected_hash_store_across_instances():
+    hashes = MemoryContentHashStore()
+    first = CollectorRuntime(
+        ContinuousCollectionPolicy(), Provider(candidate()), Fetcher(), MemoryAuditSink(),
+        content_hashes=hashes,
+    )
+    second = CollectorRuntime(
+        ContinuousCollectionPolicy(), Provider(candidate()), Fetcher(), MemoryAuditSink(),
+        content_hashes=hashes,
+    )
+    assert first.run_once().collected == 1
+    assert second.run_once().duplicate == 1
 
 
 def test_oversized_response_is_not_collected():
