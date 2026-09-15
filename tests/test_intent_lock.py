@@ -66,11 +66,34 @@ def test_locked_intent_mutation_creates_new_approved_version_and_audit_event():
     original = complete_dna()
     locked = lock_intent(original, approval(fingerprint(original))).intent_dna
     replacement = complete_dna("v2")
-    result = approve_mutation(locked, replacement, approval(locked.fingerprint))
+    result = approve_mutation(
+        locked,
+        replacement,
+        approval(
+            locked.fingerprint,
+            expected_resulting_fingerprint=fingerprint(replacement),
+        ),
+    )
     assert result.intent_dna.locked
     assert result.intent_dna.fingerprint != locked.fingerprint
     assert result.audit_event.previous_fingerprint == locked.fingerprint
     assert result.audit_event.event_type == "INTENT_DNA_MUTATION_APPROVED"
+
+
+def test_approval_for_different_replacement_cannot_authorize_mutation():
+    original = complete_dna()
+    locked = lock_intent(original, approval(fingerprint(original))).intent_dna
+    approved_replacement = complete_dna("approved")
+    substituted_replacement = complete_dna("substituted")
+    with pytest.raises(IntentLockDenied, match="UNAPPROVED_MUTATION_RESULT"):
+        approve_mutation(
+            locked,
+            substituted_replacement,
+            approval(
+                locked.fingerprint,
+                expected_resulting_fingerprint=fingerprint(approved_replacement),
+            ),
+        )
 
 
 def test_unlocked_intent_cannot_enter_mutation_path():
