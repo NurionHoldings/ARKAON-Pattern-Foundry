@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
-from pathlib import PurePosixPath
+from pathlib import Path, PurePosixPath
 from typing import Protocol
 from uuid import UUID
 
@@ -13,6 +13,7 @@ from .development_orchestrator import (
     TaskStatus,
     Worker,
 )
+from .execution_sandbox import prepare_execution_sandbox, verify_attestation
 
 
 @dataclass(frozen=True)
@@ -22,7 +23,7 @@ class WorkerExecution:
 
 
 class WorkerExecutor(Protocol):
-    def execute(self, task: TaskContract) -> WorkerExecution: ...
+    def execute(self, task: TaskContract, *, sandbox_policy, attestation) -> WorkerExecution: ...
 
 
 @dataclass(frozen=True)
@@ -55,31 +56,49 @@ class ArkaonWorkerRuntime:
         worker: Worker,
         executor: WorkerExecutor,
         receipts: ReceiptSink,
+        *,
+        worktree_root: str | Path,
     ) -> None:
         self.orchestrator = orchestrator
         self.worker = worker
         self.executor = executor
         self.receipts = receipts
+        self.worktree_root = Path(worktree_root)
 
     def run_once(self) -> ExecutionReceipt | None:
         task = self.orchestrator.claim(self.worker)
         if task is None:
             return None
         try:
-            execution = self.executor.execute(task)
+            policy, attestation = prepare_execution_sandbox(
+                task, worktree_root=self.worktree_root
+            )
+            if not verify_attestation(policy, attestation):
+                raise ValueError("INVALID_SANDBOX_ATTESTATION")
+            execution = self.executor.execute(
+                task,
+                sandbox_policy=policy,
+                attestation=attestation,
+            )
             if not _within_scope(execution.touched_paths, task.allowed_paths):
                 result = TaskResult((), ("SCOPE_CHECK_FAILED",), "FAIL")
                 failure_code = "SCOPE_VIOLATION"
             else:
                 result = execution.result
                 failure_code = None if result.outcome == "PASS" else "EXECUTION_FAILED"
-            completed = self.orchestrator.complete(task.task_id, task.lease_token, result)
+            completed = self.orchestrator.complete(
+                task.task_id,
+                task.lease_token,
+                self.worker.worker_id,
+                result,
+            )
             touched_paths = execution.touched_paths
         except (OSError, ValueError) as exc:
             failure_code = f"EXECUTOR_ERROR:{type(exc).__name__}"
             completed = self.orchestrator.complete(
                 task.task_id,
                 task.lease_token,
+                self.worker.worker_id,
                 TaskResult((), (failure_code,), "FAIL"),
             )
             touched_paths = ()

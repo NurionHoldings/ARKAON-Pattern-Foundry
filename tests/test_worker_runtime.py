@@ -19,7 +19,7 @@ class Executor:
         self.execution = execution
         self.error = error
 
-    def execute(self, task):
+    def execute(self, task, *, sandbox_policy, attestation):
         if self.error:
             raise self.error
         return self.execution
@@ -42,6 +42,7 @@ def runtime(executor):
         Worker("arkaon-builder", frozenset({TaskKind.BUILD})),
         executor,
         receipts,
+        worktree_root="/tmp/arkaon-worktree",
     )
     return task, receipts, worker_runtime
 
@@ -91,6 +92,7 @@ def test_worker_without_eligible_task_returns_idle():
         Worker("arkaon-verifier", frozenset({TaskKind.VERIFY})),
         Executor(),
         MemoryReceiptSink(),
+        worktree_root="/tmp/arkaon-worktree",
     )
     assert worker.run_once() is None
 
@@ -120,6 +122,7 @@ def test_worker_pool_claims_independent_tasks_without_duplicate_execution():
             Worker(f"arkaon-builder-{index}", frozenset({TaskKind.BUILD})),
             Executor(execution),
             receipts,
+            worktree_root="/tmp/arkaon-worktree",
         )
         for index in range(2)
     )

@@ -125,6 +125,7 @@ def serialize_task_contract(contract: TaskContract) -> str:
     payload: dict[str, Any] = {
         "allowed_paths": list(contract.allowed_paths),
         "approval_ref": contract.approval_ref,
+        "claimed_by": contract.claimed_by,
         "dependencies": [str(dependency) for dependency in contract.dependencies],
         "expected_artifacts": list(contract.expected_artifacts),
         "intent_fingerprint": contract.intent_fingerprint,
@@ -135,14 +136,14 @@ def serialize_task_contract(contract: TaskContract) -> str:
         "requested_operations": list(contract.requested_operations),
         "status": contract.status.value,
         "task_id": str(contract.task_id),
-        "version": 1,
+        "version": 2,
     }
     return json.dumps(payload, ensure_ascii=False, separators=(",", ":"), sort_keys=True)
 
 
 def deserialize_task_contract(payload: str) -> TaskContract:
     data = json.loads(payload)
-    if not isinstance(data, dict) or data.get("version") != 1:
+    if not isinstance(data, dict) or data.get("version") not in (1, 2):
         raise ValueError("UNSUPPORTED_TASK_PAYLOAD_VERSION")
     required = {
         "allowed_paths",
@@ -159,6 +160,8 @@ def deserialize_task_contract(payload: str) -> TaskContract:
         "task_id",
         "version",
     }
+    if data["version"] == 2:
+        required.add("claimed_by")
     if set(data) != required:
         raise ValueError("INVALID_TASK_PAYLOAD_FIELDS")
     return TaskContract(
@@ -173,6 +176,11 @@ def deserialize_task_contract(payload: str) -> TaskContract:
         approval_ref=None if data["approval_ref"] is None else _string(data["approval_ref"]),
         status=TaskStatus(data["status"]),
         lease_token=None if data["lease_token"] is None else UUID(data["lease_token"]),
+        claimed_by=(
+            None
+            if data.get("claimed_by") is None
+            else _string(data["claimed_by"])
+        ),
         produced_artifacts=_string_tuple(data["produced_artifacts"]),
     )
 

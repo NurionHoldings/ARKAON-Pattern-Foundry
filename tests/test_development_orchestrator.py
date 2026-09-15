@@ -66,9 +66,11 @@ def test_dependency_blocks_work_until_predecessor_passes():
     assert orchestrator.claim(builder) is None
     scout = Worker("arkaon-scout", frozenset({TaskKind.RESEARCH}))
     claimed = orchestrator.claim(scout)
+    assert claimed.claimed_by == scout.worker_id
     orchestrator.complete(
         research.task_id,
         claimed.lease_token,
+        scout.worker_id,
         TaskResult(("evidence.json",), ("provenance-check",), "PASS"),
     )
     assert orchestrator.claim(builder).task_id == build.task_id
@@ -82,6 +84,20 @@ def test_stale_worker_cannot_overwrite_task_result():
         orchestrator.complete(
             submitted.task_id,
             uuid4(),
+            "scout",
+            TaskResult(("evidence.json",), ("check",), "PASS"),
+        )
+
+
+def test_worker_cannot_complete_another_workers_lease():
+    orchestrator = DevelopmentOrchestrator()
+    submitted = orchestrator.submit(contract())
+    claimed = orchestrator.claim(Worker("scout-a", frozenset({TaskKind.RESEARCH})))
+    with pytest.raises(OrchestrationDenied, match="WORKER_IDENTITY_MISMATCH"):
+        orchestrator.complete(
+            submitted.task_id,
+            claimed.lease_token,
+            "scout-b",
             TaskResult(("evidence.json",), ("check",), "PASS"),
         )
 
@@ -93,6 +109,7 @@ def test_missing_artifact_or_check_fails_task():
     result = orchestrator.complete(
         submitted.task_id,
         claimed.lease_token,
+        "scout",
         TaskResult((), (), "PASS"),
     )
     assert result.status == TaskStatus.FAILED
