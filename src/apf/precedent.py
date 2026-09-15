@@ -32,6 +32,15 @@ class BenchmarkPlan:
     ready_for_independent_design: bool
 
 
+@dataclass(frozen=True)
+class EthernianAssistanceRequest:
+    feature: str
+    blockage_reason: str
+    requested_help: tuple[str, ...]
+    prohibited_help: tuple[str, ...]
+    status: str
+
+
 def assess_precedent(value: Precedent, *, threshold: float = 0.70) -> PrecedentAssessment:
     score = round(
         value.authority * 0.20
@@ -69,4 +78,28 @@ def independent_groups_for_feature(feature: str, precedents: list[Precedent]) ->
             for item in precedents
             if item.feature == feature and assess_precedent(item).qualified
         }
+    )
+
+
+def request_ethernian_assistance(feature: str, blockage_reason: str) -> EthernianAssistanceRequest:
+    """Escalate a blocked precedent without asking for restricted copying or access bypass."""
+    if not feature.strip() or not blockage_reason.strip():
+        raise ValueError("feature and blockage_reason are required")
+    return EthernianAssistanceRequest(
+        feature=feature,
+        blockage_reason=blockage_reason,
+        requested_help=(
+            "FIND_ALTERNATIVE_PRECEDENTS",
+            "ABSTRACT_FUNCTIONAL_PRINCIPLES",
+            "DRAFT_CLEAN_ROOM_SPECIFICATION",
+            "DESIGN_INDEPENDENT_ACCEPTANCE_TESTS",
+            "CHECK_INTENT_DNA_ALIGNMENT",
+        ),
+        prohibited_help=(
+            "COPY_RESTRICTED_SOURCE",
+            "BYPASS_ACCESS_CONTROL",
+            "REMOVE_LICENSE_NOTICE",
+            "RECONSTRUCT_PROPRIETARY_EXPRESSION",
+        ),
+        status="AWAITING_ETHERNIAN_ASSISTANCE",
     )
