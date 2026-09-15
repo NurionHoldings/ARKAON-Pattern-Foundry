@@ -38,10 +38,11 @@ REGISTER → AUTHORIZE → SNAPSHOT → EXTRACT_INTENT_DNA → ANALYZE
 11. [Intent_DNA 기법](docs/11-intent-dna.md)
 12. [실행계획과 설계 잠금](docs/12-execution-plan.md)
 13. [ARKAON 실전 역할 검증·효율 계측](docs/13-role-benchmark.md)
+14. [증거 기반 실전 벤치마크 캠페인](docs/14-evidence-benchmark-campaign.md)
 
 ## 구현 게이트
 
-현재 상태는 **#025 ROLE BENCHMARK IMPLEMENTED / CI VERIFICATION PENDING**입니다. 구현은 보호된 브랜치·PR·CI 절차로 진행하며, Intent_DNA 변경과 소유자산 승격은 사람의 최종 승인을 유지합니다.
+현재 상태는 **#026 EVIDENCE BENCHMARK CAMPAIGN IMPLEMENTED / CI VERIFICATION PENDING**입니다. 구현은 보호된 브랜치·PR·CI 절차로 진행하며, Intent_DNA 변경과 소유자산 승격은 사람의 최종 승인을 유지합니다.
 
 ## 공개 저장소 정책
 
