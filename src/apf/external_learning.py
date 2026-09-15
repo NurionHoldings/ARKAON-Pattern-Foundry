@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import StrEnum
+from math import floor
 
 
 class SourceKind(StrEnum):
@@ -68,9 +69,18 @@ def plan_learning(
         return []
     eligible = [s for s in sources if s.intent_relevance >= 0.30 and not s.content_hash_seen]
     ranked = sorted(eligible, key=lambda s: (-score_source(s), s.source_id))
-    external_slots = min(max_sources, round(max_sources * external_target_ratio))
+    ratio = min(max(external_target_ratio, 0.0), 1.0)
+    external_slots = floor(max_sources * ratio)
+    internal_slots = max_sources - external_slots
+    external = [s for s in ranked if s.is_external]
+    internal = [s for s in ranked if not s.is_external]
+
+    # Reserve both sides of the governed budget before filling unused capacity.
+    # This prevents high-scoring external evidence from silently erasing the
+    # internal operational baseline when both pools are available.
     selected: list[LearningSource] = []
-    selected.extend([s for s in ranked if s.is_external][:external_slots])
+    selected.extend(external[:external_slots])
+    selected.extend(internal[:internal_slots])
     selected_ids = {s.source_id for s in selected}
     selected.extend([s for s in ranked if s.source_id not in selected_ids][: max_sources - len(selected)])
     return [

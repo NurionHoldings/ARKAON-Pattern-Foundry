@@ -1,10 +1,46 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import UTC, datetime
 
 from .domain import Classification, RiskClass
 
 HIGH_RISK_DOMAINS = frozenset({"SECURITY", "AUTHORIZATION", "PAYMENT", "SETTLEMENT", "PRIVACY"})
+FOUNDRY_REPOSITORY = "NurionHoldings/ARKAON-Pattern-Foundry"
+SAFE_AUTONOMOUS_ACTIONS = frozenset(
+    {"analyze", "design", "edit", "test", "commit", "open_pull_request", "fix_ci"}
+)
+
+
+@dataclass(frozen=True)
+class AutonomousGrant:
+    """Repository-scoped authority granted by the owner for uninterrupted work."""
+
+    granted_by: str
+    repository: str
+    allowed_actions: frozenset[str]
+    revoked: bool = False
+    expires_at: datetime | None = None
+
+
+def can_execute_autonomously(
+    grant: AutonomousGrant,
+    *,
+    repository: str,
+    action: str,
+    now: datetime | None = None,
+) -> tuple[bool, str]:
+    """Evaluate a standing command without widening it beyond this Foundry repo."""
+    current = now or datetime.now(UTC)
+    if grant.revoked:
+        return False, "GRANT_REVOKED"
+    if grant.expires_at is not None and grant.expires_at <= current:
+        return False, "GRANT_EXPIRED"
+    if grant.repository != FOUNDRY_REPOSITORY or repository != grant.repository:
+        return False, "REPOSITORY_OUT_OF_SCOPE"
+    if action not in grant.allowed_actions or action not in SAFE_AUTONOMOUS_ACTIONS:
+        return False, "ACTION_OUT_OF_SCOPE"
+    return True, "AUTHORIZED_STANDING_COMMAND"
 
 
 @dataclass(frozen=True)

@@ -10,6 +10,22 @@ class InvalidTransition(ValueError):
     pass
 
 
+# A run is active while it can still make progress, including paused states.
+# Keep this set aligned with uq_active_run_per_snapshot in the SQL migration.
+ACTIVE_RUN_STATES = frozenset(
+    {
+        RunState.QUEUED,
+        RunState.INTENT_SCOPING,
+        RunState.ANALYZING,
+        RunState.ABSTRACTING,
+        RunState.VALIDATING,
+        RunState.REVIEW_PENDING,
+        RunState.PARTIAL_REVIEW,
+        RunState.HOLD,
+    }
+)
+
+
 TARGET_TRANSITIONS: Mapping[TargetState, frozenset[TargetState]] = {
     TargetState.DRAFT: frozenset({TargetState.AUTHORIZATION_PENDING, TargetState.ARCHIVED}),
     TargetState.AUTHORIZATION_PENDING: frozenset({TargetState.AUTHORIZED, TargetState.SUSPENDED}),
