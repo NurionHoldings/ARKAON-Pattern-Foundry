@@ -21,6 +21,7 @@ class HumanApproval:
     decision: str
     decided_at: datetime
     is_human: bool = True
+    expected_resulting_fingerprint: str | None = None
 
 
 @dataclass(frozen=True)
@@ -76,6 +77,8 @@ def approve_mutation(
         raise IntentLockDenied("LOCKED_INTENT_REQUIRED")
     _validate_approval(approval, locked_dna.fingerprint)
     replacement_fingerprint = fingerprint(replacement)
+    if approval.expected_resulting_fingerprint != replacement_fingerprint:
+        raise IntentLockDenied("UNAPPROVED_MUTATION_RESULT")
     if replacement_fingerprint == locked_dna.fingerprint:
         raise IntentLockDenied("NO_INTENT_CHANGE")
     if not evaluate_gate(replacement).ready or not can_lock_intent(score_intent(replacement)):
