@@ -1,9 +1,12 @@
+from dataclasses import replace
+from datetime import UTC, datetime, timedelta
+
 import pytest
 
 from apf.learning_evaluator import (
     AssetConceptReportBlocked,
     CandidateLesson,
-    EthernianLessonVerification,
+    EthernianVerificationService,
     LearningDecision,
     authorize_asset_concept_report,
     evaluate_lesson,
@@ -26,23 +29,28 @@ def candidate(**changes: object) -> CandidateLesson:
     return CandidateLesson(**values)  # type: ignore[arg-type]
 
 
-def verification(evaluation, **changes: object) -> EthernianLessonVerification:
-    values = {
-        "verifier": "ETHERNIAN",
-        "candidate_fingerprint": evaluation.candidate_fingerprint,
-        "decision": LearningDecision.PASS,
-        "checks": ("PROVENANCE", "INTENT", "CLEAN_ROOM", "REGRESSION"),
-    }
-    values.update(changes)
-    return EthernianLessonVerification(**values)  # type: ignore[arg-type]
+SECRET = b"evaluator-verification-secret-32-bytes-minimum"
+CHECKS = ("PROVENANCE", "INTENT_ALIGNMENT", "COUNTEREXAMPLE", "REGRESSION", "NOVELTY", "CLEAN_ROOM")
+
+
+def verification(service, evaluation):
+    return service.issue(
+        evaluation,
+        intent_fingerprint="intent-v1",
+        checks=CHECKS,
+        expires_at=datetime.now(UTC) + timedelta(minutes=5),
+    )
 
 
 def test_complete_candidate_passes_and_can_be_reported_after_ethernian_verification():
     result = evaluate_lesson(candidate())
+    service = EthernianVerificationService(SECRET)
 
     assert result.decision == LearningDecision.PASS
     assert result.failed_checks == ()
-    assert authorize_asset_concept_report(result, verification(result)).startswith("ETHERNIAN:lesson-1:")
+    assert authorize_asset_concept_report(
+        result, verification(service, result), intent_fingerprint="intent-v1", verification_service=service
+    ).startswith("ETHERNIAN:lesson-1:")
 
 
 @pytest.mark.parametrize("field", ["provenance_ref", "clean_room_confirmed"])
@@ -71,26 +79,67 @@ def test_recoverable_failures_become_next_learning_questions():
 
 def test_report_is_blocked_before_ethernian_verification():
     result = evaluate_lesson(candidate())
+    service = EthernianVerificationService(SECRET)
 
     with pytest.raises(AssetConceptReportBlocked, match="ETHERNIAN_VERIFICATION_REQUIRED"):
-        authorize_asset_concept_report(result, None)
+        authorize_asset_concept_report(
+            result, None, intent_fingerprint="intent-v1", verification_service=service
+        )
 
 
 def test_report_rejects_verification_bound_to_different_candidate():
     result = evaluate_lesson(candidate())
+    service = EthernianVerificationService(SECRET)
+    signed = verification(service, result)
 
-    with pytest.raises(AssetConceptReportBlocked, match="FINGERPRINT_MISMATCH"):
+    with pytest.raises(AssetConceptReportBlocked, match="CLAIMS_TAMPERED"):
         authorize_asset_concept_report(
             result,
-            verification(result, candidate_fingerprint="0" * 64),
+            replace(signed, candidate_fingerprint="0" * 64),
+            intent_fingerprint="intent-v1",
+            verification_service=service,
         )
 
 
 def test_failed_lesson_cannot_be_reported_even_with_verification():
     result = evaluate_lesson(candidate(novelty=0.1))
+    service = EthernianVerificationService(SECRET)
 
     with pytest.raises(AssetConceptReportBlocked, match="LESSON_EVALUATION_NOT_PASSED"):
-        authorize_asset_concept_report(result, verification(result))
+        authorize_asset_concept_report(
+            result, verification(service, result), intent_fingerprint="intent-v1", verification_service=service
+        )
+
+
+def test_verification_blocks_reuse_expiry_and_incomplete_checks():
+    result = evaluate_lesson(candidate())
+    service = EthernianVerificationService(SECRET)
+    signed = verification(service, result)
+    authorize_asset_concept_report(
+        result, signed, intent_fingerprint="intent-v1", verification_service=service
+    )
+    with pytest.raises(AssetConceptReportBlocked, match="ALREADY_USED"):
+        authorize_asset_concept_report(
+            result, signed, intent_fingerprint="intent-v1", verification_service=service
+        )
+
+    expired = service.issue(
+        result,
+        intent_fingerprint="intent-v1",
+        checks=CHECKS,
+        expires_at=datetime.now(UTC) - timedelta(seconds=1),
+    )
+    with pytest.raises(AssetConceptReportBlocked, match="EXPIRED"):
+        authorize_asset_concept_report(
+            result, expired, intent_fingerprint="intent-v1", verification_service=service
+        )
+    with pytest.raises(AssetConceptReportBlocked, match="INCOMPLETE"):
+        service.issue(
+            result,
+            intent_fingerprint="intent-v1",
+            checks=CHECKS[:-1],
+            expires_at=datetime.now(UTC) + timedelta(minutes=5),
+        )
 
 
 @pytest.mark.parametrize("field,value", [("intent_alignment", 1.1), ("novelty", -0.1)])
