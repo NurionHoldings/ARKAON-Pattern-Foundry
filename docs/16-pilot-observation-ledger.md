@@ -7,7 +7,8 @@
 ## 신뢰 경계
 
 - 아르카온 worker는 작업 영수증을 만들지만 개입·재작업·시작·종료 수치를 직접 보고하지 않는다.
-- 에테르니언 관측자가 사건을 서명한다. 서명 키 원문은 원장에 저장하지 않는다.
+- 원장은 다음 순번·직전 해시·관측 초안을 담은 불변 challenge만 발급한다. 원장 밖의 에테르니언 관측자가 Ed25519 개인키로 challenge 전체를 서명해 attestation envelope을 만든다.
+- 원장은 신뢰 공개키만 보유하며 envelope만 받는다. 따라서 원장이나 worker를 가진 호출자는 에테르니언 서명을 생성할 수 없다.
 - 원장에는 제한된 enum, 안전한 식별자, 불투명 증거 참조와 안전검사를 통과한 실행 영수증 메타데이터만 저장한다. 업무 원문을 받는 필드는 없다.
 - 식별자와 증거 참조는 `learning_safety`로 검사하며 PII, secret, URL·경로형 원문을 거부한다.
 
@@ -22,6 +23,7 @@
 5. 관측자·키 경계
 6. payload 해시와 서명
 7. trial의 `START → (REWORK | INTERVENTION)* → FINISH` 경계
+8. stale challenge, attestation replay, 초안 변조, 잘못된 키, 순번 이탈
 
 ## 캠페인 변환과 판정
 
