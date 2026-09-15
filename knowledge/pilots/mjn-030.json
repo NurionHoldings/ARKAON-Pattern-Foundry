@@ -1,0 +1,148 @@
+{
+  "schema_version": "apf.owned-platform-readonly-manifest/v1",
+  "pilot_id": "APF-PILOT-030-MJN",
+  "source": {
+    "repository": "NurionHoldings/mjn",
+    "ref": "main",
+    "commit": "f11dc338600041805b54a04a408f43b53b6d9df9",
+    "tree_sha1": "cc855f500f7f0122fe8a369ec5382db962657972"
+  },
+  "authorization": {
+    "relationship": "FIRST_PARTY",
+    "basis": "OWNER_AUTHORIZED_ANALYSIS",
+    "license_scope": "ANALYSIS_ONLY_NO_CODE_REPUBLICATION",
+    "provenance_policy": "CANONICAL_IDENTITY_AND_SHA256_ONLY"
+  },
+  "boundaries": {
+    "read_only_source": true,
+    "copy_source_material": false,
+    "mutate_intent_dna": false,
+    "promote_owned_asset": false,
+    "sensitive_value_policy": "REPORT_VIOLATION_CODE_ONLY"
+  },
+  "evidence": [
+    {
+      "path": "app/core/auth_principal.py",
+      "blob_sha1": "818d82be3db8feed2994c5ddf5948d521e40f7b7",
+      "canonical_identity": "github:NurionHoldings/mjn@f11dc338600041805b54a04a408f43b53b6d9df9:app/core/auth_principal.py#blob:818d82be3db8feed2994c5ddf5948d521e40f7b7",
+      "evidence_ref": "sha256:9e4d788712fdd7d962d3f4bd78205c0b9cc01d51af8fadf6d3bfaefe61a75ea9",
+      "kind": "CODE"
+    },
+    {
+      "path": "app/services/auth_principal_service.py",
+      "blob_sha1": "1a15825e1ccd3339a4a1deb672e33cca1be3f373",
+      "canonical_identity": "github:NurionHoldings/mjn@f11dc338600041805b54a04a408f43b53b6d9df9:app/services/auth_principal_service.py#blob:1a15825e1ccd3339a4a1deb672e33cca1be3f373",
+      "evidence_ref": "sha256:c836e51f9d09e7c54e7093cd7f8ca3f3e47c9ac456e902d834ca5b24f4cdeeff",
+      "kind": "CODE"
+    },
+    {
+      "path": "app/services/marketplace_order_access_service.py",
+      "blob_sha1": "8c48b6e683d681308fb50a7864f6ab8f47356e16",
+      "canonical_identity": "github:NurionHoldings/mjn@f11dc338600041805b54a04a408f43b53b6d9df9:app/services/marketplace_order_access_service.py#blob:8c48b6e683d681308fb50a7864f6ab8f47356e16",
+      "evidence_ref": "sha256:a06d9cdd31fd32032a6414ecd0eded55738dffbdceb6e8f3d25f250e1125426a",
+      "kind": "CODE"
+    },
+    {
+      "path": "app/services/marketplace_trade_service.py",
+      "blob_sha1": "8e823575def3a2814bf65f148abcd2152030cfb9",
+      "canonical_identity": "github:NurionHoldings/mjn@f11dc338600041805b54a04a408f43b53b6d9df9:app/services/marketplace_trade_service.py#blob:8e823575def3a2814bf65f148abcd2152030cfb9",
+      "evidence_ref": "sha256:e1b175c1f9ad43a4536d799822dfe853e226c54e2ce889cf868abe19b9cd947b",
+      "kind": "CODE"
+    },
+    {
+      "path": "app/repositories/order_trade_repository.py",
+      "blob_sha1": "7e5d5e1b4819c6b27e0bf9b5bfa9160564ed4e3a",
+      "canonical_identity": "github:NurionHoldings/mjn@f11dc338600041805b54a04a408f43b53b6d9df9:app/repositories/order_trade_repository.py#blob:7e5d5e1b4819c6b27e0bf9b5bfa9160564ed4e3a",
+      "evidence_ref": "sha256:6a377f72932017f16969143f83187d50f54ac8760772cdc71100b1a353ea0676",
+      "kind": "CODE"
+    },
+    {
+      "path": "app/services/marketplace_settlement_service.py",
+      "blob_sha1": "14d3fe4c88d9ad8a53e4543648b27a015023aa2d",
+      "canonical_identity": "github:NurionHoldings/mjn@f11dc338600041805b54a04a408f43b53b6d9df9:app/services/marketplace_settlement_service.py#blob:14d3fe4c88d9ad8a53e4543648b27a015023aa2d",
+      "evidence_ref": "sha256:3c39f652c8be55071566d1123226aebe0852039f468294f74c4f80d5722ca15a",
+      "kind": "CODE"
+    },
+    {
+      "path": "app/services/partner_lead_payment_service.py",
+      "blob_sha1": "7e875081bdd620bf611693eb5bb247c612f67758",
+      "canonical_identity": "github:NurionHoldings/mjn@f11dc338600041805b54a04a408f43b53b6d9df9:app/services/partner_lead_payment_service.py#blob:7e875081bdd620bf611693eb5bb247c612f67758",
+      "evidence_ref": "sha256:c02e025c41d65a64617495ce1323ba0997565db61990aa2f3cd1ea55ab6da37e",
+      "kind": "CODE"
+    },
+    {
+      "path": "app/services/audit_service.py",
+      "blob_sha1": "8b51be9cd64bc765634a37132e6eec9836ef83e2",
+      "canonical_identity": "github:NurionHoldings/mjn@f11dc338600041805b54a04a408f43b53b6d9df9:app/services/audit_service.py#blob:8b51be9cd64bc765634a37132e6eec9836ef83e2",
+      "evidence_ref": "sha256:fbceff215a702653e4754cdf57d5e8f29250035aeda8a825fe564ecab8babd7b",
+      "kind": "CODE"
+    },
+    {
+      "path": "tests/test_assignment_ownership_security.py",
+      "blob_sha1": "bb806fb63d8404fc8905a1ce02876880dc051ed5",
+      "canonical_identity": "github:NurionHoldings/mjn@f11dc338600041805b54a04a408f43b53b6d9df9:tests/test_assignment_ownership_security.py#blob:bb806fb63d8404fc8905a1ce02876880dc051ed5",
+      "evidence_ref": "sha256:7121e0ba7e1ded2ae9a77130c524830a0e4f64a96b286c0c2df4a49a127337eb",
+      "kind": "TEST"
+    },
+    {
+      "path": "tests/test_marketplace_trade_buy.py",
+      "blob_sha1": "d02c4bae4a08159ee819ef9183e2112fb39fc184",
+      "canonical_identity": "github:NurionHoldings/mjn@f11dc338600041805b54a04a408f43b53b6d9df9:tests/test_marketplace_trade_buy.py#blob:d02c4bae4a08159ee819ef9183e2112fb39fc184",
+      "evidence_ref": "sha256:de6ad6474ca1b35b2ea36fe62cfc5069a91ccc2ee5c60bead33b46294e27b3c5",
+      "kind": "TEST"
+    },
+    {
+      "path": "tests/test_marketplace_settlement_fee_linkage.py",
+      "blob_sha1": "6d77271966072e6519966fe304ce730fdfe74acd",
+      "canonical_identity": "github:NurionHoldings/mjn@f11dc338600041805b54a04a408f43b53b6d9df9:tests/test_marketplace_settlement_fee_linkage.py#blob:6d77271966072e6519966fe304ce730fdfe74acd",
+      "evidence_ref": "sha256:8776b3161f291044ba6b741a67bb3b6828ec8bdc931e9fb287f96b19a5fb2e19",
+      "kind": "TEST"
+    },
+    {
+      "path": "tests/test_payment_trust_boundary_audit.py",
+      "blob_sha1": "bceceaaa6b451014e67af77457a3d1394e8be0da",
+      "canonical_identity": "github:NurionHoldings/mjn@f11dc338600041805b54a04a408f43b53b6d9df9:tests/test_payment_trust_boundary_audit.py#blob:bceceaaa6b451014e67af77457a3d1394e8be0da",
+      "evidence_ref": "sha256:0092b117c50bd23cc83f23cd6a57b65d4b9e4df09bc9f50127d35255b0be1c8b",
+      "kind": "TEST"
+    }
+  ],
+  "candidates": [
+    {
+      "name": "principal-ownership-recheck",
+      "status": "CANDIDATE",
+      "review_status": "ETHERNIAN_REVIEW_REQUIRED",
+      "abstract_spec": {
+        "intent": "Resolve an authenticated principal, then recheck current authority and resource ownership at use time.",
+        "invariants": ["caller identity is server-derived", "resource scope is never widened by request input", "inactive authority fails closed"],
+        "verification": ["cross-owner access denied", "role transition rechecked", "response minimizes non-owner data"]
+      },
+      "evidence_refs": ["sha256:9e4d788712fdd7d962d3f4bd78205c0b9cc01d51af8fadf6d3bfaefe61a75ea9", "sha256:c836e51f9d09e7c54e7093cd7f8ca3f3e47c9ac456e902d834ca5b24f4cdeeff", "sha256:a06d9cdd31fd32032a6414ecd0eded55738dffbdceb6e8f3d25f250e1125426a", "sha256:7121e0ba7e1ded2ae9a77130c524830a0e4f64a96b286c0c2df4a49a127337eb"],
+      "owned_asset": false
+    },
+    {
+      "name": "transactional-idempotent-transition",
+      "status": "CANDIDATE",
+      "review_status": "ETHERNIAN_REVIEW_REQUIRED",
+      "abstract_spec": {
+        "intent": "Make a contested state transition exactly once under retry and concurrency.",
+        "invariants": ["same actor and key replay the same result", "key reuse across different intent conflicts", "only one terminal claimant wins"],
+        "verification": ["replay returns original outcome", "changed-command collision denied", "concurrent contenders have one winner"]
+      },
+      "evidence_refs": ["sha256:e1b175c1f9ad43a4536d799822dfe853e226c54e2ce889cf868abe19b9cd947b", "sha256:6a377f72932017f16969143f83187d50f54ac8760772cdc71100b1a353ea0676", "sha256:de6ad6474ca1b35b2ea36fe62cfc5069a91ccc2ee5c60bead33b46294e27b3c5"],
+      "owned_asset": false
+    },
+    {
+      "name": "financial-sot-audit-chain",
+      "status": "CANDIDATE",
+      "review_status": "ETHERNIAN_REVIEW_REQUIRED",
+      "abstract_spec": {
+        "intent": "Derive financial transitions from trusted payment and policy sources while preserving immutable snapshots and audit evidence.",
+        "invariants": ["client monetary input is not authoritative", "payment validity is rechecked before dependent transition", "settlement snapshots remain immutable"],
+        "verification": ["forged paid state denied", "reversal blocks downstream action", "duplicate payout action is idempotent", "actor-scoped audit event exists"]
+      },
+      "evidence_refs": ["sha256:3c39f652c8be55071566d1123226aebe0852039f468294f74c4f80d5722ca15a", "sha256:c02e025c41d65a64617495ce1323ba0997565db61990aa2f3cd1ea55ab6da37e", "sha256:fbceff215a702653e4754cdf57d5e8f29250035aeda8a825fe564ecab8babd7b", "sha256:8776b3161f291044ba6b741a67bb3b6828ec8bdc931e9fb287f96b19a5fb2e19", "sha256:0092b117c50bd23cc83f23cd6a57b65d4b9e4df09bc9f50127d35255b0be1c8b"],
+      "owned_asset": false
+    }
+  ],
+  "role_flow": ["RESEARCH", "ANALYZE", "ARCHITECT", "BUILD", "TEST", "AUDIT"]
+}
