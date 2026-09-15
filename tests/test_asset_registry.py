@@ -104,8 +104,30 @@ def test_source_code_copy_cannot_be_promoted_as_independent_implementation():
         implementation_ref="src/copied.py",
         copied_source_code=True,
     )
-    with pytest.raises(AssetPromotionDenied, match="INDEPENDENT_IMPLEMENTATION_REQUIRED"):
+    with pytest.raises(AssetPromotionDenied, match="SOURCE_CODE_COPY_BLOCKED"):
         promote(value, AssetLifecycle.INDEPENDENT_IMPLEMENTATION)
+
+
+def test_copied_source_cannot_bypass_gate_from_later_stage():
+    value = record(
+        stage=AssetLifecycle.INDEPENDENTLY_VERIFIED,
+        principle_ref="principle:1",
+        implementation_ref="src/copied.py",
+        test_refs=("tests/test_copied.py",),
+        approval_ref="approval:human",
+        copied_source_code=True,
+    )
+    with pytest.raises(AssetPromotionDenied, match="SOURCE_CODE_COPY_BLOCKED"):
+        promote(value, AssetLifecycle.OWNED_ASSET)
+
+
+def test_owned_asset_requires_complete_evidence_even_from_later_stage():
+    value = record(
+        stage=AssetLifecycle.INDEPENDENTLY_VERIFIED,
+        approval_ref="approval:human",
+    )
+    with pytest.raises(AssetPromotionDenied, match="COMPLETE_ASSET_EVIDENCE_REQUIRED"):
+        promote(value, AssetLifecycle.OWNED_ASSET)
 
 
 def test_report_counts_every_stage_without_inflating_owned_assets():

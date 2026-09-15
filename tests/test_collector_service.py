@@ -3,7 +3,7 @@ import socket
 
 import pytest
 
-from apf.collector_service import JsonCandidateProvider, SafeHttpsFetcher
+from apf.collector_service import JsonCandidateProvider, SafeHttpsFetcher, _SafeRedirectHandler
 
 
 def test_json_provider_loads_explicit_sources(tmp_path):
@@ -48,3 +48,14 @@ def test_fetcher_blocks_private_network_targets(monkeypatch):
     candidate = type("Candidate", (), {"locator": "https://internal.example"})()
     with pytest.raises(ValueError, match="non-global"):
         SafeHttpsFetcher().fetch(candidate, 10)
+
+
+def test_every_redirect_target_is_revalidated():
+    checked = []
+    handler = _SafeRedirectHandler(checked.append)
+    request = __import__("urllib.request").request.Request("https://example.org")
+    redirected = handler.redirect_request(
+        request, None, 302, "Found", {}, "https://redirect.example.org/resource"
+    )
+    assert checked == ["https://redirect.example.org/resource"]
+    assert redirected.full_url == "https://redirect.example.org/resource"

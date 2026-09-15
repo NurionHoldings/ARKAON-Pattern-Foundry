@@ -42,8 +42,8 @@ class JsonCandidateProvider:
 
 
 class SafeHttpsFetcher:
-    def fetch(self, candidate: CollectionCandidate, max_bytes: int) -> bytes:
-        parsed = urlsplit(candidate.locator)
+    def _validate_locator(self, locator: str) -> None:
+        parsed = urlsplit(locator)
         if parsed.scheme != "https" or not parsed.hostname or parsed.username or parsed.password:
             raise ValueError("only credential-free HTTPS sources are allowed")
         addresses = socket.getaddrinfo(parsed.hostname, parsed.port or 443, type=socket.SOCK_STREAM)
@@ -51,12 +51,25 @@ class SafeHttpsFetcher:
             ip = ipaddress.ip_address(address[4][0])
             if not ip.is_global:
                 raise ValueError("private or non-global source address blocked")
+
+    def fetch(self, candidate: CollectionCandidate, max_bytes: int) -> bytes:
+        self._validate_locator(candidate.locator)
         request = urllib.request.Request(
             candidate.locator,
             headers={"User-Agent": "ARKAON-Pattern-Foundry/0.1"},
         )
-        with urllib.request.urlopen(request, timeout=15) as response:
+        opener = urllib.request.build_opener(_SafeRedirectHandler(self._validate_locator))
+        with opener.open(request, timeout=15) as response:
             return response.read(max_bytes)
+
+
+class _SafeRedirectHandler(urllib.request.HTTPRedirectHandler):
+    def __init__(self, validate_locator) -> None:
+        self._validate_locator = validate_locator
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        self._validate_locator(newurl)
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
 
 
 def main(argv: list[str] | None = None) -> int:

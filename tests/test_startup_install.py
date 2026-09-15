@@ -24,6 +24,15 @@ def test_windows_task_is_least_privilege_and_single_instance():
     artifact = build_startup_artifact("Windows", Path("C:/ARKAON/collector.json"))
     assert "<RunLevel>LeastPrivilege</RunLevel>" in artifact.content
     assert "<MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>" in artifact.content
+    assert 'encoding="UTF-8"' in artifact.content
+    assert "<WorkingDirectory>" in artifact.content
+
+
+def test_startup_command_uses_absolute_audit_and_state_paths():
+    artifact = build_startup_artifact("Linux", Path("/safe/collector.json"))
+    assert '"--audit" "/safe/arkaon-collection-audit.jsonl"' in artifact.content
+    assert '"--state" "/safe/arkaon-collection-state.sqlite3"' in artifact.content
+    assert 'WorkingDirectory="/safe"' in artifact.content
 
 
 def test_installer_writes_only_below_explicit_user_config_root(tmp_path):
