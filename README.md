@@ -43,10 +43,11 @@ REGISTER → AUTHORIZE → SNAPSHOT → EXTRACT_INTENT_DNA → ANALYZE
 16. [실전 관측 원장·파일럿 준비](docs/16-pilot-observation-ledger.md)
 17. [실전 관측 증거 번들·독립 검증](docs/17-pilot-evidence-bundle.md)
 18. [MJN 읽기 전용 분석 파일럿](docs/18-mjn-readonly-analysis-pilot.md)
+19. [Clean-room 유사 플랫폼 재구현](docs/19-clean-room-analog-synthesis.md)
 
 ## 구현 게이트
 
-현재 상태는 **#030 MJN READ-ONLY ANALYSIS PILOT / ETHERNIAN REVIEW REQUIRED**입니다. MJN의 고정 snapshot에서 원문을 복제하지 않고 canonical source identity와 SHA-256 evidence ref만 남겼으며, 세 개의 추상 패턴은 모두 `CANDIDATE`입니다. Intent_DNA 변경과 `OWNED_ASSET` 승격은 금지되어 있고 에테르니언 검토가 필요합니다. 구현은 보호된 브랜치·PR·CI 절차로 진행합니다.
+현재 상태는 **#031 CLEAN-ROOM ANALOG SYNTHESIS / ETHERNIAN REVIEW REQUIRED**입니다. #030의 세 후보를 최소 세 독립 공식 계열과 교차검증하고, 공급사 문구·코드·API를 복제하지 않은 세 개의 실행 가능한 적합성 모델로 재구성했습니다. 결과는 모두 `ANALOG_SYNTHESIS_CANDIDATE`, `owned_asset=false`이며 Intent_DNA 변경, MJN 쓰기, `OWNED_ASSET` 승격은 금지되어 있습니다. 구현은 보호된 브랜치·PR·CI 절차로 진행합니다.
 
 ## 공개 저장소 정책
 

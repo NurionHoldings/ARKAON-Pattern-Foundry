@@ -1,0 +1,119 @@
+{
+  "schema_version": "apf.clean-room-analog-synthesis/v1",
+  "campaign_id": "apf-031-mjn-analog",
+  "retrieved_at": "2026-09-15T23:40:00+00:00",
+  "boundaries": {
+    "mjn_read_only": true,
+    "copy_external_material": false,
+    "store_quoted_text": false,
+    "mutate_intent_dna": false,
+    "promote_owned_asset": false,
+    "sensitive_data": "REJECT_PII_SECRET_CUSTOMER_DATA"
+  },
+  "sources": [
+    {
+      "family": "authz-models",
+      "lineage": "openfga-project",
+      "official_url": "https://openfga.dev/docs/modeling/getting-started",
+      "canonical_identity_ref": "sha256:a712fae0917054357fceb6cd8068bfaa0e11c904831a9cab10ee988ef52b24cb",
+      "retrieved_at": "2026-09-15T23:40:00+00:00",
+      "content_digest": "sha256:fc23fc3b2f2ed0b24a62040cc2e6030da54e8ccf7413a6d95269679c74e5929a",
+      "evidence_ref": "sha256:5f5018fc7938a8b63a87c91dc21078fcea7696fd400d6f6ee2a0a2c4f0672e49",
+      "authority": "OFFICIAL_FIRST_PARTY",
+      "access_posture": "PUBLIC_DOCS_MANUAL_RETRIEVAL",
+      "license_terms_posture": "REFERENCE_ONLY_NO_REPUBLICATION"
+    },
+    {
+      "family": "durable-workflows",
+      "lineage": "temporal-project",
+      "official_url": "https://docs.temporal.io/activity-definition",
+      "canonical_identity_ref": "sha256:7e6ec8bd95c9481d9c364f01948b87ab0dea0b7b729c59ddc4e45f415fe3cc76",
+      "retrieved_at": "2026-09-15T23:40:00+00:00",
+      "content_digest": "sha256:24dee941ec00776a94a167f38d2b6d50c90e8c27cf3a3febff24871da802a2dc",
+      "evidence_ref": "sha256:3724e87c7da4ecc14e54f8c3281d06e3bb8a874775b19feafff7f5e85be0dd5f",
+      "authority": "OFFICIAL_FIRST_PARTY",
+      "access_posture": "PUBLIC_DOCS_MANUAL_RETRIEVAL",
+      "license_terms_posture": "REFERENCE_ONLY_NO_REPUBLICATION"
+    },
+    {
+      "family": "marketplace-money",
+      "lineage": "stripe-platform",
+      "official_url": "https://docs.stripe.com/connect/separate-charges-and-transfers",
+      "canonical_identity_ref": "sha256:16973906c8d0432f22a323136e4131efea8ad607ba714f6d2d55be3751793f2a",
+      "retrieved_at": "2026-09-15T23:40:00+00:00",
+      "content_digest": "sha256:710effcfa51657ce42497d3b775c869f59b397f3c660a043fa611cba893a2f00",
+      "evidence_ref": "sha256:2befed310ec2c9fb276ac49a16d981aa5aeb36a583e15ce4deaaa89d10705a08",
+      "authority": "OFFICIAL_FIRST_PARTY",
+      "access_posture": "PUBLIC_DOCS_MANUAL_RETRIEVAL",
+      "license_terms_posture": "REFERENCE_ONLY_NO_REPUBLICATION"
+    },
+    {
+      "family": "request-replay",
+      "lineage": "stripe-platform",
+      "official_url": "https://docs.stripe.com/api/idempotent_requests",
+      "canonical_identity_ref": "sha256:037177a4a0a86b13c77b5206fb97175158abb5479b305fb4e2456aec87a650d6",
+      "retrieved_at": "2026-09-15T23:40:00+00:00",
+      "content_digest": "sha256:fe6436048f6ac038de732901f05907fcbdb764d1a22b523a66b8f3296bc8853f",
+      "evidence_ref": "sha256:8d95c66988901e6681656b86b2d55d7a2d8546a470c0ce1db823c88affb7f8e6",
+      "authority": "OFFICIAL_FIRST_PARTY",
+      "access_posture": "PUBLIC_DOCS_MANUAL_RETRIEVAL",
+      "license_terms_posture": "REFERENCE_ONLY_NO_REPUBLICATION"
+    }
+  ],
+  "mjn_input": {
+    "manifest_ref": "sha256:241c2bc0451c081baebcd5525b8d28ab12d2bdc9f374b84606c30694f920adff",
+    "candidate_names": ["principal-ownership-recheck", "transactional-idempotent-transition", "financial-sot-audit-chain"],
+    "first_party_evidence_refs": [
+      "sha256:4f204cd1b44b57814ad928d19dbbea6a5f038dc37cee18109386853f9ac9f54c",
+      "sha256:e1b175c1f9ad43a4536d799822dfe853e226c54e2ce889cf868abe19b9cd947b",
+      "sha256:3c39f652c8be55071566d1123226aebe0852039f468294f74c4f80d5722ca15a"
+    ],
+    "write_allowed": false
+  },
+  "candidates": [
+    {
+      "name": "principal-ownership-recheck",
+      "status": "ANALOG_SYNTHESIS_CANDIDATE",
+      "review_status": "ETHERNIAN_REVIEW_REQUIRED",
+      "owned_asset": false,
+      "process_steps": ["derive actor from trusted session", "load current resource scope", "evaluate authority at use time", "return minimum disclosure"],
+      "invariants": ["request input cannot select authority", "inactive actors fail closed", "resource scope never expands implicitly"],
+      "counterexamples": ["role claim accepted without current-state check", "caller supplies another owner's scope"],
+      "mjn_adaptation": {"principal": "server-resolved operator", "resource": "work-order aggregate", "decision": "current actor and current ownership must both match"},
+      "synthetic_tests": ["owner with active authority succeeds", "cross-owner request fails", "revoked actor fails", "scope substitution fails"],
+      "external_evidence_refs": ["sha256:5f5018fc7938a8b63a87c91dc21078fcea7696fd400d6f6ee2a0a2c4f0672e49"],
+      "mjn_evidence_refs": ["sha256:4f204cd1b44b57814ad928d19dbbea6a5f038dc37cee18109386853f9ac9f54c"]
+    },
+    {
+      "name": "transactional-idempotent-transition",
+      "status": "ANALOG_SYNTHESIS_CANDIDATE",
+      "review_status": "ETHERNIAN_REVIEW_REQUIRED",
+      "owned_asset": false,
+      "process_steps": ["bind replay key to actor and intent digest", "check prior receipt", "claim terminal state atomically", "return stable receipt"],
+      "invariants": ["same intent replays one outcome", "changed intent with reused key conflicts", "only one terminal claimant wins"],
+      "counterexamples": ["retry creates a second side effect", "same key silently accepts changed command", "concurrent claims both commit"],
+      "mjn_adaptation": {"command": "accept work-order", "scope": "actor-bound retry namespace", "commit": "single terminal assignment"},
+      "synthetic_tests": ["identical replay returns same receipt", "key collision with changed intent fails", "second claimant fails"],
+      "external_evidence_refs": ["sha256:3724e87c7da4ecc14e54f8c3281d06e3bb8a874775b19feafff7f5e85be0dd5f", "sha256:8d95c66988901e6681656b86b2d55d7a2d8546a470c0ce1db823c88affb7f8e6"],
+      "mjn_evidence_refs": ["sha256:e1b175c1f9ad43a4536d799822dfe853e226c54e2ce889cf868abe19b9cd947b"]
+    },
+    {
+      "name": "financial-sot-audit-chain",
+      "status": "ANALOG_SYNTHESIS_CANDIDATE",
+      "review_status": "ETHERNIAN_REVIEW_REQUIRED",
+      "owned_asset": false,
+      "process_steps": ["verify provider payment fact", "derive fee from current policy", "freeze settlement snapshot", "append actor-scoped audit receipt"],
+      "invariants": ["client amount is advisory only", "reversal blocks settlement", "settlement snapshots are immutable", "replay does not duplicate payout"],
+      "counterexamples": ["client marks an order paid", "fee is recalculated after settlement", "reversal is ignored"],
+      "mjn_adaptation": {"money_source": "verified payment record", "policy_source": "server fee policy", "result": "immutable order settlement and audit receipt"},
+      "synthetic_tests": ["client amount cannot alter settlement", "reversed payment fails", "changed settled amount conflicts", "identical settlement replays"],
+      "external_evidence_refs": ["sha256:3724e87c7da4ecc14e54f8c3281d06e3bb8a874775b19feafff7f5e85be0dd5f", "sha256:2befed310ec2c9fb276ac49a16d981aa5aeb36a583e15ce4deaaa89d10705a08"],
+      "mjn_evidence_refs": ["sha256:3c39f652c8be55071566d1123226aebe0852039f468294f74c4f80d5722ca15a"]
+    }
+  ],
+  "role_flow": ["RESEARCH", "ANALYZE", "ARCHITECT", "BUILD", "TEST", "AUDIT"],
+  "leakage_guard": {
+    "mode": "FAIL_CLOSED",
+    "forbidden_identifiers": ["openfga", "temporal", "stripe", "separate-charges-and-transfers", "idempotent_requests"]
+  }
+}

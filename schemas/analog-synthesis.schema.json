@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.nurion.example/apf/analog-synthesis.schema.json",
+  "title": "ARKAON clean-room analog synthesis manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "campaign_id", "retrieved_at", "boundaries", "sources", "mjn_input", "candidates", "role_flow", "leakage_guard"],
+  "properties": {
+    "schema_version": {"const": "apf.clean-room-analog-synthesis/v1"},
+    "campaign_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9_.-]{2,79}$"},
+    "retrieved_at": {"type": "string", "format": "date-time"},
+    "boundaries": {"type": "object"},
+    "sources": {"type": "array", "minItems": 3, "items": {"type": "object"}},
+    "mjn_input": {"type": "object"},
+    "candidates": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"type": "object"}},
+    "role_flow": {"const": ["RESEARCH", "ANALYZE", "ARCHITECT", "BUILD", "TEST", "AUDIT"]},
+    "leakage_guard": {"type": "object"}
+  }
+}
