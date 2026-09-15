@@ -40,10 +40,11 @@ REGISTER → AUTHORIZE → SNAPSHOT → EXTRACT_INTENT_DNA → ANALYZE
 13. [ARKAON 실전 역할 검증·효율 계측](docs/13-role-benchmark.md)
 14. [증거 기반 실전 벤치마크 캠페인](docs/14-evidence-benchmark-campaign.md)
 15. [안전 합성 개발과제 캠페인](docs/15-synthetic-role-campaign.md)
+16. [실전 관측 원장·파일럿 준비](docs/16-pilot-observation-ledger.md)
 
 ## 구현 게이트
 
-현재 상태는 **#027 SYNTHETIC ROLE CAMPAIGN IMPLEMENTED / CI VERIFICATION PENDING**입니다. 구현은 보호된 브랜치·PR·CI 절차로 진행하며, Intent_DNA 변경과 소유자산 승격은 사람의 최종 승인을 유지합니다.
+현재 상태는 **#028 PILOT OBSERVATION LEDGER IMPLEMENTED / CI VERIFICATION PENDING**입니다. 합성 증거는 실제 효율 판정에서 제외하며, 에테르니언이 서명한 실전 관측과 충분한 역할별 paired evidence만 효율 PASS 후보가 됩니다. 구현은 보호된 브랜치·PR·CI 절차로 진행하며, Intent_DNA 변경과 소유자산 승격은 사람의 최종 승인을 유지합니다.
 
 ## 공개 저장소 정책
 
