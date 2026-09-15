@@ -55,6 +55,14 @@ class CurriculumPlan:
     budget_spent: int
     external_slots: int
     internal_slots: int
+    selected_external_items: int
+    selected_internal_items: int
+    external_cost: int
+    internal_cost: int
+    external_item_ratio: float
+    external_cost_ratio: float
+    external_item_drift: float
+    external_cost_drift: float
     rejected_ids: tuple[str, ...]
 
 
@@ -152,19 +160,37 @@ def plan_curriculum(
     external_ratio: float = 0.65,
     exploration_ratio: float = 0.20,
     min_intent_relevance: float = 0.30,
+    prior_external_items: int = 0,
+    prior_internal_items: int = 0,
+    prior_external_cost: int = 0,
+    prior_internal_cost: int = 0,
 ) -> CurriculumPlan:
     """Build a deterministic, bounded 65/35 active-learning curriculum."""
     if max_items < 0 or budget_limit < 0:
         raise ValueError("max_items and budget_limit must not be negative")
+    if min(
+        prior_external_items,
+        prior_internal_items,
+        prior_external_cost,
+        prior_internal_cost,
+    ) < 0:
+        raise ValueError("prior counts and costs must not be negative")
     if not 0.0 <= external_ratio <= 1.0 or not 0.0 <= exploration_ratio <= 1.0:
         raise ValueError("ratios must be between 0 and 1")
     if not 0.0 <= min_intent_relevance <= 1.0:
         raise ValueError("min_intent_relevance must be between 0 and 1")
 
     unique, rejected = _deduplicate(candidates, min_intent_relevance)
-    external_slots = floor(max_items * external_ratio)
+    # Allocate against the cumulative target instead of rounding every batch down.
+    # This gives a one-item batch to the external lane while deterministic carry
+    # makes later batches repay the internal baseline (65/35 over time).
+    prior_items = prior_external_items + prior_internal_items
+    target_external_items = floor((prior_items + max_items) * external_ratio + 0.5)
+    external_slots = min(max_items, max(0, target_external_items - prior_external_items))
     internal_slots = max_items - external_slots
-    external_budget = floor(budget_limit * external_ratio)
+    prior_cost = prior_external_cost + prior_internal_cost
+    target_external_cost = floor((prior_cost + budget_limit) * external_ratio + 0.5)
+    external_budget = min(budget_limit, max(0, target_external_cost - prior_external_cost))
     internal_budget = budget_limit - external_budget
     external, external_spent = _select_pool(
         [item for item in unique if item.origin is LearningOrigin.EXTERNAL],
@@ -178,6 +204,33 @@ def plan_curriculum(
         budget=internal_budget,
         exploration_ratio=exploration_ratio,
     )
+
+    # A missing/expensive lane must not leave safe capacity idle. Reallocate only
+    # this batch's unused capacity; cumulative carry keeps the absent lane's
+    # deficit, so the 35% internal baseline cannot silently disappear.
+    chosen_ids = {candidate.candidate_id for candidate, _ in external + internal}
+    remaining_slots = max_items - len(chosen_ids)
+    remaining_budget = budget_limit - external_spent - internal_spent
+    if remaining_slots and remaining_budget:
+        overflow, overflow_spent = _select_pool(
+            [candidate for candidate in unique if candidate.candidate_id not in chosen_ids],
+            slots=remaining_slots,
+            budget=remaining_budget,
+            exploration_ratio=exploration_ratio,
+        )
+        external.extend(item for item in overflow if item[0].origin is LearningOrigin.EXTERNAL)
+        internal.extend(item for item in overflow if item[0].origin is LearningOrigin.INTERNAL)
+        external_spent += sum(
+            item.estimated_cost
+            for item, _ in overflow
+            if item.origin is LearningOrigin.EXTERNAL
+        )
+        internal_spent += sum(
+            item.estimated_cost
+            for item, _ in overflow
+            if item.origin is LearningOrigin.INTERNAL
+        )
+        assert overflow_spent == sum(item.estimated_cost for item, _ in overflow)
     chosen = external + internal
     chosen_ids = {candidate.candidate_id for candidate, _ in chosen}
     rejected.update(candidate.candidate_id for candidate in unique if candidate.candidate_id not in chosen_ids)
@@ -196,11 +249,27 @@ def plan_curriculum(
         )
         for candidate, mode in chosen
     )
+    selected_external_items = len(external)
+    selected_internal_items = len(internal)
+    selected_items = selected_external_items + selected_internal_items
+    selected_cost = external_spent + internal_spent
+    external_item_ratio = (
+        round(selected_external_items / selected_items, 6) if selected_items else 0.0
+    )
+    external_cost_ratio = round(external_spent / selected_cost, 6) if selected_cost else 0.0
     return CurriculumPlan(
         items=items,
         budget_limit=budget_limit,
-        budget_spent=external_spent + internal_spent,
+        budget_spent=selected_cost,
         external_slots=external_slots,
         internal_slots=internal_slots,
+        selected_external_items=selected_external_items,
+        selected_internal_items=selected_internal_items,
+        external_cost=external_spent,
+        internal_cost=internal_spent,
+        external_item_ratio=external_item_ratio,
+        external_cost_ratio=external_cost_ratio,
+        external_item_drift=round(external_item_ratio - external_ratio, 6),
+        external_cost_drift=round(external_cost_ratio - external_ratio, 6),
         rejected_ids=tuple(sorted(rejected)),
     )
