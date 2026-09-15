@@ -9,7 +9,8 @@ MJN `main`의 고정 커밋을 첫 자체 플랫폼 분석 대상으로 사용�
 ## 범위와 근거
 
 - 대상: `NurionHoldings/mjn`의 고정 commit/tree
-- 관찰 범위: principal·ownership, 거래 상태전이·idempotency, 결제·정산·audit 경계
+- 관찰 범위: 구조 문서, API·schema·domain boundary, principal·ownership, 거래 상태전이·
+  idempotency, 결제·정산·audit 경계
 - 증거: 저장소·커밋·경로·Git blob identity로 구성한 canonical source identity와 그
   SHA-256 참조만 저장
 - 제외: 원문 코드와 문구, 고객정보, 자격증명, 비밀, 내부 가격 및 계약정보

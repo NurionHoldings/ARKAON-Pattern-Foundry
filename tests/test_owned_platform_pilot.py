@@ -19,7 +19,7 @@ def encode(document):
 def test_checked_in_mjn_manifest_is_reproducible_and_read_only():
     result = validate_readonly_manifest(MANIFEST.read_bytes())
     assert result.source_repository == "NurionHoldings/mjn"
-    assert result.evidence_count == 12
+    assert result.evidence_count == 15
     assert result.role_flow == (
         "RESEARCH",
         "ANALYZE",
