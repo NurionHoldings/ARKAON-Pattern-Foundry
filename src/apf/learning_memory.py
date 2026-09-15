@@ -2,10 +2,16 @@ from __future__ import annotations
 
 import hashlib
 import json
+import unicodedata
 from dataclasses import dataclass
 from enum import StrEnum
 
 MIN_REUSABLE_CONFIDENCE = 0.8
+DEFAULT_FAILURE_FAMILY_LIMIT = 3
+
+
+def _normalize_semantic_text(value: str | None) -> str:
+    return " ".join(unicodedata.normalize("NFKC", value or "").casefold().split())
 
 
 class LessonOutcome(StrEnum):
@@ -55,21 +61,71 @@ class LearningLesson:
         encoded = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
         return hashlib.sha256(encoded).hexdigest()
 
+    @property
+    def semantic_identity_hash(self) -> str:
+        """Stable identity that excludes mutable verification strength."""
+        payload = {
+            "domain": _normalize_semantic_text(self.domain),
+            "failure_mode": _normalize_semantic_text(self.failure_mode),
+            "intent_fingerprint": _normalize_semantic_text(self.intent_fingerprint),
+            "outcome": self.outcome.value,
+            "principle": _normalize_semantic_text(self.principle),
+            "problem": _normalize_semantic_text(self.problem),
+        }
+        encoded = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
+        return hashlib.sha256(encoded).hexdigest()
+
+    @property
+    def failure_family_hash(self) -> str:
+        payload = {
+            "domain": _normalize_semantic_text(self.domain),
+            "failure_mode": _normalize_semantic_text(self.failure_mode),
+            "intent_fingerprint": _normalize_semantic_text(self.intent_fingerprint),
+            "problem": _normalize_semantic_text(self.problem),
+        }
+        encoded = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
+        return hashlib.sha256(encoded).hexdigest()
+
 
 class LearningMemory:
     """Stores reusable, evidence-backed lessons for ARKAON workers."""
 
-    def __init__(self, *, minimum_confidence: float = MIN_REUSABLE_CONFIDENCE) -> None:
+    def __init__(
+        self,
+        *,
+        minimum_confidence: float = MIN_REUSABLE_CONFIDENCE,
+        failure_family_limit: int = DEFAULT_FAILURE_FAMILY_LIMIT,
+    ) -> None:
         if not 0 <= minimum_confidence <= 1:
             raise ValueError("minimum_confidence must be between 0 and 1")
+        if failure_family_limit < 1:
+            raise ValueError("failure_family_limit must be positive")
         self.minimum_confidence = minimum_confidence
+        self.failure_family_limit = failure_family_limit
         self._lessons: dict[str, LearningLesson] = {}
 
     def remember(self, lesson: LearningLesson) -> str:
         self._validate_reusable(lesson)
-        digest = lesson.content_hash
+        digest = lesson.semantic_identity_hash
         if digest in self._lessons:
             raise ValueError("DUPLICATE_LESSON")
+        self._validate_failure_family_capacity(lesson)
+        self._lessons[digest] = lesson
+        return digest
+
+    def upgrade(self, lesson: LearningLesson) -> str:
+        """Replace the same semantic lesson only with strictly stronger evidence."""
+        self._validate_reusable(lesson)
+        digest = lesson.semantic_identity_hash
+        existing = self._lessons.get(digest)
+        if existing is None:
+            raise ValueError("LESSON_NOT_FOUND")
+
+        old_evidence = {_normalize_semantic_text(ref) for ref in existing.evidence_refs}
+        new_evidence = {_normalize_semantic_text(ref) for ref in lesson.evidence_refs}
+        if lesson.confidence <= existing.confidence or not new_evidence > old_evidence:
+            raise ValueError("LESSON_UPGRADE_NOT_STRONGER")
+
         self._lessons[digest] = lesson
         return digest
 
@@ -118,3 +174,14 @@ class LearningMemory:
             and bool(lesson.evidence_refs)
             and all(ref.strip() for ref in lesson.evidence_refs)
         )
+
+    def _validate_failure_family_capacity(self, lesson: LearningLesson) -> None:
+        if lesson.outcome is not LessonOutcome.FAILURE:
+            return
+        family_size = sum(
+            existing.outcome is LessonOutcome.FAILURE
+            and existing.failure_family_hash == lesson.failure_family_hash
+            for existing in self._lessons.values()
+        )
+        if family_size >= self.failure_family_limit:
+            raise ValueError("FAILURE_FAMILY_LIMIT")

@@ -44,6 +44,65 @@ def test_curriculum_reserves_external_65_internal_35_slots() -> None:
     assert plan.internal_slots == 7
     assert sum(item.origin is LearningOrigin.EXTERNAL for item in plan.items) == 13
     assert sum(item.origin is LearningOrigin.INTERNAL for item in plan.items) == 7
+    assert plan.external_item_ratio == 0.65
+    assert plan.external_cost_ratio == 0.65
+    assert plan.external_item_drift == 0
+    assert plan.external_cost_drift == 0
+
+
+@pytest.mark.parametrize(
+    ("max_items", "external", "internal"),
+    [(1, 1, 0), (2, 1, 1), (3, 2, 1), (4, 3, 1), (5, 3, 2)],
+)
+def test_small_batches_use_deterministic_65_35_carry(
+    max_items: int, external: int, internal: int
+) -> None:
+    candidates = [candidate(f"e-{index}", LearningOrigin.EXTERNAL) for index in range(10)]
+    candidates += [candidate(f"i-{index}", LearningOrigin.INTERNAL) for index in range(10)]
+
+    plan = plan_curriculum(candidates, max_items=max_items, budget_limit=max_items)
+
+    assert plan.selected_external_items == external
+    assert plan.selected_internal_items == internal
+
+
+def test_prior_carry_repays_internal_baseline_after_external_first_batch() -> None:
+    candidates = [candidate("external", LearningOrigin.EXTERNAL)]
+    candidates += [candidate(f"internal-{index}", LearningOrigin.INTERNAL) for index in range(2)]
+
+    plan = plan_curriculum(
+        candidates,
+        max_items=2,
+        budget_limit=2,
+        prior_external_items=1,
+        prior_external_cost=1,
+    )
+
+    assert plan.external_slots == 1
+    assert plan.internal_slots == 1
+    assert plan.selected_internal_items == 1
+
+
+def test_missing_lane_reallocates_without_erasing_its_cumulative_deficit() -> None:
+    candidates = [candidate(f"e-{index}", LearningOrigin.EXTERNAL) for index in range(4)]
+
+    plan = plan_curriculum(candidates, max_items=4, budget_limit=4)
+
+    assert len(plan.items) == 4
+    assert plan.selected_external_items == 4
+    assert plan.external_item_drift == pytest.approx(0.35)
+
+    recovery = plan_curriculum(
+        [candidate(f"i-{index}", LearningOrigin.INTERNAL) for index in range(4)],
+        max_items=2,
+        budget_limit=2,
+        prior_external_items=plan.selected_external_items,
+        prior_internal_items=plan.selected_internal_items,
+        prior_external_cost=plan.external_cost,
+        prior_internal_cost=plan.internal_cost,
+    )
+    assert recovery.external_slots == 0
+    assert recovery.internal_slots == 2
 
 
 def test_priority_uses_gap_failures_intent_and_novelty() -> None:

@@ -81,7 +81,7 @@ def test_pass_is_verified_remembered_and_stops_before_asset_promotion() -> None:
     ready = accelerator.complete_pass("lesson-1", verification(accelerator, evaluated))
 
     assert ready.state is AccelerationState.READY_FOR_HUMAN_AUDIT
-    assert ready.memory_ref == ready.lesson.content_hash
+    assert ready.memory_ref == ready.lesson.semantic_identity_hash
     assert ready.report_authorization.startswith("ETHERNIAN:lesson-1:")
     assert len(accelerator.memory) == 1
     assert not hasattr(ready, "asset_id")
