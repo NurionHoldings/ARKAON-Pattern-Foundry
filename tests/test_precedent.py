@@ -3,6 +3,7 @@ from apf.precedent import (
     assess_precedent,
     build_benchmark_plan,
     independent_groups_for_feature,
+    request_ethernian_assistance,
 )
 
 
@@ -62,3 +63,20 @@ def test_independent_sources_are_counted_without_duplicate_inflation():
         precedent("production", "workflow", "implementations"),
     ]
     assert independent_groups_for_feature("workflow", items) == 2
+
+
+def test_blocked_precedent_escalates_to_ethernian_for_clean_room_help():
+    request = request_ethernian_assistance("matching", "RESTRICTED_IMPLEMENTATION")
+    assert request.status == "AWAITING_ETHERNIAN_ASSISTANCE"
+    assert "FIND_ALTERNATIVE_PRECEDENTS" in request.requested_help
+    assert "DRAFT_CLEAN_ROOM_SPECIFICATION" in request.requested_help
+    assert "COPY_RESTRICTED_SOURCE" in request.prohibited_help
+
+
+def test_assistance_request_requires_a_concrete_blockage():
+    try:
+        request_ethernian_assistance("matching", "")
+    except ValueError as exc:
+        assert str(exc) == "feature and blockage_reason are required"
+    else:
+        raise AssertionError("missing blockage must be rejected")
