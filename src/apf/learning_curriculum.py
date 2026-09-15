@@ -121,7 +121,11 @@ def _select_pool(
             item.candidate_id,
         ),
     )
-    explore_slots = min(slots, max(1, floor(slots * exploration_ratio)))
+    explore_slots = (
+        0
+        if exploration_ratio == 0
+        else min(slots, max(1, floor(slots * exploration_ratio)))
+    )
     exploit_slots = slots - explore_slots
     selected: list[tuple[LearningCandidate, LearningMode]] = []
     selected_ids: set[str] = set()
