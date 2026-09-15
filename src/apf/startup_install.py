@@ -15,7 +15,18 @@ class StartupArtifact:
 
 
 def collector_command(config_path: Path) -> tuple[str, ...]:
-    return (sys.executable, "-m", "apf.collector_service", "--config", str(config_path))
+    data_dir = config_path.parent
+    return (
+        sys.executable,
+        "-m",
+        "apf.collector_service",
+        "--config",
+        str(config_path),
+        "--audit",
+        str(data_dir / "arkaon-collection-audit.jsonl"),
+        "--state",
+        str(data_dir / "arkaon-collection-state.sqlite3"),
+    )
 
 
 def build_startup_artifact(system: str, config_path: Path) -> StartupArtifact:
@@ -29,6 +40,7 @@ def build_startup_artifact(system: str, config_path: Path) -> StartupArtifact:
             content=(
                 "[Unit]\nDescription=ARKAON continuous collector\nAfter=network-online.target\n\n"
                 "[Service]\nType=simple\nRestart=on-failure\nRestartSec=30\n"
+                f"WorkingDirectory={_systemd_quote(str(config_path.parent))}\n"
                 f"ExecStart={exec_start}\n\n[Install]\nWantedBy=default.target\n"
             ),
         )
@@ -46,6 +58,7 @@ def build_startup_artifact(system: str, config_path: Path) -> StartupArtifact:
                 "  <key>ProgramArguments</key><array>\n"
                 f"{arguments}\n"
                 "  </array>\n  <key>RunAtLoad</key><true/>\n"
+                f"  <key>WorkingDirectory</key><string>{_xml_escape(str(config_path.parent))}</string>\n"
                 "  <key>KeepAlive</key><true/>\n</dict></plist>\n"
             ),
         )
@@ -56,7 +69,7 @@ def build_startup_artifact(system: str, config_path: Path) -> StartupArtifact:
             platform="windows",
             relative_path=Path("ARKAON/arkaon-collector-task.xml"),
             content=(
-                '<?xml version="1.0" encoding="UTF-16"?>\n'
+                '<?xml version="1.0" encoding="UTF-8"?>\n'
                 '<Task version="1.4" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">\n'
                 "  <Triggers><LogonTrigger><Enabled>true</Enabled></LogonTrigger></Triggers>\n"
                 "  <Principals><Principal id=\"Author\"><LogonType>InteractiveToken</LogonType>"
@@ -65,7 +78,9 @@ def build_startup_artifact(system: str, config_path: Path) -> StartupArtifact:
                 "<RestartOnFailure><Interval>PT1M</Interval><Count>3</Count></RestartOnFailure>"
                 "</Settings>\n"
                 f"  <Actions Context=\"Author\"><Exec><Command>{_xml_escape(executable)}</Command>"
-                f"<Arguments>{_xml_escape(argument_text)}</Arguments></Exec></Actions>\n"
+                f"<Arguments>{_xml_escape(argument_text)}</Arguments>"
+                f"<WorkingDirectory>{_xml_escape(str(config_path.parent))}</WorkingDirectory>"
+                "</Exec></Actions>\n"
                 "</Task>\n"
             ),
         )
