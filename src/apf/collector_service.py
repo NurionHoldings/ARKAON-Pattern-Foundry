@@ -10,7 +10,8 @@ from pathlib import Path
 from threading import Event
 from urllib.parse import urlsplit
 
-from .collector_runtime import CollectorRuntime, audit_event_dict, load_policy
+from .collector_runtime import CollectorRuntime, load_policy
+from .collector_storage import HashChainedJsonLinesAuditSink, SQLiteContentHashStore
 from .continuous_collection import AssetizationBasis, CollectionCandidate
 from .external_learning import SourceKind
 
@@ -58,20 +59,11 @@ class SafeHttpsFetcher:
             return response.read(max_bytes)
 
 
-class JsonLinesAuditSink:
-    def __init__(self, path: str | Path) -> None:
-        self.path = Path(path)
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-
-    def record(self, event) -> None:
-        with self.path.open("a", encoding="utf-8") as stream:
-            stream.write(json.dumps(audit_event_dict(event), ensure_ascii=False) + "\n")
-
-
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="ARKAON continuous collector")
     parser.add_argument("--config", required=True)
     parser.add_argument("--audit", default="arkaon-collection-audit.jsonl")
+    parser.add_argument("--state", default="arkaon-collection-state.sqlite3")
     parser.add_argument("--once", action="store_true")
     args = parser.parse_args(argv)
     policy = load_policy(args.config)
@@ -79,7 +71,8 @@ def main(argv: list[str] | None = None) -> int:
         policy,
         JsonCandidateProvider(args.config),
         SafeHttpsFetcher(),
-        JsonLinesAuditSink(args.audit),
+        HashChainedJsonLinesAuditSink(args.audit),
+        content_hashes=SQLiteContentHashStore(args.state),
     )
     if args.once:
         runtime.run_once()
