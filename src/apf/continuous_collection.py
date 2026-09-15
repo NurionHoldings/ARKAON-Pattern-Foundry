@@ -11,6 +11,22 @@ class StartupTrigger(StrEnum):
     APPLICATION_START = "APPLICATION_START"
 
 
+class AssetizationBasis(StrEnum):
+    NONE = "NONE"
+    OWNED = "OWNED"
+    EXPLICIT_PERMISSION = "EXPLICIT_PERMISSION"
+    PUBLIC_DOMAIN = "PUBLIC_DOMAIN"
+    CLEAN_ROOM_ABSTRACTION = "CLEAN_ROOM_ABSTRACTION"
+
+
+class AssetLifecycle(StrEnum):
+    REFERENCE_COLLECTED = "REFERENCE_COLLECTED"
+    PRINCIPLE_ABSTRACTED = "PRINCIPLE_ABSTRACTED"
+    INDEPENDENT_IMPLEMENTATION = "INDEPENDENT_IMPLEMENTATION"
+    INDEPENDENTLY_VERIFIED = "INDEPENDENTLY_VERIFIED"
+    OWNED_ASSET = "OWNED_ASSET"
+
+
 @dataclass(frozen=True)
 class ContinuousCollectionPolicy:
     enabled: bool = True
@@ -46,6 +62,9 @@ class CollectionCandidate:
     robots_allowed: bool = True
     terms_allowed: bool = True
     license_clarity: float = 0.0
+    assetization_basis: AssetizationBasis = AssetizationBasis.NONE
+    provenance_recorded: bool = False
+    copied_source_code: bool = False
 
 
 @dataclass(frozen=True)
@@ -53,6 +72,13 @@ class CollectionDecision:
     collect: bool
     reusable: bool
     reason: str
+
+
+@dataclass(frozen=True)
+class AssetizationRoute:
+    current: AssetLifecycle
+    next_step: AssetLifecycle | None
+    may_publish_as_owned: bool
 
 
 @dataclass(frozen=True)
@@ -88,5 +114,36 @@ def decide_collection(
         return CollectionDecision(False, False, "SOURCE_POLICY_BLOCKED")
     if candidate.kind in {SourceKind.OWNED, SourceKind.CLIENT_DELEGATED} and not candidate.explicitly_authorized:
         return CollectionDecision(False, False, "EXPLICIT_AUTHORIZATION_REQUIRED")
-    reusable = candidate.license_clarity >= 0.80
-    return CollectionDecision(True, reusable, "COLLECT_REFERENCE_ONLY" if not reusable else "COLLECT_REUSABLE")
+    licensed_reuse = candidate.license_clarity >= 0.80
+    independent_assetization = (
+        candidate.assetization_basis
+        in {
+            AssetizationBasis.OWNED,
+            AssetizationBasis.EXPLICIT_PERMISSION,
+            AssetizationBasis.PUBLIC_DOMAIN,
+            AssetizationBasis.CLEAN_ROOM_ABSTRACTION,
+        }
+        and candidate.provenance_recorded
+        and not candidate.copied_source_code
+    )
+    reusable = licensed_reuse or independent_assetization
+    if independent_assetization and not licensed_reuse:
+        return CollectionDecision(True, True, "COLLECT_INDEPENDENT_ASSET")
+    return CollectionDecision(
+        True,
+        reusable,
+        "COLLECT_REFERENCE_FOR_INDEPENDENT_DEVELOPMENT" if not reusable else "COLLECT_REUSABLE",
+    )
+
+
+def assetization_route(stage: AssetLifecycle) -> AssetizationRoute:
+    sequence = (
+        AssetLifecycle.REFERENCE_COLLECTED,
+        AssetLifecycle.PRINCIPLE_ABSTRACTED,
+        AssetLifecycle.INDEPENDENT_IMPLEMENTATION,
+        AssetLifecycle.INDEPENDENTLY_VERIFIED,
+        AssetLifecycle.OWNED_ASSET,
+    )
+    index = sequence.index(stage)
+    next_step = sequence[index + 1] if index + 1 < len(sequence) else None
+    return AssetizationRoute(stage, next_step, stage == AssetLifecycle.OWNED_ASSET)
