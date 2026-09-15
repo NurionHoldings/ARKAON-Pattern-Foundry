@@ -22,7 +22,7 @@ def source(source_id: str, kind: SourceKind, **changes) -> LearningSource:
     return LearningSource(**values)
 
 
-def test_external_sources_receive_majority_capacity():
+def test_learning_budget_reserves_internal_baseline():
     sources = [
         source("internal-1", SourceKind.OWNED),
         source("internal-2", SourceKind.OWNED),
@@ -31,7 +31,28 @@ def test_external_sources_receive_majority_capacity():
         source("oss", SourceKind.LICENSED_OPEN_SOURCE),
     ]
     plan = plan_learning(sources, max_sources=4)
-    assert sum(p.reason == "EXTERNAL_PRIORITY" for p in plan) >= 3
+    assert sum(p.reason == "EXTERNAL_PRIORITY" for p in plan) == 2
+    assert sum(p.reason == "INTENT_RELEVANT_INTERNAL_BASELINE" for p in plan) == 2
+
+
+def test_unavailable_internal_capacity_is_filled_by_external_sources():
+    sources = [
+        source(f"external-{index}", SourceKind.OFFICIAL_STANDARD)
+        for index in range(5)
+    ]
+    plan = plan_learning(sources, max_sources=4)
+    assert len(plan) == 4
+    assert all(p.reason == "EXTERNAL_PRIORITY" for p in plan)
+
+
+def test_ten_slot_budget_tracks_65_35_target_without_erasing_baseline():
+    sources = [
+        *[source(f"external-{index}", SourceKind.OFFICIAL_STANDARD) for index in range(10)],
+        *[source(f"internal-{index}", SourceKind.OWNED) for index in range(10)],
+    ]
+    plan = plan_learning(sources, max_sources=10)
+    assert sum(p.reason == "EXTERNAL_PRIORITY" for p in plan) == 6
+    assert sum(p.reason == "INTENT_RELEVANT_INTERNAL_BASELINE" for p in plan) == 4
 
 
 def test_seen_and_irrelevant_sources_are_skipped():
