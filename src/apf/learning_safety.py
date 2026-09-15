@@ -110,7 +110,8 @@ def scan_learning_payload(
         if not isinstance(ref, str) or OPAQUE_EVIDENCE_REF_PATTERN.fullmatch(ref) is None:
             codes.add("EVIDENCE_REF_NOT_OPAQUE")
             continue
-        codes.update(scan_learning_text(ref))
+        # A canonical opaque digest contains no source content. Scanning its
+        # hexadecimal payload as natural language creates phone/RRN false positives.
 
     ordered = tuple(sorted(codes))
     return LearningSafetyResult(not ordered, ordered)
