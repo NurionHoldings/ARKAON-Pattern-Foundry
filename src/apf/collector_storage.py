@@ -30,11 +30,12 @@ class SQLiteContentHashStore:
             ).fetchone()
         return row is not None
 
-    def add(self, digest: str) -> None:
+    def claim(self, digest: str) -> bool:
         with self._connect() as connection:
-            connection.execute(
+            cursor = connection.execute(
                 "INSERT OR IGNORE INTO seen_content(digest) VALUES (?)", (digest,)
             )
+        return cursor.rowcount == 1
 
 
 class AuditIntegrityError(ValueError):

@@ -26,7 +26,8 @@ def event(source_id: str) -> CollectionAuditEvent:
 
 def test_content_hash_survives_store_recreation(tmp_path):
     path = tmp_path / "state.sqlite3"
-    SQLiteContentHashStore(path).add("digest")
+    assert SQLiteContentHashStore(path).claim("digest")
+    assert not SQLiteContentHashStore(path).claim("digest")
     assert SQLiteContentHashStore(path).contains("digest")
 
 
