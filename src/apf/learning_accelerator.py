@@ -16,6 +16,7 @@ from apf.learning_evaluator import (
     next_learning_questions,
 )
 from apf.learning_memory import LearningLesson, LearningMemory
+from apf.learning_safety import require_safe_learning_payload
 
 
 class AccelerationState(StrEnum):
@@ -59,6 +60,27 @@ class LearningAccelerator:
         candidate: CandidateLesson,
         lesson: LearningLesson,
     ) -> AccelerationRecord:
+        # Validate the complete candidate/lesson payload before identity checks,
+        # evaluation, record retention, or memory promotion. References are
+        # content-free evidence-store identifiers so source material cannot be
+        # smuggled into durable learning records.
+        require_safe_learning_payload(
+            {
+                "candidate.lesson_id": candidate.lesson_id,
+                "candidate.principle": candidate.principle,
+                "lesson.intent_fingerprint": lesson.intent_fingerprint,
+                "lesson.domain": lesson.domain,
+                "lesson.problem": lesson.problem,
+                "lesson.failure_mode": lesson.failure_mode,
+                "lesson.principle": lesson.principle,
+            },
+            (
+                candidate.provenance_ref,
+                candidate.counterexample_ref,
+                candidate.regression_ref,
+                *lesson.evidence_refs,
+            ),
+        )
         if item.candidate_id != candidate.lesson_id:
             raise ValueError("CURRICULUM_CANDIDATE_MISMATCH")
         if lesson.principle.strip() != candidate.principle.strip():
