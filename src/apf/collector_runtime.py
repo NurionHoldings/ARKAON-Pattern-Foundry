@@ -30,6 +30,12 @@ class AuditSink(Protocol):
     def record(self, event: CollectionAuditEvent) -> None: ...
 
 
+class ContentHashStore(Protocol):
+    def contains(self, digest: str) -> bool: ...
+
+    def add(self, digest: str) -> None: ...
+
+
 @dataclass(frozen=True)
 class CollectionAuditEvent:
     source_id: str
@@ -58,6 +64,17 @@ class MemoryAuditSink:
         self.events.append(event)
 
 
+class MemoryContentHashStore:
+    def __init__(self) -> None:
+        self.values: set[str] = set()
+
+    def contains(self, digest: str) -> bool:
+        return digest in self.values
+
+    def add(self, digest: str) -> None:
+        self.values.add(digest)
+
+
 def load_policy(path: str | Path) -> ContinuousCollectionPolicy:
     raw = json.loads(Path(path).read_text(encoding="utf-8"))
     return ContinuousCollectionPolicy(
@@ -81,13 +98,14 @@ class CollectorRuntime:
         audit: AuditSink,
         *,
         clock: Callable[[], datetime] | None = None,
+        content_hashes: ContentHashStore | None = None,
     ) -> None:
         self.policy = policy
         self.provider = provider
         self.fetcher = fetcher
         self.audit = audit
         self._clock = clock or (lambda: datetime.now(UTC))
-        self._seen_hashes: set[str] = set()
+        self._content_hashes = content_hashes or MemoryContentHashStore()
 
     def _audit(
         self,
@@ -131,7 +149,7 @@ class CollectorRuntime:
                 continue
 
             digest = hashlib.sha256(payload).hexdigest()
-            if digest in self._seen_hashes:
+            if self._content_hashes.contains(digest):
                 duplicate += 1
                 self._audit(
                     candidate,
@@ -141,7 +159,7 @@ class CollectorRuntime:
                 )
                 continue
 
-            self._seen_hashes.add(digest)
+            self._content_hashes.add(digest)
             collected += 1
             self._audit(candidate, decision, content_hash=digest, content_bytes=len(payload))
         return CollectionCycleResult(considered, collected, denied, duplicate)
