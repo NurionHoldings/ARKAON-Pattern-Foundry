@@ -16,6 +16,23 @@
     "robots_or_terms_violation"
   ],
   "deduplicate_by_content_hash": true,
-  "unclear_license_mode": "REFERENCE_ONLY",
+  "unclear_license_mode": "FUNCTION_FIRST_WITH_INDEPENDENT_ASSET_EXCEPTION",
+  "assetization_exception_bases": [
+    "OWNED",
+    "EXPLICIT_PERMISSION",
+    "PUBLIC_DOMAIN",
+    "CLEAN_ROOM_ABSTRACTION"
+  ],
+  "assetization_exception_requires": [
+    "provenance_recorded",
+    "no_source_code_copy"
+  ],
+  "assetization_route": [
+    "REFERENCE_COLLECTED",
+    "PRINCIPLE_ABSTRACTED",
+    "INDEPENDENT_IMPLEMENTATION",
+    "INDEPENDENTLY_VERIFIED",
+    "OWNED_ASSET"
+  ],
   "audit_every_decision": true
 }
