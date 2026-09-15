@@ -130,7 +130,7 @@ def test_execution_receipt_cannot_be_reused() -> None:
     [
         ({"verifier": "ARKAON"}, "ETHERNIAN_VERIFIER_REQUIRED"),
         ({"evidence_refs": ("https://example.com/raw",)}, "OPAQUE_EVIDENCE_REQUIRED"),
-        ({"started_at": datetime(2026, 9, 15)}, "TIMEZONE_AWARE"),
+        ({"started_at": datetime(2026, 9, 15)}, "TIMEZONE_AWARE"),  # noqa: DTZ001
         ({"finished_at": NOW - timedelta(seconds=1)}, "TIME_RANGE"),
     ],
 )
