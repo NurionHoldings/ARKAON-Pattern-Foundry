@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nurion.example/schemas/work-contract/0.1",
+  "title": "AFP WorkContract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol", "message_id", "correlation_id", "idempotency_key", "tenant_id", "classification", "created_at", "expires_at", "task_type", "target_snapshot_id", "artifact_ids", "objective", "non_goals", "required_outputs", "acceptance_criteria", "risk_class", "analysis_budget", "authority_scope", "stop_conditions"],
+  "properties": {
+    "protocol": {"const": "AFP/0.1"},
+    "message_id": {"type": "string", "format": "uuid"},
+    "correlation_id": {"type": "string", "format": "uuid"},
+    "causation_id": {"type": ["string", "null"], "format": "uuid"},
+    "idempotency_key": {"type": "string", "minLength": 8, "maxLength": 200},
+    "tenant_id": {"type": "string", "format": "uuid"},
+    "classification": {"enum": ["PUBLIC", "INTERNAL", "CLIENT_RESTRICTED", "PROHIBITED"]},
+    "created_at": {"type": "string", "format": "date-time"},
+    "expires_at": {"type": "string", "format": "date-time"},
+    "task_type": {"enum": ["EXTRACT_INTENT_DNA", "ANALYZE_DOMAIN", "EXTRACT_PATTERN", "CHECK_CONFLICT", "REVIEW_PUBLICATION"]},
+    "target_snapshot_id": {"type": "string", "format": "uuid"},
+    "artifact_ids": {"type": "array", "items": {"type": "string", "format": "uuid"}},
+    "objective": {"type": "string", "minLength": 1},
+    "non_goals": {"type": "array", "items": {"type": "string"}},
+    "required_outputs": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "acceptance_criteria": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "risk_class": {"enum": ["LOW", "MODERATE", "HIGH", "CRITICAL"]},
+    "analysis_budget": {
+      "type": "object",
+      "required": ["max_seconds", "max_tokens", "max_artifacts", "max_depth"],
+      "properties": {
+        "max_seconds": {"type": "integer", "minimum": 1},
+        "max_tokens": {"type": "integer", "minimum": 1},
+        "max_artifacts": {"type": "integer", "minimum": 1},
+        "max_depth": {"type": "integer", "minimum": 1, "maximum": 10}
+      }
+    },
+    "authority_scope": {"type": "array", "items": {"type": "string"}},
+    "stop_conditions": {"type": "array", "items": {"type": "string"}}
+  }
+}
+
