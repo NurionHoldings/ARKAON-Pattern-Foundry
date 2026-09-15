@@ -6,6 +6,7 @@ import re
 from dataclasses import dataclass
 from datetime import datetime
 from enum import StrEnum
+from typing import Any
 from uuid import UUID
 
 from cryptography.exceptions import InvalidSignature
@@ -13,12 +14,15 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey, Ed25519PublicKey
 
 from .benchmark_campaign import CampaignPhase, EvidenceBenchmarkCampaign, TrialEvidence
+from .development_orchestrator import TaskStatus
 from .learning_safety import require_safe_learning_payload
 from .role_benchmark import BenchmarkReport, BenchmarkRole, BenchmarkThresholds
 from .worker_runtime import ExecutionReceipt
 
 _SAFE_ID = re.compile(r"\A[a-zA-Z0-9][a-zA-Z0-9_.:-]{0,127}\Z")
 _GENESIS_HASH = "0" * 64
+_BUNDLE_SCHEMA = "apf.pilot-observation-bundle/v1"
+_HEX_64 = re.compile(r"\A[0-9a-f]{64}\Z")
 
 
 class EvidenceClass(StrEnum):
@@ -107,6 +111,19 @@ class PilotObservationAttestation:
     observer_signature: str
 
 
+@dataclass(frozen=True)
+class PilotBundleVerificationResult:
+    """Read-only result; verification never creates or mutates a live ledger."""
+
+    schema_version: str
+    evidence_class: EvidenceClass
+    entry_count: int
+    head_hash: str
+    bundle_hash: str
+    signer_key_id: str
+    entry_key_ids: tuple[str, ...]
+
+
 class EthernianObserver:
     """Trusted signer kept outside the ledger and its callers."""
 
@@ -137,6 +154,11 @@ class EthernianObserver:
             observer_key_id=self.key_id,
             observer_signature=self._key.sign(payload).hex(),
         )
+
+    def sign_bundle_manifest(self, manifest: bytes) -> str:
+        """Sign only a domain-separated canonical pilot bundle manifest."""
+
+        return self._key.sign(b"APF:PILOT_BUNDLE:V1\x00" + manifest).hex()
 
 
 def _receipt_payload(receipt: ExecutionReceipt | None) -> dict | None:
@@ -179,6 +201,33 @@ def _canonical_payload(
         "previous_hash": previous_hash,
     }
     return json.dumps(value, sort_keys=True, separators=(",", ":")).encode()
+
+
+def _canonical_json(value: Any) -> bytes:
+    return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()
+
+
+def _entry_document(entry: PilotLedgerEntry) -> dict[str, Any]:
+    draft = entry.draft
+    return {
+        "sequence": entry.sequence,
+        "evidence_class": entry.evidence_class.value,
+        "observer_id": entry.observer_id,
+        "observer_key_id": entry.observer_key_id,
+        "event_id": str(draft.event_id),
+        "trial_id": draft.trial_id,
+        "scenario_id": draft.scenario_id,
+        "phase": draft.phase.value,
+        "role": draft.role.value,
+        "kind": draft.kind.value,
+        "observed_at": draft.observed_at.isoformat(),
+        "receipt": _receipt_payload(draft.receipt),
+        "intent_alignment": draft.intent_alignment,
+        "evidence_refs": list(draft.evidence_refs),
+        "previous_hash": entry.previous_hash,
+        "entry_hash": entry.entry_hash,
+        "observer_signature": entry.observer_signature,
+    }
 
 
 class PilotObservationLedger:
@@ -310,6 +359,29 @@ class PilotObservationLedger:
             if receipt is not None:
                 receipt_ids.add(receipt.task_id)
 
+    def export_bundle(self, observer: EthernianObserver) -> bytes:
+        """Export a canonical, manifest-signed snapshot without private key material."""
+
+        self.verify_integrity()
+        if observer.key_id not in self._trusted_observer_keys:
+            raise ValueError("UNTRUSTED_BUNDLE_SIGNER")
+        entries = [_entry_document(entry) for entry in self._entries]
+        manifest = {
+            "schema_version": _BUNDLE_SCHEMA,
+            "evidence_class": EvidenceClass.PILOT_OBSERVATION.value,
+            "entry_count": len(entries),
+            "head_hash": entries[-1]["entry_hash"] if entries else _GENESIS_HASH,
+            "entries": entries,
+            "signer_key_id": observer.key_id,
+        }
+        manifest_bytes = _canonical_json(manifest)
+        document = {
+            **manifest,
+            "bundle_hash": hashlib.sha256(manifest_bytes).hexdigest(),
+            "bundle_signature": observer.sign_bundle_manifest(manifest_bytes),
+        }
+        return _canonical_json(document)
+
     def to_campaign(self) -> EvidenceBenchmarkCampaign:
         self.verify_integrity()
         grouped: dict[str, list[PilotLedgerEntry]] = {}
@@ -357,3 +429,219 @@ class PilotObservationLedger:
         report = campaign.evaluate(thresholds=thresholds)
         self._sealed = True
         return report
+
+
+_BUNDLE_FIELDS = {
+    "schema_version",
+    "evidence_class",
+    "entry_count",
+    "head_hash",
+    "entries",
+    "signer_key_id",
+    "bundle_hash",
+    "bundle_signature",
+}
+_ENTRY_FIELDS = {
+    "sequence",
+    "evidence_class",
+    "observer_id",
+    "observer_key_id",
+    "event_id",
+    "trial_id",
+    "scenario_id",
+    "phase",
+    "role",
+    "kind",
+    "observed_at",
+    "receipt",
+    "intent_alignment",
+    "evidence_refs",
+    "previous_hash",
+    "entry_hash",
+    "observer_signature",
+}
+_RECEIPT_FIELDS = {
+    "task_id",
+    "worker_id",
+    "intent_fingerprint",
+    "status",
+    "touched_paths",
+    "checks",
+    "failure_code",
+}
+
+
+def _strict_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    result: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError("DUPLICATE_JSON_FIELD")
+        result[key] = value
+    return result
+
+
+def _require_fields(value: Any, fields: set[str], error: str) -> dict[str, Any]:
+    if not isinstance(value, dict) or set(value) != fields:
+        raise ValueError(error)
+    return value
+
+
+def _parse_receipt(value: Any) -> ExecutionReceipt | None:
+    if value is None:
+        return None
+    item = _require_fields(value, _RECEIPT_FIELDS, "INVALID_RECEIPT_SCHEMA")
+    if (
+        not isinstance(item["task_id"], str)
+        or not isinstance(item["worker_id"], str)
+        or not isinstance(item["intent_fingerprint"], str)
+        or not isinstance(item["status"], str)
+        or not isinstance(item["touched_paths"], list)
+        or not all(isinstance(path, str) for path in item["touched_paths"])
+        or not isinstance(item["checks"], list)
+        or not all(isinstance(check, str) for check in item["checks"])
+        or (item["failure_code"] is not None and not isinstance(item["failure_code"], str))
+    ):
+        raise ValueError("INVALID_RECEIPT_SCHEMA")
+    return ExecutionReceipt(
+        task_id=UUID(item["task_id"]),
+        worker_id=item["worker_id"],
+        intent_fingerprint=item["intent_fingerprint"],
+        status=TaskStatus(item["status"]),
+        touched_paths=tuple(item["touched_paths"]),
+        checks=tuple(item["checks"]),
+        failure_code=item["failure_code"],
+    )
+
+
+def verify_pilot_observation_bundle(
+    bundle: bytes, *, trusted_observer_keys: dict[str, bytes]
+) -> PilotBundleVerificationResult:
+    """Independently verify an exported bundle and return facts, never a live ledger."""
+
+    try:
+        document = json.loads(bundle, object_pairs_hook=_strict_object)
+    except (json.JSONDecodeError, UnicodeDecodeError) as exc:
+        raise ValueError("INVALID_CANONICAL_JSON") from exc
+    root = _require_fields(document, _BUNDLE_FIELDS, "INVALID_BUNDLE_SCHEMA")
+    if _canonical_json(root) != bundle:
+        raise ValueError("NON_CANONICAL_JSON")
+    if (
+        root["schema_version"] != _BUNDLE_SCHEMA
+        or root["evidence_class"] != EvidenceClass.PILOT_OBSERVATION.value
+        or type(root["entry_count"]) is not int
+        or root["entry_count"] < 0
+        or not isinstance(root["head_hash"], str)
+        or _HEX_64.fullmatch(root["head_hash"]) is None
+        or not isinstance(root["entries"], list)
+        or not isinstance(root["signer_key_id"], str)
+        or not isinstance(root["bundle_hash"], str)
+        or _HEX_64.fullmatch(root["bundle_hash"]) is None
+        or not isinstance(root["bundle_signature"], str)
+    ):
+        raise ValueError("INVALID_BUNDLE_SCHEMA")
+    manifest = {key: root[key] for key in root if key not in {"bundle_hash", "bundle_signature"}}
+    manifest_bytes = _canonical_json(manifest)
+    if hashlib.sha256(manifest_bytes).hexdigest() != root["bundle_hash"]:
+        raise ValueError("BUNDLE_TAMPERING_DETECTED")
+    signer_key = trusted_observer_keys.get(root["signer_key_id"])
+    if signer_key is None or len(signer_key) != 32:
+        raise ValueError("UNTRUSTED_BUNDLE_SIGNER")
+    try:
+        Ed25519PublicKey.from_public_bytes(bytes(signer_key)).verify(
+            bytes.fromhex(root["bundle_signature"]),
+            b"APF:PILOT_BUNDLE:V1\x00" + manifest_bytes,
+        )
+    except (InvalidSignature, ValueError):
+        raise ValueError("INVALID_BUNDLE_SIGNATURE") from None
+    if root["entry_count"] != len(root["entries"]):
+        raise ValueError("BUNDLE_TRUNCATED")
+
+    previous_hash = _GENESIS_HASH
+    previous_time: datetime | None = None
+    event_ids: set[UUID] = set()
+    receipt_ids: set[UUID] = set()
+    entry_key_ids: list[str] = []
+    for expected_sequence, raw_entry in enumerate(root["entries"], start=1):
+        item = _require_fields(raw_entry, _ENTRY_FIELDS, "INVALID_ENTRY_SCHEMA")
+        if (
+            type(item["sequence"]) is not int
+            or item["sequence"] != expected_sequence
+            or item["evidence_class"] != EvidenceClass.PILOT_OBSERVATION.value
+            or item["observer_id"] != "ETHERNIAN"
+            or not isinstance(item["observer_key_id"], str)
+            or not isinstance(item["event_id"], str)
+            or not isinstance(item["trial_id"], str)
+            or not isinstance(item["scenario_id"], str)
+            or not isinstance(item["phase"], str)
+            or not isinstance(item["role"], str)
+            or not isinstance(item["kind"], str)
+            or not isinstance(item["observed_at"], str)
+            or (item["intent_alignment"] is not None and type(item["intent_alignment"]) is not float)
+            or not isinstance(item["evidence_refs"], list)
+            or not all(isinstance(ref, str) for ref in item["evidence_refs"])
+            or item["previous_hash"] != previous_hash
+            or not isinstance(item["entry_hash"], str)
+            or _HEX_64.fullmatch(item["entry_hash"]) is None
+            or not isinstance(item["observer_signature"], str)
+        ):
+            raise ValueError("INVALID_ENTRY_SCHEMA")
+        observed_at = datetime.fromisoformat(item["observed_at"])
+        if observed_at.isoformat() != item["observed_at"]:
+            raise ValueError("NON_CANONICAL_TIMESTAMP")
+        event_id = UUID(item["event_id"])
+        if str(event_id) != item["event_id"] or event_id in event_ids:
+            raise ValueError("DUPLICATE_OR_NONCANONICAL_EVENT_ID")
+        receipt = _parse_receipt(item["receipt"])
+        if receipt is not None and receipt.task_id in receipt_ids:
+            raise ValueError("REUSED_EXECUTION_RECEIPT")
+        draft = PilotObservationDraft(
+            event_id=event_id,
+            trial_id=item["trial_id"],
+            scenario_id=item["scenario_id"],
+            phase=CampaignPhase(item["phase"]),
+            role=BenchmarkRole(item["role"]),
+            kind=PilotEventKind(item["kind"]),
+            observed_at=observed_at,
+            receipt=receipt,
+            intent_alignment=item["intent_alignment"],
+            evidence_refs=tuple(item["evidence_refs"]),
+        )
+        payload = _canonical_payload(
+            item["sequence"],
+            EvidenceClass.PILOT_OBSERVATION,
+            item["observer_id"],
+            item["observer_key_id"],
+            draft,
+            item["previous_hash"],
+        )
+        entry_key = trusted_observer_keys.get(item["observer_key_id"])
+        if entry_key is None or len(entry_key) != 32:
+            raise ValueError("UNTRUSTED_OBSERVER")
+        try:
+            Ed25519PublicKey.from_public_bytes(bytes(entry_key)).verify(
+                bytes.fromhex(item["observer_signature"]), payload
+            )
+        except (InvalidSignature, ValueError):
+            raise ValueError("INVALID_OBSERVER_SIGNATURE") from None
+        digest = hashlib.sha256(payload).hexdigest()
+        if digest != item["entry_hash"]:
+            raise ValueError("LEDGER_TAMPERING_DETECTED")
+        if previous_time is not None and observed_at < previous_time:
+            raise ValueError("OBSERVATION_TIME_REGRESSION")
+        previous_hash = digest
+        previous_time = observed_at
+        event_ids.add(event_id)
+        if receipt is not None:
+            receipt_ids.add(receipt.task_id)
+        entry_key_ids.append(item["observer_key_id"])
+    if root["head_hash"] != previous_hash:
+        raise ValueError("BUNDLE_TRUNCATED_OR_HEAD_MISMATCH")
+    return PilotBundleVerificationResult(
+        schema_version=root["schema_version"],
+        evidence_class=EvidenceClass.PILOT_OBSERVATION,
+        entry_count=root["entry_count"],
+        head_hash=root["head_hash"],
+        bundle_hash=root["bundle_hash"],
+        signer_key_id=root["signer_key_id"],
+        entry_key_ids=tuple(entry_key_ids),
+    )
