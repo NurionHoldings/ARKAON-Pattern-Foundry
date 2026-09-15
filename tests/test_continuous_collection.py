@@ -44,6 +44,7 @@ def test_private_or_owned_source_requires_explicit_authorization():
     ("changes", "reason"),
     [
         ({"contains_personal_data": True}, "PERSONAL_DATA_BLOCKED"),
+        ({"contains_secrets": True}, "SECRET_CONTENT_BLOCKED"),
         ({"requires_credentials": True}, "CREDENTIAL_ACCESS_BLOCKED"),
         ({"robots_allowed": False}, "SOURCE_POLICY_BLOCKED"),
         ({"terms_allowed": False}, "SOURCE_POLICY_BLOCKED"),
