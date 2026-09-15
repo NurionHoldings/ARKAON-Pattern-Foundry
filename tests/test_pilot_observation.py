@@ -25,6 +25,19 @@ def observer() -> EthernianObserver:
     return EthernianObserver(key_id="ethernian-pilot-v1", signing_key=b"k" * 32)
 
 
+def ledger_and_signer() -> tuple[PilotObservationLedger, EthernianObserver]:
+    signer = observer()
+    return PilotObservationLedger(trusted_observer_keys={signer.key_id: signer.public_key}), signer
+
+
+def append(
+    ledger: PilotObservationLedger,
+    signer: EthernianObserver,
+    value: PilotObservationDraft,
+):
+    return ledger.append(signer.attest(ledger.challenge(value)))
+
+
 def receipt() -> ExecutionReceipt:
     return ExecutionReceipt(
         task_id=uuid4(),
@@ -62,12 +75,14 @@ def draft(
 
 
 def test_signed_ledger_derives_observer_metrics() -> None:
-    ledger = PilotObservationLedger(observer())
-    ledger.append(draft(PilotEventKind.START, NOW))
-    ledger.append(draft(PilotEventKind.INTERVENTION, NOW + timedelta(seconds=1)))
-    ledger.append(draft(PilotEventKind.REWORK, NOW + timedelta(seconds=2)))
-    ledger.append(
-        draft(PilotEventKind.FINISH, NOW + timedelta(seconds=8), execution=receipt())
+    ledger, signer = ledger_and_signer()
+    append(ledger, signer, draft(PilotEventKind.START, NOW))
+    append(ledger, signer, draft(PilotEventKind.INTERVENTION, NOW + timedelta(seconds=1)))
+    append(ledger, signer, draft(PilotEventKind.REWORK, NOW + timedelta(seconds=2)))
+    append(
+        ledger,
+        signer,
+        draft(PilotEventKind.FINISH, NOW + timedelta(seconds=8), execution=receipt()),
     )
 
     campaign = ledger.to_campaign()
@@ -77,17 +92,16 @@ def test_signed_ledger_derives_observer_metrics() -> None:
     assert evidence.ethernian_interventions == 1
     assert evidence.rework_count == 1
     assert all(entry.observer_id == "ETHERNIAN" for entry in ledger.entries)
-    assert all(
-        entry.evidence_class is EvidenceClass.PILOT_OBSERVATION
-        for entry in ledger.entries
-    )
+    assert all(entry.evidence_class is EvidenceClass.PILOT_OBSERVATION for entry in ledger.entries)
 
 
 def test_hash_chain_detects_post_append_mutation() -> None:
-    ledger = PilotObservationLedger(observer())
-    ledger.append(draft(PilotEventKind.START, NOW))
-    finish = ledger.append(
-        draft(PilotEventKind.FINISH, NOW + timedelta(seconds=2), execution=receipt())
+    ledger, signer = ledger_and_signer()
+    append(ledger, signer, draft(PilotEventKind.START, NOW))
+    finish = append(
+        ledger,
+        signer,
+        draft(PilotEventKind.FINISH, NOW + timedelta(seconds=2), execution=receipt()),
     )
     ledger._entries[-1] = replace(finish, entry_hash="f" * 64)
 
@@ -96,36 +110,87 @@ def test_hash_chain_detects_post_append_mutation() -> None:
 
 
 def test_signature_detects_forged_observer_event() -> None:
-    ledger = PilotObservationLedger(observer())
-    entry = ledger.append(draft(PilotEventKind.START, NOW))
+    ledger, signer = ledger_and_signer()
+    entry = append(ledger, signer, draft(PilotEventKind.START, NOW))
     ledger._entries[0] = replace(entry, observer_signature="0" * 64)
 
     with pytest.raises(ValueError, match="TAMPERING"):
         ledger.verify_integrity()
 
 
+def test_ledger_cannot_sign_and_rejects_wrong_key() -> None:
+    ledger, _signer = ledger_and_signer()
+    assert not hasattr(ledger, "_observer")
+    assert not hasattr(ledger, "sign")
+
+    attacker = EthernianObserver(key_id="attacker", signing_key=b"x" * 32)
+    envelope = attacker.attest(ledger.challenge(draft(PilotEventKind.START, NOW)))
+    with pytest.raises(ValueError, match="UNTRUSTED_OBSERVER"):
+        ledger.append(envelope)
+
+
+def test_stale_challenge_and_replayed_attestation_are_rejected() -> None:
+    ledger, signer = ledger_and_signer()
+    stale = ledger.challenge(draft(PilotEventKind.START, NOW))
+    accepted = signer.attest(stale)
+    ledger.append(accepted)
+
+    with pytest.raises(ValueError, match="STALE|OUT_OF_ORDER"):
+        ledger.append(accepted)
+    with pytest.raises(ValueError, match="STALE|OUT_OF_ORDER"):
+        ledger.append(signer.attest(stale))
+
+
+def test_attested_draft_tampering_is_rejected() -> None:
+    ledger, signer = ledger_and_signer()
+    envelope = signer.attest(ledger.challenge(draft(PilotEventKind.START, NOW)))
+    tampered_challenge = replace(
+        envelope.challenge,
+        draft=replace(envelope.challenge.draft, scenario_id="scenario-tampered"),
+    )
+    tampered = replace(envelope, challenge=tampered_challenge)
+
+    with pytest.raises(ValueError, match="INVALID_OBSERVER_SIGNATURE"):
+        ledger.append(tampered)
+
+
+def test_out_of_order_sequence_and_previous_hash_are_rejected() -> None:
+    ledger, signer = ledger_and_signer()
+    challenge = ledger.challenge(draft(PilotEventKind.START, NOW))
+    for changed in (
+        replace(challenge, sequence=2),
+        replace(challenge, previous_hash="f" * 64),
+    ):
+        with pytest.raises(ValueError, match="STALE|OUT_OF_ORDER"):
+            ledger.append(signer.attest(changed))
+
+
 def test_duplicate_time_regression_and_receipt_reuse_fail_closed() -> None:
-    ledger = PilotObservationLedger(observer())
+    ledger, signer = ledger_and_signer()
     first = draft(PilotEventKind.START, NOW)
-    ledger.append(first)
+    append(ledger, signer, first)
     with pytest.raises(ValueError, match="DUPLICATE_EVENT"):
-        ledger.append(first)
+        append(ledger, signer, first)
     with pytest.raises(ValueError, match="TIME_REGRESSION"):
-        ledger.append(draft(PilotEventKind.REWORK, NOW - timedelta(seconds=1)))
+        append(ledger, signer, draft(PilotEventKind.REWORK, NOW - timedelta(seconds=1)))
 
     execution = receipt()
-    ledger.append(
-        draft(PilotEventKind.FINISH, NOW + timedelta(seconds=2), execution=execution)
+    append(
+        ledger,
+        signer,
+        draft(PilotEventKind.FINISH, NOW + timedelta(seconds=2), execution=execution),
     )
     with pytest.raises(ValueError, match="REUSED_EXECUTION_RECEIPT"):
-        ledger.append(
+        append(
+            ledger,
+            signer,
             draft(
                 PilotEventKind.FINISH,
                 NOW + timedelta(seconds=3),
                 scenario="another",
                 trial="another-trial",
                 execution=execution,
-            )
+            ),
         )
 
 
@@ -161,61 +226,69 @@ def test_secret_in_worker_receipt_is_rejected_before_storage() -> None:
 
 
 def test_incomplete_or_wrongly_ordered_trial_is_rejected() -> None:
-    ledger = PilotObservationLedger(observer())
-    ledger.append(
-        draft(PilotEventKind.FINISH, NOW, execution=receipt())
-    )
+    ledger, signer = ledger_and_signer()
+    append(ledger, signer, draft(PilotEventKind.FINISH, NOW, execution=receipt()))
 
     with pytest.raises(ValueError, match="BOUNDARY|ORDER"):
         ledger.to_campaign()
 
 
 def test_insufficient_paired_role_evidence_cannot_pass() -> None:
-    ledger = PilotObservationLedger(observer())
+    ledger, signer = ledger_and_signer()
     for index, phase in enumerate(CampaignPhase):
         trial = f"trial-build-{phase.value.lower()}"
-        ledger.append(
+        append(
+            ledger,
+            signer,
             draft(
                 PilotEventKind.START,
                 NOW + timedelta(seconds=index * 10),
                 phase=phase,
                 trial=trial,
-            )
+            ),
         )
-        ledger.append(
+        append(
+            ledger,
+            signer,
             draft(
                 PilotEventKind.FINISH,
                 NOW + timedelta(seconds=index * 10 + 5),
                 phase=phase,
                 trial=trial,
                 execution=receipt(),
-            )
+            ),
         )
 
-    report = ledger.evaluate(
-        thresholds=BenchmarkThresholds(minimum_intervention_reduction=0)
-    )
+    report = ledger.evaluate(thresholds=BenchmarkThresholds(minimum_intervention_reduction=0))
 
     assert not report.passed
     assert "REQUIRED_ROLE_COVERAGE_MISSING" in report.blocking_reasons
 
 
 def test_ledger_is_sealed_after_evaluation_attempt() -> None:
-    ledger = PilotObservationLedger(observer())
+    ledger, signer = ledger_and_signer()
     # A structurally complete but role-incomplete campaign evaluates to a failed report.
     for index, phase in enumerate(CampaignPhase):
         trial = f"trial-{phase.value.lower()}"
-        ledger.append(draft(PilotEventKind.START, NOW + timedelta(seconds=index * 4), phase=phase, trial=trial))
-        ledger.append(
+        append(
+            ledger,
+            signer,
+            draft(
+                PilotEventKind.START, NOW + timedelta(seconds=index * 4), phase=phase, trial=trial
+            ),
+        )
+        append(
+            ledger,
+            signer,
             draft(
                 PilotEventKind.FINISH,
                 NOW + timedelta(seconds=index * 4 + 2),
                 phase=phase,
                 trial=trial,
                 execution=receipt(),
-            )
+            ),
         )
     ledger.evaluate(thresholds=BenchmarkThresholds(minimum_intervention_reduction=0))
 
     with pytest.raises(ValueError, match="SEALED"):
-        ledger.append(draft(PilotEventKind.START, NOW + timedelta(seconds=20)))
+        append(ledger, signer, draft(PilotEventKind.START, NOW + timedelta(seconds=20)))
