@@ -6,7 +6,7 @@ from collections.abc import Callable, Iterable
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from threading import Event
+from threading import Event, RLock
 from typing import Protocol
 
 from .continuous_collection import (
@@ -31,9 +31,9 @@ class AuditSink(Protocol):
 
 
 class ContentHashStore(Protocol):
-    def contains(self, digest: str) -> bool: ...
-
-    def add(self, digest: str) -> None: ...
+    def claim(self, digest: str) -> bool:
+        """Atomically return True only for the first claimant."""
+        ...
 
 
 @dataclass(frozen=True)
@@ -54,6 +54,7 @@ class CollectionCycleResult:
     collected: int
     denied: int
     duplicate: int
+    failed: int = 0
 
 
 class MemoryAuditSink:
@@ -67,12 +68,14 @@ class MemoryAuditSink:
 class MemoryContentHashStore:
     def __init__(self) -> None:
         self.values: set[str] = set()
+        self._lock = RLock()
 
-    def contains(self, digest: str) -> bool:
-        return digest in self.values
-
-    def add(self, digest: str) -> None:
-        self.values.add(digest)
+    def claim(self, digest: str) -> bool:
+        with self._lock:
+            if digest in self.values:
+                return False
+            self.values.add(digest)
+            return True
 
 
 def load_policy(path: str | Path) -> ContinuousCollectionPolicy:
@@ -129,7 +132,7 @@ class CollectorRuntime:
         )
 
     def run_once(self) -> CollectionCycleResult:
-        considered = collected = denied = duplicate = 0
+        considered = collected = denied = duplicate = failed = 0
         for candidate in self.provider.candidates():
             considered += 1
             decision = decide_collection(candidate, self.policy)
@@ -138,7 +141,15 @@ class CollectorRuntime:
                 self._audit(candidate, decision)
                 continue
 
-            payload = self.fetcher.fetch(candidate, self.policy.max_response_bytes + 1)
+            try:
+                payload = self.fetcher.fetch(candidate, self.policy.max_response_bytes + 1)
+            except (OSError, ValueError) as exc:
+                failed += 1
+                self._audit(
+                    candidate,
+                    CollectionDecision(False, False, f"FETCH_FAILED:{type(exc).__name__}"),
+                )
+                continue
             if len(payload) > self.policy.max_response_bytes:
                 denied += 1
                 self._audit(
@@ -149,7 +160,7 @@ class CollectorRuntime:
                 continue
 
             digest = hashlib.sha256(payload).hexdigest()
-            if self._content_hashes.contains(digest):
+            if not self._content_hashes.claim(digest):
                 duplicate += 1
                 self._audit(
                     candidate,
@@ -159,10 +170,9 @@ class CollectorRuntime:
                 )
                 continue
 
-            self._content_hashes.add(digest)
             collected += 1
             self._audit(candidate, decision, content_hash=digest, content_bytes=len(payload))
-        return CollectionCycleResult(considered, collected, denied, duplicate)
+        return CollectionCycleResult(considered, collected, denied, duplicate, failed)
 
     def run_forever(self, stop: Event) -> None:
         if not self.policy.enabled:
