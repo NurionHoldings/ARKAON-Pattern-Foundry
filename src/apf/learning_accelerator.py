@@ -128,16 +128,15 @@ class LearningAccelerator:
             intent_fingerprint=record.lesson.intent_fingerprint,
             verification_service=self.verification_service,
         )
-        verified = replace(record, state=AccelerationState.ETHERNIAN_VERIFIED, verification=verification)
-        self._records[candidate_id] = verified
-
-        memory_ref = self.memory.remember(verified.lesson)
-        remembered = replace(verified, state=AccelerationState.REMEMBERED, memory_ref=memory_ref)
-        self._records[candidate_id] = remembered
-
+        # The verification nonce is consumed by authorization. Do not publish an
+        # intermediate verified state until durable memory accepts the lesson:
+        # on failure the candidate remains retryable with a newly issued token.
+        memory_ref = self.memory.remember(record.lesson)
         ready = replace(
-            remembered,
+            record,
             state=AccelerationState.READY_FOR_HUMAN_AUDIT,
+            verification=verification,
+            memory_ref=memory_ref,
             report_authorization=authorization,
         )
         self._records[candidate_id] = ready
