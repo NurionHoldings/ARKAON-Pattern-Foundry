@@ -9,7 +9,7 @@ from apf.learning_evaluator import (
     CandidateLesson,
     EthernianVerificationService,
 )
-from apf.learning_memory import LearningLesson, LessonOutcome
+from apf.learning_memory import LearningLesson, LearningMemory, LessonOutcome
 from apf.learning_safety import LearningSafetyViolation
 
 EVIDENCE_A = "evidence://sha256/" + "a" * 64
@@ -198,3 +198,33 @@ def test_unsafe_payload_is_blocked_before_evaluation_or_memory(
     assert len(accelerator.memory) == 0
     with pytest.raises(ValueError, match="UNKNOWN_CURRICULUM_CANDIDATE"):
         accelerator.get("lesson-1")
+
+
+def test_memory_failure_keeps_candidate_retryable_with_new_verification() -> None:
+    class FailOnceMemory(LearningMemory):
+        def __init__(self) -> None:
+            super().__init__()
+            self.fail_once = True
+
+        def remember(self, value):
+            if self.fail_once:
+                self.fail_once = False
+                raise RuntimeError("MEMORY_WRITE_FAILED")
+            return super().remember(value)
+
+    accelerator = LearningAccelerator(
+        EthernianVerificationService(SECRET),
+        memory=FailOnceMemory(),
+    )
+    evaluated = accelerator.evaluate(item(), candidate(), lesson())
+
+    with pytest.raises(RuntimeError, match="MEMORY_WRITE_FAILED"):
+        accelerator.complete_pass("lesson-1", verification(accelerator, evaluated))
+
+    assert accelerator.get("lesson-1").state is AccelerationState.AWAITING_ETHERNIAN_VERIFICATION
+    ready = accelerator.complete_pass(
+        "lesson-1",
+        verification(accelerator, accelerator.get("lesson-1")),
+    )
+    assert ready.state is AccelerationState.READY_FOR_HUMAN_AUDIT
+    assert len(accelerator.memory) == 1

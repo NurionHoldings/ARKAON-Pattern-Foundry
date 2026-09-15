@@ -1,3 +1,4 @@
+from dataclasses import replace
 from uuid import uuid4
 
 import pytest
@@ -150,3 +151,23 @@ def test_submitted_plan_releases_only_first_stage():
     claimed = orchestrator.claim(all_capabilities)
     assert claimed.kind == TaskKind.RESEARCH
     assert orchestrator.claim(all_capabilities) is None
+
+
+def test_legacy_running_task_can_complete_with_valid_lease_capability():
+    orchestrator = DevelopmentOrchestrator()
+    legacy = replace(
+        contract(),
+        status=TaskStatus.RUNNING,
+        lease_token=uuid4(),
+        claimed_by=None,
+    )
+    orchestrator.restore((legacy,))
+
+    completed = orchestrator.complete(
+        legacy.task_id,
+        legacy.lease_token,
+        "legacy-worker",
+        TaskResult(("evidence.json",), ("check",), "PASS"),
+    )
+
+    assert completed.status is TaskStatus.SUCCEEDED

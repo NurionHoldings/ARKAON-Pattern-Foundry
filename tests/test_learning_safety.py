@@ -94,3 +94,14 @@ def test_invalid_payload_fails_closed_without_crashing() -> None:
     result = scan_learning_payload({"principle": 123}, (EVIDENCE_ID,))  # type: ignore[dict-item]
 
     assert result.violation_codes == ("LEARNING_PAYLOAD_INVALID",)
+
+
+def test_opaque_digest_is_not_rescanned_as_pii() -> None:
+    # This valid opaque SHA-256 contains phone- and RRN-shaped digit runs.
+    reference = "evidence://sha256/" + "01012345678" + "9001011234568" + "a" * 40
+    assert len(reference.removeprefix("evidence://sha256/")) == 64
+
+    result = scan_learning_payload({"principle": "Safe principle"}, (reference,))
+
+    assert result.safe
+    assert result.violation_codes == ()

@@ -127,3 +127,23 @@ def test_claimed_task_can_be_saved_and_resumed_after_restart(tmp_path) -> None:
 def test_short_integrity_key_is_rejected(tmp_path) -> None:
     with pytest.raises(ValueError, match="INTEGRITY_KEY_MUST_BE_AT_LEAST_32_BYTES"):
         SQLiteOrchestratorStorage(tmp_path / "queue.db", integrity_key=b"short")
+
+
+def test_restore_failure_does_not_partially_mutate_live_orchestrator(tmp_path) -> None:
+    storage = SQLiteOrchestratorStorage(tmp_path / "queue.db", integrity_key=INTEGRITY_KEY)
+    valid = replace(contract(), dependencies=())
+    normalized = task_contract(
+        TaskKind.PROMOTE_OWNED_ASSET,
+        intent_fingerprint="intent:abc123",
+        objective="promote only after human approval",
+        allowed_paths=("assets/",),
+        expected_artifacts=("asset.json",),
+    )
+    storage.save_many((valid, normalized))
+    live = DevelopmentOrchestrator()
+    sentinel = live.submit(replace(contract(), dependencies=()))
+
+    with pytest.raises(OrchestratorStorageError, match="RESTORED_TASK_STATE_CHANGED"):
+        storage.restore_into(live)
+
+    assert live.snapshot() == (sentinel,)

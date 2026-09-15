@@ -139,12 +139,18 @@ class LearningMemory:
     ) -> tuple[LearningLesson, ...]:
         if limit < 1:
             raise ValueError("limit must be positive")
+        normalized_intent = _normalize_semantic_text(intent_fingerprint)
+        normalized_domain = _normalize_semantic_text(domain)
+        normalized_problem = None if problem is None else _normalize_semantic_text(problem)
         matches = [
             lesson
             for lesson in self._lessons.values()
-            if lesson.intent_fingerprint == intent_fingerprint
-            and lesson.domain == domain
-            and (problem is None or lesson.problem == problem)
+            if _normalize_semantic_text(lesson.intent_fingerprint) == normalized_intent
+            and _normalize_semantic_text(lesson.domain) == normalized_domain
+            and (
+                normalized_problem is None
+                or _normalize_semantic_text(lesson.problem) == normalized_problem
+            )
             and self._is_reusable(lesson)
         ]
         matches.sort(

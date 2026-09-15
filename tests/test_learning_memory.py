@@ -123,3 +123,24 @@ def test_untrusted_lessons_cannot_enter_reusable_memory(candidate, error: str) -
 def test_failure_lesson_requires_named_failure_mode() -> None:
     with pytest.raises(ValueError, match="failure_mode"):
         lesson(outcome=LessonOutcome.FAILURE)
+
+
+def test_recall_uses_the_same_semantic_normalization_as_storage() -> None:
+    memory = LearningMemory()
+    original = lesson(confidence=0.9, evidence_refs=("test:one",))
+    memory.remember(original)
+    stronger = lesson(
+        intent_fingerprint=" INTENT-V1 ",
+        domain=" COLLECTION ",
+        problem="  duplicate   FETCHES ",
+        principle="bind DEDUPLICATION to canonical source identity.",
+        confidence=0.96,
+        evidence_refs=("test:one", "audit:two"),
+    )
+    memory.upgrade(stronger)
+
+    assert memory.recall(
+        intent_fingerprint="intent-v1",
+        domain="collection",
+        problem="duplicate fetches",
+    ) == (stronger,)
