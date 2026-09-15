@@ -167,3 +167,21 @@ def test_invalid_cost_and_metrics_are_rejected() -> None:
         candidate("bad-cost", LearningOrigin.EXTERNAL, cost=0)
     with pytest.raises(ValueError):
         candidate("bad-score", LearningOrigin.EXTERNAL, gap=1.1)
+
+
+def test_zero_exploration_ratio_selects_only_exploitation() -> None:
+    values = [candidate(f"e-{index}", LearningOrigin.EXTERNAL) for index in range(4)]
+    plan = plan_curriculum(
+        values, max_items=3, budget_limit=3, external_ratio=1, exploration_ratio=0
+    )
+    assert plan.items
+    assert all(item.mode is LearningMode.EXPLOIT for item in plan.items)
+
+
+def test_full_exploration_ratio_selects_only_exploration() -> None:
+    values = [candidate(f"e-{index}", LearningOrigin.EXTERNAL) for index in range(4)]
+    plan = plan_curriculum(
+        values, max_items=3, budget_limit=3, external_ratio=1, exploration_ratio=1
+    )
+    assert plan.items
+    assert all(item.mode is LearningMode.EXPLORE for item in plan.items)
