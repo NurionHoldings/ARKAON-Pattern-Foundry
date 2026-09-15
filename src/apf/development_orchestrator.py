@@ -54,6 +54,7 @@ class TaskContract:
     approval_ref: str | None = None
     status: TaskStatus = TaskStatus.QUEUED
     lease_token: UUID | None = None
+    claimed_by: str | None = None
     produced_artifacts: tuple[str, ...] = ()
 
 
@@ -121,15 +122,28 @@ class DevelopmentOrchestrator:
             )
             if not eligible:
                 return None
-            claimed = replace(eligible[0], status=TaskStatus.RUNNING, lease_token=uuid4())
+            claimed = replace(
+                eligible[0],
+                status=TaskStatus.RUNNING,
+                lease_token=uuid4(),
+                claimed_by=worker.worker_id,
+            )
             self._tasks[claimed.task_id] = claimed
             return claimed
 
-    def complete(self, task_id: UUID, lease_token: UUID, result: TaskResult) -> TaskContract:
+    def complete(
+        self,
+        task_id: UUID,
+        lease_token: UUID,
+        worker_id: str,
+        result: TaskResult,
+    ) -> TaskContract:
         with self._lock:
             task = self._tasks[task_id]
             if task.status != TaskStatus.RUNNING or task.lease_token != lease_token:
                 raise OrchestrationDenied("INVALID_OR_STALE_LEASE")
+            if task.claimed_by != worker_id:
+                raise OrchestrationDenied("WORKER_IDENTITY_MISMATCH")
             missing = set(task.expected_artifacts) - set(result.artifacts)
             if missing or result.outcome != "PASS" or not result.checks:
                 failed = replace(task, status=TaskStatus.FAILED, produced_artifacts=result.artifacts)
@@ -140,6 +154,7 @@ class DevelopmentOrchestrator:
                 status=TaskStatus.SUCCEEDED,
                 produced_artifacts=result.artifacts,
                 lease_token=None,
+                claimed_by=None,
             )
             self._tasks[task_id] = completed
             return completed
