@@ -50,11 +50,23 @@ class ConceptReportSink(Protocol):
     def publish(self, report: AssetConceptReport) -> None: ...
 
 
+@dataclass(frozen=True)
+class ConceptVerification:
+    verifier: str
+    decision: str
+    checks: tuple[str, ...]
+
+
+class ConceptVerifier(Protocol):
+    def verify(self, report: AssetConceptReport) -> ConceptVerification: ...
+
+
 def promote(
     record: AssetRecord,
     target: AssetLifecycle,
     *,
     report_sink: ConceptReportSink | None = None,
+    ethernian_verifier: ConceptVerifier | None = None,
 ) -> AssetRecord:
     route = assetization_route(record.stage)
     if route.next_step != target:
@@ -72,18 +84,26 @@ def promote(
     if target == AssetLifecycle.OWNED_ASSET and not record.approval_ref:
         raise AssetPromotionDenied("HUMAN_APPROVAL_REQUIRED")
     updated = replace(record, stage=target, updated_at=datetime.now(UTC))
-    if target == AssetLifecycle.PRINCIPLE_ABSTRACTED and report_sink is not None:
-        report_sink.publish(
-            AssetConceptReport(
-                report_type="NEW_ASSET_CONCEPTUALIZED",
-                asset_id=updated.asset_id,
-                source_id=updated.source_id,
-                title=updated.title,
-                principle_ref=updated.principle_ref or "",
-                provenance_ref=updated.provenance_ref,
-                generated_at=updated.updated_at,
-            )
+    if target == AssetLifecycle.PRINCIPLE_ABSTRACTED:
+        if report_sink is None or ethernian_verifier is None:
+            raise AssetPromotionDenied("ETHERNIAN_VERIFICATION_AND_REPORTING_REQUIRED")
+        report = AssetConceptReport(
+            report_type="NEW_ASSET_CONCEPTUALIZED",
+            asset_id=updated.asset_id,
+            source_id=updated.source_id,
+            title=updated.title,
+            principle_ref=updated.principle_ref or "",
+            provenance_ref=updated.provenance_ref,
+            generated_at=updated.updated_at,
         )
+        verification = ethernian_verifier.verify(report)
+        if (
+            verification.verifier != "ETHERNIAN"
+            or verification.decision != "PASS"
+            or not verification.checks
+        ):
+            raise AssetPromotionDenied("ETHERNIAN_VERIFICATION_FAILED")
+        report_sink.publish(report)
     return updated
 
 
