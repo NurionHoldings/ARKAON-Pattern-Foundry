@@ -3,6 +3,7 @@ import pytest
 from apf.asset_registry import (
     AssetPromotionDenied,
     AssetRecord,
+    ConceptVerification,
     build_assetization_report,
     promote,
 )
@@ -29,6 +30,18 @@ class Reports:
         self.values.append(report)
 
 
+class Ethernian:
+    def __init__(self, decision="PASS"):
+        self.decision = decision
+
+    def verify(self, report):
+        return ConceptVerification(
+            verifier="ETHERNIAN",
+            decision=self.decision,
+            checks=("provenance", "clean-room", "intent-alignment"),
+        )
+
+
 def test_asset_must_advance_sequentially():
     with pytest.raises(AssetPromotionDenied, match="NON_SEQUENTIAL"):
         promote(record(), AssetLifecycle.OWNED_ASSET)
@@ -40,6 +53,7 @@ def test_each_new_asset_concept_publishes_an_immediate_report():
         record(principle_ref="principle:retry-with-jitter"),
         AssetLifecycle.PRINCIPLE_ABSTRACTED,
         report_sink=reports,
+        ethernian_verifier=Ethernian(),
     )
     assert conceptualized.stage == AssetLifecycle.PRINCIPLE_ABSTRACTED
     assert len(reports.values) == 1
@@ -47,9 +61,24 @@ def test_each_new_asset_concept_publishes_an_immediate_report():
     assert reports.values[0].principle_ref == "principle:retry-with-jitter"
 
 
+def test_failed_ethernian_review_prevents_promotion_and_user_report():
+    reports = Reports()
+    with pytest.raises(AssetPromotionDenied, match="ETHERNIAN_VERIFICATION_FAILED"):
+        promote(
+            record(principle_ref="principle:unsafe"),
+            AssetLifecycle.PRINCIPLE_ABSTRACTED,
+            report_sink=reports,
+            ethernian_verifier=Ethernian("FAIL"),
+        )
+    assert reports.values == []
+
+
 def test_independent_route_requires_principle_implementation_tests_and_human_approval():
     value = promote(
-        record(principle_ref="principle:1"), AssetLifecycle.PRINCIPLE_ABSTRACTED
+        record(principle_ref="principle:1"),
+        AssetLifecycle.PRINCIPLE_ABSTRACTED,
+        report_sink=Reports(),
+        ethernian_verifier=Ethernian(),
     )
     value = promote(
         value.__class__(**{**value.__dict__, "implementation_ref": "src/retry.py"}),
