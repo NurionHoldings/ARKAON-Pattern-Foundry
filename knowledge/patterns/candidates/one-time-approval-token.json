@@ -1,0 +1,57 @@
+{
+  "schema_version": "apf.pattern-candidate/1.0",
+  "pattern_id": "apf.public.one-time-approval-token",
+  "version": "0.1.0",
+  "title": "One-time Approval Token",
+  "intent": "Consume narrowly bound human approval exactly once before mutation.",
+  "problem": "Without HMAC-bound claims consumed under a lock, the system can accept an outcome that is not justified by the one-time approval token contract.",
+  "context": "This pattern addresses one human decision authorizes one sensitive command; its concrete control is HMAC-bound claims consumed under a lock.",
+  "forces": [
+    "Correctness requires that task and result fingerprints match exactly",
+    "Operational pressure can cause: expired approval authorizes a late mutation"
+  ],
+  "solution": "Implement HMAC-bound claims consumed under a lock. Verify the anchored symbol `ApprovalTokenDenied` with `test_token_is_bound_and_consumed_once` before reuse.",
+  "invariants": [
+    "task and result fingerprints match exactly",
+    "a token identifier is consumed at most once"
+  ],
+  "failure_modes": [
+    "expired approval authorizes a late mutation",
+    "concurrent retries consume the token twice"
+  ],
+  "security": "The security boundary specifically rejects `expired approval authorizes a late mutation` and fails closed if the one-time approval token evidence cannot be verified.",
+  "privacy": "For one-time approval token, persist only its decision identifiers and digests; exclude payload data unrelated to HMAC-bound claims consumed under a lock.",
+  "license_provenance": {
+    "license": "INTERNAL_PROPRIETARY",
+    "origin": "ARKAON_IMPLEMENTED_INTERNAL",
+    "external_material_included": false
+  },
+  "evidence_hashes": {
+    "src/apf/approval_tokens.py": "4e8a2ee1144cdecb6b18ce22825f60b1636cb04679f1a2ff5a496276bbdac05a",
+    "tests/test_approval_tokens.py": "1fa15da4476d70d220a22376b9e8cf87c325201169f6fa833a1bd6cc9ac5e0ad"
+  },
+  "source_refs": [
+    "src/apf/approval_tokens.py"
+  ],
+  "test_refs": [
+    "tests/test_approval_tokens.py"
+  ],
+  "verification_test_ids": [
+    "tests/test_approval_tokens.py::test_token_is_bound_and_consumed_once"
+  ],
+  "reuse_constraints": [
+    "Confirm the target still requires: one human decision authorizes one sensitive command",
+    "Do not apply when: standing role permission is the intended policy",
+    "External Ethernian promotion signature remains mandatory"
+  ],
+  "applies_when": "one human decision authorizes one sensitive command",
+  "not_when": "standing role permission is the intended policy",
+  "evidence_anchors": {
+    "source_symbol": "ApprovalTokenDenied",
+    "test_name": "test_token_is_bound_and_consumed_once"
+  },
+  "status": "ETHERNIAN_REVIEW_REQUIRED",
+  "owned_asset": false,
+  "semantic_fingerprint": "d66069fc5b619e6ea2f18e5e916d81240677fd209c26873b82206415db8fc2c9",
+  "package_hash": "a3ca31d939baee3fc5f703288dfef876918195c30a5ad74a274b5625dfd45b94"
+}

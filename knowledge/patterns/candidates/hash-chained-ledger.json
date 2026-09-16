@@ -1,0 +1,57 @@
+{
+  "schema_version": "apf.pattern-candidate/1.0",
+  "pattern_id": "apf.public.hash-chained-ledger",
+  "version": "0.1.0",
+  "title": "Hash-chained Audit Ledger",
+  "intent": "Make ordered audit history tamper-evident with predecessor-bound hashes.",
+  "problem": "Without each entry hashes canonical content plus predecessor hash, the system can accept an outcome that is not justified by the hash-chained audit ledger contract.",
+  "context": "This pattern addresses audit ordering must reveal tampering; its concrete control is each entry hashes canonical content plus predecessor hash.",
+  "forces": [
+    "Correctness requires that entry order is cryptographically committed",
+    "Operational pressure can cause: history rows are edited without recomputing descendants"
+  ],
+  "solution": "Implement each entry hashes canonical content plus predecessor hash. Verify the anchored symbol `OrchestratorStorageError` with `test_task_contract_canonical_round_trip` before reuse.",
+  "invariants": [
+    "entry order is cryptographically committed",
+    "chain verification starts from a defined genesis"
+  ],
+  "failure_modes": [
+    "history rows are edited without recomputing descendants",
+    "canonicalization differs across readers"
+  ],
+  "security": "The security boundary specifically rejects `history rows are edited without recomputing descendants` and fails closed if the hash-chained audit ledger evidence cannot be verified.",
+  "privacy": "For hash-chained audit ledger, persist only its decision identifiers and digests; exclude payload data unrelated to each entry hashes canonical content plus predecessor hash.",
+  "license_provenance": {
+    "license": "INTERNAL_PROPRIETARY",
+    "origin": "ARKAON_IMPLEMENTED_INTERNAL",
+    "external_material_included": false
+  },
+  "evidence_hashes": {
+    "src/apf/orchestrator_storage.py": "e31028deadbc28f37754b721d90d0b12f7721d76ee47efff2cf8a2ad7b4238e3",
+    "tests/test_orchestrator_storage.py": "235458d1d2d74e4bd56e3aac9074326801c9127892ec681ab3b127de764be588"
+  },
+  "source_refs": [
+    "src/apf/orchestrator_storage.py"
+  ],
+  "test_refs": [
+    "tests/test_orchestrator_storage.py"
+  ],
+  "verification_test_ids": [
+    "tests/test_orchestrator_storage.py::test_task_contract_canonical_round_trip"
+  ],
+  "reuse_constraints": [
+    "Confirm the target still requires: audit ordering must reveal tampering",
+    "Do not apply when: cryptographic non-repudiation requires an external signature service",
+    "External Ethernian promotion signature remains mandatory"
+  ],
+  "applies_when": "audit ordering must reveal tampering",
+  "not_when": "cryptographic non-repudiation requires an external signature service",
+  "evidence_anchors": {
+    "source_symbol": "OrchestratorStorageError",
+    "test_name": "test_task_contract_canonical_round_trip"
+  },
+  "status": "ETHERNIAN_REVIEW_REQUIRED",
+  "owned_asset": false,
+  "semantic_fingerprint": "3c9662227b3680002be9a6abd281fc500773e39d6afd47a6b7171f32fe5bd772",
+  "package_hash": "163013de2cc8da1e060936e04549b13d1613fa42aeb98d971c3e2c1d0b5251d8"
+}

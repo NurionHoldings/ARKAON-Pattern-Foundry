@@ -1,0 +1,57 @@
+{
+  "schema_version": "apf.pattern-candidate/1.0",
+  "pattern_id": "apf.public.static-normalization-sandbox",
+  "version": "0.1.0",
+  "title": "Static Normalization Sandbox",
+  "intent": "Normalize authorized minified material without executing untrusted code.",
+  "problem": "Without parser-only normalization forbids dynamic execution and network access, the system can accept an outcome that is not justified by the static normalization sandbox contract.",
+  "context": "This pattern addresses authorized minified code needs structural inspection; its concrete control is parser-only normalization forbids dynamic execution and network access.",
+  "forces": [
+    "Correctness requires that untrusted scripts are never evaluated",
+    "Operational pressure can cause: parser confusion triggers executable fallback"
+  ],
+  "solution": "Implement parser-only normalization forbids dynamic execution and network access. Verify the anchored symbol `SandboxPolicyDenied` with `test_builds_fail_closed_policy_and_verifiable_attestation` before reuse.",
+  "invariants": [
+    "untrusted scripts are never evaluated",
+    "normalized output preserves analyzable structure"
+  ],
+  "failure_modes": [
+    "parser confusion triggers executable fallback",
+    "oversized syntax causes resource exhaustion"
+  ],
+  "security": "The security boundary specifically rejects `parser confusion triggers executable fallback` and fails closed if the static normalization sandbox evidence cannot be verified.",
+  "privacy": "For static normalization sandbox, persist only its decision identifiers and digests; exclude payload data unrelated to parser-only normalization forbids dynamic execution and network access.",
+  "license_provenance": {
+    "license": "INTERNAL_PROPRIETARY",
+    "origin": "ARKAON_IMPLEMENTED_INTERNAL",
+    "external_material_included": false
+  },
+  "evidence_hashes": {
+    "src/apf/execution_sandbox.py": "86841812697142d4d9e2e00d248abcb87f30180d58a85ac33b4ee0fef3fc0dea",
+    "tests/test_execution_sandbox.py": "8539f429016d8ec5217f87ee1b2058fa7fdcaef0f6e2db37fe1de23f50f7e121"
+  },
+  "source_refs": [
+    "src/apf/execution_sandbox.py"
+  ],
+  "test_refs": [
+    "tests/test_execution_sandbox.py"
+  ],
+  "verification_test_ids": [
+    "tests/test_execution_sandbox.py::test_builds_fail_closed_policy_and_verifiable_attestation"
+  ],
+  "reuse_constraints": [
+    "Confirm the target still requires: authorized minified code needs structural inspection",
+    "Do not apply when: behavior can only be established by executing untrusted payloads",
+    "External Ethernian promotion signature remains mandatory"
+  ],
+  "applies_when": "authorized minified code needs structural inspection",
+  "not_when": "behavior can only be established by executing untrusted payloads",
+  "evidence_anchors": {
+    "source_symbol": "SandboxPolicyDenied",
+    "test_name": "test_builds_fail_closed_policy_and_verifiable_attestation"
+  },
+  "status": "ETHERNIAN_REVIEW_REQUIRED",
+  "owned_asset": false,
+  "semantic_fingerprint": "b7322a58b952c3546b97e08a236fe2d97bc51f2211eecaf7c488577810c387be",
+  "package_hash": "95c331b20f341458a7de258ae39eaf217471c9a22e8218bf647956952b30eb15"
+}

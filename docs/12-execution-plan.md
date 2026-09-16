@@ -1,7 +1,13 @@
 # 12. 실행계획과 설계 잠금
 
 - 명세 ID: APF-PLAN-001
-- 상태: DESIGN_COMPLETE / IMPLEMENT_HOLD
+- 상태: PARTIAL_IMPLEMENTATION / PRODUCT_IMPLEMENT_HOLD
+
+이 문서의 최초 `DESIGN_COMPLETE / IMPLEMENT_HOLD`는 더 이상 전체 저장소의 구현 상태를
+정확히 표현하지 못한다. #013~#042의 안전·증거·파일럿·검토·PostgreSQL 대상 어댑터,
+운영 UI shell 및 SQLite durable console adapter는 구현되었지만 제품
+Definition of Done은 충족되지 않았다. 기계 판독 기준은
+`knowledge/readiness/v0.1-readiness.json`이다.
 
 ## 단계
 
@@ -48,4 +54,14 @@ main은 승인된 문서와 Green 결과만 유지한다. 구현부터 feature b
 
 ## 다음 Gate
 
-코드 구현 전에 APF-SCOPE-001, APF-DOMAIN-001, APF-PROTOCOL-001, APF-INTENT-001을 LOCK하고 threat-model.md, ADR, JSON Schemas, OpenAPI를 작성·검증한다.
+현재 #037은 #031 후보의 외부 서명 검토 증거만 수락한다. 승인 결과도
+`APPROVED_FOR_PATTERN_PROMOTION`에서 멈추며 Intent_DNA 변경, MJN 쓰기, `OWNED_ASSET`
+승격을 허용하지 않는다.
+
+다음 제품 게이트는 PostgreSQL 실연결 CI Green 증거, PostgreSQL 검토·후보 어댑터와
+운영 UI 상세 렌더링,
+노가다뉴스·부업장터의 실제 저장소 연결 분석, 30개 후보의 외부 서명 개별 승격, 실제 플랫폼
+재사용 proof 순서다. #042는 정확히 30개 증거결합 후보와 검증·승격·재사용 proof harness를
+구현했지만 외부 승격서명과 운영 재사용 증명은 만들지 않았다. #041은 제공된 메타데이터 기반 파일럿까지만 구현했으며 실제
+저장소 연결은 `NOT_RUN_UNAVAILABLE`이다. 이 항목이 끝나기 전 `IMPLEMENT_HOLD`를 해제하거나 v0.1 제품 완료로
+표현하지 않는다.

@@ -1,0 +1,57 @@
+{
+  "schema_version": "apf.pattern-candidate/1.0",
+  "pattern_id": "apf.public.state-machine-guard",
+  "version": "0.1.0",
+  "title": "State Machine Guard",
+  "intent": "Permit lifecycle changes only through explicit transition rules.",
+  "problem": "Without transition table rejects undeclared source-to-target edges, the system can accept an outcome that is not justified by the state machine guard contract.",
+  "context": "This pattern addresses workflow legality is finite and enumerable; its concrete control is transition table rejects undeclared source-to-target edges.",
+  "forces": [
+    "Correctness requires that terminal states cannot silently reopen",
+    "Operational pressure can cause: caller assigns a target state directly"
+  ],
+  "solution": "Implement transition table rejects undeclared source-to-target edges. Verify the anchored symbol `InvalidTransition` with `test_valid_transitions` before reuse.",
+  "invariants": [
+    "terminal states cannot silently reopen",
+    "side effects occur only after a legal edge"
+  ],
+  "failure_modes": [
+    "caller assigns a target state directly",
+    "new states ship without transition coverage"
+  ],
+  "security": "The security boundary specifically rejects `caller assigns a target state directly` and fails closed if the state machine guard evidence cannot be verified.",
+  "privacy": "For state machine guard, persist only its decision identifiers and digests; exclude payload data unrelated to transition table rejects undeclared source-to-target edges.",
+  "license_provenance": {
+    "license": "INTERNAL_PROPRIETARY",
+    "origin": "ARKAON_IMPLEMENTED_INTERNAL",
+    "external_material_included": false
+  },
+  "evidence_hashes": {
+    "src/apf/state_machine.py": "6f66493a25932d9d3e1059449ebaecb1e0d0e9660f23b16c401de0776f2bbaa3",
+    "tests/test_state_machine.py": "5c424c48c1d05fc543248b474f4b550ec70f013675b282467d421ea668105dc9"
+  },
+  "source_refs": [
+    "src/apf/state_machine.py"
+  ],
+  "test_refs": [
+    "tests/test_state_machine.py"
+  ],
+  "verification_test_ids": [
+    "tests/test_state_machine.py::test_valid_transitions"
+  ],
+  "reuse_constraints": [
+    "Confirm the target still requires: workflow legality is finite and enumerable",
+    "Do not apply when: state is merely descriptive and carries no behavior",
+    "External Ethernian promotion signature remains mandatory"
+  ],
+  "applies_when": "workflow legality is finite and enumerable",
+  "not_when": "state is merely descriptive and carries no behavior",
+  "evidence_anchors": {
+    "source_symbol": "InvalidTransition",
+    "test_name": "test_valid_transitions"
+  },
+  "status": "ETHERNIAN_REVIEW_REQUIRED",
+  "owned_asset": false,
+  "semantic_fingerprint": "f660e246beae23fdc481073cf42065ba08fb3b68a194ef780a08bfa35ea27d0f",
+  "package_hash": "23a969e3bd3aec65f32c241cffa93ee5cd474beea70a2bce283b89b5c466ab22"
+}

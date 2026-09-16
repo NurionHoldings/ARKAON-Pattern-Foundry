@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://arkaon.local/schemas/owned-platform-metadata-pilot.schema.json",
+  "title": "Owned-platform read-only metadata pilot",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "pilot_id", "platform", "authorization", "collection", "domain_metadata", "domain_metadata_hash", "candidates", "cross_platform_comparison", "gates"],
+  "properties": {
+    "schema_version": {"const": "apf.owned-platform-metadata-pilot/v1"},
+    "pilot_id": {"type": "string", "minLength": 1},
+    "platform": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "ownership"],
+      "properties": {
+        "id": {"enum": ["NOGADA_NEWS", "SIDEJOB_MARKET"]},
+        "name": {"enum": ["노가다뉴스", "부업장터"]},
+        "ownership": {"const": "FIRST_PARTY_USER_DECLARED"}
+      }
+    },
+    "authorization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["basis", "evidence_ref", "scope"],
+      "properties": {
+        "basis": {"const": "OWNER_AUTHORIZED_READ_ONLY_METADATA_ANALYSIS"},
+        "evidence_ref": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "scope": {"const": "SUPPLIED_ARCHITECTURE_METADATA_ONLY"}
+      }
+    },
+    "collection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_basis", "repository_connection", "actual_code_analysis", "allowed_surfaces", "prohibited"],
+      "properties": {
+        "source_basis": {"const": "SUPPLIED_AND_PUBLIC_ARCHITECTURE_METADATA"},
+        "repository_connection": {"const": "NOT_RUN_UNAVAILABLE"},
+        "actual_code_analysis": {"const": false},
+        "allowed_surfaces": {"type": "array", "minItems": 3, "uniqueItems": true, "items": {"type": "string"}},
+        "prohibited": {"type": "array", "minItems": 8, "uniqueItems": true, "items": {"type": "string"}}
+      }
+    },
+    "domain_metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["workflows", "source_claim"],
+      "properties": {
+        "workflows": {"type": "array", "minItems": 3, "uniqueItems": true, "items": {"type": "string"}},
+        "source_claim": {"const": "USER_SUPPLIED_CONCEPT_METADATA_NOT_REPOSITORY_OBSERVATION"}
+      }
+    },
+    "domain_metadata_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "candidates": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "derived_from_workflows", "status", "owned_asset", "contains_source_material"],
+        "properties": {
+          "name": {"type": "string", "minLength": 1},
+          "derived_from_workflows": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+          "status": {"const": "ETHERNIAN_REVIEW_REQUIRED"},
+          "owned_asset": {"const": false},
+          "contains_source_material": {"const": false}
+        }
+      }
+    },
+    "cross_platform_comparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reference", "mode", "reusable_abstractions", "copied_source"],
+      "properties": {
+        "reference": {"const": "MJN-030-ABSTRACT-CANDIDATES"},
+        "mode": {"const": "ABSTRACT_BEHAVIOR_COMPARISON_ONLY"},
+        "reusable_abstractions": {"type": "array", "minItems": 2, "uniqueItems": true, "items": {"type": "string"}},
+        "copied_source": {"const": false}
+      }
+    },
+    "gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["intent_dna_mutation", "owned_asset_promotion", "writes", "review_status"],
+      "properties": {
+        "intent_dna_mutation": {"const": false},
+        "owned_asset_promotion": {"const": false},
+        "writes": {"const": false},
+        "review_status": {"const": "ETHERNIAN_REVIEW_REQUIRED"}
+      }
+    }
+  }
+}

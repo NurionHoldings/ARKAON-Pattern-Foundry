@@ -1,0 +1,57 @@
+{
+  "schema_version": "apf.pattern-candidate/1.0",
+  "pattern_id": "apf.public.read-only-pilot-observation",
+  "version": "0.1.0",
+  "title": "Read-only Pilot Observation",
+  "intent": "Gather platform metadata without write authority or operational side effects.",
+  "problem": "Without read-only capability and deterministic metadata snapshots prohibit writes, the system can accept an outcome that is not justified by the read-only pilot observation contract.",
+  "context": "This pattern addresses an owned platform is analyzed before integration; its concrete control is read-only capability and deterministic metadata snapshots prohibit writes.",
+  "forces": [
+    "Correctness requires that pilot execution has no mutation route",
+    "Operational pressure can cause: read credentials unexpectedly allow writes"
+  ],
+  "solution": "Implement read-only capability and deterministic metadata snapshots prohibit writes. Verify the anchored symbol `PilotManifestError` with `test_checked_in_mjn_manifest_is_reproducible_and_read_only` before reuse.",
+  "invariants": [
+    "pilot execution has no mutation route",
+    "snapshot digest identifies the analyzed input"
+  ],
+  "failure_modes": [
+    "read credentials unexpectedly allow writes",
+    "live data changes during observation"
+  ],
+  "security": "The security boundary specifically rejects `read credentials unexpectedly allow writes` and fails closed if the read-only pilot observation evidence cannot be verified.",
+  "privacy": "For read-only pilot observation, persist only its decision identifiers and digests; exclude payload data unrelated to read-only capability and deterministic metadata snapshots prohibit writes.",
+  "license_provenance": {
+    "license": "INTERNAL_PROPRIETARY",
+    "origin": "ARKAON_IMPLEMENTED_INTERNAL",
+    "external_material_included": false
+  },
+  "evidence_hashes": {
+    "src/apf/owned_platform_pilot.py": "fe7bf4c02340bb2ac735799c8db0d4efbdf8b87436cac55957a710a820ce73fe",
+    "tests/test_owned_platform_pilot.py": "ceeeb071ed8fdf3d5bd7520b8106b5fef36fc88c2956b818a587ea49b0c931c9"
+  },
+  "source_refs": [
+    "src/apf/owned_platform_pilot.py"
+  ],
+  "test_refs": [
+    "tests/test_owned_platform_pilot.py"
+  ],
+  "verification_test_ids": [
+    "tests/test_owned_platform_pilot.py::test_checked_in_mjn_manifest_is_reproducible_and_read_only"
+  ],
+  "reuse_constraints": [
+    "Confirm the target still requires: an owned platform is analyzed before integration",
+    "Do not apply when: the task requires modifying the platform",
+    "External Ethernian promotion signature remains mandatory"
+  ],
+  "applies_when": "an owned platform is analyzed before integration",
+  "not_when": "the task requires modifying the platform",
+  "evidence_anchors": {
+    "source_symbol": "PilotManifestError",
+    "test_name": "test_checked_in_mjn_manifest_is_reproducible_and_read_only"
+  },
+  "status": "ETHERNIAN_REVIEW_REQUIRED",
+  "owned_asset": false,
+  "semantic_fingerprint": "096f90492981a4a65108489b7f417d8f19c7f532651ee9623c15518dd9610b86",
+  "package_hash": "8518326c28e461519d6491c229193ff97291c7a2afd7a3d04c766715ae8a66c1"
+}

@@ -1,0 +1,57 @@
+{
+  "schema_version": "apf.pattern-candidate/1.0",
+  "pattern_id": "apf.public.tenant-bound-ownership",
+  "version": "0.1.0",
+  "title": "Tenant-bound Ownership",
+  "intent": "Revalidate tenant and owner relationships at every protected operation.",
+  "problem": "Without repository predicates include tenant and owner identifiers, the system can accept an outcome that is not justified by the tenant-bound ownership contract.",
+  "context": "This pattern addresses shared storage serves independent organizations; its concrete control is repository predicates include tenant and owner identifiers.",
+  "forces": [
+    "Correctness requires that cross-tenant rows are never returned",
+    "Operational pressure can cause: an ID-only lookup leaks another tenant"
+  ],
+  "solution": "Implement repository predicates include tenant and owner identifiers. Verify the anchored symbol `NotFound` with `test_memory_repository_contract` before reuse.",
+  "invariants": [
+    "cross-tenant rows are never returned",
+    "ownership is checked from durable state, not request claims"
+  ],
+  "failure_modes": [
+    "an ID-only lookup leaks another tenant",
+    "ownership changes between read and write"
+  ],
+  "security": "The security boundary specifically rejects `an ID-only lookup leaks another tenant` and fails closed if the tenant-bound ownership evidence cannot be verified.",
+  "privacy": "For tenant-bound ownership, persist only its decision identifiers and digests; exclude payload data unrelated to repository predicates include tenant and owner identifiers.",
+  "license_provenance": {
+    "license": "INTERNAL_PROPRIETARY",
+    "origin": "ARKAON_IMPLEMENTED_INTERNAL",
+    "external_material_included": false
+  },
+  "evidence_hashes": {
+    "src/apf/repository.py": "55ee20c1ee54b8bca574c2e25029e216a929dd36951863d4b68777c60efb3ee6",
+    "tests/test_repository_contract.py": "a8fd1153b7b2ec01b32c2d562cb99befc9a0bab2580172769d2765e3947cea32"
+  },
+  "source_refs": [
+    "src/apf/repository.py"
+  ],
+  "test_refs": [
+    "tests/test_repository_contract.py"
+  ],
+  "verification_test_ids": [
+    "tests/test_repository_contract.py::test_memory_repository_contract"
+  ],
+  "reuse_constraints": [
+    "Confirm the target still requires: shared storage serves independent organizations",
+    "Do not apply when: data is physically isolated with no shared query surface",
+    "External Ethernian promotion signature remains mandatory"
+  ],
+  "applies_when": "shared storage serves independent organizations",
+  "not_when": "data is physically isolated with no shared query surface",
+  "evidence_anchors": {
+    "source_symbol": "NotFound",
+    "test_name": "test_memory_repository_contract"
+  },
+  "status": "ETHERNIAN_REVIEW_REQUIRED",
+  "owned_asset": false,
+  "semantic_fingerprint": "e68c65dfd7eda60e61190e20c36531f9ff874c0cd1e2d3593633d146d951af1a",
+  "package_hash": "6776ebb67594589895b8b5f8760d5fa2ceb8615f0381cedcc13ca6003a703848"
+}

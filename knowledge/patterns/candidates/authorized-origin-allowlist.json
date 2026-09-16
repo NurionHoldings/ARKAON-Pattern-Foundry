@@ -1,0 +1,57 @@
+{
+  "schema_version": "apf.pattern-candidate/1.0",
+  "pattern_id": "apf.public.authorized-origin-allowlist",
+  "version": "0.1.0",
+  "title": "Authorized Origin Allowlist",
+  "intent": "Restrict collectors to pre-authorized origins and revalidate redirects.",
+  "problem": "Without normalized scheme-host-port tuple is checked after every redirect, the system can accept an outcome that is not justified by the authorized origin allowlist contract.",
+  "context": "This pattern addresses collection authority names exact web origins; its concrete control is normalized scheme-host-port tuple is checked after every redirect.",
+  "forces": [
+    "Correctness requires that no request leaves approved origins",
+    "Operational pressure can cause: userinfo or port tricks alter origin parsing"
+  ],
+  "solution": "Implement normalized scheme-host-port tuple is checked after every redirect. Verify the anchored symbol `CandidateProvider` with `test_default_config_loads_boot_collection_policy` before reuse.",
+  "invariants": [
+    "no request leaves approved origins",
+    "redirect destinations receive a fresh policy check"
+  ],
+  "failure_modes": [
+    "userinfo or port tricks alter origin parsing",
+    "DNS or redirect moves collection outside scope"
+  ],
+  "security": "The security boundary specifically rejects `userinfo or port tricks alter origin parsing` and fails closed if the authorized origin allowlist evidence cannot be verified.",
+  "privacy": "For authorized origin allowlist, persist only its decision identifiers and digests; exclude payload data unrelated to normalized scheme-host-port tuple is checked after every redirect.",
+  "license_provenance": {
+    "license": "INTERNAL_PROPRIETARY",
+    "origin": "ARKAON_IMPLEMENTED_INTERNAL",
+    "external_material_included": false
+  },
+  "evidence_hashes": {
+    "src/apf/collector_runtime.py": "ce754ec5a88d1fdbee4cafed7a4f82a3aa8e00846b2048a9a4696b690417aca2",
+    "tests/test_collector_runtime.py": "3e61e36b67b8325dad6c3863cae0911f0555c9f925afb88b10f019d11cd5af30"
+  },
+  "source_refs": [
+    "src/apf/collector_runtime.py"
+  ],
+  "test_refs": [
+    "tests/test_collector_runtime.py"
+  ],
+  "verification_test_ids": [
+    "tests/test_collector_runtime.py::test_default_config_loads_boot_collection_policy"
+  ],
+  "reuse_constraints": [
+    "Confirm the target still requires: collection authority names exact web origins",
+    "Do not apply when: a local supplied file requires no network access",
+    "External Ethernian promotion signature remains mandatory"
+  ],
+  "applies_when": "collection authority names exact web origins",
+  "not_when": "a local supplied file requires no network access",
+  "evidence_anchors": {
+    "source_symbol": "CandidateProvider",
+    "test_name": "test_default_config_loads_boot_collection_policy"
+  },
+  "status": "ETHERNIAN_REVIEW_REQUIRED",
+  "owned_asset": false,
+  "semantic_fingerprint": "78251b662567efcc8931e66b068ef8bdcef8cb41b8505b24e0e900cb490f87db",
+  "package_hash": "8c68e6435e7671436647a22c97c39d2c774e91f570ac7bb45dcd3829a2e9eac7"
+}

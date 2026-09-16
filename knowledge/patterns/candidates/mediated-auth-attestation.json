@@ -1,0 +1,57 @@
+{
+  "schema_version": "apf.pattern-candidate/1.0",
+  "pattern_id": "apf.public.mediated-auth-attestation",
+  "version": "0.1.0",
+  "title": "Mediated Auth Attestation",
+  "intent": "Bind user-mediated authentication evidence to the exact acquisition request.",
+  "problem": "Without external signature binds request fingerprint, actions and grant reference, the system can accept an outcome that is not justified by the mediated auth attestation contract.",
+  "context": "This pattern addresses user must complete official authentication interaction; its concrete control is external signature binds request fingerprint, actions and grant reference.",
+  "forces": [
+    "Correctness requires that gate holds verification key but no signing key",
+    "Operational pressure can cause: boolean approval is spoofed by the worker"
+  ],
+  "solution": "Implement external signature binds request fingerprint, actions and grant reference. Verify the anchored symbol `AuthGateError` with `test_complete_flow_stops_at_ready_to_report` before reuse.",
+  "invariants": [
+    "gate holds verification key but no signing key",
+    "interactive actions exactly match the approved request"
+  ],
+  "failure_modes": [
+    "boolean approval is spoofed by the worker",
+    "attestation is replayed against another request"
+  ],
+  "security": "The security boundary specifically rejects `boolean approval is spoofed by the worker` and fails closed if the mediated auth attestation evidence cannot be verified.",
+  "privacy": "For mediated auth attestation, persist only its decision identifiers and digests; exclude payload data unrelated to external signature binds request fingerprint, actions and grant reference.",
+  "license_provenance": {
+    "license": "INTERNAL_PROPRIETARY",
+    "origin": "ARKAON_IMPLEMENTED_INTERNAL",
+    "external_material_included": false
+  },
+  "evidence_hashes": {
+    "src/apf/mediated_auth.py": "bf3e2379e1a899a381155dacd0f367c08ce5f41392c08f8112479e8b08efd282",
+    "tests/test_mediated_auth.py": "31ba6f399afe86ce5c4382400d5b5cdd95f3ff4312a5285abe7325464c2c3b81"
+  },
+  "source_refs": [
+    "src/apf/mediated_auth.py"
+  ],
+  "test_refs": [
+    "tests/test_mediated_auth.py"
+  ],
+  "verification_test_ids": [
+    "tests/test_mediated_auth.py::test_complete_flow_stops_at_ready_to_report"
+  ],
+  "reuse_constraints": [
+    "Confirm the target still requires: user must complete official authentication interaction",
+    "Do not apply when: public data requires no authenticated session",
+    "External Ethernian promotion signature remains mandatory"
+  ],
+  "applies_when": "user must complete official authentication interaction",
+  "not_when": "public data requires no authenticated session",
+  "evidence_anchors": {
+    "source_symbol": "AuthGateError",
+    "test_name": "test_complete_flow_stops_at_ready_to_report"
+  },
+  "status": "ETHERNIAN_REVIEW_REQUIRED",
+  "owned_asset": false,
+  "semantic_fingerprint": "0072fb62bd10cecc52a3af31b21cf4933e6d7bf3dabdca7b675e09539a5f1038",
+  "package_hash": "a47a1a910377b3aa601f8846090e8928d295baffdbdbfb61d753c41f59870b4b"
+}

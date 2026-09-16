@@ -1,0 +1,57 @@
+{
+  "schema_version": "apf.pattern-candidate/1.0",
+  "pattern_id": "apf.public.similarity-leakage-guard",
+  "version": "0.1.0",
+  "title": "Similarity Leakage Guard",
+  "intent": "Reject outputs retaining excessive source identifiers or verbatim fragments.",
+  "problem": "Without token and identifier overlap thresholds quarantine suspicious output, the system can accept an outcome that is not justified by the similarity leakage guard contract.",
+  "context": "This pattern addresses derived work must remain independently expressed; its concrete control is token and identifier overlap thresholds quarantine suspicious output.",
+  "forces": [
+    "Correctness requires that large verbatim fragments always block publication",
+    "Operational pressure can cause: renaming evades a lexical-only detector"
+  ],
+  "solution": "Implement token and identifier overlap thresholds quarantine suspicious output. Verify the anchored symbol `LearningSafetyViolation` with `test_scanner_blocks_secret_and_pii_without_returning_source` before reuse.",
+  "invariants": [
+    "large verbatim fragments always block publication",
+    "similarity decision is recorded with measured evidence"
+  ],
+  "failure_modes": [
+    "renaming evades a lexical-only detector",
+    "common framework boilerplate causes a false positive"
+  ],
+  "security": "The security boundary specifically rejects `renaming evades a lexical-only detector` and fails closed if the similarity leakage guard evidence cannot be verified.",
+  "privacy": "For similarity leakage guard, persist only its decision identifiers and digests; exclude payload data unrelated to token and identifier overlap thresholds quarantine suspicious output.",
+  "license_provenance": {
+    "license": "INTERNAL_PROPRIETARY",
+    "origin": "ARKAON_IMPLEMENTED_INTERNAL",
+    "external_material_included": false
+  },
+  "evidence_hashes": {
+    "src/apf/learning_safety.py": "a109a1d246a05f80a04e6c05d6d0a1f533283c3fc72b2dab3ca8fbbb64bf7db4",
+    "tests/test_learning_safety.py": "8e27901fb2c391c1f928a052d9c6163c232be2fa5c9544001aaec8e96b2a480c"
+  },
+  "source_refs": [
+    "src/apf/learning_safety.py"
+  ],
+  "test_refs": [
+    "tests/test_learning_safety.py"
+  ],
+  "verification_test_ids": [
+    "tests/test_learning_safety.py::test_scanner_blocks_secret_and_pii_without_returning_source"
+  ],
+  "reuse_constraints": [
+    "Confirm the target still requires: derived work must remain independently expressed",
+    "Do not apply when: direct reuse is authorized and attribution obligations are satisfied",
+    "External Ethernian promotion signature remains mandatory"
+  ],
+  "applies_when": "derived work must remain independently expressed",
+  "not_when": "direct reuse is authorized and attribution obligations are satisfied",
+  "evidence_anchors": {
+    "source_symbol": "LearningSafetyViolation",
+    "test_name": "test_scanner_blocks_secret_and_pii_without_returning_source"
+  },
+  "status": "ETHERNIAN_REVIEW_REQUIRED",
+  "owned_asset": false,
+  "semantic_fingerprint": "0f3afa84269d86b41606e98f1fe59f0a9d54bf2a25112f1f956e671d0eabdac5",
+  "package_hash": "2de49b02d4d8f8444d4629032c13eb0dcf80182df4ef945706da8c17263f5fc0"
+}

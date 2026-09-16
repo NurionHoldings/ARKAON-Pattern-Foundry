@@ -1,0 +1,57 @@
+{
+  "schema_version": "apf.pattern-candidate/1.0",
+  "pattern_id": "apf.public.idempotent-command-receipt",
+  "version": "0.1.0",
+  "title": "Idempotent Command Receipt",
+  "intent": "Make retried commands return the same committed result without duplicate effects.",
+  "problem": "Without idempotency key maps to a fingerprinted stored receipt, the system can accept an outcome that is not justified by the idempotent command receipt contract.",
+  "context": "This pattern addresses clients retry commands after network ambiguity; its concrete control is idempotency key maps to a fingerprinted stored receipt.",
+  "forces": [
+    "Correctness requires that same key and payload returns one result",
+    "Operational pressure can cause: receipt persistence follows the side effect"
+  ],
+  "solution": "Implement idempotency key maps to a fingerprinted stored receipt. Verify the anchored symbol `TaskKind` with `test_arkaon_can_claim_delegated_research_build_test_and_audit_work` before reuse.",
+  "invariants": [
+    "same key and payload returns one result",
+    "same key with different payload is rejected"
+  ],
+  "failure_modes": [
+    "receipt persistence follows the side effect",
+    "key scope collides across tenants"
+  ],
+  "security": "The security boundary specifically rejects `receipt persistence follows the side effect` and fails closed if the idempotent command receipt evidence cannot be verified.",
+  "privacy": "For idempotent command receipt, persist only its decision identifiers and digests; exclude payload data unrelated to idempotency key maps to a fingerprinted stored receipt.",
+  "license_provenance": {
+    "license": "INTERNAL_PROPRIETARY",
+    "origin": "ARKAON_IMPLEMENTED_INTERNAL",
+    "external_material_included": false
+  },
+  "evidence_hashes": {
+    "src/apf/development_orchestrator.py": "dcc0132d5fe609fb9afe4aa26b3adffa6e20638062e166022a2c77fe740fa728",
+    "tests/test_development_orchestrator.py": "9ab3e9676576a12ba9c27e77ff555c38e395cb71754927e301e6f06d86305634"
+  },
+  "source_refs": [
+    "src/apf/development_orchestrator.py"
+  ],
+  "test_refs": [
+    "tests/test_development_orchestrator.py"
+  ],
+  "verification_test_ids": [
+    "tests/test_development_orchestrator.py::test_arkaon_can_claim_delegated_research_build_test_and_audit_work"
+  ],
+  "reuse_constraints": [
+    "Confirm the target still requires: clients retry commands after network ambiguity",
+    "Do not apply when: every invocation is intentionally a distinct event",
+    "External Ethernian promotion signature remains mandatory"
+  ],
+  "applies_when": "clients retry commands after network ambiguity",
+  "not_when": "every invocation is intentionally a distinct event",
+  "evidence_anchors": {
+    "source_symbol": "TaskKind",
+    "test_name": "test_arkaon_can_claim_delegated_research_build_test_and_audit_work"
+  },
+  "status": "ETHERNIAN_REVIEW_REQUIRED",
+  "owned_asset": false,
+  "semantic_fingerprint": "918bcf639a82fe0e72f88469b79bfe40b399ee7abfcfa85332682d63c1f4bb3e",
+  "package_hash": "724f5f2df4dd7cce27e26207b140f5f30ed2c0c31f88d3fa7dc8996064759e71"
+}
