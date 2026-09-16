@@ -1,0 +1,8 @@
+{
+  "schema_version": "arkaon.workspace/v1",
+  "platform_id": "PLATFORM_ID",
+  "foundry_root": "D:\\ARKAON_Pattern Foundry",
+  "allowed_analysis_roots": ["src", "tests", "docs", "config"],
+  "forbidden_globs": [".env", "**/secrets/**", "**/.git/**"],
+  "production_change_allowed": false
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": "apf.resource-limits/v1",
+  "max_platforms_per_run": 8,
+  "max_files_per_platform": 5000,
+  "max_inbox_packets": 32,
+  "max_seconds_per_platform": 120,
+  "max_memory_mb_per_platform": 512,
+  "sequential_platform_analysis": true,
+  "notes": [
+    "Central orchestrator analyzes registered platforms one after another.",
+    "Disable extra platforms in config/platforms.json until their paths exist."
+  ]
+}

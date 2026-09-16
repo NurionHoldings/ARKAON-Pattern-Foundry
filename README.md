@@ -59,10 +59,32 @@ REGISTER → AUTHORIZE → SNAPSHOT → EXTRACT_INTENT_DNA → ANALYZE
 28. [운영·검토 콘솔](docs/28-operations-review-console.md)
 29. [노가다뉴스·부업장터 메타데이터 파일럿](docs/29-owned-platform-metadata-pilots.md)
 30. [공용 Pattern 후보 30개와 승격·재사용 증명](docs/30-public-pattern-catalog.md)
+31. [ARKAON 지도 연동 역량](docs/31-arkaon-map-integration-capability.md)
+32. [ARKAON 진화 경계](docs/32-arkaon-evolution-boundary.md)
+33. [ARKAON 정확도 보증](docs/33-arkaon-accuracy-assurance.md)
+34. [ARKAON 단계적 롤아웃](docs/34-arkaon-staged-rollout.md)
+35. [라이더 경로 선택권·안전·비용 투명성](docs/35-route-choice-safety-cost.md)
+36. [ARKAON 지도역량 정확도 평가](docs/36-arkaon-map-competency-evaluation.md)
+37. [라이더 모빌리티 광장 기반계층](docs/37-rider-mobility-plaza-foundation.md)
+38. [중앙 ARKAON 오케스트레이터](docs/38-central-arkaon-orchestrator.md)
+39. [ARKAON 화면·콘텐츠·운영 정합성 감사](docs/39-arkaon-experience-operations-audit.md)
+40. [ARKAON 통제된 성찰학습·교훈기억](docs/40-arkaon-reflective-learning.md)
+
+## 중앙 오케스트레이터
+
+Pattern Foundry는 다중 플랫폼 ARKAON의 본거지입니다. PC 로그인 시 등록된 플랫폼만
+순차 분석하고, 결과는 `inbox/eternian-review`에 격리합니다. 승인 전 코드·운영 반영은
+하지 않습니다.
+
+```powershell
+powershell.exe -ExecutionPolicy Bypass -File "D:\ARKAON_Pattern Foundry\orchestrator\arkaon-launcher.ps1"
+powershell.exe -File "D:\ARKAON_Pattern Foundry\orchestrator\arkaon-startup.ps1"
+powershell.exe -ExecutionPolicy Bypass -File "D:\ARKAON_Pattern Foundry\orchestrator\register-startup-task.ps1"
+```
 
 ## 구현 게이트
 
-현재 상태는 **#042 PUBLIC PATTERN CANDIDATE CATALOG IMPLEMENTED / PRODUCT IMPLEMENTATION HOLD**입니다. 정확히 30개 후보와 검증·외부서명 승격·재사용 proof harness가 있지만, 모든 후보는 `ETHERNIAN_REVIEW_REQUIRED`이며 운영 승격은 0건입니다. 테스트 전용 서명은 `TEST_VECTOR`일 뿐 운영 승인이 아닙니다. PostgreSQL 대상 저장소와 CI 경로는 구현됐지만 live Green 증거 및 PostgreSQL 검토·후보 어댑터는 아직 없습니다. 노가다뉴스·부업장터는 제공된 구조 메타데이터 기반 읽기 전용 파일럿만 구현됐고 실제 저장소 연결·코드 분석은 `NOT_RUN_UNAVAILABLE`입니다. UI 상세 렌더링, 외부 서명에 의한 30개 개별 승격과 실제 재사용 증명도 미완료입니다. 상세 상태는 `knowledge/readiness/v0.1-readiness.json`이 기준입니다.
+현재 상태는 **#047 CENTRAL ARKAON ORCHESTRATOR FOUNDATION / PRODUCT IMPLEMENTATION HOLD**입니다. 정확히 30개 후보와 검증·외부서명 승격·재사용 proof harness가 있지만, 모든 후보는 `ETHERNIAN_REVIEW_REQUIRED`이며 운영 승격은 0건입니다. 테스트 전용 서명은 `TEST_VECTOR`일 뿐 운영 승인이 아닙니다. PostgreSQL 대상 저장소와 CI 경로는 구현됐지만 live Green 증거 및 PostgreSQL 검토·후보 어댑터는 아직 없습니다. 노가다뉴스·부업장터는 제공된 구조 메타데이터 기반 읽기 전용 파일럿만 구현됐고 실제 저장소 연결·코드 분석은 `NOT_RUN_UNAVAILABLE`입니다. UI 상세 렌더링, 외부 서명에 의한 30개 개별 승격과 실제 재사용 증명도 미완료입니다. 상세 상태는 `knowledge/readiness/v0.1-readiness.json`이 기준입니다.
 
 ## 공개 저장소 정책
 

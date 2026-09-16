@@ -1,0 +1,30 @@
+{
+  "schema_version": "apf.arkaon-experience-operations-audit.v1",
+  "areas": [
+    "CONTENT",
+    "PLACEMENT",
+    "HOME_READABILITY",
+    "ACCESSIBILITY",
+    "NAVIGATION",
+    "ROUTE_CONSISTENCY",
+    "OFFICIAL_BENCHMARK"
+  ],
+  "trigger": "ON_EVERY_ORCHESTRATOR_RUN_AND_SCHEDULED_SCAN",
+  "maximum_outcome": "IMPROVEMENT_PROPOSAL",
+  "official_benchmark_only": true,
+  "competitor_copy_allowed": false,
+  "automatic_change_allowed": false,
+  "operator_approval_required": true,
+  "roles": [
+    "content_editor",
+    "ux_auditor",
+    "competitive_feature_analyst",
+    "operations_consistency_monitor"
+  ],
+  "severity_map": {
+    "BLOCKER": ["BROKEN_PATH", "FRONTEND_API", "POLICY_ROUTE", "PAGE_ROUTE"],
+    "HIGH": ["HOME_IA", "HEADING", "READABILITY"],
+    "MEDIUM": ["CONTENT", "PRIMARY_ACTION"],
+    "LOW": ["BENCHMARK"]
+  }
+}

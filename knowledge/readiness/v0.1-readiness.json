@@ -1,6 +1,6 @@
 {
   "schema_version": "apf.readiness-matrix/v1",
-  "as_of_phase": "042",
+  "as_of_phase": "049",
   "overall_status": "PRODUCT_IMPLEMENT_HOLD",
   "implemented": [
     {"phase": "013-019", "capability": "intent, execution, learning, evidence, collection and clean-room synthesis foundations", "evidence": "src/apf"},
@@ -11,7 +11,14 @@
     ,{"phase": "039", "capability": "tenant-scoped authenticated operations and review console shell", "evidence": "docs/28-operations-review-console.md"},
     {"phase": "040", "capability": "tenant/principal-scoped SQLite durable review and candidate console adapters with externally signed decisions", "evidence": "tests/test_console_durable.py"},
     {"phase": "041", "capability": "노가다뉴스 and 부업장터 deterministic read-only pilots from supplied/public architecture metadata", "evidence": "docs/29-owned-platform-metadata-pilots.md"},
-    {"phase": "042", "capability": "exactly 30 evidence-bound public Pattern candidates, catalog validation, external Ed25519 promotion verification and fail-closed reuse proof harness", "evidence": "docs/30-public-pattern-catalog.md"}
+    {"phase": "042", "capability": "exactly 30 evidence-bound public Pattern candidates, catalog validation, external Ed25519 promotion verification and fail-closed reuse proof harness", "evidence": "docs/30-public-pattern-catalog.md"},
+    {"phase": "043", "capability": "privacy-preserving map knowledge registry and ephemeral navigation-handoff analog", "evidence": "docs/31-arkaon-map-integration-capability.md"},
+    {"phase": "044", "capability": "ARKAON propose-only evolution boundary, integer accuracy gates with national/drift fail-closed, and staged branch rollout with kill switch", "evidence": "docs/32-arkaon-evolution-boundary.md"},
+    {"phase": "045", "capability": "multi-route rider choice with cost/safety explanations, no shortest-path coercion or deviation penalties, and deterministic map competency evaluation", "evidence": "docs/35-route-choice-safety-cost.md"},
+    {"phase": "046", "capability": "rider mobility plaza foundation: coarse-cell commons, consent membership, occupancy counts, advisory-only ARKAON, no dispatch or surveillance", "evidence": "docs/37-rider-mobility-plaza-foundation.md"},
+    {"phase": "047", "capability": "central ARKAON orchestrator with registered platform workspaces, inbox quarantine, reports/logs/state, and Windows startup registration scripts", "evidence": "docs/38-central-arkaon-orchestrator.md"},
+    {"phase": "048", "capability": "ARKAON experience and operations consistency audit: content, UX, official benchmark, route-contract checks with IMPROVEMENT_PROPOSAL-only admin inbox output", "evidence": "docs/39-arkaon-experience-operations-audit.md"},
+    {"phase": "049", "capability": "governed reflective learning memory: observation-to-lesson state machine, immutable rejected/failed/regression lessons, append-only store, no self-modification", "evidence": "docs/40-arkaon-reflective-learning.md"}
   ],
   "not_implemented": [
     {"id": "postgres-live-proof", "capability": "successful live PostgreSQL migration, tenant, JSONB, idempotency and concurrency CI evidence"},

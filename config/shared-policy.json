@@ -1,0 +1,28 @@
+{
+  "schema_version": "apf.shared-policy/v1",
+  "automatic_learning": false,
+  "production_change_allowed": false,
+  "collect_platform_operational_data": false,
+  "knowledge_allowed_kinds": [
+    "public_reference",
+    "policy",
+    "schema",
+    "synthetic_test_pattern",
+    "generalized_dev_knowledge"
+  ],
+  "forbidden_in_foundry_knowledge": [
+    "member",
+    "order",
+    "location",
+    "settlement",
+    "contract",
+    "identity",
+    "credential",
+    "secret"
+  ],
+  "approval_required_from": "operator-insuk",
+  "notes": [
+    "Foundry stores public materials, policies, schemas, and synthetic patterns only.",
+    "Platform operational data remains inside each platform workspace."
+  ]
+}

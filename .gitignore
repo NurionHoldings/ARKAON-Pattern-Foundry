@@ -19,3 +19,14 @@ node_modules/
 dist/
 coverage/
 .DS_Store
+
+# central orchestrator local runs (structure only in git)
+inbox/research/*.json
+inbox/eternian-review/*.json
+inbox/operator-decision/*.json
+reports/**/*.json
+logs/*.log
+state/orchestrator-state.json
+state/orchestrator.run.lock
+quarantine/*.json
+knowledge/reflective-lessons/*.json
