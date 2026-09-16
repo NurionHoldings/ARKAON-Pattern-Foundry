@@ -1,0 +1,57 @@
+{
+  "schema_version": "apf.pattern-candidate/1.0",
+  "pattern_id": "apf.public.license-obligation-gate",
+  "version": "0.1.0",
+  "title": "License Obligation Gate",
+  "intent": "Block reuse until license permissions and obligations are explicit.",
+  "problem": "Without permission class and obligations select the reuse route, the system can accept an outcome that is not justified by the license obligation gate contract.",
+  "context": "This pattern addresses third-party material may be incorporated; its concrete control is permission class and obligations select the reuse route.",
+  "forces": [
+    "Correctness requires that unknown licenses never enter direct reuse",
+    "Operational pressure can cause: a permissive label lacks supporting evidence"
+  ],
+  "solution": "Implement permission class and obligations select the reuse route. Verify the anchored symbol `LearningSafetyViolation` with `test_scanner_blocks_secret_and_pii_without_returning_source` before reuse.",
+  "invariants": [
+    "unknown licenses never enter direct reuse",
+    "attribution and share-alike duties remain attached"
+  ],
+  "failure_modes": [
+    "a permissive label lacks supporting evidence",
+    "incompatible obligations are combined"
+  ],
+  "security": "The security boundary specifically rejects `a permissive label lacks supporting evidence` and fails closed if the license obligation gate evidence cannot be verified.",
+  "privacy": "For license obligation gate, persist only its decision identifiers and digests; exclude payload data unrelated to permission class and obligations select the reuse route.",
+  "license_provenance": {
+    "license": "INTERNAL_PROPRIETARY",
+    "origin": "ARKAON_IMPLEMENTED_INTERNAL",
+    "external_material_included": false
+  },
+  "evidence_hashes": {
+    "src/apf/learning_safety.py": "a109a1d246a05f80a04e6c05d6d0a1f533283c3fc72b2dab3ca8fbbb64bf7db4",
+    "tests/test_learning_safety.py": "8e27901fb2c391c1f928a052d9c6163c232be2fa5c9544001aaec8e96b2a480c"
+  },
+  "source_refs": [
+    "src/apf/learning_safety.py"
+  ],
+  "test_refs": [
+    "tests/test_learning_safety.py"
+  ],
+  "verification_test_ids": [
+    "tests/test_learning_safety.py::test_scanner_blocks_secret_and_pii_without_returning_source"
+  ],
+  "reuse_constraints": [
+    "Confirm the target still requires: third-party material may be incorporated",
+    "Do not apply when: only internal proprietary code is involved",
+    "External Ethernian promotion signature remains mandatory"
+  ],
+  "applies_when": "third-party material may be incorporated",
+  "not_when": "only internal proprietary code is involved",
+  "evidence_anchors": {
+    "source_symbol": "LearningSafetyViolation",
+    "test_name": "test_scanner_blocks_secret_and_pii_without_returning_source"
+  },
+  "status": "ETHERNIAN_REVIEW_REQUIRED",
+  "owned_asset": false,
+  "semantic_fingerprint": "a2bd5db423a10554a1d6ac36cb49d8866f71598e2e0b1216833d3f35cdd27d77",
+  "package_hash": "7a0d7d3122e36b60bc76a14d2d0d16b54c6ff982068a45c72ff2ca9877b9ef84"
+}

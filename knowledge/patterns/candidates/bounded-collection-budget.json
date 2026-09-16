@@ -1,0 +1,57 @@
+{
+  "schema_version": "apf.pattern-candidate/1.0",
+  "pattern_id": "apf.public.bounded-collection-budget",
+  "version": "0.1.0",
+  "title": "Bounded Collection Budget",
+  "intent": "Enforce request, size, rate, and media limits during acquisition.",
+  "problem": "Without request count, byte size, media type and rate counters fail closed, the system can accept an outcome that is not justified by the bounded collection budget contract.",
+  "context": "This pattern addresses remote acquisition must limit operational impact; its concrete control is request count, byte size, media type and rate counters fail closed.",
+  "forces": [
+    "Correctness requires that budget exhaustion stops further fetches",
+    "Operational pressure can cause: streaming content exceeds its advertised length"
+  ],
+  "solution": "Implement request count, byte size, media type and rate counters fail closed. Verify the anchored symbol `JsonCandidateProvider` with `test_json_provider_loads_explicit_sources` before reuse.",
+  "invariants": [
+    "budget exhaustion stops further fetches",
+    "declared size never overrides measured bytes"
+  ],
+  "failure_modes": [
+    "streaming content exceeds its advertised length",
+    "retries evade the request counter"
+  ],
+  "security": "The security boundary specifically rejects `streaming content exceeds its advertised length` and fails closed if the bounded collection budget evidence cannot be verified.",
+  "privacy": "For bounded collection budget, persist only its decision identifiers and digests; exclude payload data unrelated to request count, byte size, media type and rate counters fail closed.",
+  "license_provenance": {
+    "license": "INTERNAL_PROPRIETARY",
+    "origin": "ARKAON_IMPLEMENTED_INTERNAL",
+    "external_material_included": false
+  },
+  "evidence_hashes": {
+    "src/apf/collector_service.py": "0a2fdde1a91ba0cdc225e46f19cac455d535cbd3cf20330b358ed10481934545",
+    "tests/test_collector_service.py": "98be94bf6803427efa6ab8abacbf5f488b9430bce72a037f0f2ac394cd0e3d32"
+  },
+  "source_refs": [
+    "src/apf/collector_service.py"
+  ],
+  "test_refs": [
+    "tests/test_collector_service.py"
+  ],
+  "verification_test_ids": [
+    "tests/test_collector_service.py::test_json_provider_loads_explicit_sources"
+  ],
+  "reuse_constraints": [
+    "Confirm the target still requires: remote acquisition must limit operational impact",
+    "Do not apply when: a prevalidated local artifact is read once",
+    "External Ethernian promotion signature remains mandatory"
+  ],
+  "applies_when": "remote acquisition must limit operational impact",
+  "not_when": "a prevalidated local artifact is read once",
+  "evidence_anchors": {
+    "source_symbol": "JsonCandidateProvider",
+    "test_name": "test_json_provider_loads_explicit_sources"
+  },
+  "status": "ETHERNIAN_REVIEW_REQUIRED",
+  "owned_asset": false,
+  "semantic_fingerprint": "0c64d53d9b981cb5f7aecc2d7c5b1794f45148903591fbda776a5c251b4d4172",
+  "package_hash": "d9034f8bc98769fa4bd74df3da189775f2ff8b6c3888794748396aac5abca6c4"
+}

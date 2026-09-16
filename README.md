@@ -1,14 +1,18 @@
 # ARKAON Pattern Foundry
 
+현재 #039는 tenant-scoped 대상 API와 인증된 한국어 운영·검토 콘솔 shell을 제공한다.
+검토·후보 live adapter, 외부 서명 검증 수신, 운영 IAM 연동 전까지 제품 상태는
+`PRODUCT_IMPLEMENT_HOLD`이며 Intent_DNA 변경, MJN 쓰기, 자동 자산 승격은 잠겨 있다.
+
 에테르니언과 아르카온이 허가된 시스템을 구조적으로 분석하여 재사용 가능한 설계자산을 생산하는 지식제조 엔진입니다.
 
-> 특정 서비스의 디자인·문구·소스코드를 복제하지 않습니다. 자체 시스템, 위임받은 시스템, 공식 문서, 라이선스가 확인된 오픈소스만 분석합니다.
+> 복제 기술 자체를 금지하지 않습니다. 소유·명시적 허가·라이선스 범위에서는 코드와 소재를 재사용하고 의무를 승계하며, 공개 관찰물은 기능·구조를 추출해 실질적으로 개선합니다. 개인정보·비밀정보 취득과 접근통제 우회는 금지합니다.
 
 ## v0.1 목표
 
 - 자체 플랫폼 3개 완전 분석: MJN, 노가다뉴스, 부업장터
 - 플랫폼 유형 5개 정의
-- 공통 설계패턴 30개 확보
+- 공통 설계패턴 30개 심사·승격 및 재사용 증명 (목표, 현재 미달성)
 - 재사용 기능모듈 10개 확정
 - 신규 사업아이디어 1개에 자산 재사용
 - 기존 대비 기획시간 50% 단축
@@ -44,10 +48,21 @@ REGISTER → AUTHORIZE → SNAPSHOT → EXTRACT_INTENT_DNA → ANALYZE
 17. [실전 관측 증거 번들·독립 검증](docs/17-pilot-evidence-bundle.md)
 18. [MJN 읽기 전용 분석 파일럿](docs/18-mjn-readonly-analysis-pilot.md)
 19. [Clean-room 유사 플랫폼 재구현](docs/19-clean-room-analog-synthesis.md)
+20. [사용자 매개 인증요청·외부 자산획득 게이트](docs/20-mediated-auth-acquisition.md)
+21. [권한 기반 소재 수집·복제·개선](docs/21-authorized-material-acquisition.md)
+22. [자산획득 작업 오케스트레이터](docs/22-acquisition-job-orchestrator.md)
+23. [재시작 안전 영속 저장소·에테르니언 검토 큐](docs/23-durable-review-queue.md)
+24. [v0.1 출시준비 인증 실행서](docs/24-release-readiness.md)
+25. [v0.1 로컬 출시준비 보고서](docs/25-v0.1-release-report.md)
+26. [#031 에테르니언 검토 게이트](docs/26-analog-review-gate.md)
+27. [PostgreSQL Repository 및 실연결 게이트](docs/27-postgresql-repository.md)
+28. [운영·검토 콘솔](docs/28-operations-review-console.md)
+29. [노가다뉴스·부업장터 메타데이터 파일럿](docs/29-owned-platform-metadata-pilots.md)
+30. [공용 Pattern 후보 30개와 승격·재사용 증명](docs/30-public-pattern-catalog.md)
 
 ## 구현 게이트
 
-현재 상태는 **#031 CLEAN-ROOM ANALOG SYNTHESIS / ETHERNIAN REVIEW REQUIRED**입니다. #030의 세 후보를 최소 세 독립 공식 계열과 교차검증하고, 공급사 문구·코드·API를 복제하지 않은 세 개의 실행 가능한 적합성 모델로 재구성했습니다. 결과는 모두 `ANALOG_SYNTHESIS_CANDIDATE`, `owned_asset=false`이며 Intent_DNA 변경, MJN 쓰기, `OWNED_ASSET` 승격은 금지되어 있습니다. 구현은 보호된 브랜치·PR·CI 절차로 진행합니다.
+현재 상태는 **#042 PUBLIC PATTERN CANDIDATE CATALOG IMPLEMENTED / PRODUCT IMPLEMENTATION HOLD**입니다. 정확히 30개 후보와 검증·외부서명 승격·재사용 proof harness가 있지만, 모든 후보는 `ETHERNIAN_REVIEW_REQUIRED`이며 운영 승격은 0건입니다. 테스트 전용 서명은 `TEST_VECTOR`일 뿐 운영 승인이 아닙니다. PostgreSQL 대상 저장소와 CI 경로는 구현됐지만 live Green 증거 및 PostgreSQL 검토·후보 어댑터는 아직 없습니다. 노가다뉴스·부업장터는 제공된 구조 메타데이터 기반 읽기 전용 파일럿만 구현됐고 실제 저장소 연결·코드 분석은 `NOT_RUN_UNAVAILABLE`입니다. UI 상세 렌더링, 외부 서명에 의한 30개 개별 승격과 실제 재사용 증명도 미완료입니다. 상세 상태는 `knowledge/readiness/v0.1-readiness.json`이 기준입니다.
 
 ## 공개 저장소 정책
 

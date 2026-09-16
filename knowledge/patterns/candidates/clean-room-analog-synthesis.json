@@ -1,0 +1,57 @@
+{
+  "schema_version": "apf.pattern-candidate/1.0",
+  "pattern_id": "apf.public.clean-room-analog-synthesis",
+  "version": "0.1.0",
+  "title": "Clean-room Analog Synthesis",
+  "intent": "Convert observed behavior into independent specifications and implementation evidence.",
+  "problem": "Without observations become behavior specs before independent implementation, the system can accept an outcome that is not justified by the clean-room analog synthesis contract.",
+  "context": "This pattern addresses functionality may be independently reimplemented; its concrete control is observations become behavior specs before independent implementation.",
+  "forces": [
+    "Correctness requires that source fragments do not enter generated output",
+    "Operational pressure can cause: unique identifiers leak through the specification"
+  ],
+  "solution": "Implement observations become behavior specs before independent implementation. Verify the anchored symbol `AnalogSynthesisError` with `test_checked_in_manifest_has_independent_sources_and_locked_outcome` before reuse.",
+  "invariants": [
+    "source fragments do not enter generated output",
+    "implementation evidence traces to abstract requirements"
+  ],
+  "failure_modes": [
+    "unique identifiers leak through the specification",
+    "a developer copies implementation details from capture"
+  ],
+  "security": "The security boundary specifically rejects `unique identifiers leak through the specification` and fails closed if the clean-room analog synthesis evidence cannot be verified.",
+  "privacy": "For clean-room analog synthesis, persist only its decision identifiers and digests; exclude payload data unrelated to observations become behavior specs before independent implementation.",
+  "license_provenance": {
+    "license": "INTERNAL_PROPRIETARY",
+    "origin": "ARKAON_IMPLEMENTED_INTERNAL",
+    "external_material_included": false
+  },
+  "evidence_hashes": {
+    "src/apf/analog_synthesis.py": "5ea8b8d3f494c6b5f2d0a1e5545c54adb4b96a81e171702ce27b7f25f41023b4",
+    "tests/test_analog_synthesis.py": "1a25ed953db9d1a65a9489bfa685ff205a28ee653808cfd7e9dbbd1902c7950b"
+  },
+  "source_refs": [
+    "src/apf/analog_synthesis.py"
+  ],
+  "test_refs": [
+    "tests/test_analog_synthesis.py"
+  ],
+  "verification_test_ids": [
+    "tests/test_analog_synthesis.py::test_checked_in_manifest_has_independent_sources_and_locked_outcome"
+  ],
+  "reuse_constraints": [
+    "Confirm the target still requires: functionality may be independently reimplemented",
+    "Do not apply when: the license explicitly permits direct source reuse",
+    "External Ethernian promotion signature remains mandatory"
+  ],
+  "applies_when": "functionality may be independently reimplemented",
+  "not_when": "the license explicitly permits direct source reuse",
+  "evidence_anchors": {
+    "source_symbol": "AnalogSynthesisError",
+    "test_name": "test_checked_in_manifest_has_independent_sources_and_locked_outcome"
+  },
+  "status": "ETHERNIAN_REVIEW_REQUIRED",
+  "owned_asset": false,
+  "semantic_fingerprint": "281c8db88d9a83bd1f1767ae85c245a9e0fec802ad315f04dabb8a39efa836e6",
+  "package_hash": "200fd97b8db730efd845980d5a4adfc985405fa9d19112412e4a15fb282ec4a2"
+}

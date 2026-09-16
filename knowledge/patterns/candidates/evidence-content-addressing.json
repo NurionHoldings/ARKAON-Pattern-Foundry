@@ -1,0 +1,57 @@
+{
+  "schema_version": "apf.pattern-candidate/1.0",
+  "pattern_id": "apf.public.evidence-content-addressing",
+  "version": "0.1.0",
+  "title": "Evidence Content Addressing",
+  "intent": "Address evidence by verified content digest rather than mutable location.",
+  "problem": "Without SHA-256 digest indexes immutable evidence bytes, the system can accept an outcome that is not justified by the evidence content addressing contract.",
+  "context": "This pattern addresses review depends on exact captured material; its concrete control is SHA-256 digest indexes immutable evidence bytes.",
+  "forces": [
+    "Correctness requires that retrieved bytes reproduce the recorded digest",
+    "Operational pressure can cause: mutable files change behind a stable path"
+  ],
+  "solution": "Implement SHA-256 digest indexes immutable evidence bytes. Verify the anchored symbol `EvidenceVaultError` with `test_store_returns_opaque_content_addressed_metadata_without_raw_content` before reuse.",
+  "invariants": [
+    "retrieved bytes reproduce the recorded digest",
+    "different content cannot reuse an evidence identity"
+  ],
+  "failure_modes": [
+    "mutable files change behind a stable path",
+    "digest metadata is trusted without byte verification"
+  ],
+  "security": "The security boundary specifically rejects `mutable files change behind a stable path` and fails closed if the evidence content addressing evidence cannot be verified.",
+  "privacy": "For evidence content addressing, persist only its decision identifiers and digests; exclude payload data unrelated to SHA-256 digest indexes immutable evidence bytes.",
+  "license_provenance": {
+    "license": "INTERNAL_PROPRIETARY",
+    "origin": "ARKAON_IMPLEMENTED_INTERNAL",
+    "external_material_included": false
+  },
+  "evidence_hashes": {
+    "src/apf/evidence_vault.py": "2877f709c422ea56ba52dc7d24bd8ca019f0d8f4fb684c6c2e98ee1d522dca38",
+    "tests/test_evidence_vault.py": "687554e87f713f8a7cf01eea6050ea2f3159616a3c30f5e3a68f2f03907478bc"
+  },
+  "source_refs": [
+    "src/apf/evidence_vault.py"
+  ],
+  "test_refs": [
+    "tests/test_evidence_vault.py"
+  ],
+  "verification_test_ids": [
+    "tests/test_evidence_vault.py::test_store_returns_opaque_content_addressed_metadata_without_raw_content"
+  ],
+  "reuse_constraints": [
+    "Confirm the target still requires: review depends on exact captured material",
+    "Do not apply when: only a live external state observation matters",
+    "External Ethernian promotion signature remains mandatory"
+  ],
+  "applies_when": "review depends on exact captured material",
+  "not_when": "only a live external state observation matters",
+  "evidence_anchors": {
+    "source_symbol": "EvidenceVaultError",
+    "test_name": "test_store_returns_opaque_content_addressed_metadata_without_raw_content"
+  },
+  "status": "ETHERNIAN_REVIEW_REQUIRED",
+  "owned_asset": false,
+  "semantic_fingerprint": "bff523efa047d9b67813b60ba62178b39a89e38e95e7633602bfcb61c68fceb8",
+  "package_hash": "9bf47617c7cdecf712a6274b089476a51baff0e1fabd423f7ce441566aa5bdce"
+}

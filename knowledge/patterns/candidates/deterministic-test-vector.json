@@ -1,0 +1,57 @@
+{
+  "schema_version": "apf.pattern-candidate/1.0",
+  "pattern_id": "apf.public.deterministic-test-vector",
+  "version": "0.1.0",
+  "title": "Deterministic Test Vector",
+  "intent": "Label synthetic signing and benchmark artifacts so they cannot imply production approval.",
+  "problem": "Without fixed inputs and explicit TEST_VECTOR labels produce reproducible artifacts, the system can accept an outcome that is not justified by the deterministic test vector contract.",
+  "context": "This pattern addresses cryptographic failure paths need stable fixtures; its concrete control is fixed inputs and explicit TEST_VECTOR labels produce reproducible artifacts.",
+  "forces": [
+    "Correctness requires that test signatures cannot be presented as production evidence",
+    "Operational pressure can cause: random time or nonce changes the fixture"
+  ],
+  "solution": "Implement fixed inputs and explicit TEST_VECTOR labels produce reproducible artifacts. Verify the anchored symbol `_key` with `test_actual_api_vectors_produce_signed_canonical_release_manifest` before reuse.",
+  "invariants": [
+    "test signatures cannot be presented as production evidence",
+    "repeated runs yield the same expected digest"
+  ],
+  "failure_modes": [
+    "random time or nonce changes the fixture",
+    "test keys are loaded by production configuration"
+  ],
+  "security": "The security boundary specifically rejects `random time or nonce changes the fixture` and fails closed if the deterministic test vector evidence cannot be verified.",
+  "privacy": "For deterministic test vector, persist only its decision identifiers and digests; exclude payload data unrelated to fixed inputs and explicit TEST_VECTOR labels produce reproducible artifacts.",
+  "license_provenance": {
+    "license": "INTERNAL_PROPRIETARY",
+    "origin": "ARKAON_IMPLEMENTED_INTERNAL",
+    "external_material_included": false
+  },
+  "evidence_hashes": {
+    "src/apf/certification_vectors.py": "4d3696a624ab68fe14c620f240517360a70dca50c5db0a1995416747620faf6e",
+    "tests/test_release_certification.py": "601409cf7dffbdf2672d8b4067bbde2d096c815c2b1bcfc05dcda97541151ab7"
+  },
+  "source_refs": [
+    "src/apf/certification_vectors.py"
+  ],
+  "test_refs": [
+    "tests/test_release_certification.py"
+  ],
+  "verification_test_ids": [
+    "tests/test_release_certification.py::test_actual_api_vectors_produce_signed_canonical_release_manifest"
+  ],
+  "reuse_constraints": [
+    "Confirm the target still requires: cryptographic failure paths need stable fixtures",
+    "Do not apply when: real approvals are being issued",
+    "External Ethernian promotion signature remains mandatory"
+  ],
+  "applies_when": "cryptographic failure paths need stable fixtures",
+  "not_when": "real approvals are being issued",
+  "evidence_anchors": {
+    "source_symbol": "_key",
+    "test_name": "test_actual_api_vectors_produce_signed_canonical_release_manifest"
+  },
+  "status": "ETHERNIAN_REVIEW_REQUIRED",
+  "owned_asset": false,
+  "semantic_fingerprint": "3ec4f30ab8730200f9c263a6e78cf1b0e0facb018d5a94fe0a1533a0e26455b0",
+  "package_hash": "760611051618d673eb291c0a78801ac6418060179ca8ae9cbea4c06121a9c014"
+}

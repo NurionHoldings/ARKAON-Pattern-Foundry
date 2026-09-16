@@ -1,0 +1,57 @@
+{
+  "schema_version": "apf.pattern-candidate/1.0",
+  "pattern_id": "apf.public.migration-roundtrip",
+  "version": "0.1.0",
+  "title": "Migration Roundtrip",
+  "intent": "Verify schema upgrades and downgrades preserve declared database invariants.",
+  "problem": "Without ordered upgrade and downgrade scripts are executed against schema invariants, the system can accept an outcome that is not justified by the migration roundtrip contract.",
+  "context": "This pattern addresses versioned relational schema changes ship; its concrete control is ordered upgrade and downgrade scripts are executed against schema invariants.",
+  "forces": [
+    "Correctness requires that upgrade reaches the declared head once",
+    "Operational pressure can cause: duplicate columns break fresh installs"
+  ],
+  "solution": "Implement ordered upgrade and downgrade scripts are executed against schema invariants. Verify the anchored symbol `migration_versions` with `test_every_upgrade_has_a_downgrade` before reuse.",
+  "invariants": [
+    "upgrade reaches the declared head once",
+    "downgrade removes only revision-owned objects"
+  ],
+  "failure_modes": [
+    "duplicate columns break fresh installs",
+    "rollback destroys preexisting data structures"
+  ],
+  "security": "The security boundary specifically rejects `duplicate columns break fresh installs` and fails closed if the migration roundtrip evidence cannot be verified.",
+  "privacy": "For migration roundtrip, persist only its decision identifiers and digests; exclude payload data unrelated to ordered upgrade and downgrade scripts are executed against schema invariants.",
+  "license_provenance": {
+    "license": "INTERNAL_PROPRIETARY",
+    "origin": "ARKAON_IMPLEMENTED_INTERNAL",
+    "external_material_included": false
+  },
+  "evidence_hashes": {
+    "src/apf/migrations.py": "c80f0fc7db74181257fc3a9e3f6489d0c6bab6699d598bf20e80f7bd39179bfc",
+    "tests/test_migrations.py": "c80e9f05427e2db207821954eded3fbfce010e990fdb094d8f7813d8878efa8f"
+  },
+  "source_refs": [
+    "src/apf/migrations.py"
+  ],
+  "test_refs": [
+    "tests/test_migrations.py"
+  ],
+  "verification_test_ids": [
+    "tests/test_migrations.py::test_every_upgrade_has_a_downgrade"
+  ],
+  "reuse_constraints": [
+    "Confirm the target still requires: versioned relational schema changes ship",
+    "Do not apply when: storage is ephemeral and schemaless",
+    "External Ethernian promotion signature remains mandatory"
+  ],
+  "applies_when": "versioned relational schema changes ship",
+  "not_when": "storage is ephemeral and schemaless",
+  "evidence_anchors": {
+    "source_symbol": "migration_versions",
+    "test_name": "test_every_upgrade_has_a_downgrade"
+  },
+  "status": "ETHERNIAN_REVIEW_REQUIRED",
+  "owned_asset": false,
+  "semantic_fingerprint": "ca50913d21c0a280479606840eede0e0b457a216803feaace611003f73c5e8c1",
+  "package_hash": "0a641a349b0cc20c523280d280fce30a1dd3de7553a9a5841369b5ad22d82e02"
+}

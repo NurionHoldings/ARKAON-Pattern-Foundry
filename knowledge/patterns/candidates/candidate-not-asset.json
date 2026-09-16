@@ -1,0 +1,57 @@
+{
+  "schema_version": "apf.pattern-candidate/1.0",
+  "pattern_id": "apf.public.candidate-not-asset",
+  "version": "0.1.0",
+  "title": "Candidate Not Asset",
+  "intent": "Keep reviewed candidates distinct from owned or production assets.",
+  "problem": "Without separate status types prohibit candidate-to-owned coercion, the system can accept an outcome that is not justified by the candidate not asset contract.",
+  "context": "This pattern addresses learning outputs await rights and quality review; its concrete control is separate status types prohibit candidate-to-owned coercion.",
+  "forces": [
+    "Correctness requires that review approval does not establish ownership",
+    "Operational pressure can cause: generic strings bypass typed status checks"
+  ],
+  "solution": "Implement separate status types prohibit candidate-to-owned coercion. Verify the anchored symbol `AssetPromotionDenied` with `test_asset_must_advance_sequentially` before reuse.",
+  "invariants": [
+    "review approval does not establish ownership",
+    "registry accepts only declared promotion outcomes"
+  ],
+  "failure_modes": [
+    "generic strings bypass typed status checks",
+    "UI labels imply ownership absent legal evidence"
+  ],
+  "security": "The security boundary specifically rejects `generic strings bypass typed status checks` and fails closed if the candidate not asset evidence cannot be verified.",
+  "privacy": "For candidate not asset, persist only its decision identifiers and digests; exclude payload data unrelated to separate status types prohibit candidate-to-owned coercion.",
+  "license_provenance": {
+    "license": "INTERNAL_PROPRIETARY",
+    "origin": "ARKAON_IMPLEMENTED_INTERNAL",
+    "external_material_included": false
+  },
+  "evidence_hashes": {
+    "src/apf/asset_registry.py": "b47722ac2a7c2778f840b1f6e015b0ea21b4e1404bc0da1f5305d9af946d4c94",
+    "tests/test_asset_registry.py": "072496f1f5b67b05e83d03d8ac4023b16bcab185e692143467de2ea997712927"
+  },
+  "source_refs": [
+    "src/apf/asset_registry.py"
+  ],
+  "test_refs": [
+    "tests/test_asset_registry.py"
+  ],
+  "verification_test_ids": [
+    "tests/test_asset_registry.py::test_asset_must_advance_sequentially"
+  ],
+  "reuse_constraints": [
+    "Confirm the target still requires: learning outputs await rights and quality review",
+    "Do not apply when: the artifact was authored and registered through the owned-asset process",
+    "External Ethernian promotion signature remains mandatory"
+  ],
+  "applies_when": "learning outputs await rights and quality review",
+  "not_when": "the artifact was authored and registered through the owned-asset process",
+  "evidence_anchors": {
+    "source_symbol": "AssetPromotionDenied",
+    "test_name": "test_asset_must_advance_sequentially"
+  },
+  "status": "ETHERNIAN_REVIEW_REQUIRED",
+  "owned_asset": false,
+  "semantic_fingerprint": "8c15e17abdbebf0d02753ebca0eeb61eafcc5fe7232797f6ad6ed34318892a80",
+  "package_hash": "d9d8b3682bdb25eaf6dc0fc4f239181619cd31442055e68d2a2a3774cf8dba49"
+}

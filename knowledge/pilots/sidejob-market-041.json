@@ -1,0 +1,35 @@
+{
+  "schema_version": "apf.owned-platform-metadata-pilot/v1",
+  "pilot_id": "APF-PILOT-041-SIDEJOB-MARKET",
+  "platform": {"id": "SIDEJOB_MARKET", "name": "부업장터", "ownership": "FIRST_PARTY_USER_DECLARED"},
+  "authorization": {
+    "basis": "OWNER_AUTHORIZED_READ_ONLY_METADATA_ANALYSIS",
+    "evidence_ref": "sha256:c920f470852c9271bbc0614e8e50efed82d97bc6d3724f040ce219f374142dc2",
+    "scope": "SUPPLIED_ARCHITECTURE_METADATA_ONLY"
+  },
+  "collection": {
+    "source_basis": "SUPPLIED_AND_PUBLIC_ARCHITECTURE_METADATA",
+    "repository_connection": "NOT_RUN_UNAVAILABLE",
+    "actual_code_analysis": false,
+    "allowed_surfaces": ["PROVIDER_PARTICIPANT_MATCHING", "EARNINGS_OPPORTUNITY_LIFECYCLE", "AI_ASSISTANT_DELEGATION", "SETTLEMENT_ANTI_FRAUD"],
+    "prohibited": ["PII", "SECRET", "CREDENTIAL", "SESSION", "TOKEN", "WRITE", "INTENT_DNA_MUTATION", "OWNED_ASSET_PROMOTION"]
+  },
+  "domain_metadata": {
+    "workflows": ["OPPORTUNITY_CREATE_TO_MATCH", "PARTICIPATION_TO_COMPLETION", "DELEGATION_TO_USER_CONFIRMATION", "EARNING_VERIFICATION_TO_SETTLEMENT"],
+    "source_claim": "USER_SUPPLIED_CONCEPT_METADATA_NOT_REPOSITORY_OBSERVATION"
+  },
+  "domain_metadata_hash": "sha256:9610c852bb76ea3732eadafeed9b7119bd5a6f9d484e1876c8d91c7707b6b424",
+  "candidates": [
+    {"name": "constraint-aware-opportunity-matching", "derived_from_workflows": ["OPPORTUNITY_CREATE_TO_MATCH"], "status": "ETHERNIAN_REVIEW_REQUIRED", "owned_asset": false, "contains_source_material": false},
+    {"name": "participant-earnings-lifecycle", "derived_from_workflows": ["PARTICIPATION_TO_COMPLETION", "EARNING_VERIFICATION_TO_SETTLEMENT"], "status": "ETHERNIAN_REVIEW_REQUIRED", "owned_asset": false, "contains_source_material": false},
+    {"name": "bounded-ai-assistant-delegation", "derived_from_workflows": ["DELEGATION_TO_USER_CONFIRMATION"], "status": "ETHERNIAN_REVIEW_REQUIRED", "owned_asset": false, "contains_source_material": false},
+    {"name": "evidence-gated-settlement", "derived_from_workflows": ["EARNING_VERIFICATION_TO_SETTLEMENT"], "status": "ETHERNIAN_REVIEW_REQUIRED", "owned_asset": false, "contains_source_material": false}
+  ],
+  "cross_platform_comparison": {
+    "reference": "MJN-030-ABSTRACT-CANDIDATES",
+    "mode": "ABSTRACT_BEHAVIOR_COMPARISON_ONLY",
+    "reusable_abstractions": ["principal-ownership-recheck", "transactional-idempotent-transition", "financial-sot-audit-chain"],
+    "copied_source": false
+  },
+  "gates": {"intent_dna_mutation": false, "owned_asset_promotion": false, "writes": false, "review_status": "ETHERNIAN_REVIEW_REQUIRED"}
+}

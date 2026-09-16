@@ -1,0 +1,57 @@
+{
+  "schema_version": "apf.pattern-candidate/1.0",
+  "pattern_id": "apf.public.release-manifest-binding",
+  "version": "0.1.0",
+  "title": "Release Manifest Binding",
+  "intent": "Bind release decisions to exact artifact, test, evidence, and policy digests.",
+  "problem": "Without release signature covers artifact, evidence, test and policy digests, the system can accept an outcome that is not justified by the release manifest binding contract.",
+  "context": "This pattern addresses a deployable bundle needs independent certification; its concrete control is release signature covers artifact, evidence, test and policy digests.",
+  "forces": [
+    "Correctness requires that any released byte change invalidates certification",
+    "Operational pressure can cause: tests run against a different build"
+  ],
+  "solution": "Implement release signature covers artifact, evidence, test and policy digests. Verify the anchored symbol `CertificationError` with `test_actual_api_vectors_produce_signed_canonical_release_manifest` before reuse.",
+  "invariants": [
+    "any released byte change invalidates certification",
+    "release identity includes the complete tested manifest"
+  ],
+  "failure_modes": [
+    "tests run against a different build",
+    "mutable evidence URLs replace content hashes"
+  ],
+  "security": "The security boundary specifically rejects `tests run against a different build` and fails closed if the release manifest binding evidence cannot be verified.",
+  "privacy": "For release manifest binding, persist only its decision identifiers and digests; exclude payload data unrelated to release signature covers artifact, evidence, test and policy digests.",
+  "license_provenance": {
+    "license": "INTERNAL_PROPRIETARY",
+    "origin": "ARKAON_IMPLEMENTED_INTERNAL",
+    "external_material_included": false
+  },
+  "evidence_hashes": {
+    "src/apf/release_certification.py": "04ec145124d13f590f737e9098d8704ed3de42a6b1b702b9f3d6700952a39816",
+    "tests/test_release_certification.py": "601409cf7dffbdf2672d8b4067bbde2d096c815c2b1bcfc05dcda97541151ab7"
+  },
+  "source_refs": [
+    "src/apf/release_certification.py"
+  ],
+  "test_refs": [
+    "tests/test_release_certification.py"
+  ],
+  "verification_test_ids": [
+    "tests/test_release_certification.py::test_actual_api_vectors_produce_signed_canonical_release_manifest"
+  ],
+  "reuse_constraints": [
+    "Confirm the target still requires: a deployable bundle needs independent certification",
+    "Do not apply when: an exploratory local build will not be distributed",
+    "External Ethernian promotion signature remains mandatory"
+  ],
+  "applies_when": "a deployable bundle needs independent certification",
+  "not_when": "an exploratory local build will not be distributed",
+  "evidence_anchors": {
+    "source_symbol": "CertificationError",
+    "test_name": "test_actual_api_vectors_produce_signed_canonical_release_manifest"
+  },
+  "status": "ETHERNIAN_REVIEW_REQUIRED",
+  "owned_asset": false,
+  "semantic_fingerprint": "1e826fc5290d7cfa286a8f75cd0298ade44e23878afe636b30101e29dd6da9a3",
+  "package_hash": "d417f4d7f0205ba1bf03a4f8d1ed2edf4dacbb4e67186a4754b42ac5af420a2e"
+}

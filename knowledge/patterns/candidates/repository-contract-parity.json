@@ -1,0 +1,57 @@
+{
+  "schema_version": "apf.pattern-candidate/1.0",
+  "pattern_id": "apf.public.repository-contract-parity",
+  "version": "0.1.0",
+  "title": "Repository Contract Parity",
+  "intent": "Run one behavioral contract across memory and PostgreSQL repositories.",
+  "problem": "Without one behavioral suite executes against memory and PostgreSQL adapters, the system can accept an outcome that is not justified by the repository contract parity contract.",
+  "context": "This pattern addresses multiple persistence adapters implement one port; its concrete control is one behavioral suite executes against memory and PostgreSQL adapters.",
+  "forces": [
+    "Correctness requires that adapter-visible outcomes remain equivalent",
+    "Operational pressure can cause: memory tests miss transaction behavior"
+  ],
+  "solution": "Implement one behavioral suite executes against memory and PostgreSQL adapters. Verify the anchored symbol `Base` with `test_upgrade_repository_contract_and_downgrade` before reuse.",
+  "invariants": [
+    "adapter-visible outcomes remain equivalent",
+    "database-specific constraints strengthen rather than alter contracts"
+  ],
+  "failure_modes": [
+    "memory tests miss transaction behavior",
+    "SQL null or JSON semantics diverge"
+  ],
+  "security": "The security boundary specifically rejects `memory tests miss transaction behavior` and fails closed if the repository contract parity evidence cannot be verified.",
+  "privacy": "For repository contract parity, persist only its decision identifiers and digests; exclude payload data unrelated to one behavioral suite executes against memory and PostgreSQL adapters.",
+  "license_provenance": {
+    "license": "INTERNAL_PROPRIETARY",
+    "origin": "ARKAON_IMPLEMENTED_INTERNAL",
+    "external_material_included": false
+  },
+  "evidence_hashes": {
+    "src/apf/db.py": "5bca32a2aa84df171f807d2bdd6f20f4b1e12126d73439b5965bdaa3d835d790",
+    "tests/test_postgres_repository.py": "762e4b79bc9c21f242a40d82120cee8420e7daff9abfd8a6b55d555bf0c20aa5"
+  },
+  "source_refs": [
+    "src/apf/db.py"
+  ],
+  "test_refs": [
+    "tests/test_postgres_repository.py"
+  ],
+  "verification_test_ids": [
+    "tests/test_postgres_repository.py::test_upgrade_repository_contract_and_downgrade"
+  ],
+  "reuse_constraints": [
+    "Confirm the target still requires: multiple persistence adapters implement one port",
+    "Do not apply when: only one storage engine will ever exist",
+    "External Ethernian promotion signature remains mandatory"
+  ],
+  "applies_when": "multiple persistence adapters implement one port",
+  "not_when": "only one storage engine will ever exist",
+  "evidence_anchors": {
+    "source_symbol": "Base",
+    "test_name": "test_upgrade_repository_contract_and_downgrade"
+  },
+  "status": "ETHERNIAN_REVIEW_REQUIRED",
+  "owned_asset": false,
+  "semantic_fingerprint": "ddaa331539d0f2ce9c881792c46a51d3733a58dd356fd54b6b4f7b538e5ed46d",
+  "package_hash": "e1757d7a82ed9844f04c4a49fedc9c95111dca17b7efcf247c3cd6ba5eb88fbc"
+}

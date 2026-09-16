@@ -1,0 +1,34 @@
+{
+  "schema_version": "apf.owned-platform-metadata-pilot/v1",
+  "pilot_id": "APF-PILOT-041-NOGADA-NEWS",
+  "platform": {"id": "NOGADA_NEWS", "name": "노가다뉴스", "ownership": "FIRST_PARTY_USER_DECLARED"},
+  "authorization": {
+    "basis": "OWNER_AUTHORIZED_READ_ONLY_METADATA_ANALYSIS",
+    "evidence_ref": "sha256:1376d8e50d7a429c7b0bd2ba38d35570ff6b0b9f519cd14d69793040ae761a91",
+    "scope": "SUPPLIED_ARCHITECTURE_METADATA_ONLY"
+  },
+  "collection": {
+    "source_basis": "SUPPLIED_AND_PUBLIC_ARCHITECTURE_METADATA",
+    "repository_connection": "NOT_RUN_UNAVAILABLE",
+    "actual_code_analysis": false,
+    "allowed_surfaces": ["EDITORIAL_WORKFLOW", "SOURCE_PROVENANCE", "PUBLISH_APPROVALS"],
+    "prohibited": ["PII", "SECRET", "CREDENTIAL", "SESSION", "TOKEN", "WRITE", "INTENT_DNA_MUTATION", "OWNED_ASSET_PROMOTION"]
+  },
+  "domain_metadata": {
+    "workflows": ["SOURCE_REGISTER_TO_VERIFICATION", "DRAFT_TO_EDITORIAL_REVIEW", "APPROVAL_TO_PUBLICATION"],
+    "source_claim": "USER_SUPPLIED_CONCEPT_METADATA_NOT_REPOSITORY_OBSERVATION"
+  },
+  "domain_metadata_hash": "sha256:bb0904c13e476dc030a3442e0537ced3a9e36f28d4e4f553882b5a7744bc7761",
+  "candidates": [
+    {"name": "source-provenance-ledger", "derived_from_workflows": ["SOURCE_REGISTER_TO_VERIFICATION"], "status": "ETHERNIAN_REVIEW_REQUIRED", "owned_asset": false, "contains_source_material": false},
+    {"name": "two-stage-publish-approval", "derived_from_workflows": ["DRAFT_TO_EDITORIAL_REVIEW", "APPROVAL_TO_PUBLICATION"], "status": "ETHERNIAN_REVIEW_REQUIRED", "owned_asset": false, "contains_source_material": false},
+    {"name": "correction-aware-editorial-workflow", "derived_from_workflows": ["SOURCE_REGISTER_TO_VERIFICATION", "APPROVAL_TO_PUBLICATION"], "status": "ETHERNIAN_REVIEW_REQUIRED", "owned_asset": false, "contains_source_material": false}
+  ],
+  "cross_platform_comparison": {
+    "reference": "MJN-030-ABSTRACT-CANDIDATES",
+    "mode": "ABSTRACT_BEHAVIOR_COMPARISON_ONLY",
+    "reusable_abstractions": ["evidence-bound-approval", "auditable-state-transition"],
+    "copied_source": false
+  },
+  "gates": {"intent_dna_mutation": false, "owned_asset_promotion": false, "writes": false, "review_status": "ETHERNIAN_REVIEW_REQUIRED"}
+}

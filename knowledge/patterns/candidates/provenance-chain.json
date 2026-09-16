@@ -1,0 +1,57 @@
+{
+  "schema_version": "apf.pattern-candidate/1.0",
+  "pattern_id": "apf.public.provenance-chain",
+  "version": "0.1.0",
+  "title": "Provenance Chain",
+  "intent": "Carry origin, authorization, and transformation evidence through asset review.",
+  "problem": "Without origin and authorization survive every transformation record, the system can accept an outcome that is not justified by the provenance chain contract.",
+  "context": "This pattern addresses materials may become reusable candidates; its concrete control is origin and authorization survive every transformation record.",
+  "forces": [
+    "Correctness requires that every derivative points to its immediate source",
+    "Operational pressure can cause: a transformation drops license metadata"
+  ],
+  "solution": "Implement origin and authorization survive every transformation record. Verify the anchored symbol `MaterialError` with `test_authorized_rights_allow_licensed_reuse` before reuse.",
+  "invariants": [
+    "every derivative points to its immediate source",
+    "authorization evidence precedes acquisition"
+  ],
+  "failure_modes": [
+    "a transformation drops license metadata",
+    "two sources merge without separate lineage"
+  ],
+  "security": "The security boundary specifically rejects `a transformation drops license metadata` and fails closed if the provenance chain evidence cannot be verified.",
+  "privacy": "For provenance chain, persist only its decision identifiers and digests; exclude payload data unrelated to origin and authorization survive every transformation record.",
+  "license_provenance": {
+    "license": "INTERNAL_PROPRIETARY",
+    "origin": "ARKAON_IMPLEMENTED_INTERNAL",
+    "external_material_included": false
+  },
+  "evidence_hashes": {
+    "src/apf/authorized_material.py": "009f1b79287f6f4b8d80b6ce77b3d7783521d316d39029e801f34c5e47b5d5ee",
+    "tests/test_authorized_material.py": "8f654cbb7bb3efc121dabdceaff126f10735e5952e2922f76dcb8b3ecbf15468"
+  },
+  "source_refs": [
+    "src/apf/authorized_material.py"
+  ],
+  "test_refs": [
+    "tests/test_authorized_material.py"
+  ],
+  "verification_test_ids": [
+    "tests/test_authorized_material.py::test_authorized_rights_allow_licensed_reuse"
+  ],
+  "reuse_constraints": [
+    "Confirm the target still requires: materials may become reusable candidates",
+    "Do not apply when: input is generated entirely inside the current transaction",
+    "External Ethernian promotion signature remains mandatory"
+  ],
+  "applies_when": "materials may become reusable candidates",
+  "not_when": "input is generated entirely inside the current transaction",
+  "evidence_anchors": {
+    "source_symbol": "MaterialError",
+    "test_name": "test_authorized_rights_allow_licensed_reuse"
+  },
+  "status": "ETHERNIAN_REVIEW_REQUIRED",
+  "owned_asset": false,
+  "semantic_fingerprint": "e0f16bfa5409a986ed6c5529e9294b412dea1da0587ddb99a4063f5ca1b5e25e",
+  "package_hash": "4e55b54671a4f885bcf56942452d4522bb96c83f4c6094f25a898c640715727f"
+}

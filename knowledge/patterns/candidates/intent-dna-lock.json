@@ -1,0 +1,57 @@
+{
+  "schema_version": "apf.pattern-candidate/1.0",
+  "pattern_id": "apf.public.intent-dna-lock",
+  "version": "0.1.0",
+  "title": "Intent DNA Lock",
+  "intent": "Bind every execution to an immutable approved intent fingerprint.",
+  "problem": "Without canonical intent fingerprint compared before every transition, the system can accept an outcome that is not justified by the intent dna lock contract.",
+  "context": "This pattern addresses approved intent governs a multi-step job; its concrete control is canonical intent fingerprint compared before every transition.",
+  "forces": [
+    "Correctness requires that stored fingerprint never changes after approval",
+    "Operational pressure can cause: noncanonical JSON changes the digest"
+  ],
+  "solution": "Implement canonical intent fingerprint compared before every transition. Verify the anchored symbol `IntentLockDenied` with `test_human_can_lock_quality_passed_intent` before reuse.",
+  "invariants": [
+    "stored fingerprint never changes after approval",
+    "mismatched execution intent cannot advance"
+  ],
+  "failure_modes": [
+    "noncanonical JSON changes the digest",
+    "an alternate command path omits the check"
+  ],
+  "security": "The security boundary specifically rejects `noncanonical JSON changes the digest` and fails closed if the intent dna lock evidence cannot be verified.",
+  "privacy": "For intent dna lock, persist only its decision identifiers and digests; exclude payload data unrelated to canonical intent fingerprint compared before every transition.",
+  "license_provenance": {
+    "license": "INTERNAL_PROPRIETARY",
+    "origin": "ARKAON_IMPLEMENTED_INTERNAL",
+    "external_material_included": false
+  },
+  "evidence_hashes": {
+    "src/apf/intent_lock.py": "166b2c9f221f202cd92671f3be809b16e0b8c6241acab4284b12aa303fec2bc9",
+    "tests/test_intent_lock.py": "7496aa017f1e53e9068f74ed7442aa4978b33dd3601a5f59eea193d2e015ef90"
+  },
+  "source_refs": [
+    "src/apf/intent_lock.py"
+  ],
+  "test_refs": [
+    "tests/test_intent_lock.py"
+  ],
+  "verification_test_ids": [
+    "tests/test_intent_lock.py::test_human_can_lock_quality_passed_intent"
+  ],
+  "reuse_constraints": [
+    "Confirm the target still requires: approved intent governs a multi-step job",
+    "Do not apply when: operators need an editable draft rather than a locked execution",
+    "External Ethernian promotion signature remains mandatory"
+  ],
+  "applies_when": "approved intent governs a multi-step job",
+  "not_when": "operators need an editable draft rather than a locked execution",
+  "evidence_anchors": {
+    "source_symbol": "IntentLockDenied",
+    "test_name": "test_human_can_lock_quality_passed_intent"
+  },
+  "status": "ETHERNIAN_REVIEW_REQUIRED",
+  "owned_asset": false,
+  "semantic_fingerprint": "fc4cc8c5a34cb50b422a6b55ff433f659dc85958f2cd39ccc4434c3655ba03c2",
+  "package_hash": "fdf892f9014f0808b852f13c978e2c68ac108adb6d388b218a8b28c55bb0435c"
+}

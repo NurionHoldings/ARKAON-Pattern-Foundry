@@ -1,0 +1,57 @@
+{
+  "schema_version": "apf.pattern-candidate/1.0",
+  "pattern_id": "apf.public.durable-review-queue",
+  "version": "0.1.0",
+  "title": "Durable Review Queue",
+  "intent": "Persist open and completed reviews with restart-safe ordering and integrity checks.",
+  "problem": "Without transactional queue persists open review, decision and receipt records, the system can accept an outcome that is not justified by the durable review queue contract.",
+  "context": "This pattern addresses human review spans processes or restarts; its concrete control is transactional queue persists open review, decision and receipt records.",
+  "forces": [
+    "Correctness requires that restart preserves every unresolved review",
+    "Operational pressure can cause: crash commits state without its receipt"
+  ],
+  "solution": "Implement transactional queue persists open review, decision and receipt records. Verify the anchored symbol `DurableStoreError` with `test_real_sqlite_reviews_are_principal_and_tenant_scoped_and_xss_is_inert` before reuse.",
+  "invariants": [
+    "restart preserves every unresolved review",
+    "one review decision produces one durable receipt"
+  ],
+  "failure_modes": [
+    "crash commits state without its receipt",
+    "duplicate delivery creates two open reviews"
+  ],
+  "security": "The security boundary specifically rejects `crash commits state without its receipt` and fails closed if the durable review queue evidence cannot be verified.",
+  "privacy": "For durable review queue, persist only its decision identifiers and digests; exclude payload data unrelated to transactional queue persists open review, decision and receipt records.",
+  "license_provenance": {
+    "license": "INTERNAL_PROPRIETARY",
+    "origin": "ARKAON_IMPLEMENTED_INTERNAL",
+    "external_material_included": false
+  },
+  "evidence_hashes": {
+    "src/apf/durable_review.py": "d4f1a1f262719666743485b011f7a9eb1e17f69d89b9bf28098adf79803a51e3",
+    "tests/test_console_durable.py": "b7b69b9ee51d136bf778e166cb73979a24d769ae42e033bf0c46012f036d4e97"
+  },
+  "source_refs": [
+    "src/apf/durable_review.py"
+  ],
+  "test_refs": [
+    "tests/test_console_durable.py"
+  ],
+  "verification_test_ids": [
+    "tests/test_console_durable.py::test_real_sqlite_reviews_are_principal_and_tenant_scoped_and_xss_is_inert"
+  ],
+  "reuse_constraints": [
+    "Confirm the target still requires: human review spans processes or restarts",
+    "Do not apply when: review finishes synchronously inside one failure-free call",
+    "External Ethernian promotion signature remains mandatory"
+  ],
+  "applies_when": "human review spans processes or restarts",
+  "not_when": "review finishes synchronously inside one failure-free call",
+  "evidence_anchors": {
+    "source_symbol": "DurableStoreError",
+    "test_name": "test_real_sqlite_reviews_are_principal_and_tenant_scoped_and_xss_is_inert"
+  },
+  "status": "ETHERNIAN_REVIEW_REQUIRED",
+  "owned_asset": false,
+  "semantic_fingerprint": "fc5e8f5a47382dfc2473da7828053a520356d8951349725ec128bd2f441981f0",
+  "package_hash": "d86dc21263fa0ddd04139bf77de9ba9a8bd85aa0b460644bdca000e3d833607a"
+}

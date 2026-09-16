@@ -1,0 +1,57 @@
+{
+  "schema_version": "apf.pattern-candidate/1.0",
+  "pattern_id": "apf.public.nonce-replay-defense",
+  "version": "0.1.0",
+  "title": "Nonce Replay Defense",
+  "intent": "Consume signed decision nonces once to prevent approval replay.",
+  "problem": "Without atomic nonce consumption follows successful signature and binding checks, the system can accept an outcome that is not justified by the nonce replay defense contract.",
+  "context": "This pattern addresses signed decisions represent one-time authority; its concrete control is atomic nonce consumption follows successful signature and binding checks.",
+  "forces": [
+    "Correctness requires that invalid signatures never consume nonce state",
+    "Operational pressure can cause: process-local nonce state resets unexpectedly"
+  ],
+  "solution": "Implement atomic nonce consumption follows successful signature and binding checks. Verify the anchored symbol `AnalogReviewError` with `test_checked_in_candidates_produce_deterministic_immutable_packets` before reuse.",
+  "invariants": [
+    "invalid signatures never consume nonce state",
+    "a valid nonce succeeds no more than once"
+  ],
+  "failure_modes": [
+    "process-local nonce state resets unexpectedly",
+    "two verifiers lack a shared consumption store"
+  ],
+  "security": "The security boundary specifically rejects `process-local nonce state resets unexpectedly` and fails closed if the nonce replay defense evidence cannot be verified.",
+  "privacy": "For nonce replay defense, persist only its decision identifiers and digests; exclude payload data unrelated to atomic nonce consumption follows successful signature and binding checks.",
+  "license_provenance": {
+    "license": "INTERNAL_PROPRIETARY",
+    "origin": "ARKAON_IMPLEMENTED_INTERNAL",
+    "external_material_included": false
+  },
+  "evidence_hashes": {
+    "src/apf/analog_review.py": "683114ca6441f02a97e0b3e6cc6a7aca91953349c212f87915a68e4c811e4108",
+    "tests/test_analog_review.py": "96af0535c3d8be9d2ff822cc1b47dd3657b66782db8e132fe3af2bbb2c4c7aa3"
+  },
+  "source_refs": [
+    "src/apf/analog_review.py"
+  ],
+  "test_refs": [
+    "tests/test_analog_review.py"
+  ],
+  "verification_test_ids": [
+    "tests/test_analog_review.py::test_checked_in_candidates_produce_deterministic_immutable_packets"
+  ],
+  "reuse_constraints": [
+    "Confirm the target still requires: signed decisions represent one-time authority",
+    "Do not apply when: the signed message is informational and reusable",
+    "External Ethernian promotion signature remains mandatory"
+  ],
+  "applies_when": "signed decisions represent one-time authority",
+  "not_when": "the signed message is informational and reusable",
+  "evidence_anchors": {
+    "source_symbol": "AnalogReviewError",
+    "test_name": "test_checked_in_candidates_produce_deterministic_immutable_packets"
+  },
+  "status": "ETHERNIAN_REVIEW_REQUIRED",
+  "owned_asset": false,
+  "semantic_fingerprint": "b67b40dc43fb267c406c537c0fb64ca21b3d9ff454ce0ac8847a0aa60ce01a1a",
+  "package_hash": "e57de30b73897ae0a0b0f383769d92618ea9ef4eff4adb9dfcad419294e22d11"
+}

@@ -1,0 +1,57 @@
+{
+  "schema_version": "apf.pattern-candidate/1.0",
+  "pattern_id": "apf.public.role-separated-benchmark",
+  "version": "0.1.0",
+  "title": "Role-separated Benchmark",
+  "intent": "Separate producer, attacker, judge, and approver roles in evaluation.",
+  "problem": "Without producer, attacker, judge and approver identities are independently assigned, the system can accept an outcome that is not justified by the role-separated benchmark contract.",
+  "context": "This pattern addresses evaluation claims require adversarial independence; its concrete control is producer, attacker, judge and approver identities are independently assigned.",
+  "forces": [
+    "Correctness requires that a producer cannot approve its own result",
+    "Operational pressure can cause: one actor silently occupies multiple roles"
+  ],
+  "solution": "Implement producer, attacker, judge and approver identities are independently assigned. Verify the anchored symbol `BenchmarkRole` with `test_complete_role_benchmark_passes_all_025_gates` before reuse.",
+  "invariants": [
+    "a producer cannot approve its own result",
+    "attack findings remain visible to the judge"
+  ],
+  "failure_modes": [
+    "one actor silently occupies multiple roles",
+    "score aggregation hides a critical failure"
+  ],
+  "security": "The security boundary specifically rejects `one actor silently occupies multiple roles` and fails closed if the role-separated benchmark evidence cannot be verified.",
+  "privacy": "For role-separated benchmark, persist only its decision identifiers and digests; exclude payload data unrelated to producer, attacker, judge and approver identities are independently assigned.",
+  "license_provenance": {
+    "license": "INTERNAL_PROPRIETARY",
+    "origin": "ARKAON_IMPLEMENTED_INTERNAL",
+    "external_material_included": false
+  },
+  "evidence_hashes": {
+    "src/apf/role_benchmark.py": "9e2876bbb0ca519d000dca636d6588a9e6d54403bb338052640d0d502eef7f32",
+    "tests/test_role_benchmark.py": "b6aed2393e191b0a15c51fee95fcc5bd1143056ffb29056baab59a0df3d33e82"
+  },
+  "source_refs": [
+    "src/apf/role_benchmark.py"
+  ],
+  "test_refs": [
+    "tests/test_role_benchmark.py"
+  ],
+  "verification_test_ids": [
+    "tests/test_role_benchmark.py::test_complete_role_benchmark_passes_all_025_gates"
+  ],
+  "reuse_constraints": [
+    "Confirm the target still requires: evaluation claims require adversarial independence",
+    "Do not apply when: a disposable developer unit test needs no governance decision",
+    "External Ethernian promotion signature remains mandatory"
+  ],
+  "applies_when": "evaluation claims require adversarial independence",
+  "not_when": "a disposable developer unit test needs no governance decision",
+  "evidence_anchors": {
+    "source_symbol": "BenchmarkRole",
+    "test_name": "test_complete_role_benchmark_passes_all_025_gates"
+  },
+  "status": "ETHERNIAN_REVIEW_REQUIRED",
+  "owned_asset": false,
+  "semantic_fingerprint": "1e7d0b156d927c29e2a1db0135ed75e92012ce045dac2ff44b5f49ef4a3bee88",
+  "package_hash": "4bd1359b51ea2a958833ad52e91ab49b20b9f8777c6bb3d3f653504ac2f1eca7"
+}

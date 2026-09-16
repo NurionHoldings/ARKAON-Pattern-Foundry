@@ -1,0 +1,57 @@
+{
+  "schema_version": "apf.pattern-candidate/1.0",
+  "pattern_id": "apf.public.robots-policy-check",
+  "version": "0.1.0",
+  "title": "Robots Policy Check",
+  "intent": "Evaluate declared crawl policy before retrieving public material.",
+  "problem": "Without robots decision is recorded before a scheduled public fetch, the system can accept an outcome that is not justified by the robots policy check contract.",
+  "context": "This pattern addresses automated public crawling is authorized; its concrete control is robots decision is recorded before a scheduled public fetch.",
+  "forces": [
+    "Correctness requires that denied paths are not requested",
+    "Operational pressure can cause: stale robots data permits a newly denied path"
+  ],
+  "solution": "Implement robots decision is recorded before a scheduled public fetch. Verify the anchored symbol `StartupTrigger` with `test_default_plan_starts_at_boot_and_collects_immediately` before reuse.",
+  "invariants": [
+    "denied paths are not requested",
+    "policy cache expiry triggers reevaluation"
+  ],
+  "failure_modes": [
+    "stale robots data permits a newly denied path",
+    "user-agent matching selects the wrong group"
+  ],
+  "security": "The security boundary specifically rejects `stale robots data permits a newly denied path` and fails closed if the robots policy check evidence cannot be verified.",
+  "privacy": "For robots policy check, persist only its decision identifiers and digests; exclude payload data unrelated to robots decision is recorded before a scheduled public fetch.",
+  "license_provenance": {
+    "license": "INTERNAL_PROPRIETARY",
+    "origin": "ARKAON_IMPLEMENTED_INTERNAL",
+    "external_material_included": false
+  },
+  "evidence_hashes": {
+    "src/apf/continuous_collection.py": "b9cf56e82022592b585f28a93e5743fa0454f26c12e0f813a5b31b70a7d6cf53",
+    "tests/test_continuous_collection.py": "71af48faeb4bd91a664dea2b4deef8b9d8020c56b1b7e825cc5878b51bb6c2e1"
+  },
+  "source_refs": [
+    "src/apf/continuous_collection.py"
+  ],
+  "test_refs": [
+    "tests/test_continuous_collection.py"
+  ],
+  "verification_test_ids": [
+    "tests/test_continuous_collection.py::test_default_plan_starts_at_boot_and_collects_immediately"
+  ],
+  "reuse_constraints": [
+    "Confirm the target still requires: automated public crawling is authorized",
+    "Do not apply when: the owner directly supplies the material",
+    "External Ethernian promotion signature remains mandatory"
+  ],
+  "applies_when": "automated public crawling is authorized",
+  "not_when": "the owner directly supplies the material",
+  "evidence_anchors": {
+    "source_symbol": "StartupTrigger",
+    "test_name": "test_default_plan_starts_at_boot_and_collects_immediately"
+  },
+  "status": "ETHERNIAN_REVIEW_REQUIRED",
+  "owned_asset": false,
+  "semantic_fingerprint": "ca9f859d63d1cf7a43f1fee4338f1a664cabdbdc39ae6b7c5844c229fe41ddf4",
+  "package_hash": "88b01633fbac6c8b65e3cdaab20b4b757949e7781a1032e3810871455fbd4f04"
+}

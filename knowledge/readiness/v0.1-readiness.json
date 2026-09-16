@@ -1,0 +1,30 @@
+{
+  "schema_version": "apf.readiness-matrix/v1",
+  "as_of_phase": "042",
+  "overall_status": "PRODUCT_IMPLEMENT_HOLD",
+  "implemented": [
+    {"phase": "013-019", "capability": "intent, execution, learning, evidence, collection and clean-room synthesis foundations", "evidence": "src/apf"},
+    {"phase": "027-031", "capability": "role campaign, observation/evidence pilots, MJN read-only analysis and three analog candidates", "evidence": "docs/15-synthetic-role-campaign.md"},
+    {"phase": "032-036", "capability": "mediated auth, authorized material acquisition, orchestration, durable review and local certification", "evidence": "docs/20-mediated-auth-acquisition.md"},
+    {"phase": "037", "capability": "externally signed per-candidate Ethernian review gate", "evidence": "docs/26-analog-review-gate.md"},
+    {"phase": "038", "capability": "production PostgreSQL repository, reversible migrations and CI integration path", "evidence": "docs/27-postgresql-repository.md"}
+    ,{"phase": "039", "capability": "tenant-scoped authenticated operations and review console shell", "evidence": "docs/28-operations-review-console.md"},
+    {"phase": "040", "capability": "tenant/principal-scoped SQLite durable review and candidate console adapters with externally signed decisions", "evidence": "tests/test_console_durable.py"},
+    {"phase": "041", "capability": "노가다뉴스 and 부업장터 deterministic read-only pilots from supplied/public architecture metadata", "evidence": "docs/29-owned-platform-metadata-pilots.md"},
+    {"phase": "042", "capability": "exactly 30 evidence-bound public Pattern candidates, catalog validation, external Ed25519 promotion verification and fail-closed reuse proof harness", "evidence": "docs/30-public-pattern-catalog.md"}
+  ],
+  "not_implemented": [
+    {"id": "postgres-live-proof", "capability": "successful live PostgreSQL migration, tenant, JSONB, idempotency and concurrency CI evidence"},
+    {"id": "postgres-review-adapter", "capability": "PostgreSQL durable review/candidate schema, adapter and live CI proof"},
+    {"id": "ui-detail-rendering", "capability": "review and candidate detail rendering backed by the live console APIs"},
+    {"id": "owned-platform-live-connection", "capability": "노가다뉴스 and 부업장터 actual repository connection and authorized code-level analysis"},
+    {"id": "pattern-30-promotion", "capability": "external Ethernian review signatures and individual production promotion for the 30 candidates"},
+    {"id": "reuse-proof", "capability": "real reuse of at least three production-approved patterns in another platform and measured planning reduction"}
+  ],
+  "locks": {
+    "intent_dna_mutation": false,
+    "mjn_write": false,
+    "automatic_owned_asset_promotion": false,
+    "deployment": false
+  }
+}

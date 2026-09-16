@@ -1,0 +1,57 @@
+{
+  "schema_version": "apf.pattern-candidate/1.0",
+  "pattern_id": "apf.public.principal-capability-separation",
+  "version": "0.1.0",
+  "title": "Principal Capability Separation",
+  "intent": "Separate actor identity from narrowly scoped execution authority.",
+  "problem": "Without principal resolution followed by capability scope verification, the system can accept an outcome that is not justified by the principal capability separation contract.",
+  "context": "This pattern addresses actors receive task-scoped authority; its concrete control is principal resolution followed by capability scope verification.",
+  "forces": [
+    "Correctness requires that identity alone grants no operation",
+    "Operational pressure can cause: role claims are mistaken for capabilities"
+  ],
+  "solution": "Implement principal resolution followed by capability scope verification. Verify the anchored symbol `utcnow` with `test_health` before reuse.",
+  "invariants": [
+    "identity alone grants no operation",
+    "capability subject must equal the resolved principal"
+  ],
+  "failure_modes": [
+    "role claims are mistaken for capabilities",
+    "a capability is accepted for another subject"
+  ],
+  "security": "The security boundary specifically rejects `role claims are mistaken for capabilities` and fails closed if the principal capability separation evidence cannot be verified.",
+  "privacy": "For principal capability separation, persist only its decision identifiers and digests; exclude payload data unrelated to principal resolution followed by capability scope verification.",
+  "license_provenance": {
+    "license": "INTERNAL_PROPRIETARY",
+    "origin": "ARKAON_IMPLEMENTED_INTERNAL",
+    "external_material_included": false
+  },
+  "evidence_hashes": {
+    "src/apf/domain.py": "0100e2909078cacc6862d6bf294b8d7a1db6283a2c9241dc7bb24fae66e8b310",
+    "tests/test_api.py": "48dabfbffe3414fe501ce61116f60ad3b2a5fd3c35ca799a86acbd5c03c62383"
+  },
+  "source_refs": [
+    "src/apf/domain.py"
+  ],
+  "test_refs": [
+    "tests/test_api.py"
+  ],
+  "verification_test_ids": [
+    "tests/test_api.py::test_health"
+  ],
+  "reuse_constraints": [
+    "Confirm the target still requires: actors receive task-scoped authority",
+    "Do not apply when: a trusted single-user offline utility has no authorization boundary",
+    "External Ethernian promotion signature remains mandatory"
+  ],
+  "applies_when": "actors receive task-scoped authority",
+  "not_when": "a trusted single-user offline utility has no authorization boundary",
+  "evidence_anchors": {
+    "source_symbol": "utcnow",
+    "test_name": "test_health"
+  },
+  "status": "ETHERNIAN_REVIEW_REQUIRED",
+  "owned_asset": false,
+  "semantic_fingerprint": "8e94837460ba69ebf5e87acac3f9b653342f5f2924abaddbbd46310eaa4f10f3",
+  "package_hash": "311138586e66de2fb7b18a1b05b9a2d86a0a80272c80fa5e19db58ed663a2ff3"
+}
