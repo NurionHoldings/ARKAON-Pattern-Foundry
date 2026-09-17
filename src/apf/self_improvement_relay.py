@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import base64
 import json
+import os
 import subprocess
 import time
 from dataclasses import dataclass
@@ -105,31 +106,43 @@ def _save_receipts(path: Path, receipts: dict[str, dict[str, str]]) -> None:
 
 
 def relay_once(*, foundry_root: Path, publisher: Publisher) -> tuple[RelayReceipt, ...]:
-    inbox = foundry_root / "inbox" / "self-improvement"
-    state_path = foundry_root / "state" / "self-improvement-relay.json"
-    receipts = _load_receipts(state_path)
-    delivered: list[RelayReceipt] = []
-    for path in sorted(inbox.glob("*.json")) if inbox.is_dir() else ():
-        document = json.loads(path.read_text(encoding="utf-8"))
-        request_id, scope_digest = validate_request(document)
-        existing = receipts.get(request_id)
-        if existing:
-            if existing.get("scope_digest") != scope_digest:
-                raise RelayError("RELAY_REQUEST_ID_SCOPE_CONFLICT")
-            continue
-        content = json.dumps(document, ensure_ascii=False, indent=2, sort_keys=True)
-        url = publisher.publish(
-            request_id=request_id,
-            scope_digest=scope_digest,
-            content=content,
-        )
-        receipts[request_id] = {
-            "scope_digest": scope_digest,
-            "pull_request_url": url,
-        }
-        _save_receipts(state_path, receipts)
-        delivered.append(RelayReceipt(request_id, scope_digest, url))
-    return tuple(delivered)
+    state_root = foundry_root / "state"
+    state_root.mkdir(parents=True, exist_ok=True)
+    lock_path = state_root / "self-improvement-relay.lock"
+    try:
+        descriptor = os.open(str(lock_path), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+    except FileExistsError as exc:
+        raise RelayError("RELAY_ALREADY_RUNNING") from exc
+    try:
+        os.write(descriptor, str(os.getpid()).encode())
+        inbox = foundry_root / "inbox" / "self-improvement"
+        state_path = state_root / "self-improvement-relay.json"
+        receipts = _load_receipts(state_path)
+        delivered: list[RelayReceipt] = []
+        for path in sorted(inbox.glob("*.json")) if inbox.is_dir() else ():
+            document = json.loads(path.read_text(encoding="utf-8"))
+            request_id, scope_digest = validate_request(document)
+            existing = receipts.get(request_id)
+            if existing:
+                if existing.get("scope_digest") != scope_digest:
+                    raise RelayError("RELAY_REQUEST_ID_SCOPE_CONFLICT")
+                continue
+            content = json.dumps(document, ensure_ascii=False, indent=2, sort_keys=True)
+            url = publisher.publish(
+                request_id=request_id,
+                scope_digest=scope_digest,
+                content=content,
+            )
+            receipts[request_id] = {
+                "scope_digest": scope_digest,
+                "pull_request_url": url,
+            }
+            _save_receipts(state_path, receipts)
+            delivered.append(RelayReceipt(request_id, scope_digest, url))
+        return tuple(delivered)
+    finally:
+        os.close(descriptor)
+        lock_path.unlink(missing_ok=True)
 
 
 class GhPublisher:
