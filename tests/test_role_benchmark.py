@@ -105,6 +105,18 @@ def test_invalid_measurements_fail_closed(changes, error) -> None:
         RoleTrial(**values)
 
 
+def test_untyped_trial_collection_and_fields_fail_closed() -> None:
+    sample = trials(prefix="typed", interventions=1)
+    with pytest.raises(ValueError, match="TYPED_ROLE_TRIAL_TUPLE_REQUIRED"):
+        summarize_trials(list(sample))
+    with pytest.raises(ValueError, match="TYPED_ROLE_TRIAL_TUPLE_REQUIRED"):
+        summarize_trials((object(),))
+    with pytest.raises(ValueError, match="TYPED_ROLE_AND_BOOLEAN_RESULT_REQUIRED"):
+        RoleTrial("bad-role", "TEST", True, 1, 0, 0, 1)
+    with pytest.raises(ValueError, match="TYPED_ROLE_AND_BOOLEAN_RESULT_REQUIRED"):
+        RoleTrial("bad-pass", BenchmarkRole.TEST, 1, 1, 0, 0, 1)
+
+
 def test_duplicate_trial_identity_is_rejected() -> None:
     sample = trials(prefix="same", interventions=1)
     with pytest.raises(ValueError, match="DUPLICATE_TRIAL_ID"):

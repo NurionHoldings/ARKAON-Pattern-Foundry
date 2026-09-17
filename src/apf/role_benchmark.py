@@ -27,6 +27,8 @@ class RoleTrial:
     safety_violations: int = 0
 
     def __post_init__(self) -> None:
+        if not isinstance(self.role, BenchmarkRole) or type(self.passed) is not bool:
+            raise ValueError("TYPED_ROLE_AND_BOOLEAN_RESULT_REQUIRED")
         if not self.trial_id.strip():
             raise ValueError("TRIAL_ID_REQUIRED")
         if self.duration_seconds < 0:
@@ -102,6 +104,8 @@ def _average(values: list[float]) -> float:
 
 
 def summarize_trials(trials: tuple[RoleTrial, ...]) -> BenchmarkSnapshot:
+    if not isinstance(trials, tuple) or any(not isinstance(trial, RoleTrial) for trial in trials):
+        raise ValueError("TYPED_ROLE_TRIAL_TUPLE_REQUIRED")
     if not trials:
         raise ValueError("BENCHMARK_TRIALS_REQUIRED")
     identities = [trial.trial_id for trial in trials]
