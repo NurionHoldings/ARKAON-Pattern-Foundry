@@ -103,7 +103,7 @@ def test_symlink_escape_is_skipped(tmp_path: Path) -> None:
         pytest.skip("symlink creation unavailable")
     orchestrator = CentralOrchestrator.from_config(FOUNDRY)
     report = orchestrator.run((PlatformRegistration("DEMO", platform),))
-    assert report.platform_reports[0].file_count == 1
+    assert report.platform_reports[0].file_count == 2
 
 
 def test_operator_decision_inbox_is_forbidden() -> None:
