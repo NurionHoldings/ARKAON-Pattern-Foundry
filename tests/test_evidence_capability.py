@@ -34,10 +34,30 @@ def test_verified_evidence_can_only_reach_human_review() -> None:
 
 
 @pytest.mark.parametrize("kind", [EvidenceKind.PUBLIC_SNS, EvidenceKind.PUBLIC_SHORTFORM])
-def test_social_and_shortform_material_remain_analysis_only(kind: EvidenceKind) -> None:
-    decision = limit_capabilities(evidence(kind=kind))
+def test_uncorroborated_social_material_remains_analysis_only(kind: EvidenceKind) -> None:
+    decision = limit_capabilities(
+        evidence(kind=kind, independently_verified=False, independent_source_count=1)
+    )
     assert decision.tier is CapabilityTier.ANALYZE_ONLY
     assert decision.allowed_capabilities == frozenset({"READ", "ANALYZE", "WARN"})
+
+
+@pytest.mark.parametrize("kind", [EvidenceKind.PUBLIC_SNS, EvidenceKind.PUBLIC_SHORTFORM])
+def test_corroborated_social_insight_can_build_sandbox_improvement(kind: EvidenceKind) -> None:
+    decision = limit_capabilities(
+        evidence(kind=kind, confidence_percent=85, independent_source_count=2)
+    )
+    assert decision.tier is CapabilityTier.PROPOSE_ONLY
+    for capability in (
+        "ABSTRACT_PATTERN",
+        "DESIGN_IMPROVEMENT",
+        "BUILD_SANDBOX_CANDIDATE",
+        "RUN_SYNTHETIC_TESTS",
+        "PROPOSE",
+    ):
+        assert decision.allows(capability)
+    assert not decision.allows("EXECUTE")
+    assert not decision.allows("PUBLISH")
 
 
 @pytest.mark.parametrize(
@@ -75,3 +95,5 @@ def test_invalid_typed_fields_fail_closed() -> None:
         limit_capabilities(evidence(confidence_percent=True))
     with pytest.raises(ValueError, match="STRICT_BOOLEAN_EVIDENCE_FLAGS_REQUIRED"):
         limit_capabilities(evidence(fresh=1))
+    with pytest.raises(ValueError, match="INDEPENDENT_SOURCE_COUNT_REQUIRED"):
+        limit_capabilities(evidence(independent_source_count=0))
