@@ -160,6 +160,7 @@ class RunLock:
 class InboxStage(str, Enum):
     RESEARCH = "research"
     ETHERNIAN_REVIEW = "eternian-review"
+    SELF_IMPROVEMENT = "self-improvement"
     OPERATOR_DECISION = "operator-decision"
 
 
@@ -587,7 +588,11 @@ class CentralOrchestrator:
         return tuple(
             sorted(
                 path
-                for stage in (InboxStage.RESEARCH, InboxStage.ETHERNIAN_REVIEW)
+                for stage in (
+                    InboxStage.RESEARCH,
+                    InboxStage.ETHERNIAN_REVIEW,
+                    InboxStage.SELF_IMPROVEMENT,
+                )
                 for path in (self.inbox_root / stage.value).glob("*.json")
                 if path.is_file()
             )
