@@ -1,0 +1,4 @@
+{"schema_version":"apf.evidence-ledger-checkpoint-policy/1.0","status":"ETHERNIAN_REVIEW_REQUIRED",
+ "source_project":"NurionHoldings/NURION_PG","source_feature":"064","source_commit":"5ead6e00bfc78bb8f7f037866aed645698988f58",
+ "shared_data_included":false,"asset_promotion_allowed":false,"mutation_authority_allowed":false,
+ "deployment_authority_allowed":false,"automatic_merge_allowed":false}
