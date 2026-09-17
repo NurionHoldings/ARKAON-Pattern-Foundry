@@ -162,3 +162,68 @@ def test_narang_workspace_id_matches_registration() -> None:
     platforms = json.loads((FOUNDRY / "config" / "platforms.json").read_text(encoding="utf-8"))
     narang = next(item for item in platforms["platforms"] if item["id"] == "NARANG_RIDER")
     assert workspace["platform_id"] == narang["id"]
+
+
+def make_isolated_foundry(tmp_path: Path) -> Path:
+    foundry = tmp_path / "foundry"
+    for folder in ("config", "inbox/research", "inbox/eternian-review", "reports", "logs", "state"):
+        (foundry / folder).mkdir(parents=True, exist_ok=True)
+    for name in ("shared-policy.json", "resource-limits.json"):
+        (foundry / "config" / name).write_text(
+            (FOUNDRY / "config" / name).read_text(encoding="utf-8"),
+            encoding="utf-8",
+        )
+    return foundry
+
+
+def test_equivalent_pending_packet_is_reused_instead_of_duplicated(tmp_path: Path) -> None:
+    foundry = make_isolated_foundry(tmp_path)
+    orchestrator = CentralOrchestrator.from_config(foundry)
+    first = InboxPacket(
+        packet_id="run-one-demo-research",
+        stage=InboxStage.RESEARCH,
+        platform_id="DEMO",
+        created_at=NOW,
+        summary="same intent and evidence",
+        payload_digest="a" * 64,
+    )
+    second = InboxPacket(
+        packet_id="run-two-demo-research",
+        stage=InboxStage.RESEARCH,
+        platform_id="DEMO",
+        created_at=NOW,
+        summary="same intent and evidence",
+        payload_digest="a" * 64,
+    )
+
+    first_path = orchestrator._write_inbox(first)
+    second_path = orchestrator._write_inbox(second)
+
+    assert second_path == first_path
+    assert len(list((foundry / "inbox" / "research").glob("*.json"))) == 1
+
+
+def test_pending_limit_activates_single_backpressure_state(tmp_path: Path) -> None:
+    foundry = make_isolated_foundry(tmp_path)
+    orchestrator = CentralOrchestrator.from_config(foundry)
+    for index in range(orchestrator.limits.max_inbox_packets):
+        (foundry / "inbox" / "research" / f"pending-{index}.json").write_text(
+            json.dumps({"packet_id": f"pending-{index}"}),
+            encoding="utf-8",
+        )
+    packet = InboxPacket(
+        packet_id="blocked-new-packet",
+        stage=InboxStage.ETHERNIAN_REVIEW,
+        platform_id="DEMO",
+        created_at=NOW,
+        summary="new review request",
+        payload_digest="b" * 64,
+    )
+
+    assert orchestrator._write_inbox(packet) is None
+    assert not (foundry / "inbox" / "eternian-review" / "blocked-new-packet.json").exists()
+    state_path = foundry / "state" / "inbox-backpressure.json"
+    state = json.loads(state_path.read_text(encoding="utf-8"))
+    assert state["status"] == "ACTIVE"
+    assert state["pending_count"] == orchestrator.limits.max_inbox_packets
+    assert state["new_packet_created"] is False
