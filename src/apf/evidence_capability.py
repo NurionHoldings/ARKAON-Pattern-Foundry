@@ -25,9 +25,30 @@ class CapabilityTier(StrEnum):
 _TIER_CAPABILITIES: dict[CapabilityTier, frozenset[str]] = {
     CapabilityTier.QUARANTINE: frozenset(),
     CapabilityTier.ANALYZE_ONLY: frozenset({"READ", "ANALYZE", "WARN"}),
-    CapabilityTier.PROPOSE_ONLY: frozenset({"READ", "ANALYZE", "WARN", "PROPOSE"}),
+    CapabilityTier.PROPOSE_ONLY: frozenset(
+        {
+            "READ",
+            "ANALYZE",
+            "WARN",
+            "ABSTRACT_PATTERN",
+            "DESIGN_IMPROVEMENT",
+            "BUILD_SANDBOX_CANDIDATE",
+            "RUN_SYNTHETIC_TESTS",
+            "PROPOSE",
+        }
+    ),
     CapabilityTier.REVIEW_ELIGIBLE: frozenset(
-        {"READ", "ANALYZE", "WARN", "PROPOSE", "REQUEST_REVIEW"}
+        {
+            "READ",
+            "ANALYZE",
+            "WARN",
+            "ABSTRACT_PATTERN",
+            "DESIGN_IMPROVEMENT",
+            "BUILD_SANDBOX_CANDIDATE",
+            "RUN_SYNTHETIC_TESTS",
+            "PROPOSE",
+            "REQUEST_REVIEW",
+        }
     ),
 }
 
@@ -57,12 +78,15 @@ class CollectedEvidence:
     fresh: bool
     contains_sensitive_data: bool
     confidence_percent: int
+    independent_source_count: int = 1
 
     def validate(self) -> None:
         if not isinstance(self.kind, EvidenceKind):
             raise ValueError("TYPED_EVIDENCE_KIND_REQUIRED")
         if type(self.confidence_percent) is not int or not 0 <= self.confidence_percent <= 100:
             raise ValueError("CONFIDENCE_PERCENT_REQUIRED")
+        if type(self.independent_source_count) is not int or self.independent_source_count < 1:
+            raise ValueError("INDEPENDENT_SOURCE_COUNT_REQUIRED")
         flags = (
             self.provenance_complete,
             self.authorization_valid,
@@ -103,8 +127,18 @@ def limit_capabilities(evidence: CollectedEvidence) -> CapabilityDecision:
         tier = CapabilityTier.QUARANTINE
         reasons.append("RIGHTS_OR_LICENSE_INVALID")
     elif evidence.kind in {EvidenceKind.PUBLIC_SNS, EvidenceKind.PUBLIC_SHORTFORM}:
-        tier = CapabilityTier.ANALYZE_ONLY
-        reasons.append("SOCIAL_MATERIAL_ANALYSIS_ONLY")
+        if (
+            evidence.consent_valid
+            and evidence.fresh
+            and evidence.independently_verified
+            and evidence.confidence_percent >= 80
+            and evidence.independent_source_count >= 2
+        ):
+            tier = CapabilityTier.PROPOSE_ONLY
+            reasons.append("SOCIAL_INSIGHT_SANDBOX_IMPROVEMENT_ALLOWED")
+        else:
+            tier = CapabilityTier.ANALYZE_ONLY
+            reasons.append("SOCIAL_MATERIAL_NEEDS_CORROBORATION")
     elif evidence.kind is EvidenceKind.UNKNOWN:
         tier = CapabilityTier.ANALYZE_ONLY
         reasons.append("UNKNOWN_SOURCE_ANALYSIS_ONLY")
