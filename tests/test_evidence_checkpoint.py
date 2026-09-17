@@ -1,8 +1,16 @@
-from datetime import datetime,timedelta,timezone
 import hashlib
+from datetime import UTC, datetime, timedelta
+
 import pytest
-from apf.evidence_checkpoint import CHECKPOINT_STATUS,EvidenceCheckpointError,VerifiedEvidenceLedgerTip,checkpoint_evidence_ledger
-NOW=datetime(2026,9,17,tzinfo=timezone.utc)
+
+from apf.evidence_checkpoint import (
+    CHECKPOINT_STATUS,
+    EvidenceCheckpointError,
+    VerifiedEvidenceLedgerTip,
+    checkpoint_evidence_ledger,
+)
+
+NOW=datetime(2026,9,17,tzinfo=UTC)
 def h(v:bytes)->str:return hashlib.sha256(v).hexdigest()
 def tip()->VerifiedEvidenceLedgerTip:return VerifiedEvidenceLedgerTip(1,h(b"tip"),h(b"report"),NOW,True)
 def test_verified_tip_creates_nonpromoting_checkpoint():

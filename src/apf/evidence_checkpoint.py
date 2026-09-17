@@ -1,5 +1,6 @@
 """Incubating, non-promoting checkpoint for a verified evidence-ledger tip."""
 from __future__ import annotations
+
 import hashlib
 import json
 from dataclasses import dataclass

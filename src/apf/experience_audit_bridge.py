@@ -12,7 +12,6 @@ from pathlib import Path
 from .experience_operations_audit import (
     ArkaonExperienceOperationsAuditor,
     AuditRejected,
-    BenchmarkFeature,
     ImprovementProposal,
     MaximumOutcome,
     OperationalManifest,
