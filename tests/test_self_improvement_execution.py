@@ -9,6 +9,7 @@ from apf.self_improvement_execution import (
     parse_approval_receipt,
     record_approval,
     run_in_approved_worktree,
+    sync_approval_receipts,
 )
 
 SCOPE = "a" * 64
@@ -133,3 +134,110 @@ def test_github_receipt_content_is_fetched_at_resolved_commit(monkeypatch):
     assert document["request_id"] == "relay-quarantine-001"
     assert commit == COMMIT
     assert f"ref={COMMIT}" in calls[1]
+
+
+class FakeApprovalSource:
+    def __init__(self, documents):
+        self.documents = documents
+
+    def fetch(self, request_id):
+        value = self.documents[request_id]
+        if isinstance(value, Exception):
+            raise value
+        return value, COMMIT
+
+
+def test_approval_sync_accepts_exact_scope_and_creates_nonexecuting_queue(tmp_path):
+    source = FakeApprovalSource({"relay-quarantine-001": receipt_document()})
+
+    result = sync_approval_receipts(
+        foundry_root=tmp_path,
+        source=source,
+        requests={"relay-quarantine-001": SCOPE},
+    )
+
+    assert len(result.accepted) == 1
+    assert result.pending == result.blocked == ()
+    queued = json.loads(
+        (tmp_path / "state/self-improvement-execution-queue/relay-quarantine-001.json").read_text()
+    )
+    assert queued["state"] == "OWNER_APPROVED"
+    status = json.loads((tmp_path / "state/self-improvement-approval-sync-latest.json").read_text())
+    assert status["execution_automatic"] is False
+    assert status["deployment_automatic"] is False
+
+
+def test_approval_sync_distinguishes_pending_from_blocked(tmp_path):
+    source = FakeApprovalSource(
+        {
+            "pending": ApprovalExecutionError("GITHUB_APPROVAL_COMMIT_UNRESOLVED"),
+            "blocked": receipt_document(request_id="blocked", scope_digest="c" * 64),
+        }
+    )
+
+    result = sync_approval_receipts(
+        foundry_root=tmp_path,
+        source=source,
+        requests={"pending": SCOPE, "blocked": SCOPE},
+    )
+
+    assert result.pending == ("pending",)
+    assert result.blocked == (("blocked", "APPROVAL_SCOPE_BINDING_MISMATCH"),)
+    assert not (tmp_path / "state/self-improvement-execution-queue/blocked.json").exists()
+
+
+def test_approval_sync_is_idempotent_and_detects_queue_conflict(tmp_path):
+    source = FakeApprovalSource({"relay-quarantine-001": receipt_document()})
+    first = sync_approval_receipts(
+        foundry_root=tmp_path,
+        source=source,
+        requests={"relay-quarantine-001": SCOPE},
+    )
+    second = sync_approval_receipts(
+        foundry_root=tmp_path,
+        source=source,
+        requests={"relay-quarantine-001": SCOPE},
+    )
+    assert len(first.accepted) == 1
+    assert second.accepted == second.pending == second.blocked == ()
+
+    queue = tmp_path / "state/self-improvement-execution-queue/relay-quarantine-001.json"
+    document = json.loads(queue.read_text())
+    document["scope_digest"] = "d" * 64
+    queue.write_text(json.dumps(document))
+    conflict = sync_approval_receipts(
+        foundry_root=tmp_path,
+        source=source,
+        requests={"relay-quarantine-001": SCOPE},
+    )
+    assert conflict.blocked == (("relay-quarantine-001", "APPROVAL_QUEUE_CONFLICT"),)
+
+
+def test_approval_sync_rejects_request_id_path_escape_before_queue_path(tmp_path):
+    result = sync_approval_receipts(
+        foundry_root=tmp_path,
+        source=FakeApprovalSource({}),
+        requests={"../outside": SCOPE},
+    )
+
+    assert result.blocked == (("../outside", "INVALID_REQUEST_ID"),)
+    assert not (tmp_path / "state/outside.json").exists()
+
+
+def test_approval_sync_rejects_queue_not_bound_to_ledger(tmp_path):
+    source = FakeApprovalSource({"relay-quarantine-001": receipt_document()})
+    sync_approval_receipts(
+        foundry_root=tmp_path,
+        source=source,
+        requests={"relay-quarantine-001": SCOPE},
+    )
+    ledger = tmp_path / "state/owner-approvals.json"
+    ledger.unlink()
+
+    result = sync_approval_receipts(
+        foundry_root=tmp_path,
+        source=source,
+        requests={"relay-quarantine-001": SCOPE},
+    )
+
+    assert result.blocked == (("relay-quarantine-001", "APPROVAL_QUEUE_CONFLICT"),)

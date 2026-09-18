@@ -14,6 +14,12 @@ from pathlib import Path
 from typing import Protocol
 
 from .mailbox_maintenance import run_maintenance
+from .self_improvement_execution import (
+    ApprovalSource,
+    ApprovalSyncResult,
+    GhApprovalSource,
+    sync_approval_receipts,
+)
 
 
 class RelayError(RuntimeError):
@@ -43,6 +49,7 @@ class BlockedPacket:
 class RelayCycle:
     delivered: tuple[RelayReceipt, ...]
     blocked: tuple[BlockedPacket, ...]
+    approvals: ApprovalSyncResult | None
     mailbox: dict[str, object]
 
 
@@ -211,15 +218,38 @@ def relay_once(
         lock_path.unlink(missing_ok=True)
 
 
-def relay_cycle(*, foundry_root: Path, publisher: Publisher, batch_size: int = 30) -> RelayCycle:
+def relay_cycle(
+    *,
+    foundry_root: Path,
+    publisher: Publisher,
+    batch_size: int = 30,
+    approval_source: ApprovalSource | None = None,
+) -> RelayCycle:
     delivered, blocked = relay_once(foundry_root=foundry_root, publisher=publisher)
+    approvals = None
+    if approval_source is not None:
+        receipts = _load_receipts(foundry_root / "state" / "self-improvement-relay.json")
+        approvals = sync_approval_receipts(
+            foundry_root=foundry_root,
+            source=approval_source,
+            requests={
+                request_id: receipt["scope_digest"]
+                for request_id, receipt in receipts.items()
+                if isinstance(receipt.get("scope_digest"), str)
+            },
+        )
     mailbox = run_maintenance(
         foundry_root=foundry_root,
         batch_size=batch_size,
         apply_archive_changes=True,
         summary_only=True,
     )
-    return RelayCycle(delivered=delivered, blocked=blocked, mailbox=mailbox)
+    return RelayCycle(
+        delivered=delivered,
+        blocked=blocked,
+        approvals=approvals,
+        mailbox=mailbox,
+    )
 
 
 class GhPublisher:
@@ -329,11 +359,13 @@ def main() -> int:
     parser.add_argument("--mailbox-batch-size", type=int, default=30)
     arguments = parser.parse_args()
     publisher = GhPublisher(arguments.repository)
+    approval_source = GhApprovalSource(arguments.repository)
     while True:
         relay_cycle(
             foundry_root=arguments.foundry_root.resolve(),
             publisher=publisher,
             batch_size=arguments.mailbox_batch_size,
+            approval_source=approval_source,
         )
         if arguments.watch_seconds <= 0:
             return 0

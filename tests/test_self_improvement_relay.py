@@ -126,6 +126,7 @@ def test_relay_cycle_delivers_then_archives_transport_packet(tmp_path) -> None:
 
     assert len(cycle.delivered) == 1
     assert cycle.blocked == ()
+    assert cycle.approvals is None
     assert cycle.mailbox["counts"]["relayed"] == 1
     assert cycle.mailbox["counts"]["archived"] == 1
     assert not path.exists()
