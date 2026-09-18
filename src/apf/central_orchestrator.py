@@ -11,6 +11,7 @@ import json
 import os
 import re
 import subprocess
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import TimeoutError as FuturesTimeoutError
 from dataclasses import asdict, dataclass, field
@@ -18,7 +19,6 @@ from datetime import UTC, datetime
 from enum import Enum
 from hashlib import sha256
 from pathlib import Path
-from collections.abc import Callable
 from typing import Any
 
 from .experience_audit_bridge import run_platform_experience_audit
