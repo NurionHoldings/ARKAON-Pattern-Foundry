@@ -82,7 +82,7 @@ class CollectedEvidence:
 
     def validate(self) -> None:
         if not isinstance(self.kind, EvidenceKind):
-            raise ValueError("TYPED_EVIDENCE_KIND_REQUIRED")
+            raise TypeError("TYPED_EVIDENCE_KIND_REQUIRED")
         if type(self.confidence_percent) is not int or not 0 <= self.confidence_percent <= 100:
             raise ValueError("CONFIDENCE_PERCENT_REQUIRED")
         if type(self.independent_source_count) is not int or self.independent_source_count < 1:
@@ -113,7 +113,7 @@ class CapabilityDecision:
 
 def limit_capabilities(evidence: CollectedEvidence) -> CapabilityDecision:
     if not isinstance(evidence, CollectedEvidence):
-        raise ValueError("TYPED_COLLECTED_EVIDENCE_REQUIRED")
+        raise TypeError("TYPED_COLLECTED_EVIDENCE_REQUIRED")
     evidence.validate()
     reasons: list[str] = []
 
