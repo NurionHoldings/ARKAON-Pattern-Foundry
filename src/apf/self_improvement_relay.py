@@ -212,8 +212,8 @@ class GhPublisher:
         )
         body = (
             "ARKAON self-improvement request.\n\n"
-            f"- request_id: \`{request_id}\`\n"
-            f"- scope_digest: \`{scope_digest}\`\n"
+            f"- request_id: `{request_id}`\n"
+            f"- scope_digest: `{scope_digest}`\n"
             "- status: OWNER_APPROVAL_REQUIRED\n"
             "- automatic merge/deploy: forbidden\n"
         )
