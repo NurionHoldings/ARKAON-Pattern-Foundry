@@ -46,3 +46,26 @@ def test_does_not_modify_mailbox_when_only_building_plan(tmp_path):
 
     assert plan.archive == (packet,)
     assert packet.is_file()
+
+
+def test_packets_without_strong_identity_are_not_deduplicated(tmp_path):
+    inbox = tmp_path / "inbox"
+    write_packet(inbox / "research" / "one.json", status="PENDING")
+    write_packet(inbox / "research" / "two.json", status="PENDING")
+
+    plan = build_plan(inbox)
+
+    assert {path.name for path in plan.deliver} == {"one.json", "two.json"}
+    assert plan.duplicates == ()
+
+
+def test_invalid_json_is_reported_without_archiving(tmp_path):
+    invalid = tmp_path / "inbox" / "research" / "invalid.json"
+    invalid.parent.mkdir(parents=True)
+    invalid.write_text("{not-json", encoding="utf-8")
+
+    plan = build_plan(tmp_path / "inbox")
+
+    assert plan.invalid == (invalid,)
+    assert plan.archive == ()
+    assert invalid.is_file()
