@@ -1,0 +1,30 @@
+{
+  "schema_version": "apf.owner-approval-receipt/1.0",
+  "state": "OWNER_APPROVED",
+  "request_id": "relay-quarantine-001",
+  "scope_digest": "9f17275acb2a7bd27974d2cb3e53ca49115d3e3218afed7559a60ff2583382c2",
+  "approver": "최인석",
+  "approved_at": "2026-09-18T23:00:00+09:00",
+  "allowed_paths": [
+    "src/apf/self_improvement_relay.py",
+    "src/apf/self_improvement_execution.py",
+    "tests/test_self_improvement_relay.py",
+    "tests/test_self_improvement_execution.py",
+    "docs/42-self-improvement-execution.md",
+    "requests/self-improvement/relay-quarantine-001.json",
+    "approvals/self-improvement/relay-quarantine-001.json",
+    "evidence/self-improvement/relay-quarantine-001-arkaon.json",
+    "evidence/self-improvement/relay-quarantine-001-eternian.json",
+    "evidence/self-improvement/relay-quarantine-001-result.json"
+  ],
+  "allowed_operations": [
+    "READ_WORKTREE",
+    "WRITE_WORKTREE",
+    "RUN_TESTS",
+    "RUN_LINTER",
+    "GENERATE_ARTIFACT"
+  ],
+  "production_change_allowed": false,
+  "automatic_merge_allowed": false,
+  "deployment_allowed": false
+}

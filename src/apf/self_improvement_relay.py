@@ -32,8 +32,17 @@ class RelayReceipt:
 
 
 @dataclass(frozen=True)
+class BlockedPacket:
+    source_name: str
+    quarantine_name: str
+    reason: str
+    evidence_digest: str
+
+
+@dataclass(frozen=True)
 class RelayCycle:
     delivered: tuple[RelayReceipt, ...]
+    blocked: tuple[BlockedPacket, ...]
     mailbox: dict[str, object]
 
 
@@ -113,7 +122,39 @@ def _save_receipts(path: Path, receipts: dict[str, dict[str, str]]) -> None:
     temporary.replace(path)
 
 
-def relay_once(*, foundry_root: Path, publisher: Publisher) -> tuple[RelayReceipt, ...]:
+def _quarantine_packet(*, foundry_root: Path, path: Path, reason: str) -> BlockedPacket:
+    content = path.read_bytes()
+    digest = sha256(content).hexdigest()
+    quarantine = foundry_root / "quarantine" / "self-improvement"
+    quarantine.mkdir(parents=True, exist_ok=True)
+    target = quarantine / f"{path.stem}-{digest[:12]}.json"
+    if target.exists() and target.read_bytes() != content:
+        raise RelayError("QUARANTINE_DIGEST_COLLISION")
+    if not target.exists():
+        path.replace(target)
+    else:
+        path.unlink()
+    receipt = {
+        "schema_version": "apf.self-improvement-quarantine/1.0",
+        "state": "BLOCKED",
+        "source_name": path.name,
+        "quarantine_name": target.name,
+        "reason": reason,
+        "evidence_digest": f"sha256:{digest}",
+    }
+    receipt_path = target.with_suffix(".blocked.json")
+    temporary = receipt_path.with_suffix(".tmp")
+    temporary.write_text(
+        json.dumps(receipt, ensure_ascii=False, indent=2, sort_keys=True),
+        encoding="utf-8",
+    )
+    temporary.replace(receipt_path)
+    return BlockedPacket(path.name, target.name, reason, f"sha256:{digest}")
+
+
+def relay_once(
+    *, foundry_root: Path, publisher: Publisher
+) -> tuple[tuple[RelayReceipt, ...], tuple[BlockedPacket, ...]]:
     state_root = foundry_root / "state"
     state_root.mkdir(parents=True, exist_ok=True)
     lock_path = state_root / "self-improvement-relay.lock"
@@ -127,13 +168,30 @@ def relay_once(*, foundry_root: Path, publisher: Publisher) -> tuple[RelayReceip
         state_path = state_root / "self-improvement-relay.json"
         receipts = _load_receipts(state_path)
         delivered: list[RelayReceipt] = []
+        blocked: list[BlockedPacket] = []
         for path in sorted(inbox.glob("*.json")) if inbox.is_dir() else ():
-            document = json.loads(path.read_text(encoding="utf-8"))
-            request_id, scope_digest = validate_request(document)
+            try:
+                document = json.loads(path.read_text(encoding="utf-8"))
+                if not isinstance(document, dict):
+                    raise RelayError("SELF_IMPROVEMENT_OBJECT_REQUIRED")
+                request_id, scope_digest = validate_request(document)
+            except (OSError, UnicodeError, json.JSONDecodeError, RelayError) as exc:
+                reason = str(exc) if isinstance(exc, RelayError) else type(exc).__name__.upper()
+                blocked.append(
+                    _quarantine_packet(foundry_root=foundry_root, path=path, reason=reason)
+                )
+                continue
             existing = receipts.get(request_id)
             if existing:
                 if existing.get("scope_digest") != scope_digest:
-                    raise RelayError("RELAY_REQUEST_ID_SCOPE_CONFLICT")
+                    blocked.append(
+                        _quarantine_packet(
+                            foundry_root=foundry_root,
+                            path=path,
+                            reason="RELAY_REQUEST_ID_SCOPE_CONFLICT",
+                        )
+                    )
+                    continue
                 continue
             content = json.dumps(document, ensure_ascii=False, indent=2, sort_keys=True)
             url = publisher.publish(
@@ -147,21 +205,21 @@ def relay_once(*, foundry_root: Path, publisher: Publisher) -> tuple[RelayReceip
             }
             _save_receipts(state_path, receipts)
             delivered.append(RelayReceipt(request_id, scope_digest, url))
-        return tuple(delivered)
+        return tuple(delivered), tuple(blocked)
     finally:
         os.close(descriptor)
         lock_path.unlink(missing_ok=True)
 
 
 def relay_cycle(*, foundry_root: Path, publisher: Publisher, batch_size: int = 30) -> RelayCycle:
-    delivered = relay_once(foundry_root=foundry_root, publisher=publisher)
+    delivered, blocked = relay_once(foundry_root=foundry_root, publisher=publisher)
     mailbox = run_maintenance(
         foundry_root=foundry_root,
         batch_size=batch_size,
         apply_archive_changes=True,
         summary_only=True,
     )
-    return RelayCycle(delivered=delivered, mailbox=mailbox)
+    return RelayCycle(delivered=delivered, blocked=blocked, mailbox=mailbox)
 
 
 class GhPublisher:

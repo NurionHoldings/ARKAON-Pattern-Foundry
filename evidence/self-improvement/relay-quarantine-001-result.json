@@ -1,0 +1,23 @@
+{
+  "schema_version": "apf.self-improvement-result/1.0",
+  "request_id": "relay-quarantine-001",
+  "scope_digest": "9f17275acb2a7bd27974d2cb3e53ca49115d3e3218afed7559a60ff2583382c2",
+  "state": "DEPLOYMENT_APPROVAL_PENDING",
+  "approval_receipt_digest": "sha256:31acb421b62f80f9b98f8cb540f0bb7703a6386a9a0de425b4c4f1a15a0eddd1",
+  "sandbox_runner_base_sha": "9c26ab7f23be6daa09192639927000d9c3aa196e",
+  "sandbox_runner_stdout_digest": "sha256:f81ec537130afe39d6f3aca5d28180b601ee2dae7ba988e3a3009f33841d517e",
+  "sandbox_runner_stderr_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "before": "One malformed or tampered packet raised from relay_once and stopped all later delivery.",
+  "after": "Invalid packets are content-addressed, moved to quarantine with BLOCKED evidence, and later valid packets continue in the same pass.",
+  "arkaon_verification_digest": "sha256:0d58848e3d3119f0b7eede8df941f0791679e1a0a1af742f5d99785508e4325f",
+  "eternian_audit_and_remediation_digest": "sha256:9e4f93f1e23cbe0ef6ec33b36d745b5092725b0165311b05117be9a1d305a75c",
+  "regression": "594 PASS / 5 SKIP; Ruff PASS",
+  "remaining_risks": [
+    "Owner-PC Scheduled Task integration has not run in this Linux verification environment.",
+    "Quarantine retention remains an operational responsibility."
+  ],
+  "rollback": "Revert the feature commit. Do not delete quarantined bytes or BLOCKED receipts.",
+  "production_change_allowed": false,
+  "automatic_merge_allowed": false,
+  "deployment_allowed": false
+}
