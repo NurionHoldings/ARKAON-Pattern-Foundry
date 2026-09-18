@@ -17,6 +17,7 @@ class MailboxPlan:
     deliver: tuple[Path, ...]
     archive: tuple[Path, ...]
     duplicates: tuple[Path, ...]
+    invalid: tuple[Path, ...]
 
 
 def _load(path: Path) -> dict[str, Any] | None:
@@ -31,16 +32,25 @@ def _status(document: dict[str, Any]) -> str:
     return str(document.get("status") or document.get("state") or "PENDING").upper()
 
 
-def _fingerprint(path: Path, document: dict[str, Any]) -> str:
+def _fingerprint(path: Path, document: dict[str, Any]) -> str | None:
     stable = {
         "stage": document.get("stage") or path.parent.name,
         "platform_id": document.get("platform_id"),
         "payload_digest": document.get("payload_digest"),
+        "scope_digest": document.get("scope_digest"),
         "summary": document.get("summary"),
         "intent_dna": document.get("intent_dna"),
         "capability_gap": document.get("capability_gap"),
         "proposed_change": document.get("proposed_change"),
     }
+    has_strong_identity = bool(
+        document.get("payload_digest")
+        or document.get("scope_digest")
+        or (document.get("platform_id") and document.get("summary"))
+        or (document.get("intent_dna") and document.get("proposed_change"))
+    )
+    if not has_strong_identity:
+        return None
     encoded = json.dumps(stable, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     return sha256(encoded.encode()).hexdigest()
 
@@ -68,26 +78,30 @@ def build_plan(inbox_root: Path, *, batch_size: int = 30) -> MailboxPlan:
     candidates: list[tuple[Path, dict[str, Any]]] = []
     archive: list[Path] = []
     duplicates: list[Path] = []
+    invalid: list[Path] = []
     seen: set[str] = set()
     for path in sorted(inbox_root.rglob("*.json")) if inbox_root.is_dir() else ():
         document = _load(path)
         if document is None:
+            invalid.append(path)
             continue
         if _status(document) in {"FULFILLED", "COMPLETED", "ARCHIVED"}:
             archive.append(path)
             continue
         fingerprint = _fingerprint(path, document)
-        if fingerprint in seen:
+        if fingerprint is not None and fingerprint in seen:
             archive.append(path)
             duplicates.append(path)
             continue
-        seen.add(fingerprint)
+        if fingerprint is not None:
+            seen.add(fingerprint)
         candidates.append((path, document))
     candidates.sort(key=lambda item: _priority(*item))
     return MailboxPlan(
         deliver=tuple(path for path, _ in candidates[:batch_size]),
         archive=tuple(archive),
         duplicates=tuple(duplicates),
+        invalid=tuple(invalid),
     )
 
 
@@ -124,6 +138,7 @@ def main() -> int:
         "deliver": [str(path) for path in plan.deliver],
         "archive_candidates": [str(path) for path in plan.archive],
         "duplicates": [str(path) for path in plan.duplicates],
+        "invalid": [str(path) for path in plan.invalid],
         "archived": [str(path) for path in moved],
     }, ensure_ascii=False, indent=2))
     return 0
