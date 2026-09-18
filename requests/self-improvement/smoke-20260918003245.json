@@ -1,0 +1,30 @@
+{
+  "automatic_merge_allowed": false,
+  "capability_gap": "The real-time relay requires an end-to-end smoke test.",
+  "deployment_allowed": false,
+  "detected_at": "2026-09-18T00:32:45.493782+00:00",
+  "evidence_refs": [
+    "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  ],
+  "expected_benefit": "Verify local inbox to Eternian event delivery.",
+  "intent_dna": "Verify owner-governed ARKAON self-improvement relay.",
+  "owner_approval_digest": null,
+  "production_change_allowed": false,
+  "proposed_change": "Create a proposal-only smoke-test pull request.",
+  "request_id": "smoke-20260918003245",
+  "revision": 1,
+  "risks": [
+    "Test PR must not be merged or deployed."
+  ],
+  "schema_version": "apf.self-improvement-request/1.0",
+  "scope_digest": "f05d6f414dd8e4ec021ae3323b72deada15cc78440033c9c20d4783177fd847b",
+  "source_tier": "REVIEW_ELIGIBLE",
+  "state": "INBOX_POSTED",
+  "updated_at": "2026-09-18T00:32:45.493782+00:00",
+  "validation_plan": [
+    "Confirm PR creation within 15 seconds.",
+    "Confirm duplicate delivery is suppressed.",
+    "Confirm owner approval remains required."
+  ]
+}
