@@ -7,11 +7,11 @@ or safety; it cannot rank, exclude, or penalize from plaza presence.
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass, replace
 from datetime import datetime, timedelta
 from enum import StrEnum
 from hashlib import sha256
-from typing import Mapping
 
 
 class PlazaPurpose(StrEnum):

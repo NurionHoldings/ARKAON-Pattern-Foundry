@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from hashlib import sha256
 from itertools import pairwise
 
@@ -15,7 +15,7 @@ from apf.reflective_learning import (
 )
 from apf.reflective_lesson_store import ReflectiveLessonStore
 
-NOW = datetime(2026, 9, 16, tzinfo=timezone.utc)
+NOW = datetime(2026, 9, 16, tzinfo=UTC)
 HEAD = "e2dd9f5d55e5a3a953af565ca467bd0aa4d1c875"
 
 

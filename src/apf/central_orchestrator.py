@@ -11,13 +11,14 @@ import json
 import os
 import re
 import subprocess
-from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
+from collections.abc import Callable
+from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import TimeoutError as FuturesTimeoutError
 from dataclasses import asdict, dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
 from hashlib import sha256
 from pathlib import Path
-from collections.abc import Callable
 from typing import Any
 
 from .experience_audit_bridge import run_platform_experience_audit
@@ -146,7 +147,7 @@ class RunLock:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         try:
             self._fd = os.open(str(self.path), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
-            os.write(self._fd, f"{datetime.now(timezone.utc).isoformat()}\n".encode())
+            os.write(self._fd, f"{datetime.now(UTC).isoformat()}\n".encode())
         except FileExistsError as exc:
             raise OrchestratorError("RUN_LOCK_HELD", "orchestrator already running") from exc
 
@@ -160,6 +161,7 @@ class RunLock:
 class InboxStage(str, Enum):
     RESEARCH = "research"
     ETHERNIAN_REVIEW = "eternian-review"
+    SELF_IMPROVEMENT = "self-improvement"
     OPERATOR_DECISION = "operator-decision"
 
 
@@ -324,7 +326,7 @@ class CentralOrchestrator:
         self.foundry_root = foundry_root.resolve()
         self.policy = policy
         self.limits = limits
-        self.clock = clock or (lambda: datetime.now(timezone.utc))
+        self.clock = clock or (lambda: datetime.now(UTC))
         self.inbox_root = self.foundry_root / "inbox"
         self.reports_root = self.foundry_root / "reports"
         self.logs_root = self.foundry_root / "logs"
@@ -374,35 +376,35 @@ class CentralOrchestrator:
                 if analysis.stage == PlatformStage.BLOCKED:
                     continue
                 if len(packet_paths) < self.limits.max_inbox_packets:
-                    packet_paths.append(
-                        self._write_inbox(
-                            InboxPacket(
-                                packet_id=f"{run_id}-{registration.platform_id}-research",
-                                stage=InboxStage.RESEARCH,
-                                platform_id=registration.platform_id,
-                                created_at=self.clock(),
-                                summary=analysis.pre_improvement_guide,
-                                payload_digest=analysis.inventory_digest,
-                            ),
-                            dry_run=dry_run,
-                        )
+                    research_path = self._write_inbox(
+                        InboxPacket(
+                            packet_id=f"{run_id}-{registration.platform_id}-research",
+                            stage=InboxStage.RESEARCH,
+                            platform_id=registration.platform_id,
+                            created_at=self.clock(),
+                            summary=analysis.pre_improvement_guide,
+                            payload_digest=analysis.inventory_digest,
+                        ),
+                        dry_run=dry_run,
                     )
+                    if research_path:
+                        packet_paths.append(research_path)
                 if len(packet_paths) < self.limits.max_inbox_packets:
-                    packet_paths.append(
-                        self._write_inbox(
-                            InboxPacket(
-                                packet_id=f"{run_id}-{registration.platform_id}-eternian",
-                                stage=InboxStage.ETHERNIAN_REVIEW,
-                                platform_id=registration.platform_id,
-                                created_at=self.clock(),
-                                summary=(
-                                    f"{registration.platform_id}: eternian review required before any code or ops change"
-                                ),
-                                payload_digest=analysis.inventory_digest,
+                    review_path = self._write_inbox(
+                        InboxPacket(
+                            packet_id=f"{run_id}-{registration.platform_id}-eternian",
+                            stage=InboxStage.ETHERNIAN_REVIEW,
+                            platform_id=registration.platform_id,
+                            created_at=self.clock(),
+                            summary=(
+                                f"{registration.platform_id}: eternian review required before any code or ops change"
                             ),
-                            dry_run=dry_run,
-                        )
+                            payload_digest=analysis.inventory_digest,
+                        ),
+                        dry_run=dry_run,
                     )
+                    if review_path:
+                        packet_paths.append(review_path)
                 if analysis.candidate_commit and len(packet_paths) < self.limits.max_inbox_packets:
                     packet_paths.extend(
                         self._write_experience_proposals(
@@ -581,7 +583,58 @@ class CentralOrchestrator:
         )
         return target.as_posix()
 
-    def _write_inbox(self, packet: InboxPacket, *, dry_run: bool = False) -> str:
+    def _pending_inbox_paths(self) -> tuple[Path, ...]:
+        if not self.inbox_root.is_dir():
+            return ()
+        return tuple(
+            sorted(
+                path
+                for stage in (
+                    InboxStage.RESEARCH,
+                    InboxStage.ETHERNIAN_REVIEW,
+                    InboxStage.SELF_IMPROVEMENT,
+                )
+                for path in (self.inbox_root / stage.value).glob("*.json")
+                if path.is_file()
+            )
+        )
+
+    def _find_equivalent_pending(self, packet: InboxPacket) -> Path | None:
+        stage_dir = self.inbox_root / packet.stage.value
+        if not stage_dir.is_dir():
+            return None
+        for path in sorted(stage_dir.glob("*.json")):
+            try:
+                document = json.loads(path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                continue
+            if (
+                document.get("stage") == packet.stage.value
+                and document.get("platform_id") == packet.platform_id
+                and document.get("payload_digest") == packet.payload_digest
+                and document.get("summary") == packet.summary
+            ):
+                return path
+        return None
+
+    def _record_inbox_backpressure(self, pending_count: int) -> None:
+        self.state_root.mkdir(parents=True, exist_ok=True)
+        target = self.state_root / "inbox-backpressure.json"
+        document = {
+            "schema_version": "apf.inbox-backpressure/v1",
+            "status": "ACTIVE",
+            "observed_at": self.clock().isoformat(),
+            "pending_count": pending_count,
+            "pending_limit": self.limits.max_inbox_packets,
+            "new_packet_created": False,
+            "reason": "PENDING_LIMIT_REACHED",
+        }
+        target.write_text(
+            json.dumps(document, ensure_ascii=False, indent=2, sort_keys=True),
+            encoding="utf-8",
+        )
+
+    def _write_inbox(self, packet: InboxPacket, *, dry_run: bool = False) -> str | None:
         if packet.stage == InboxStage.OPERATOR_DECISION:
             raise OrchestratorError(
                 "INBOX_STAGE_FORBIDDEN",
@@ -599,6 +652,13 @@ class CentralOrchestrator:
         target = stage_dir / f"{packet.packet_id}.json"
         if dry_run:
             return target.as_posix()
+        equivalent = self._find_equivalent_pending(packet)
+        if equivalent is not None:
+            return equivalent.as_posix()
+        pending_count = len(self._pending_inbox_paths())
+        if pending_count >= self.limits.max_inbox_packets:
+            self._record_inbox_backpressure(pending_count)
+            return None
         stage_dir.mkdir(parents=True, exist_ok=True)
         target.write_text(
             json.dumps(packet.to_document(), ensure_ascii=False, indent=2, sort_keys=True),
@@ -612,7 +672,7 @@ class CentralOrchestrator:
         target.write_text(json.dumps(packet.to_document(), ensure_ascii=False, indent=2), encoding="utf-8")
 
     def _write_report(self, report: OrchestratorRunReport) -> Path:
-        day = report.completed_at.astimezone(timezone.utc).strftime("%Y-%m-%d")
+        day = report.completed_at.astimezone(UTC).strftime("%Y-%m-%d")
         report_dir = self.reports_root / day
         report_dir.mkdir(parents=True, exist_ok=True)
         target = report_dir / f"{report.run_id}.json"
@@ -654,7 +714,7 @@ class CentralOrchestrator:
 
     def _append_log(self, report: OrchestratorRunReport) -> None:
         self.logs_root.mkdir(parents=True, exist_ok=True)
-        day = report.completed_at.astimezone(timezone.utc).strftime("%Y-%m-%d")
+        day = report.completed_at.astimezone(UTC).strftime("%Y-%m-%d")
         log_path = self.logs_root / f"orchestrator-{day}.log"
         line = (
             f"{report.completed_at.isoformat()} run={report.run_id} "
