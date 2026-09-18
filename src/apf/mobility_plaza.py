@@ -11,7 +11,7 @@ from dataclasses import dataclass, replace
 from datetime import datetime, timedelta
 from enum import StrEnum
 from hashlib import sha256
-from typing import Mapping
+from collections.abc import Mapping
 
 
 class PlazaPurpose(StrEnum):
