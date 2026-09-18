@@ -207,9 +207,11 @@ def transition_improvement(
         if owner_approval_digest != request.scope_digest():
             raise ImprovementWorkflowError("OWNER_APPROVAL_SCOPE_DIGEST_REQUIRED")
         approval = owner_approval_digest
-    if desired is ImprovementState.SANDBOX_IMPLEMENTING:
-        if request.owner_approval_digest != request.scope_digest():
-            raise ImprovementWorkflowError("OWNER_APPROVAL_REQUIRED_BEFORE_IMPLEMENTATION")
+    if (
+        desired is ImprovementState.SANDBOX_IMPLEMENTING
+        and request.owner_approval_digest != request.scope_digest()
+    ):
+        raise ImprovementWorkflowError("OWNER_APPROVAL_REQUIRED_BEFORE_IMPLEMENTATION")
     return replace(
         request,
         state=desired,
