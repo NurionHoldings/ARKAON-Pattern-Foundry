@@ -47,7 +47,16 @@ def request():
     )
 
 
-def move(item, desired, actor, seconds, approval=None):
+def move(
+    item,
+    desired,
+    actor,
+    seconds,
+    approval=None,
+    arkaon_evidence=None,
+    audit_evidence=None,
+    remediation_evidence=None,
+):
     return transition_improvement(
         item,
         desired=desired,
@@ -55,6 +64,9 @@ def move(item, desired, actor, seconds, approval=None):
         expected_revision=item.revision,
         now=NOW + timedelta(seconds=seconds),
         owner_approval_digest=approval,
+        arkaon_verification_digest=arkaon_evidence,
+        eternian_audit_digest=audit_evidence,
+        eternian_remediation_digest=remediation_evidence,
     )
 
 
@@ -73,18 +85,93 @@ def test_full_owner_governed_improvement_flow(tmp_path) -> None:
         approval=item.scope_digest(),
     )
     item = move(item, ImprovementState.SANDBOX_IMPLEMENTING, ImprovementActor.ARKAON, 4)
-    item = move(item, ImprovementState.VERIFIED, ImprovementActor.VERIFIER, 5)
-    item = move(item, ImprovementState.CHANGE_REPORTED, ImprovementActor.ARKAON, 6)
+    item = move(item, ImprovementState.ARKAON_VERIFYING, ImprovementActor.ARKAON, 5)
+    item = move(
+        item,
+        ImprovementState.ARKAON_VERIFIED,
+        ImprovementActor.ARKAON,
+        6,
+        arkaon_evidence="sha256:" + "c" * 64,
+    )
+    item = move(item, ImprovementState.ETERNIAN_AUDITING, ImprovementActor.ETERNIAN, 7)
+    item = move(
+        item,
+        ImprovementState.ETERNIAN_VERIFIED,
+        ImprovementActor.ETERNIAN,
+        8,
+        audit_evidence="sha256:" + "d" * 64,
+    )
+    item = move(item, ImprovementState.CHANGE_REPORTED, ImprovementActor.ETERNIAN, 9)
     item = move(
         item,
         ImprovementState.DEPLOYMENT_APPROVAL_PENDING,
         ImprovementActor.OWNER,
-        7,
+        10,
     )
 
     assert item.state is ImprovementState.DEPLOYMENT_APPROVAL_PENDING
     assert item.production_change_allowed is False
     assert item.deployment_allowed is False
+
+
+def approved_arkaon_verified_item():
+    item = request()
+    item = move(item, ImprovementState.INBOX_POSTED, ImprovementActor.ARKAON, 1)
+    item = move(item, ImprovementState.ETERNIAN_REVIEWING, ImprovementActor.ETERNIAN, 2)
+    item = move(item, ImprovementState.OWNER_APPROVAL_PENDING, ImprovementActor.ETERNIAN, 3)
+    item = move(
+        item,
+        ImprovementState.OWNER_APPROVED,
+        ImprovementActor.OWNER,
+        4,
+        approval=item.scope_digest(),
+    )
+    item = move(item, ImprovementState.SANDBOX_IMPLEMENTING, ImprovementActor.ARKAON, 5)
+    item = move(item, ImprovementState.ARKAON_VERIFYING, ImprovementActor.ARKAON, 6)
+    return move(
+        item,
+        ImprovementState.ARKAON_VERIFIED,
+        ImprovementActor.ARKAON,
+        7,
+        arkaon_evidence="sha256:" + "c" * 64,
+    )
+
+
+def test_eternian_can_audit_remediate_and_finally_verify() -> None:
+    item = approved_arkaon_verified_item()
+    item = move(item, ImprovementState.ETERNIAN_AUDITING, ImprovementActor.ETERNIAN, 8)
+    item = move(
+        item,
+        ImprovementState.ETERNIAN_REMEDIATING,
+        ImprovementActor.ETERNIAN,
+        9,
+        audit_evidence="sha256:" + "d" * 64,
+    )
+    item = move(
+        item,
+        ImprovementState.ETERNIAN_VERIFIED,
+        ImprovementActor.ETERNIAN,
+        10,
+        remediation_evidence="sha256:" + "e" * 64,
+    )
+
+    assert item.state is ImprovementState.ETERNIAN_VERIFIED
+    assert item.arkaon_verification_digest == "sha256:" + "c" * 64
+    assert item.eternian_audit_digest == "sha256:" + "d" * 64
+    assert item.eternian_remediation_digest == "sha256:" + "e" * 64
+
+
+def test_arkaon_cannot_perform_eternian_audit() -> None:
+    item = approved_arkaon_verified_item()
+    with pytest.raises(ImprovementWorkflowError, match="IMPROVEMENT_ACTOR_FORBIDDEN"):
+        move(item, ImprovementState.ETERNIAN_AUDITING, ImprovementActor.ARKAON, 8)
+
+
+def test_verification_transitions_require_evidence_digests() -> None:
+    item = approved_arkaon_verified_item()
+    item = move(item, ImprovementState.ETERNIAN_AUDITING, ImprovementActor.ETERNIAN, 8)
+    with pytest.raises(ImprovementWorkflowError, match="ETERNIAN_AUDIT_EVIDENCE_REQUIRED"):
+        move(item, ImprovementState.ETERNIAN_VERIFIED, ImprovementActor.ETERNIAN, 9)
 
 
 def test_arkaon_cannot_implement_before_owner_approval(tmp_path) -> None:
