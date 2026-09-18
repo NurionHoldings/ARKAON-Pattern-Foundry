@@ -11,10 +11,20 @@
 식별 근거가 부족한 패킷은 서로 같다고 추정하지 않으며, 읽을 수 없는 JSON은 `invalid`로
 보고하고 이동하지 않는다.
 
+관리 명령은 저장소 위치를 자동 인식한다.
+
 ```powershell
-python -m apf.mailbox_maintenance --foundry-root .
-python -m apf.mailbox_maintenance --foundry-root . --apply-archive
+.\orchestrator\manage-mailbox.ps1 status
+.\orchestrator\manage-mailbox.ps1 plan
+.\orchestrator\manage-mailbox.ps1 archive
 ```
+
+- `status`: 개수와 이번 처리 대상만 표시
+- `plan`: 전체 세부 계획 표시, 파일 이동 없음
+- `archive`: 아카이브 후보만 날짜별 폴더로 이동
+
+모든 실행 결과는 `state/mailbox-maintenance-latest.json`에 저장한다. relay receipt가 이미
+존재하는 자기개선 요청은 다시 deliver하지 않고 아카이브 후보로 분류한다.
 
 운영 불변조건:
 
