@@ -7,6 +7,10 @@
 수정·학습방해·자기개선 요청을 먼저 선별하고 회당 최대 30건을 출력한다. 출력된 `deliver`
 목록은 검토 대상일 뿐 승인 목록이 아니다.
 
+중복 판정에는 payload/scope digest 또는 플랫폼+요약 등 강한 식별 근거가 필요하다.
+식별 근거가 부족한 패킷은 서로 같다고 추정하지 않으며, 읽을 수 없는 JSON은 `invalid`로
+보고하고 이동하지 않는다.
+
 ```powershell
 python -m apf.mailbox_maintenance --foundry-root .
 python -m apf.mailbox_maintenance --foundry-root . --apply-archive
