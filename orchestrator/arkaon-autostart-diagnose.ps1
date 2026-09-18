@@ -58,20 +58,32 @@ $collectorStatus = Read-ArkaonDaemonStatus -StatusPath (Join-Path $FoundryRoot "
 $analysisStatus = Read-ArkaonDaemonStatus -StatusPath (Join-Path $FoundryRoot "state\analysis-daemon.json")
 $startupStatus = Read-ArkaonDaemonStatus -StatusPath (Join-Path $FoundryRoot "state\startup-last-run.json")
 
-$collectorAlive = $collectorStatus -and (Test-ArkaonProcessAlive -ProcessId ([int]$collectorStatus.pid))
-$analysisAlive = $analysisStatus -and (Test-ArkaonProcessAlive -ProcessId ([int]$analysisStatus.pid))
+$CollectorDaemon = Join-Path $FoundryRoot "orchestrator\arkaon-collector-daemon.ps1"
+$AnalysisDaemon = Join-Path $FoundryRoot "orchestrator\arkaon-analysis-daemon.ps1"
+$collectorWorker = Test-ArkaonCollectorWorkerAlive -FoundryRoot $FoundryRoot
+$analysisFresh = Test-ArkaonAnalysisCycleFresh -FoundryRoot $FoundryRoot
+$collectorAlive = $collectorStatus -and (
+    (Test-ArkaonDaemonProcess -ProcessId ([int]$collectorStatus.pid) -ScriptPath $CollectorDaemon) -and $collectorWorker
+)
+$analysisAlive = $analysisStatus -and (
+    (Test-ArkaonDaemonProcess -ProcessId ([int]$analysisStatus.pid) -ScriptPath $AnalysisDaemon) -and $analysisFresh
+)
 
 $checks += [PSCustomObject]@{
     id = "COLLECTOR_DAEMON"
     status = $(if ($collectorAlive) { "PASS" } else { "FAIL" })
-    detail = $(if ($collectorStatus) { "pid=$($collectorStatus.pid) started=$($collectorStatus.started_at)" } else { "status file missing" })
+    detail = $(if ($collectorStatus) {
+        "pid=$($collectorStatus.pid) worker=$collectorWorker started=$($collectorStatus.started_at)"
+    } else { "status file missing" })
 }
 if (-not $collectorAlive) { $issues += "COLLECTOR_DAEMON" }
 
 $checks += [PSCustomObject]@{
     id = "ANALYSIS_DAEMON"
     status = $(if ($analysisAlive) { "PASS" } else { "FAIL" })
-    detail = $(if ($analysisStatus) { "pid=$($analysisStatus.pid) started=$($analysisStatus.started_at)" } else { "status file missing" })
+    detail = $(if ($analysisStatus) {
+        "pid=$($analysisStatus.pid) fresh_cycle=$analysisFresh started=$($analysisStatus.started_at)"
+    } else { "status file missing" })
 }
 if (-not $analysisAlive) { $issues += "ANALYSIS_DAEMON" }
 

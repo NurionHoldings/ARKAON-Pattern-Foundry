@@ -25,8 +25,14 @@ if (Test-Path -LiteralPath $CollectorPolicy) {
 $collectorStatus = Read-ArkaonDaemonStatus -StatusPath (Join-Path $FoundryRoot "state\collector-daemon.json")
 $analysisStatus = Read-ArkaonDaemonStatus -StatusPath (Join-Path $FoundryRoot "state\analysis-daemon.json")
 
-$collectorAlive = $collectorStatus -and (Test-ArkaonProcessAlive -ProcessId ([int]$collectorStatus.pid))
-$analysisAlive = $analysisStatus -and (Test-ArkaonProcessAlive -ProcessId ([int]$analysisStatus.pid))
+$collectorAlive = $collectorStatus -and (
+    (Test-ArkaonDaemonProcess -ProcessId ([int]$collectorStatus.pid) -ScriptPath $CollectorDaemon) -and
+    (Test-ArkaonCollectorWorkerAlive -FoundryRoot $FoundryRoot)
+)
+$analysisAlive = $analysisStatus -and (
+    (Test-ArkaonDaemonProcess -ProcessId ([int]$analysisStatus.pid) -ScriptPath $AnalysisDaemon) -and
+    (Test-ArkaonAnalysisCycleFresh -FoundryRoot $FoundryRoot)
+)
 
 $actions = @()
 

@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import os
+import subprocess
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -31,6 +33,55 @@ class AutostartHealthReport:
                 for item in self.checks
             ],
         }
+
+
+def _daemon_process_alive(pid: int, script_leaf: str) -> bool:
+    if pid <= 0:
+        return False
+    if os.name != "nt":
+        return False
+    command = (
+        f"$p=Get-CimInstance Win32_Process -Filter 'ProcessId={pid}' -EA SilentlyContinue; "
+        f"if ($p -and $p.CommandLine -like '*{script_leaf}*') {{ 'true' }} else {{ 'false' }}"
+    )
+    completed = subprocess.run(
+        ["powershell", "-NoProfile", "-Command", command],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    return completed.stdout.strip().lower() == "true"
+
+
+def _daemon_worker_ok(root: Path, daemon_name: str, worker_hint: str) -> bool:
+    if daemon_name == "collector-daemon":
+        if os.name != "nt":
+            return False
+        pattern = str(root).replace("\\", "\\\\")
+        command = (
+            "$hit=Get-CimInstance Win32_Process -Filter \"Name='python.exe'\" -EA SilentlyContinue | "
+            f"Where-Object {{ $_.CommandLine -match 'apf.collector_service' -and $_.CommandLine -match '{pattern}' }} | "
+            "Select-Object -First 1; if ($hit) { 'true' } else { 'false' }"
+        )
+        completed = subprocess.run(
+            ["powershell", "-NoProfile", "-Command", command],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        return completed.stdout.strip().lower() == "true"
+    log_path = root / "logs" / "analysis-daemon.log"
+    if not log_path.is_file():
+        return False
+    lines = [line for line in log_path.read_text(encoding="utf-8", errors="ignore").splitlines() if worker_hint in line]
+    if not lines:
+        return False
+    stamp = lines[-1].split("orchestrator cycle at ", 1)[-1].strip()
+    try:
+        cycle_at = datetime.fromisoformat(stamp.replace("Z", "+00:00"))
+    except ValueError:
+        return False
+    return (datetime.now(UTC) - cycle_at.astimezone(UTC)).total_seconds() <= 1200
 
 
 def _read_json(path: Path) -> dict[str, Any] | None:
@@ -90,24 +141,35 @@ def evaluate_autostart_health(foundry_root: str | Path) -> AutostartHealthReport
     else:
         checks.append(HealthCheck("LAST_AUTOSTART", "WARN", "startup-last-run.json missing or incomplete"))
 
-    for daemon_name in ("collector-daemon", "analysis-daemon"):
+    for daemon_name, script_leaf, worker_hint in (
+        ("collector-daemon", "arkaon-collector-daemon.ps1", "collector_service"),
+        ("analysis-daemon", "arkaon-analysis-daemon.ps1", "orchestrator cycle"),
+    ):
+        check_id = daemon_name.upper().replace("-", "_")
         status = _read_json(root / "state" / f"{daemon_name}.json")
-        if status and status.get("pid") and status.get("started_at"):
+        if not status or not status.get("pid") or not status.get("started_at"):
+            checks.append(HealthCheck(check_id, "FAIL", "daemon status file missing"))
+            issues.append(check_id)
+            continue
+        alive = _daemon_process_alive(int(status["pid"]), script_leaf)
+        worker_ok = _daemon_worker_ok(root, daemon_name, worker_hint)
+        if alive and worker_ok:
             checks.append(
                 HealthCheck(
-                    daemon_name.upper().replace("-", "_"),
+                    check_id,
                     "PASS",
-                    f"pid={status['pid']} started={status['started_at']}",
+                    f"pid={status['pid']} worker=ok started={status['started_at']}",
                 )
             )
         else:
             checks.append(
                 HealthCheck(
-                    daemon_name.upper().replace("-", "_"),
-                    "WARN",
-                    "daemon status file missing",
+                    check_id,
+                    "FAIL",
+                    f"pid={status['pid']} process={alive} worker={worker_ok} started={status['started_at']}",
                 )
             )
+            issues.append(check_id)
 
     audit_path = root / "state" / "arkaon-collection-audit.jsonl"
     if audit_path.exists() and audit_path.stat().st_size > 0:

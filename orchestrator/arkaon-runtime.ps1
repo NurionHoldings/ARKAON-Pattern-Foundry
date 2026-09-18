@@ -75,6 +75,58 @@ function Test-ArkaonProcessAlive {
     return [bool](Get-Process -Id $ProcessId -ErrorAction SilentlyContinue)
 }
 
+function Test-ArkaonDaemonProcess {
+    param(
+        [int]$ProcessId,
+        [Parameter(Mandatory = $true)][string]$ScriptPath
+    )
+
+    if ($ProcessId -le 0) {
+        return $false
+    }
+    $leaf = Split-Path -Leaf $ScriptPath
+    $proc = Get-CimInstance Win32_Process -Filter "ProcessId=$ProcessId" -ErrorAction SilentlyContinue
+    if (-not $proc) {
+        return $false
+    }
+    return ($proc.CommandLine -like "*$leaf*")
+}
+
+function Test-ArkaonCollectorWorkerAlive {
+    param(
+        [Parameter(Mandatory = $true)][string]$FoundryRoot
+    )
+
+    $pattern = [regex]::Escape($FoundryRoot)
+    Get-CimInstance Win32_Process -Filter "Name='python.exe'" -ErrorAction SilentlyContinue |
+        Where-Object { $_.CommandLine -match 'apf\.collector_service' -and $_.CommandLine -match $pattern } |
+        Select-Object -First 1 |
+        ForEach-Object { return $true }
+    return $false
+}
+
+function Test-ArkaonAnalysisCycleFresh {
+    param(
+        [Parameter(Mandatory = $true)][string]$FoundryRoot,
+        [int]$MaxAgeSeconds = 1200
+    )
+
+    $logPath = Join-Path $FoundryRoot "logs\analysis-daemon.log"
+    if (-not (Test-Path -LiteralPath $logPath)) {
+        return $false
+    }
+    $lastCycle = Select-String -LiteralPath $logPath -Pattern '^orchestrator cycle at ' |
+        Select-Object -Last 1
+    if (-not $lastCycle) {
+        return $false
+    }
+    if ($lastCycle.Line -notmatch 'orchestrator cycle at (.+)$') {
+        return $false
+    }
+    $cycleAt = [DateTime]::Parse($Matches[1]).ToUniversalTime()
+    return ((Get-Date).ToUniversalTime() - $cycleAt).TotalSeconds -le $MaxAgeSeconds
+}
+
 function Read-ArkaonDaemonStatus {
     param(
         [Parameter(Mandatory = $true)][string]$StatusPath
@@ -102,9 +154,20 @@ function Start-ArkaonDaemonProcess {
 
     $statusPath = Join-Path $FoundryRoot "state\$DaemonName.json"
     $existing = Read-ArkaonDaemonStatus -StatusPath $statusPath
-    if ($existing -and (Test-ArkaonProcessAlive -ProcessId ([int]$existing.pid))) {
-        Write-ArkaonAutostartLog -FoundryRoot $FoundryRoot -Message "$DaemonName already running pid=$($existing.pid)"
-        return [PSCustomObject]@{ started = $false; pid = [int]$existing.pid; verified = $true }
+    if ($existing -and (Test-ArkaonDaemonProcess -ProcessId ([int]$existing.pid) -ScriptPath $ScriptPath)) {
+        $workerOk = $true
+        if ($DaemonName -eq "collector-daemon") {
+            $workerOk = Test-ArkaonCollectorWorkerAlive -FoundryRoot $FoundryRoot
+        }
+        elseif ($DaemonName -eq "analysis-daemon") {
+            $workerOk = Test-ArkaonAnalysisCycleFresh -FoundryRoot $FoundryRoot
+        }
+        if ($workerOk) {
+            Write-ArkaonAutostartLog -FoundryRoot $FoundryRoot -Message "$DaemonName already running pid=$($existing.pid)"
+            return [PSCustomObject]@{ started = $false; pid = [int]$existing.pid; verified = $true }
+        }
+        Write-ArkaonAutostartLog -FoundryRoot $FoundryRoot -Message "$DaemonName stale pid=$($existing.pid); restarting"
+        Stop-Process -Id ([int]$existing.pid) -Force -ErrorAction SilentlyContinue
     }
 
     $argumentList = @(
