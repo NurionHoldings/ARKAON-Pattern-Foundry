@@ -69,6 +69,7 @@ REGISTER → AUTHORIZE → SNAPSHOT → EXTRACT_INTENT_DNA → ANALYZE
 38. [중앙 ARKAON 오케스트레이터](docs/38-central-arkaon-orchestrator.md)
 39. [ARKAON 화면·콘텐츠·운영 정합성 감사](docs/39-arkaon-experience-operations-audit.md)
 40. [ARKAON 통제된 성찰학습·교훈기억](docs/40-arkaon-reflective-learning.md)
+41. [증거대장 체크포인트 격리 후보](docs/41-evidence-ledger-checkpoint.md)
 
 ## 중앙 오케스트레이터
 
