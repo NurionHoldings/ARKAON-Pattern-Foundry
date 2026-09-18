@@ -26,6 +26,10 @@
 모든 실행 결과는 `state/mailbox-maintenance-latest.json`에 저장한다. relay receipt가 이미
 존재하는 자기개선 요청은 다시 deliver하지 않고 아카이브 후보로 분류한다.
 
+정상 운영에서는 별도 명령이 필요 없다. 로그인 예약 작업으로 실행되는 self-improvement
+relay가 15초 주기마다 요청 전달 후 우편함 유지관리를 자동 수행한다. 위 세 명령은 상태 확인,
+감사 및 장애 복구용이다.
+
 운영 불변조건:
 
 - 자동 approve·merge·deploy 금지

@@ -13,6 +13,8 @@ from hashlib import sha256
 from pathlib import Path
 from typing import Protocol
 
+from .mailbox_maintenance import run_maintenance
+
 
 class RelayError(RuntimeError):
     pass
@@ -27,6 +29,12 @@ class RelayReceipt:
     request_id: str
     scope_digest: str
     pull_request_url: str
+
+
+@dataclass(frozen=True)
+class RelayCycle:
+    delivered: tuple[RelayReceipt, ...]
+    mailbox: dict[str, object]
 
 
 def _canonical_scope(document: dict[str, object]) -> dict[str, object]:
@@ -145,6 +153,17 @@ def relay_once(*, foundry_root: Path, publisher: Publisher) -> tuple[RelayReceip
         lock_path.unlink(missing_ok=True)
 
 
+def relay_cycle(*, foundry_root: Path, publisher: Publisher, batch_size: int = 30) -> RelayCycle:
+    delivered = relay_once(foundry_root=foundry_root, publisher=publisher)
+    mailbox = run_maintenance(
+        foundry_root=foundry_root,
+        batch_size=batch_size,
+        apply_archive_changes=True,
+        summary_only=True,
+    )
+    return RelayCycle(delivered=delivered, mailbox=mailbox)
+
+
 class GhPublisher:
     def __init__(self, repository: str) -> None:
         self.repository = repository
@@ -249,10 +268,15 @@ def main() -> int:
         default="NurionHoldings/ARKAON-Pattern-Foundry",
     )
     parser.add_argument("--watch-seconds", type=int, default=0)
+    parser.add_argument("--mailbox-batch-size", type=int, default=30)
     arguments = parser.parse_args()
     publisher = GhPublisher(arguments.repository)
     while True:
-        relay_once(foundry_root=arguments.foundry_root.resolve(), publisher=publisher)
+        relay_cycle(
+            foundry_root=arguments.foundry_root.resolve(),
+            publisher=publisher,
+            batch_size=arguments.mailbox_batch_size,
+        )
         if arguments.watch_seconds <= 0:
             return 0
         time.sleep(max(arguments.watch_seconds, 5))

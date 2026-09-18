@@ -6,7 +6,7 @@ import pytest
 
 from apf.evidence_capability import CollectedEvidence, EvidenceKind
 from apf.self_improvement import detect_self_improvement, post_self_improvement
-from apf.self_improvement_relay import RelayError, relay_once
+from apf.self_improvement_relay import RelayError, relay_cycle, relay_once
 
 
 class FakePublisher:
@@ -112,3 +112,25 @@ def test_gh_publisher_forces_utf8_and_tolerates_empty_stdout(monkeypatch) -> Non
     assert output == ""
     assert observed["encoding"] == "utf-8"
     assert observed["errors"] == "replace"
+
+
+def test_relay_cycle_delivers_then_archives_transport_packet(tmp_path) -> None:
+    now = datetime(2026, 9, 18, tzinfo=UTC)
+    _, path = post_self_improvement(
+        request(now),
+        inbox_root=tmp_path / "inbox",
+        now=now,
+    )
+
+    cycle = relay_cycle(foundry_root=tmp_path, publisher=FakePublisher())
+
+    assert len(cycle.delivered) == 1
+    assert cycle.mailbox["counts"]["relayed"] == 1
+    assert cycle.mailbox["counts"]["archived"] == 1
+    assert not path.exists()
+    archived = list((tmp_path / "archive" / "mailbox").rglob(path.name))
+    assert len(archived) == 1
+    report = json.loads(
+        (tmp_path / "state" / "mailbox-maintenance-latest.json").read_text(encoding="utf-8")
+    )
+    assert report["counts"]["pending"] == 0

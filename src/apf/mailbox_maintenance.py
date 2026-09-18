@@ -183,6 +183,49 @@ def _plan_document(
     return document
 
 
+def run_maintenance(
+    *,
+    foundry_root: Path,
+    batch_size: int = 30,
+    apply_archive_changes: bool = False,
+    summary_only: bool = False,
+    report_path: Path | None = None,
+) -> dict[str, Any]:
+    root = foundry_root.resolve()
+    plan = build_plan(
+        root / "inbox",
+        batch_size=batch_size,
+        relayed_request_ids=_relayed_request_ids(root),
+    )
+    moved: tuple[Path, ...] = ()
+    if apply_archive_changes:
+        moved = apply_archive(
+            plan,
+            inbox_root=root / "inbox",
+            archive_root=root / "archive" / "mailbox",
+        )
+    full_document = _plan_document(
+        plan,
+        batch_size=batch_size,
+        moved=moved,
+        summary_only=False,
+    )
+    target = report_path or root / "state" / "mailbox-maintenance-latest.json"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(
+        json.dumps(full_document, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    if summary_only:
+        return _plan_document(
+            plan,
+            batch_size=batch_size,
+            moved=moved,
+            summary_only=True,
+        )
+    return full_document
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--foundry-root", type=Path, default=Path.cwd())
@@ -191,31 +234,12 @@ def main() -> int:
     parser.add_argument("--summary", action="store_true")
     parser.add_argument("--report-path", type=Path)
     arguments = parser.parse_args()
-    root = arguments.foundry_root.resolve()
-    plan = build_plan(
-        root / "inbox",
+    output = run_maintenance(
+        foundry_root=arguments.foundry_root,
         batch_size=arguments.batch_size,
-        relayed_request_ids=_relayed_request_ids(root),
-    )
-    moved: tuple[Path, ...] = ()
-    if arguments.apply_archive:
-        moved = apply_archive(plan, inbox_root=root / "inbox", archive_root=root / "archive" / "mailbox")
-    full_document = _plan_document(
-        plan,
-        batch_size=arguments.batch_size,
-        moved=moved,
-        summary_only=False,
-    )
-    report_path = arguments.report_path or root / "state" / "mailbox-maintenance-latest.json"
-    report_path.parent.mkdir(parents=True, exist_ok=True)
-    report_path.write_text(
-        json.dumps(full_document, ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
-    output = (
-        _plan_document(plan, batch_size=arguments.batch_size, moved=moved, summary_only=True)
-        if arguments.summary
-        else full_document
+        apply_archive_changes=arguments.apply_archive,
+        summary_only=arguments.summary,
+        report_path=arguments.report_path,
     )
     print(json.dumps(output, ensure_ascii=False, indent=2))
     return 0
