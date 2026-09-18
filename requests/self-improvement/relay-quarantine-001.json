@@ -1,0 +1,28 @@
+{
+  "schema_version": "apf.self-improvement-request/1.0",
+  "request_id": "relay-quarantine-001",
+  "state": "OWNER_APPROVED",
+  "revision": 4,
+  "intent_dna": "Preserve relay availability without weakening owner-governed self-improvement controls.",
+  "capability_gap": "One malformed or tampered mailbox packet can stop processing of later valid requests.",
+  "evidence_refs": [
+    "sha256:425bc6fbe7fde42245ef4e768d8fb38e262f7cb875df2303bf7001c888d275fd"
+  ],
+  "proposed_change": "Quarantine invalid packets as BLOCKED with content-addressed evidence and continue processing later valid requests; add owner approval receipt ingestion and a confined worktree test runner.",
+  "expected_benefit": "A single invalid packet no longer blocks valid self-improvement delivery while preserving fail-closed evidence.",
+  "risks": [
+    "An invalid packet could be quarantined because of an implementation defect.",
+    "A runner could exceed approved scope if path or command validation fails."
+  ],
+  "validation_plan": [
+    "Prove malformed and tampered packets are quarantined.",
+    "Prove a later valid request is still delivered.",
+    "Prove approval scope and path tampering are rejected.",
+    "Run full regression and Ruff checks."
+  ],
+  "source_tier": "VERIFIED",
+  "scope_digest": "9f17275acb2a7bd27974d2cb3e53ca49115d3e3218afed7559a60ff2583382c2",
+  "production_change_allowed": false,
+  "automatic_merge_allowed": false,
+  "deployment_allowed": false
+}
