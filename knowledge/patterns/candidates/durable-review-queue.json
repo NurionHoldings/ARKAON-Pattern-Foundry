@@ -10,7 +10,7 @@
     "Correctness requires that restart preserves every unresolved review",
     "Operational pressure can cause: crash commits state without its receipt"
   ],
-  "solution": "Implement transactional queue persists open review, decision and receipt records. Verify the anchored symbol `DurableStoreError` with `test_real_sqlite_reviews_are_principal_and_tenant_scoped_and_xss_is_inert` before reuse.",
+  "solution": "Implement transactional queue persists open review, decision and receipt records. Verify the anchored symbol `DurableStoreError` with `test_review_detail_is_principal_scoped` before reuse.",
   "invariants": [
     "restart preserves every unresolved review",
     "one review decision produces one durable receipt"
@@ -27,8 +27,8 @@
     "external_material_included": false
   },
   "evidence_hashes": {
-    "src/apf/durable_review.py": "d4f1a1f262719666743485b011f7a9eb1e17f69d89b9bf28098adf79803a51e3",
-    "tests/test_console_durable.py": "b7b69b9ee51d136bf778e166cb73979a24d769ae42e033bf0c46012f036d4e97"
+    "src/apf/durable_review.py": "3e2552d359632e86d995c7259227ee31722648763e249fc961161c49560e08b5",
+    "tests/test_console_durable.py": "6cdd11c17624cdbf541c7bd7393fd5592ec32e5b1c03b474bc23bca2760d4153"
   },
   "source_refs": [
     "src/apf/durable_review.py"
@@ -37,7 +37,7 @@
     "tests/test_console_durable.py"
   ],
   "verification_test_ids": [
-    "tests/test_console_durable.py::test_real_sqlite_reviews_are_principal_and_tenant_scoped_and_xss_is_inert"
+    "tests/test_console_durable.py::test_review_detail_is_principal_scoped"
   ],
   "reuse_constraints": [
     "Confirm the target still requires: human review spans processes or restarts",
@@ -48,10 +48,10 @@
   "not_when": "review finishes synchronously inside one failure-free call",
   "evidence_anchors": {
     "source_symbol": "DurableStoreError",
-    "test_name": "test_real_sqlite_reviews_are_principal_and_tenant_scoped_and_xss_is_inert"
+    "test_name": "test_review_detail_is_principal_scoped"
   },
   "status": "ETHERNIAN_REVIEW_REQUIRED",
   "owned_asset": false,
   "semantic_fingerprint": "fc5e8f5a47382dfc2473da7828053a520356d8951349725ec128bd2f441981f0",
-  "package_hash": "d86dc21263fa0ddd04139bf77de9ba9a8bd85aa0b460644bdca000e3d833607a"
+  "package_hash": "19db53ffdcc94603349857dd1c14184a8261f1c988f124258c0bb4dec8bad58e"
 }

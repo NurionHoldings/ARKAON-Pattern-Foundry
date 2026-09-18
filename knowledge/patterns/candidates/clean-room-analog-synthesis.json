@@ -27,8 +27,8 @@
     "external_material_included": false
   },
   "evidence_hashes": {
-    "src/apf/analog_synthesis.py": "5ea8b8d3f494c6b5f2d0a1e5545c54adb4b96a81e171702ce27b7f25f41023b4",
-    "tests/test_analog_synthesis.py": "1a25ed953db9d1a65a9489bfa685ff205a28ee653808cfd7e9dbbd1902c7950b"
+    "src/apf/analog_synthesis.py": "a48d6fba250bb8592ef36bc4ae278fdb532b3497992eaa3a5184e7185316bd45",
+    "tests/test_analog_synthesis.py": "86942adc93bfbbf99022072376ec6a5692edd24f888de8c12855fb57a5bbbd31"
   },
   "source_refs": [
     "src/apf/analog_synthesis.py"
@@ -53,5 +53,5 @@
   "status": "ETHERNIAN_REVIEW_REQUIRED",
   "owned_asset": false,
   "semantic_fingerprint": "281c8db88d9a83bd1f1767ae85c245a9e0fec802ad315f04dabb8a39efa836e6",
-  "package_hash": "200fd97b8db730efd845980d5a4adfc985405fa9d19112412e4a15fb282ec4a2"
+  "package_hash": "d295ef2cc34e3a61dab79abf3172520ee0e45b0bbf2375e5657b0c27e4603abc"
 }

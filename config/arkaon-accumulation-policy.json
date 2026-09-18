@@ -1,0 +1,14 @@
+{
+  "schema_version": "apf.accumulation-policy/v1",
+  "accumulation_mode": "unbounded",
+  "engine_performance_mode": "unbounded",
+  "learning_memory_unbounded": true,
+  "failure_family_limit": null,
+  "curriculum_unbounded": true,
+  "recall_limit": null,
+  "notes": [
+    "Learning assets, lessons, digests, and inbox research packets accumulate without artificial caps.",
+    "Engine throughput is not throttled by per-run platform, inbox, file, or timeout ceilings.",
+    "Safety-only limits remain: HTTP bytes per fetch, auth TTL, symlink escape, PII/secrets denial."
+  ]
+}

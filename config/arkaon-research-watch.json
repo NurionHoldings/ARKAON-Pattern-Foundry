@@ -1,0 +1,13 @@
+{
+  "schema_version": "apf.arkaon-research-watch/v1",
+  "maximum_outcome": "RESEARCH_PACKET",
+  "automatic_learning": false,
+  "production_change_allowed": false,
+  "competitor_copy_allowed": false,
+  "change_detection": "DIGEST_DIFF",
+  "default_interval_seconds": 900,
+  "notes": [
+    "watch public HTTPS sources and local manifest digests only",
+    "detected changes become inbox/research packets for reflective learning input"
+  ]
+}

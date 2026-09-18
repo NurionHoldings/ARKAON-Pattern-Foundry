@@ -1,0 +1,25 @@
+{
+  "schema_version": "apf.arkaon-predeployment-readiness/v1",
+  "automatic_deploy_allowed": false,
+  "production_change_allowed": false,
+  "mandatory_checks": [
+    "SHARED_POLICY",
+    "RESOURCE_LIMITS",
+    "ACCUMULATION_POLICY",
+    "LEARNING_IMPEDIMENT_POLICY",
+    "PLATFORMS_REGISTRY",
+    "ADMIN_CHANGE_CONTROL",
+    "PUBLIC_SURFACE_POLICY",
+    "RESEARCH_WATCH_POLICY",
+    "REFLECTIVE_LEARNING_POLICY",
+    "EXPERIENCE_AUDIT_POLICY",
+    "INBOX_DIRECTORIES",
+    "STATE_DIRECTORIES",
+    "MOBILITY_PLAZA_GOVERNANCE",
+    "MAP_OPS_GATE"
+  ],
+  "notes": [
+    "predeployment gate must pass before orchestrator startup registration or live platform connection",
+    "failed checks block startup intent recording only; they do not auto-fix or auto-deploy"
+  ]
+}

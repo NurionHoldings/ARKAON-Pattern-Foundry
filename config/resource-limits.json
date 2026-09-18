@@ -1,13 +1,16 @@
 {
-  "schema_version": "apf.resource-limits/v1",
-  "max_platforms_per_run": 8,
-  "max_files_per_platform": 5000,
-  "max_inbox_packets": 32,
-  "max_seconds_per_platform": 120,
-  "max_memory_mb_per_platform": 512,
-  "sequential_platform_analysis": true,
+  "schema_version": "apf.resource-limits/v2",
+  "accumulation_mode": "unbounded",
+  "max_platforms_per_run": null,
+  "max_files_per_platform": null,
+  "max_inbox_packets": null,
+  "max_seconds_per_platform": null,
+  "max_memory_mb_per_platform": null,
+  "sequential_platform_analysis": false,
+  "parallel_platform_workers": null,
   "notes": [
-    "Central orchestrator analyzes registered platforms one after another.",
-    "Disable extra platforms in config/platforms.json until their paths exist."
+    "null limits mean unbounded — ARKAON accumulates and analyzes without artificial ceilings.",
+    "parallel_platform_workers null uses all enabled platforms concurrently.",
+    "Safety-only fetch/auth limits live in collector and map-ops policies, not here."
   ]
 }
