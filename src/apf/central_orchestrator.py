@@ -11,9 +11,10 @@ import json
 import os
 import re
 import subprocess
-from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
+from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import TimeoutError as FuturesTimeoutError
 from dataclasses import asdict, dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
 from hashlib import sha256
 from pathlib import Path
@@ -146,7 +147,7 @@ class RunLock:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         try:
             self._fd = os.open(str(self.path), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
-            os.write(self._fd, f"{datetime.now(timezone.utc).isoformat()}\n".encode())
+            os.write(self._fd, f"{datetime.now(UTC).isoformat()}\n".encode())
         except FileExistsError as exc:
             raise OrchestratorError("RUN_LOCK_HELD", "orchestrator already running") from exc
 
@@ -325,7 +326,7 @@ class CentralOrchestrator:
         self.foundry_root = foundry_root.resolve()
         self.policy = policy
         self.limits = limits
-        self.clock = clock or (lambda: datetime.now(timezone.utc))
+        self.clock = clock or (lambda: datetime.now(UTC))
         self.inbox_root = self.foundry_root / "inbox"
         self.reports_root = self.foundry_root / "reports"
         self.logs_root = self.foundry_root / "logs"
@@ -671,7 +672,7 @@ class CentralOrchestrator:
         target.write_text(json.dumps(packet.to_document(), ensure_ascii=False, indent=2), encoding="utf-8")
 
     def _write_report(self, report: OrchestratorRunReport) -> Path:
-        day = report.completed_at.astimezone(timezone.utc).strftime("%Y-%m-%d")
+        day = report.completed_at.astimezone(UTC).strftime("%Y-%m-%d")
         report_dir = self.reports_root / day
         report_dir.mkdir(parents=True, exist_ok=True)
         target = report_dir / f"{report.run_id}.json"
@@ -713,7 +714,7 @@ class CentralOrchestrator:
 
     def _append_log(self, report: OrchestratorRunReport) -> None:
         self.logs_root.mkdir(parents=True, exist_ok=True)
-        day = report.completed_at.astimezone(timezone.utc).strftime("%Y-%m-%d")
+        day = report.completed_at.astimezone(UTC).strftime("%Y-%m-%d")
         log_path = self.logs_root / f"orchestrator-{day}.log"
         line = (
             f"{report.completed_at.isoformat()} run={report.run_id} "
