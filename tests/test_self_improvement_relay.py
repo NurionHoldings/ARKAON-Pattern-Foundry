@@ -1,4 +1,5 @@
 import json
+import subprocess
 from datetime import UTC, datetime
 
 import pytest
@@ -91,3 +92,23 @@ def test_relay_rejects_permission_escalation(tmp_path) -> None:
 
     with pytest.raises(RelayError, match="PROPOSE_ONLY_BOUNDARY_REQUIRED"):
         relay_once(foundry_root=tmp_path, publisher=FakePublisher())
+
+
+def test_gh_publisher_forces_utf8_and_tolerates_empty_stdout(monkeypatch) -> None:
+    from apf.self_improvement_relay import GhPublisher
+
+    observed = {}
+
+    def fake_run(arguments, **kwargs):
+        observed.update(kwargs)
+        return subprocess.CompletedProcess(arguments, 0, stdout=None, stderr="")
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+    output = GhPublisher("NurionHoldings/ARKAON-Pattern-Foundry")._run(
+        "auth",
+        "status",
+    )
+
+    assert output == ""
+    assert observed["encoding"] == "utf-8"
+    assert observed["errors"] == "replace"

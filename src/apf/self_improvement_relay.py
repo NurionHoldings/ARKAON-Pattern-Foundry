@@ -154,12 +154,14 @@ class GhPublisher:
             ("gh", *arguments),
             input=input_text,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             capture_output=True,
             check=False,
         )
         if completed.returncode != 0:
             raise RelayError("GITHUB_RELAY_FAILED")
-        return completed.stdout.strip()
+        return (completed.stdout or "").strip()
 
     def publish(self, *, request_id: str, scope_digest: str, content: str) -> str:
         self._run("auth", "status")
