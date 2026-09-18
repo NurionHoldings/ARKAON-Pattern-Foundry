@@ -131,6 +131,10 @@ class CoCreationProposal:
     reference_site_url: str | None = None
     reference_style_path: str | None = None
     feature_reference_styles: tuple[dict[str, object], ...] = ()
+    proposal_quality_score_at_intake: float | None = None
+    proposal_quality_replenished: bool = False
+    proposal_quality_replenish_trigger: str | None = None
+    proposal_quality_replenish_digest: str | None = None
 
     def to_document(self) -> dict[str, object]:
         return {
@@ -153,6 +157,10 @@ class CoCreationProposal:
             "reference_site_url": self.reference_site_url,
             "reference_style_path": self.reference_style_path,
             "feature_reference_styles": list(self.feature_reference_styles),
+            "proposal_quality_score_at_intake": self.proposal_quality_score_at_intake,
+            "proposal_quality_replenished": self.proposal_quality_replenished,
+            "proposal_quality_replenish_trigger": self.proposal_quality_replenish_trigger,
+            "proposal_quality_replenish_digest": self.proposal_quality_replenish_digest,
             "review_status": "PROPOSED",
             "automatic_implement_allowed": False,
             "production_change_allowed": False,
@@ -221,17 +229,9 @@ def verify_payment_entitlement(
 
 
 def count_experience_artifacts(foundry_root: Path) -> int:
-    count = 0
-    patterns = foundry_root / "knowledge" / "landing-structure-patterns" / "proposed"
-    if patterns.is_dir():
-        count += len(list(patterns.glob("*.json")))
-    learning = foundry_root / "state" / "cross-platform-learning"
-    if learning.is_dir():
-        count += len(list(learning.glob("20*.json")))
-    lessons = foundry_root / "knowledge" / "reflective-lessons"
-    if lessons.is_dir():
-        count += len(list(lessons.glob("*.json")))
-    return count
+    from .proposal_quality_score import count_learning_artifacts
+
+    return count_learning_artifacts(foundry_root)
 
 
 def _scan_message_tokens(message: str) -> frozenset[str]:
@@ -371,6 +371,7 @@ class ConversationalCoCreationEngine:
         self.proposal_root = self.foundry_root / "state" / "co-creation" / "proposals"
         self.session_root.mkdir(parents=True, exist_ok=True)
         self.proposal_root.mkdir(parents=True, exist_ok=True)
+        self._last_replenish_report = None
 
     def _load_session(self, session_id: str) -> CoCreationSession | None:
         path = self.session_root / f"{session_id}.json"
@@ -433,11 +434,21 @@ class ConversationalCoCreationEngine:
             foundry_root=self.foundry_root,
         ):
             raise CoCreationRejected("PAYMENT_REQUIRED", "valid payment entitlement digest required")
-        if count_experience_artifacts(self.foundry_root) < self.policy.minimum_experience_artifacts:
-            raise CoCreationRejected(
-                "INSUFFICIENT_EXPERIENCE",
-                "phase-1 learning artifacts required before co-creation proposals",
+        from .proposal_quality_replenish import resolve_proposal_quality_with_replenish
+        from .proposal_quality_score import ProposalQualityRejected
+
+        try:
+            quality_report, replenish_report = resolve_proposal_quality_with_replenish(
+                foundry_root=self.foundry_root,
+                platform_id=platform_id,
+                message=message,
+                minimum_artifacts=self.policy.minimum_experience_artifacts,
+                now=now,
             )
+        except ProposalQualityRejected as error:
+            raise CoCreationRejected(error.code, str(error)) from error
+        proposal_quality_score = quality_report.score
+        self._last_replenish_report = replenish_report
         session = self._load_session(session_id) if session_id else None
         if session is None:
             session_id = str(uuid4())
@@ -530,6 +541,12 @@ class ConversationalCoCreationEngine:
                 f" Reference site structural profile applied from {reference_site_url} "
                 "(similar feel, no verbatim copy)."
             )
+        if replenish_report is not None:
+            assistant_reply += (
+                f" Supplemental analysis added {len(replenish_report.actions)} learning asset(s) "
+                f"(trigger={replenish_report.trigger}; score {replenish_report.before_score:.2f}"
+                f"→{replenish_report.after_score:.2f}) before this re-proposal."
+            )
         proposal = CoCreationProposal(
             proposal_id=proposal_id,
             session_id=session_id,
@@ -553,6 +570,10 @@ class ConversationalCoCreationEngine:
             reference_site_url=reference_site_url,
             reference_style_path=reference_style_path,
             feature_reference_styles=tuple(item.to_document() for item in feature_profiles),
+            proposal_quality_score_at_intake=proposal_quality_score,
+            proposal_quality_replenished=replenish_report is not None,
+            proposal_quality_replenish_trigger=replenish_report.trigger if replenish_report else None,
+            proposal_quality_replenish_digest=replenish_report.replenish_digest if replenish_report else None,
         )
         assistant_turn = ChatTurn("assistant", assistant_reply, now)
         updated_session = CoCreationSession(

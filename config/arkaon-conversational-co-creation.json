@@ -10,6 +10,6 @@
   "notes": [
     "phase-2 prototype: chat intake to template and platform blueprint proposals",
     "payment entitlement verified via billing SoT API (docs/67) with digest dev fallback",
-    "INSUFFICIENT_EXPERIENCE when landing patterns and cross-platform lessons are absent"
+    "INSUFFICIENT_EXPERIENCE or INSUFFICIENT_PROPOSAL_QUALITY when learning assets cannot support better proposals (docs/70)"
   ]
 }

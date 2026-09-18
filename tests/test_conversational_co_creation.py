@@ -29,6 +29,10 @@ def _write_policy(tmp_path: Path) -> None:
         json.dumps({"schema_version": "apf.conversational-co-creation/v1"}),
         encoding="utf-8",
     )
+    (config / "arkaon-proposal-quality.json").write_text(
+        json.dumps({"schema_version": "apf.proposal-quality/v1", "minimum_proposal_quality_score": 0.2}),
+        encoding="utf-8",
+    )
 
 
 def _seed_experience(tmp_path: Path) -> None:

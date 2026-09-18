@@ -30,9 +30,18 @@ Dev fallback digest:
 sha256("{tenant_id}|{principal_id}|{platform_id}|paid")
 ```
 
-## experience gate
+## experience gate · proposal quality score
 
-`minimum_experience_artifacts` 미만이면 `INSUFFICIENT_EXPERIENCE` (409).
+North star: `docs/70-learning-assets-for-better-proposals.md`
+
+1. `minimum_experience_artifacts` 미만 → `INSUFFICIENT_EXPERIENCE` (409)
+2. `proposal_quality_score < minimum` → 보강(replenish) 시도 후에도 미달 시 `INSUFFICIENT_PROPOSAL_QUALITY` (409)
+
+Score 구성: landing patterns · cross-platform learning · reflective lessons · self-evolution analyses.
+
+gate 실패 또는 사용자 불만+자산 부족 시 `proposal_quality_replenish`가 선행되고, 보강 후 **같은 턴에서 재제안** (`docs/70`).
+
+proposal JSON: `proposal_quality_score_at_intake`, `proposal_quality_replenished`, `proposal_quality_replenish_trigger`.
 
 집계:
 
@@ -58,14 +67,18 @@ CSRF header 필수 (`X-CSRF-Token`).
 | `state/co-creation/proposals/` | blueprint JSON |
 | `inbox/operator-decision/*co-creation*` | operator 검토 패킷 |
 
-## 3단계 (미구현)
+## 3단계
 
-- 승인 후 template variant codegen
-- platform scaffold generation
-- tenant-scoped preview sandbox
+`docs/66-co-creation-phase3-reference-urls.md` — URL 참조, GitHub onboarding, build scaffold (PARTIAL).
+
+## 4단계 (roadmap)
+
+`docs/68-co-creation-phase4-roadmap.md` — codegen → preview sandbox → staged deploy.
 
 ## 관련
 
 - `docs/51` 2단계 분야 요청
 - `docs/64` cross-platform learning (1단계 feed)
+- `docs/66` phase-3 reference · build
+- `docs/68` phase-4 codegen · preview · deploy
 - `docs/11` Intent_DNA (향후 chat ↔ 12축 정렬)

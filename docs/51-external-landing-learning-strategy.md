@@ -80,7 +80,12 @@ DISCOVER (공개 surface / 승인 manifest)
 - reflective lesson ≥ 3 (채택·기각·실패 포함)
 - verbatim copy / competitor storage contamination **0**
 
-## 2단계 — 분야 요청 시 정리·제안 (추후)
+## 2단계 — 분야 요청 시 정리·제안
+
+구현: `docs/65-conversational-co-creation.md`.  
+4단계 납품 roadmap: `docs/68-co-creation-phase4-roadmap.md`.
+
+### (원래 명세)
 
 사용자가 분야·플랫폼·전환 목표를 요청하면:
 

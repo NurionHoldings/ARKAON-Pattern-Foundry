@@ -42,6 +42,10 @@
 - `BILLING_API` — billing SoT HTTPS verify
 - `DIGEST_THEN_API` — API 우선, digest fallback
 
+## 4단계 (다음)
+
+`docs/68-co-creation-phase4-roadmap.md` — scaffold manifest 이후 **codegen → tenant preview → staged deploy**.
+
 ## API 요약
 
 ```json

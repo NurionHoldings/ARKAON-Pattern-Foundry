@@ -71,6 +71,66 @@ class CoCreationBuildRequest(BaseModel):
     operator_approval_digest: str = Field(pattern=r"^[0-9a-f]{64}$")
 
 
+class CoCreationCodegenRequest(BaseModel):
+    proposal_id: str = Field(min_length=8, max_length=64)
+    operator_approval_digest: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+class CoCreationCodegenApproveRequest(BaseModel):
+    operator_codegen_approval_digest: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+class CoCreationPreviewStartRequest(BaseModel):
+    proposal_id: str = Field(min_length=8, max_length=64)
+    platform_id: str = Field(min_length=1, max_length=128)
+    preview_base_url: str = Field(min_length=8, max_length=512)
+    payment_entitlement_digest: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+class CoCreationPreviewFeedbackRequest(BaseModel):
+    platform_id: str = Field(min_length=1, max_length=128)
+    message: str = Field(min_length=1, max_length=4000)
+    payment_entitlement_digest: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+class ProposalQualityReplenishRequest(BaseModel):
+    platform_id: str = Field(min_length=1, max_length=128)
+    message: str = Field(min_length=1, max_length=4000)
+    user_dissatisfied: bool = False
+
+
+class CoCreationPreviewAcceptRequest(BaseModel):
+    platform_id: str = Field(min_length=1, max_length=128)
+    payment_entitlement_digest: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+class CoCreationDeployShadowRequest(BaseModel):
+    proposal_id: str = Field(min_length=8, max_length=64)
+    platform_id: str = Field(min_length=1, max_length=128)
+    codegen_manifest_digest: str = Field(pattern=r"^[0-9a-f]{64}$")
+    operator_approval_digest: str = Field(pattern=r"^[0-9a-f]{64}$")
+    sandbox_id: str | None = None
+
+
+class CoCreationDeployPromoteRequest(BaseModel):
+    stage: Literal["PILOT", "PRODUCTION"]
+    operator_approval_digest: str = Field(pattern=r"^[0-9a-f]{64}$")
+    eternian_approval_digest: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+    eternian_principal_id: UUID | None = None
+
+
+class CoCreationDeployKillRequest(BaseModel):
+    operator_approval_digest: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+class SelfEvolutionProposeToUserRequest(BaseModel):
+    platform_id: str = Field(min_length=1, max_length=128)
+    payment_entitlement_digest: str = Field(pattern=r"^[0-9a-f]{64}$")
+    analysis_digest: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+    baseline_snapshot_id: str | None = None
+    candidate_snapshot_id: str | None = None
+
+
 class GitHubOnboardingRequest(BaseModel):
     platform_id: str = Field(min_length=1, max_length=128)
     console_base_url: str = Field(min_length=8, max_length=512)
@@ -439,7 +499,7 @@ def install_console(
             )
         except CoCreationRejected as error:
             status = 402 if error.code == "PAYMENT_REQUIRED" else 422
-            if error.code == "INSUFFICIENT_EXPERIENCE":
+            if error.code in {"INSUFFICIENT_EXPERIENCE", "INSUFFICIENT_PROPOSAL_QUALITY"}:
                 status = 409
             raise HTTPException(status_code=status, detail=error.code) from None
         bridge_co_creation_proposal(
@@ -464,6 +524,10 @@ def install_console(
             "reference_site_url": proposal.reference_site_url,
             "reference_style_path": proposal.reference_style_path,
             "feature_reference_styles": document["feature_reference_styles"],
+            "proposal_quality_score_at_intake": proposal.proposal_quality_score_at_intake,
+            "proposal_quality_replenished": proposal.proposal_quality_replenished,
+            "proposal_quality_replenish_trigger": proposal.proposal_quality_replenish_trigger,
+            "proposal_quality_replenish_digest": proposal.proposal_quality_replenish_digest,
         }
 
     @application.post("/v1/console/co-creation/build")
@@ -485,6 +549,502 @@ def install_console(
         except CoCreationBuildRejected as error:
             raise HTTPException(status_code=422, detail=error.code) from None
         return report.to_document()
+
+    @application.post("/v1/console/co-creation/codegen")
+    def co_creation_codegen(
+        payload: CoCreationCodegenRequest,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified, actor
+        from .co_creation_codegen import CoCreationCodegenEngine, CoCreationCodegenRejected
+        from .co_creation_codegen_bridge import bridge_codegen_manifest
+
+        engine = CoCreationCodegenEngine(foundry_root=foundry_root())
+        now = datetime.now().astimezone()
+        try:
+            manifest = engine.run_codegen(
+                proposal_id=payload.proposal_id,
+                operator_approval_digest=payload.operator_approval_digest,
+                now=now,
+            )
+        except CoCreationCodegenRejected as error:
+            status = 422
+            if error.code == "CONTAMINATION_BLOCKED":
+                status = 409
+            raise HTTPException(status_code=status, detail=error.code) from None
+        bridge_codegen_manifest(
+            foundry_root=foundry_root(),
+            manifest=manifest,
+            policy=engine.policy,
+            run_id=manifest.proposal_id,
+            now=now,
+            dry_run=False,
+        )
+        return manifest.to_document()
+
+    @application.get("/v1/console/co-creation/codegen/{proposal_id}")
+    def co_creation_codegen_manifest(
+        proposal_id: str,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+    ) -> dict[str, object]:
+        del actor
+        from .co_creation_codegen import CoCreationCodegenEngine, CoCreationCodegenRejected
+
+        engine = CoCreationCodegenEngine(foundry_root=foundry_root())
+        try:
+            manifest = engine.load_manifest(proposal_id)
+        except CoCreationCodegenRejected as error:
+            raise HTTPException(status_code=404, detail=error.code) from None
+        return manifest.to_document()
+
+    @application.post("/v1/console/co-creation/codegen/{proposal_id}/approve")
+    def co_creation_codegen_approve(
+        proposal_id: str,
+        payload: CoCreationCodegenApproveRequest,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified, actor
+        from .co_creation_codegen import CoCreationCodegenEngine, CoCreationCodegenRejected
+
+        engine = CoCreationCodegenEngine(foundry_root=foundry_root())
+        try:
+            manifest = engine.approve_codegen(
+                proposal_id=proposal_id,
+                operator_codegen_approval_digest=payload.operator_codegen_approval_digest,
+                now=datetime.now().astimezone(),
+            )
+        except CoCreationCodegenRejected as error:
+            raise HTTPException(status_code=422, detail=error.code) from None
+        return manifest.to_document()
+
+    @application.post("/v1/console/co-creation/preview/start")
+    def co_creation_preview_start(
+        payload: CoCreationPreviewStartRequest,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        from .co_creation_preview import CoCreationPreviewEngine, CoCreationPreviewRejected
+
+        engine = CoCreationPreviewEngine(foundry_root=foundry_root())
+        try:
+            runtime = engine.start_preview(
+                proposal_id=payload.proposal_id,
+                tenant_id=str(actor.tenant_id),
+                principal_id=str(actor.principal_id),
+                platform_id=payload.platform_id,
+                preview_base_url=payload.preview_base_url,
+                payment_entitlement_digest=payload.payment_entitlement_digest,
+                now=datetime.now().astimezone(),
+            )
+        except CoCreationPreviewRejected as error:
+            status = 422
+            if error.code in {"ENTITLEMENT_INACTIVE", "TENANT_FORBIDDEN"}:
+                status = 403
+            if error.code == "CODEGEN_NOT_READY":
+                status = 409
+            raise HTTPException(status_code=status, detail=error.code) from None
+        return runtime.to_document()
+
+    @application.get("/v1/console/co-creation/preview/{sandbox_id}")
+    def co_creation_preview_get(
+        sandbox_id: str,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        platform_id: Annotated[str, Query(min_length=1, max_length=128)],
+        payment_entitlement_digest: Annotated[str | None, Query(pattern=r"^[0-9a-f]{64}$")] = None,
+    ) -> dict[str, object]:
+        from .co_creation_preview import CoCreationPreviewEngine, CoCreationPreviewRejected
+
+        engine = CoCreationPreviewEngine(foundry_root=foundry_root())
+        try:
+            runtime = engine.get_sandbox(
+                sandbox_id=sandbox_id,
+                tenant_id=str(actor.tenant_id),
+                principal_id=str(actor.principal_id),
+                platform_id=platform_id,
+                payment_entitlement_digest=payment_entitlement_digest,
+                now=datetime.now().astimezone(),
+            )
+        except CoCreationPreviewRejected as error:
+            status = 404
+            if error.code in {"ENTITLEMENT_INACTIVE", "TENANT_FORBIDDEN"}:
+                status = 403
+            if error.code == "SANDBOX_EXPIRED":
+                status = 410
+            raise HTTPException(status_code=status, detail=error.code) from None
+        return runtime.to_document()
+
+    @application.delete("/v1/console/co-creation/preview/{sandbox_id}")
+    def co_creation_preview_teardown(
+        sandbox_id: str,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        from .co_creation_preview import CoCreationPreviewEngine, CoCreationPreviewRejected
+
+        engine = CoCreationPreviewEngine(foundry_root=foundry_root())
+        try:
+            runtime = engine.teardown(
+                sandbox_id=sandbox_id,
+                tenant_id=str(actor.tenant_id),
+                now=datetime.now().astimezone(),
+            )
+        except CoCreationPreviewRejected as error:
+            status = 404 if error.code == "SANDBOX_NOT_FOUND" else 403
+            raise HTTPException(status_code=status, detail=error.code) from None
+        return runtime.to_document()
+
+    @application.post("/v1/console/co-creation/preview/{sandbox_id}/feedback")
+    def co_creation_preview_feedback(
+        sandbox_id: str,
+        payload: CoCreationPreviewFeedbackRequest,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        from .co_creation_preview import CoCreationPreviewEngine, CoCreationPreviewRejected
+
+        engine = CoCreationPreviewEngine(foundry_root=foundry_root())
+        try:
+            runtime, proposal_id, loop_result = engine.submit_feedback(
+                sandbox_id=sandbox_id,
+                tenant_id=str(actor.tenant_id),
+                principal_id=str(actor.principal_id),
+                platform_id=payload.platform_id,
+                message=payload.message,
+                payment_entitlement_digest=payload.payment_entitlement_digest,
+                now=datetime.now().astimezone(),
+            )
+        except CoCreationPreviewRejected as error:
+            status = 422
+            if error.code in {"ENTITLEMENT_INACTIVE", "TENANT_FORBIDDEN", "SANDBOX_EXPIRED"}:
+                status = 403 if error.code != "SANDBOX_EXPIRED" else 410
+            if error.code in {"INSUFFICIENT_EXPERIENCE", "INSUFFICIENT_PROPOSAL_QUALITY", "REVISION_LIMIT"}:
+                status = 409
+            raise HTTPException(status_code=status, detail=error.code) from None
+        document = runtime.to_document()
+        document["revision_proposal_id"] = proposal_id
+        document["feedback_loop"] = loop_result
+        if loop_result and loop_result.get("proposal_quality_replenish"):
+            document["proposal_quality_replenish"] = loop_result["proposal_quality_replenish"]
+        return document
+
+    @application.post("/v1/console/co-creation/preview/{sandbox_id}/accept")
+    def co_creation_preview_accept(
+        sandbox_id: str,
+        payload: CoCreationPreviewAcceptRequest,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        from .co_creation_preview import CoCreationPreviewEngine, CoCreationPreviewRejected
+
+        engine = CoCreationPreviewEngine(foundry_root=foundry_root())
+        try:
+            runtime = engine.accept_preview(
+                sandbox_id=sandbox_id,
+                tenant_id=str(actor.tenant_id),
+                principal_id=str(actor.principal_id),
+                platform_id=payload.platform_id,
+                payment_entitlement_digest=payload.payment_entitlement_digest,
+                now=datetime.now().astimezone(),
+            )
+        except CoCreationPreviewRejected as error:
+            status = 403 if error.code in {"ENTITLEMENT_INACTIVE", "TENANT_FORBIDDEN"} else 422
+            raise HTTPException(status_code=status, detail=error.code) from None
+        return runtime.to_document()
+
+    @application.get("/v1/console/co-creation/feedback-loop/{session_id}")
+    def co_creation_feedback_loop_state(
+        session_id: str,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+    ) -> dict[str, object]:
+        del actor
+        from .co_creation_feedback_loop import CoCreationFeedbackLoopEngine
+
+        engine = CoCreationFeedbackLoopEngine(foundry_root=foundry_root())
+        state = engine._load_loop_state(session_id)
+        if state is None:
+            raise HTTPException(status_code=404, detail="FEEDBACK_LOOP_NOT_FOUND")
+        return state.to_document()
+
+    @application.post("/v1/console/co-creation/deploy/shadow")
+    def co_creation_deploy_shadow(
+        payload: CoCreationDeployShadowRequest,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        from .co_creation_deploy import CoCreationDeployEngine, CoCreationDeployRejected
+
+        engine = CoCreationDeployEngine(foundry_root=foundry_root())
+        try:
+            state = engine.start_shadow(
+                proposal_id=payload.proposal_id,
+                tenant_id=str(actor.tenant_id),
+                platform_id=payload.platform_id,
+                sandbox_id=payload.sandbox_id,
+                codegen_manifest_digest=payload.codegen_manifest_digest,
+                operator_approval_digest=payload.operator_approval_digest,
+                operator_principal_id=str(actor.principal_id),
+                now=datetime.now().astimezone(),
+            )
+        except CoCreationDeployRejected as error:
+            status = 422
+            if error.code == "PREDEPLOY_FAILED":
+                status = 409
+            raise HTTPException(status_code=status, detail=error.code) from None
+        return state.to_document()
+
+    @application.post("/v1/console/co-creation/deploy/{proposal_id}/promote")
+    def co_creation_deploy_promote(
+        proposal_id: str,
+        payload: CoCreationDeployPromoteRequest,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        from .co_creation_deploy import CoCreationDeployEngine, CoCreationDeployRejected, DeployRolloutStage
+
+        engine = CoCreationDeployEngine(foundry_root=foundry_root())
+        try:
+            state = engine.promote(
+                proposal_id=proposal_id,
+                stage=DeployRolloutStage(payload.stage),
+                operator_approval_digest=payload.operator_approval_digest,
+                eternian_approval_digest=payload.eternian_approval_digest,
+                operator_principal_id=str(actor.principal_id),
+                eternian_principal_id=(
+                    str(payload.eternian_principal_id) if payload.eternian_principal_id else None
+                ),
+                now=datetime.now().astimezone(),
+            )
+        except CoCreationDeployRejected as error:
+            status = 422
+            if error.code in {"PRODUCTION_LOCKED", "PREDEPLOY_FAILED", "STAGE_ORDER"}:
+                status = 409
+            if error.code == "DUAL_APPROVAL_FORBIDDEN":
+                status = 403
+            raise HTTPException(status_code=status, detail=error.code) from None
+        return state.to_document()
+
+    @application.post("/v1/console/co-creation/deploy/{proposal_id}/kill")
+    def co_creation_deploy_kill(
+        proposal_id: str,
+        payload: CoCreationDeployKillRequest,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified, actor
+        from .co_creation_deploy import CoCreationDeployEngine, CoCreationDeployRejected
+
+        engine = CoCreationDeployEngine(foundry_root=foundry_root())
+        try:
+            state = engine.kill_switch(
+                proposal_id=proposal_id,
+                operator_approval_digest=payload.operator_approval_digest,
+                now=datetime.now().astimezone(),
+            )
+        except CoCreationDeployRejected as error:
+            raise HTTPException(status_code=422, detail=error.code) from None
+        return state.to_document()
+
+    @application.get("/v1/console/co-creation/deploy/{proposal_id}")
+    def co_creation_deploy_status(
+        proposal_id: str,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+    ) -> dict[str, object]:
+        del actor
+        from .co_creation_deploy import CoCreationDeployEngine, CoCreationDeployRejected
+
+        engine = CoCreationDeployEngine(foundry_root=foundry_root())
+        try:
+            state = engine.get_status(proposal_id)
+        except CoCreationDeployRejected as error:
+            raise HTTPException(status_code=404, detail=error.code) from None
+        return state.to_document()
+
+    @application.get("/v1/console/proposal-quality")
+    def proposal_quality_latest(
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+    ) -> dict[str, object]:
+        del actor
+        from .proposal_quality_score import ProposalQualityScorer
+
+        scorer = ProposalQualityScorer(foundry_root=foundry_root())
+        latest = scorer.load_latest()
+        if latest is None:
+            report = scorer.evaluate_and_persist(now=datetime.now().astimezone())
+            return report.to_document()
+        return latest.to_document()
+
+    @application.get("/v1/console/proposal-quality/replenish")
+    def proposal_quality_replenish_list(
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        limit: Annotated[int, Query(ge=1, le=50)] = 20,
+    ) -> list[dict[str, object]]:
+        del actor
+        from .proposal_quality_replenish import ProposalQualityReplenishEngine
+
+        engine = ProposalQualityReplenishEngine(foundry_root=foundry_root())
+        return [item.to_document() for item in engine.list_recent(limit=limit)]
+
+    @application.post("/v1/console/proposal-quality/replenish")
+    def proposal_quality_replenish_run(
+        payload: ProposalQualityReplenishRequest,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified, actor
+        from .proposal_quality_replenish import (
+            ProposalQualityReplenishEngine,
+            ProposalQualityReplenishRejected,
+            user_dissatisfaction_detected,
+        )
+        from .proposal_quality_score import ProposalQualityScorer, assert_proposal_quality_gate
+
+        now = datetime.now().astimezone()
+        engine = ProposalQualityReplenishEngine(foundry_root=foundry_root())
+        user_dissatisfied = payload.user_dissatisfied or user_dissatisfaction_detected(payload.message)
+        before = ProposalQualityScorer(foundry_root=foundry_root()).evaluate(now=now)
+        trigger, should = engine._decide_replenish(before, user_dissatisfied=user_dissatisfied)
+        if not should:
+            return {
+                "replenished": False,
+                "reason": "NO_REPLENISH_TRIGGER",
+                "proposal_quality": before.to_document(),
+            }
+        try:
+            report = engine.replenish(
+                platform_id=payload.platform_id,
+                message=payload.message,
+                trigger=trigger,
+                now=now,
+            )
+        except ProposalQualityReplenishRejected as error:
+            raise HTTPException(status_code=422, detail=error.code) from None
+        try:
+            quality = assert_proposal_quality_gate(foundry_root=foundry_root())
+        except Exception:
+            quality = ProposalQualityScorer(foundry_root=foundry_root()).evaluate(now=now)
+        return {
+            "replenished": True,
+            "replenish_report": report.to_document(),
+            "proposal_quality": quality.to_document(),
+        }
+
+    @application.get("/v1/console/self-evolution/snapshots")
+    def self_evolution_snapshots(
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        limit: Annotated[int, Query(ge=1, le=50)] = 20,
+    ) -> list[dict[str, object]]:
+        del actor
+        from .arkaon_self_evolution_compare import ArkaonSelfEvolutionCompareEngine
+
+        engine = ArkaonSelfEvolutionCompareEngine(foundry_root=foundry_root())
+        return [item.to_document() for item in engine.list_snapshots(limit=limit)]
+
+    @application.get("/v1/console/self-evolution/compare")
+    def self_evolution_compare(
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        baseline_snapshot_id: Annotated[str | None, Query()] = None,
+        candidate_snapshot_id: Annotated[str | None, Query()] = None,
+        include_analysis: Annotated[bool, Query()] = False,
+    ) -> dict[str, object]:
+        del actor
+        from .arkaon_self_evolution_compare import ArkaonSelfEvolutionCompareEngine, SelfEvolutionRejected
+        from .arkaon_self_evolution_analysis import ArkaonSelfEvolutionAnalysisEngine, SelfEvolutionAnalysisRejected
+
+        engine = ArkaonSelfEvolutionCompareEngine(foundry_root=foundry_root())
+        now = datetime.now().astimezone()
+        try:
+            if baseline_snapshot_id and candidate_snapshot_id:
+                report = engine.compare(
+                    baseline_snapshot_id=baseline_snapshot_id,
+                    candidate_snapshot_id=candidate_snapshot_id,
+                    now=now,
+                )
+            else:
+                report = engine.compare_latest_pair(now=now)
+        except SelfEvolutionRejected as error:
+            raise HTTPException(status_code=404, detail=error.code) from None
+        document = report.to_document()
+        if include_analysis:
+            try:
+                analysis_engine = ArkaonSelfEvolutionAnalysisEngine(foundry_root=foundry_root())
+                analysis = analysis_engine.analyze_comparison(report=report, now=now)
+                document["improvement_analysis"] = analysis.to_document()
+            except SelfEvolutionAnalysisRejected as error:
+                raise HTTPException(status_code=422, detail=error.code) from None
+        return document
+
+    @application.get("/v1/console/self-evolution/analyze")
+    def self_evolution_analyze(
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        baseline_snapshot_id: Annotated[str | None, Query()] = None,
+        candidate_snapshot_id: Annotated[str | None, Query()] = None,
+    ) -> dict[str, object]:
+        del actor
+        from .arkaon_self_evolution_analysis import ArkaonSelfEvolutionAnalysisEngine, SelfEvolutionAnalysisRejected
+
+        engine = ArkaonSelfEvolutionAnalysisEngine(foundry_root=foundry_root())
+        now = datetime.now().astimezone()
+        try:
+            if baseline_snapshot_id and candidate_snapshot_id:
+                analysis = engine.analyze(
+                    baseline_snapshot_id=baseline_snapshot_id,
+                    candidate_snapshot_id=candidate_snapshot_id,
+                    now=now,
+                )
+            else:
+                analysis = engine.analyze_latest(now=now)
+        except SelfEvolutionAnalysisRejected as error:
+            raise HTTPException(status_code=404, detail=error.code) from None
+        return analysis.to_document()
+
+    @application.post("/v1/console/self-evolution/propose-to-user")
+    def self_evolution_propose_to_user(
+        payload: SelfEvolutionProposeToUserRequest,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        from .arkaon_user_feature_proposal import ArkaonUserFeatureProposalEngine, UserFeatureProposalRejected
+
+        engine = ArkaonUserFeatureProposalEngine(foundry_root=foundry_root())
+        try:
+            proposal = engine.propose_to_user(
+                tenant_id=str(actor.tenant_id),
+                principal_id=str(actor.principal_id),
+                platform_id=payload.platform_id,
+                payment_entitlement_digest=payload.payment_entitlement_digest,
+                now=datetime.now().astimezone(),
+                analysis_digest=payload.analysis_digest,
+                baseline_snapshot_id=payload.baseline_snapshot_id,
+                candidate_snapshot_id=payload.candidate_snapshot_id,
+            )
+        except UserFeatureProposalRejected as error:
+            status = 403 if error.code == "ENTITLEMENT_INACTIVE" else 422
+            if error.code == "INSUFFICIENT_HISTORY":
+                status = 409
+            raise HTTPException(status_code=status, detail=error.code) from None
+        return proposal.to_document()
+
+    @application.get("/v1/console/self-evolution/user-proposals")
+    def self_evolution_user_proposals(
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        limit: Annotated[int, Query(ge=1, le=50)] = 20,
+    ) -> list[dict[str, object]]:
+        from .arkaon_user_feature_proposal import ArkaonUserFeatureProposalEngine
+
+        engine = ArkaonUserFeatureProposalEngine(foundry_root=foundry_root())
+        return [
+            item.to_document()
+            for item in engine.list_proposals(tenant_id=str(actor.tenant_id), limit=limit)
+        ]
 
     @application.post("/v1/console/co-creation/github-onboarding/start")
     def co_creation_github_onboarding(

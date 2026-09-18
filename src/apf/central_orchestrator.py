@@ -397,6 +397,7 @@ class OrchestratorRunReport:
     platform_reports: tuple[PlatformAnalysis, ...]
     inbox_packets: tuple[str, ...]
     production_change_allowed: bool = False
+    proposal_quality: dict[str, object] | None = None
 
 
 class CentralOrchestrator:
@@ -550,6 +551,7 @@ class CentralOrchestrator:
             )
             packet_paths.extend(resolution_paths)
             completed = self.clock()
+            proposal_quality_doc = self._evaluate_proposal_quality(now=completed, dry_run=dry_run)
             report = OrchestratorRunReport(
                 run_id=run_id,
                 started_at=started,
@@ -557,6 +559,7 @@ class CentralOrchestrator:
                 foundry_root=self.foundry_root,
                 platform_reports=tuple(analyses),
                 inbox_packets=tuple(packet_paths),
+                proposal_quality=proposal_quality_doc,
             )
             if not dry_run:
                 self._sync_mailbox(completed)
@@ -1338,6 +1341,19 @@ class CentralOrchestrator:
             json.dumps(packet.to_document(), ensure_ascii=False, indent=2), encoding="utf-8"
         )
 
+    def _evaluate_proposal_quality(
+        self,
+        *,
+        now: datetime,
+        dry_run: bool,
+    ) -> dict[str, object]:
+        from .proposal_quality_score import ProposalQualityScorer
+
+        scorer = ProposalQualityScorer(foundry_root=self.foundry_root)
+        if dry_run:
+            return scorer.evaluate(now=now).to_document()
+        return scorer.evaluate_and_persist(now=now).to_document()
+
     def _write_report(self, report: OrchestratorRunReport) -> Path:
         day = report.completed_at.astimezone(UTC).strftime("%Y-%m-%d")
         report_dir = self.reports_root / day
@@ -1363,6 +1379,7 @@ class CentralOrchestrator:
                 for item in report.platform_reports
             ],
             "inbox_packets": list(report.inbox_packets),
+            "proposal_quality": report.proposal_quality,
         }
         canonical = json.dumps(document, ensure_ascii=False, indent=2, sort_keys=True)
         document["report_sha256"] = sha256(canonical.encode()).hexdigest()
