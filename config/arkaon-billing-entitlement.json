@@ -1,0 +1,11 @@
+{
+  "schema_version": "apf.billing-entitlement/v1",
+  "enabled": true,
+  "mode": "DIGEST_THEN_API",
+  "billing_api_base_url": null,
+  "allow_digest_fallback": true,
+  "notes": [
+    "prototype uses sha256 tenant|principal|platform|paid digest",
+    "set billing_api_base_url when production billing SoT is ready"
+  ]
+}

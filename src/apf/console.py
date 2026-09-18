@@ -56,6 +56,27 @@ class FulfillmentCompleteRequest(BaseModel):
     completion_note: str = Field(min_length=1, max_length=2000)
 
 
+class CoCreationChatRequest(BaseModel):
+    session_id: str | None = None
+    platform_id: str = Field(min_length=1, max_length=128)
+    message: str = Field(min_length=1, max_length=4000)
+    scope: Literal["TEMPLATE", "PLATFORM", "BOTH"] = "BOTH"
+    payment_entitlement_digest: str = Field(pattern=r"^[0-9a-f]{64}$")
+    reference_site_url: str | None = Field(default=None, max_length=512)
+    feature_reference_urls: dict[str, str] | None = None
+
+
+class CoCreationBuildRequest(BaseModel):
+    proposal_id: str = Field(min_length=8, max_length=64)
+    operator_approval_digest: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+class GitHubOnboardingRequest(BaseModel):
+    platform_id: str = Field(min_length=1, max_length=128)
+    console_base_url: str = Field(min_length=8, max_length=512)
+    github_client_id: str | None = None
+
+
 class ReviewSubmission(BaseModel):
     task_fingerprint: str = Field(pattern=r"^sha256:[0-9a-f]{64}$")
     task_id: UUID
@@ -365,6 +386,128 @@ def install_console(
                 if len(items) >= limit:
                     return items
         return items
+
+    @application.get("/v1/console/co-creation/proposals")
+    def co_creation_proposals(
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        limit: Annotated[int, Query(ge=1, le=50)] = 20,
+    ) -> list[dict[str, object]]:
+        del actor
+        store = foundry_root() / "state" / "co-creation" / "proposals"
+        if not store.is_dir():
+            return []
+        return [
+            json.loads(path.read_text(encoding="utf-8"))
+            for path in sorted(store.glob("*.json"), reverse=True)[:limit]
+        ]
+
+    @application.get("/v1/console/co-creation/sessions/{session_id}")
+    def co_creation_session(
+        session_id: str,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+    ) -> dict[str, object]:
+        del actor
+        path = foundry_root() / "state" / "co-creation" / "sessions" / f"{session_id}.json"
+        if not path.is_file():
+            raise HTTPException(status_code=404, detail="session not found")
+        return json.loads(path.read_text(encoding="utf-8"))
+
+    @application.post("/v1/console/co-creation/chat")
+    def co_creation_chat(
+        payload: CoCreationChatRequest,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        from .conversational_co_creation import CoCreationRejected, CoCreationScope, ConversationalCoCreationEngine
+        from .conversational_co_creation_bridge import bridge_co_creation_proposal
+
+        engine = ConversationalCoCreationEngine(foundry_root=foundry_root())
+        now = datetime.now().astimezone()
+        try:
+            proposal = engine.chat(
+                tenant_id=str(actor.tenant_id),
+                principal_id=str(actor.principal_id),
+                platform_id=payload.platform_id,
+                message=payload.message,
+                scope=CoCreationScope(payload.scope),
+                payment_entitlement_digest=payload.payment_entitlement_digest,
+                now=now,
+                session_id=payload.session_id,
+                reference_site_url=payload.reference_site_url,
+                feature_reference_urls=payload.feature_reference_urls,
+            )
+        except CoCreationRejected as error:
+            status = 402 if error.code == "PAYMENT_REQUIRED" else 422
+            if error.code == "INSUFFICIENT_EXPERIENCE":
+                status = 409
+            raise HTTPException(status_code=status, detail=error.code) from None
+        bridge_co_creation_proposal(
+            foundry_root=foundry_root(),
+            proposal=proposal,
+            policy=engine.policy,
+            run_id=proposal.proposal_id,
+            now=now,
+            dry_run=False,
+        )
+        document = proposal.to_document()
+        return {
+            "session_id": proposal.session_id,
+            "proposal_id": proposal.proposal_id,
+            "assistant_reply": proposal.assistant_reply,
+            "scope": proposal.scope.value,
+            "recommended_structure": document["recommended_structure"],
+            "template_blueprint": document["template_blueprint"],
+            "platform_blueprint": document["platform_blueprint"],
+            "evidence_table": document["evidence_table"],
+            "copy_angle_options": document["copy_angle_options"],
+            "reference_site_url": proposal.reference_site_url,
+            "reference_style_path": proposal.reference_style_path,
+            "feature_reference_styles": document["feature_reference_styles"],
+        }
+
+    @application.post("/v1/console/co-creation/build")
+    def co_creation_build_after_approval(
+        payload: CoCreationBuildRequest,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        from .co_creation_build import CoCreationBuildEngine, CoCreationBuildRejected
+
+        engine = CoCreationBuildEngine(foundry_root=foundry_root())
+        try:
+            report = engine.build_after_approval(
+                proposal_id=payload.proposal_id,
+                operator_approval_digest=payload.operator_approval_digest,
+                now=datetime.now().astimezone(),
+            )
+        except CoCreationBuildRejected as error:
+            raise HTTPException(status_code=422, detail=error.code) from None
+        return report.to_document()
+
+    @application.post("/v1/console/co-creation/github-onboarding/start")
+    def co_creation_github_onboarding(
+        payload: GitHubOnboardingRequest,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        from .github_onboarding import GitHubOnboardingEngine, GitHubOnboardingRejected
+
+        engine = GitHubOnboardingEngine(foundry_root=foundry_root())
+        try:
+            guide = engine.start_guide(
+                tenant_id=str(actor.tenant_id),
+                principal_id=str(actor.principal_id),
+                platform_id=payload.platform_id,
+                console_base_url=payload.console_base_url,
+                now=datetime.now().astimezone(),
+                client_id=payload.github_client_id,
+            )
+        except GitHubOnboardingRejected as error:
+            raise HTTPException(status_code=422, detail=error.code) from None
+        return guide.to_document()
 
     @application.get("/v1/console/mailbox")
     def mailbox_items(

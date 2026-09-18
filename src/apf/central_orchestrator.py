@@ -541,6 +541,14 @@ class CentralOrchestrator:
                         analysis=analysis,
                     )
                     packet_paths.extend(extra_paths)
+            resolution_paths = self._run_analysis_target_resolution(
+                run_id=run_id,
+                registrations=registrations,
+                analyses=tuple(analyses),
+                dry_run=dry_run,
+                packet_count=len(packet_paths),
+            )
+            packet_paths.extend(resolution_paths)
             completed = self.clock()
             report = OrchestratorRunReport(
                 run_id=run_id,
@@ -896,6 +904,86 @@ class CentralOrchestrator:
                 now=self.clock(),
                 dry_run=dry_run,
             )
+        )
+
+    def _run_analysis_target_resolution(
+        self,
+        *,
+        run_id: str,
+        registrations: tuple[PlatformRegistration, ...],
+        analyses: tuple[PlatformAnalysis, ...],
+        dry_run: bool,
+        packet_count: int,
+    ) -> list[str]:
+        if not has_capacity(packet_count, self.limits.max_inbox_packets):
+            return []
+        from .analysis_target_resolution import AnalysisTargetResolutionEngine
+        from .analysis_target_resolution_bridge import bridge_analysis_target_resolution_report
+
+        enabled = tuple(item for item in registrations if item.enabled)
+        registered_ids = frozenset(item.platform_id for item in registrations)
+        enabled_paths_missing = bool(enabled) and all(not item.path.is_dir() for item in enabled)
+        all_blocked = bool(analyses) and all(item.stage == PlatformStage.BLOCKED for item in analyses)
+        engine = AnalysisTargetResolutionEngine(foundry_root=self.foundry_root)
+        try:
+            report = engine.analyze(
+                now=self.clock(),
+                run_id=run_id,
+                dry_run=dry_run,
+                enabled_registration_count=len(enabled),
+                enabled_paths_missing=enabled_paths_missing,
+                registered_platform_ids=registered_ids,
+                all_platforms_blocked=all_blocked,
+            )
+        except (OSError, ValueError):
+            return []
+        paths = bridge_analysis_target_resolution_report(
+            foundry_root=self.foundry_root,
+            report=report,
+            policy=engine.policy,
+            run_id=run_id,
+            now=self.clock(),
+            dry_run=dry_run,
+        )
+        paths.extend(
+            self._run_cross_platform_learning(
+                resolution_report=report,
+                run_id=run_id,
+                dry_run=dry_run,
+                packet_count=packet_count + len(paths),
+            )
+        )
+        return paths
+
+    def _run_cross_platform_learning(
+        self,
+        *,
+        resolution_report,
+        run_id: str,
+        dry_run: bool,
+        packet_count: int,
+    ) -> list[str]:
+        if not has_capacity(packet_count, self.limits.max_inbox_packets):
+            return []
+        from .cross_platform_learning import CrossPlatformLearningEngine
+        from .cross_platform_learning_bridge import bridge_cross_platform_learning_report
+
+        engine = CrossPlatformLearningEngine(foundry_root=self.foundry_root)
+        try:
+            report = engine.execute(
+                resolution_report=resolution_report,
+                now=self.clock(),
+                dry_run=dry_run,
+            )
+        except (OSError, ValueError):
+            return []
+        return bridge_cross_platform_learning_report(
+            foundry_root=self.foundry_root,
+            report=report,
+            policy=engine.policy,
+            run_id=run_id,
+            now=self.clock(),
+            dry_run=dry_run,
         )
 
     def _run_intent_dna_self_repair(self, *, run_id: str, dry_run: bool) -> list[str]:

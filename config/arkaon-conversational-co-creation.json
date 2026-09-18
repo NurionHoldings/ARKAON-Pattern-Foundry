@@ -1,0 +1,15 @@
+{
+  "schema_version": "apf.conversational-co-creation/v1",
+  "enabled": true,
+  "require_payment_entitlement": true,
+  "minimum_experience_artifacts": 1,
+  "emit_operator_proposal": true,
+  "maximum_copy_angles": 3,
+  "automatic_implement_allowed": false,
+  "production_change_allowed": false,
+  "notes": [
+    "phase-2 prototype: chat intake to template and platform blueprint proposals",
+    "payment entitlement verified via tenant-scoped digest — replace with billing SoT in production",
+    "INSUFFICIENT_EXPERIENCE when landing patterns and cross-platform lessons are absent"
+  ]
+}
