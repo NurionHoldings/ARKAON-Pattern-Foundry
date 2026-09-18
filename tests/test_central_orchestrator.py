@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -12,10 +12,9 @@ from apf.central_orchestrator import (
     OrchestratorError,
     PlatformRegistration,
     RunLock,
-    SharedPolicy,
 )
 
-NOW = datetime(2026, 9, 17, tzinfo=timezone.utc)
+NOW = datetime(2026, 9, 17, tzinfo=UTC)
 FOUNDRY = Path(__file__).resolve().parents[1]
 
 
