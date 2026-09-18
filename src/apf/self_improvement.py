@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import asdict, dataclass, replace
 from datetime import datetime
 from enum import StrEnum
@@ -20,6 +21,8 @@ class ImprovementActor(StrEnum):
     ARKAON = "ARKAON"
     ETERNIAN = "ETERNIAN"
     OWNER = "OWNER"
+    # Retained only for reading legacy records. New verification authority is
+    # split explicitly between ARKAON and ETERNIAN.
     VERIFIER = "VERIFIER"
 
 
@@ -30,7 +33,11 @@ class ImprovementState(StrEnum):
     OWNER_APPROVAL_PENDING = "OWNER_APPROVAL_PENDING"
     OWNER_APPROVED = "OWNER_APPROVED"
     SANDBOX_IMPLEMENTING = "SANDBOX_IMPLEMENTING"
-    VERIFIED = "VERIFIED"
+    ARKAON_VERIFYING = "ARKAON_VERIFYING"
+    ARKAON_VERIFIED = "ARKAON_VERIFIED"
+    ETERNIAN_AUDITING = "ETERNIAN_AUDITING"
+    ETERNIAN_REMEDIATING = "ETERNIAN_REMEDIATING"
+    ETERNIAN_VERIFIED = "ETERNIAN_VERIFIED"
     CHANGE_REPORTED = "CHANGE_REPORTED"
     DEPLOYMENT_APPROVAL_PENDING = "DEPLOYMENT_APPROVAL_PENDING"
     HOLD = "HOLD"
@@ -63,6 +70,9 @@ class SelfImprovementRequest:
     validation_plan: tuple[str, ...]
     source_tier: CapabilityTier
     owner_approval_digest: str | None = None
+    arkaon_verification_digest: str | None = None
+    eternian_audit_digest: str | None = None
+    eternian_remediation_digest: str | None = None
     production_change_allowed: bool = False
     automatic_merge_allowed: bool = False
     deployment_allowed: bool = False
@@ -170,11 +180,31 @@ _ALLOWED_TRANSITIONS: dict[
         ImprovementState.SANDBOX_IMPLEMENTING: ImprovementActor.ARKAON,
     },
     ImprovementState.SANDBOX_IMPLEMENTING: {
-        ImprovementState.VERIFIED: ImprovementActor.VERIFIER,
-        ImprovementState.FAILED: ImprovementActor.VERIFIER,
+        ImprovementState.ARKAON_VERIFYING: ImprovementActor.ARKAON,
+        ImprovementState.FAILED: ImprovementActor.ARKAON,
     },
-    ImprovementState.VERIFIED: {
-        ImprovementState.CHANGE_REPORTED: ImprovementActor.ARKAON,
+    ImprovementState.ARKAON_VERIFYING: {
+        ImprovementState.ARKAON_VERIFIED: ImprovementActor.ARKAON,
+        ImprovementState.FAILED: ImprovementActor.ARKAON,
+    },
+    ImprovementState.ARKAON_VERIFIED: {
+        ImprovementState.ETERNIAN_AUDITING: ImprovementActor.ETERNIAN,
+    },
+    ImprovementState.ETERNIAN_AUDITING: {
+        ImprovementState.ETERNIAN_REMEDIATING: ImprovementActor.ETERNIAN,
+        ImprovementState.ETERNIAN_VERIFIED: ImprovementActor.ETERNIAN,
+        ImprovementState.HOLD: ImprovementActor.ETERNIAN,
+        ImprovementState.BLOCKED: ImprovementActor.ETERNIAN,
+        ImprovementState.FAILED: ImprovementActor.ETERNIAN,
+    },
+    ImprovementState.ETERNIAN_REMEDIATING: {
+        ImprovementState.ETERNIAN_VERIFIED: ImprovementActor.ETERNIAN,
+        ImprovementState.HOLD: ImprovementActor.ETERNIAN,
+        ImprovementState.BLOCKED: ImprovementActor.ETERNIAN,
+        ImprovementState.FAILED: ImprovementActor.ETERNIAN,
+    },
+    ImprovementState.ETERNIAN_VERIFIED: {
+        ImprovementState.CHANGE_REPORTED: ImprovementActor.ETERNIAN,
     },
     ImprovementState.CHANGE_REPORTED: {
         ImprovementState.DEPLOYMENT_APPROVAL_PENDING: ImprovementActor.OWNER,
@@ -192,6 +222,9 @@ def transition_improvement(
     expected_revision: int,
     now: datetime,
     owner_approval_digest: str | None = None,
+    arkaon_verification_digest: str | None = None,
+    eternian_audit_digest: str | None = None,
+    eternian_remediation_digest: str | None = None,
 ) -> SelfImprovementRequest:
     if expected_revision != request.revision:
         raise ImprovementWorkflowError("IMPROVEMENT_REVISION_CONFLICT")
@@ -212,13 +245,53 @@ def transition_improvement(
         and request.owner_approval_digest != request.scope_digest()
     ):
         raise ImprovementWorkflowError("OWNER_APPROVAL_REQUIRED_BEFORE_IMPLEMENTATION")
+    verification = request.arkaon_verification_digest
+    audit = request.eternian_audit_digest
+    remediation = request.eternian_remediation_digest
+    if desired is ImprovementState.ARKAON_VERIFIED:
+        _require_evidence_digest(
+            arkaon_verification_digest,
+            "ARKAON_VERIFICATION_EVIDENCE_REQUIRED",
+        )
+        verification = arkaon_verification_digest
+    if desired is ImprovementState.ETERNIAN_REMEDIATING:
+        if request.owner_approval_digest != request.scope_digest():
+            raise ImprovementWorkflowError("OWNER_APPROVAL_REQUIRED_BEFORE_REMEDIATION")
+        _require_evidence_digest(eternian_audit_digest, "ETERNIAN_AUDIT_EVIDENCE_REQUIRED")
+        audit = eternian_audit_digest
+    if desired is ImprovementState.ETERNIAN_VERIFIED:
+        if request.arkaon_verification_digest is None:
+            raise ImprovementWorkflowError("ARKAON_VERIFICATION_REQUIRED_BEFORE_AUDIT")
+        if request.state is ImprovementState.ETERNIAN_REMEDIATING:
+            _require_evidence_digest(
+                eternian_remediation_digest,
+                "ETERNIAN_REMEDIATION_EVIDENCE_REQUIRED",
+            )
+            remediation = eternian_remediation_digest
+        else:
+            _require_evidence_digest(
+                eternian_audit_digest,
+                "ETERNIAN_AUDIT_EVIDENCE_REQUIRED",
+            )
+            audit = eternian_audit_digest
     return replace(
         request,
         state=desired,
         revision=request.revision + 1,
         updated_at=now,
         owner_approval_digest=approval,
+        arkaon_verification_digest=verification,
+        eternian_audit_digest=audit,
+        eternian_remediation_digest=remediation,
     )
+
+
+_EVIDENCE_DIGEST = re.compile(r"\Asha256:[0-9a-f]{64}\Z")
+
+
+def _require_evidence_digest(value: str | None, code: str) -> None:
+    if not isinstance(value, str) or _EVIDENCE_DIGEST.fullmatch(value) is None:
+        raise ImprovementWorkflowError(code)
 
 
 def post_self_improvement(
