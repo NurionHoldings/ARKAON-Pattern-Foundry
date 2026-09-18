@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from .reflective_learning import ReflectiveLesson, ReflectionRejected
+from .reflective_learning import ReflectionRejected, ReflectiveLesson
 
 
 class ReflectiveLessonStore:
