@@ -69,3 +69,26 @@ def test_invalid_json_is_reported_without_archiving(tmp_path):
     assert plan.invalid == (invalid,)
     assert plan.archive == ()
     assert invalid.is_file()
+
+
+def test_relayed_self_improvement_is_archived_not_delivered(tmp_path):
+    inbox = tmp_path / "inbox"
+    request = inbox / "self-improvement" / "smoke.json"
+    write_packet(request, state="INBOX_POSTED", request_id="smoke-001")
+
+    plan = build_plan(inbox, relayed_request_ids=frozenset({"smoke-001"}))
+
+    assert plan.deliver == ()
+    assert plan.relayed == (request,)
+    assert plan.archive == (request,)
+
+
+def test_plan_keeps_all_pending_while_selecting_batch(tmp_path):
+    inbox = tmp_path / "inbox"
+    for index in range(5):
+        write_packet(inbox / "research" / f"{index}.json", status="PENDING")
+
+    plan = build_plan(inbox, batch_size=2)
+
+    assert len(plan.pending) == 5
+    assert len(plan.deliver) == 2
