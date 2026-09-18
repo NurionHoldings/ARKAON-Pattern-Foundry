@@ -1,0 +1,70 @@
+{
+  "authorization": {
+    "basis": "SELF_DIAGNOSIS_SELF_GENERATION",
+    "mutate_locked_intent_dna": false,
+    "scope": "MISSING_INTENT_DNA_ONLY"
+  },
+  "completeness": 1.0,
+  "contributor": "UNKNOWN",
+  "evidence_refs": [
+    "config/arkaon-mobility-plaza-governance.json",
+    "src/apf/mobility_plaza_governance.py"
+  ],
+  "feature_id": "mobility-plaza-governance",
+  "feature_intent": {
+    "constraint": [
+      "plaza governance audits consent TTL, forbidden labor control, and PII-free notices; occupancy remains a count only; ARKAON advice stays advisory-only"
+    ],
+    "evolution": [
+      "Pass 1 evidence routing",
+      "Pass 3 human lock"
+    ],
+    "invariant": [
+      "locked Intent_DNA mutation 금지",
+      "propose-only inbox 유지"
+    ],
+    "journey": [
+      "기능 추가 → intent 누락 감지 → Pass-0 seed 자가생성 → inbox 검토"
+    ],
+    "object": [
+      "mobility plaza governance"
+    ],
+    "outcome": [
+      "Pass-0 Intent_DNA seed 생성",
+      "에테르니언 검토 후 CORE lock 가능"
+    ],
+    "owner": [
+      "누리온 Foundry 거버넌스",
+      "에테르니언 최종 lock 권한"
+    ],
+    "risk": [
+      "의도 누락 시 학습·승격 경로 단절",
+      "잘못된 seed는 eternian review에서 차단"
+    ],
+    "signal": [
+      "missing_intent_count",
+      "generated_seed_count",
+      "completeness"
+    ],
+    "value": [
+      "mobility-plaza-governance 기능의 의도·경계를 기계 판독 가능하게 고정"
+    ],
+    "who": [
+      "범(운영자)",
+      "에테르니언 검토자",
+      "아르카온 자가진단"
+    ],
+    "why": [
+      "ARKAON 모빌리티 광장 거버넌스 (Pattern Foundry #079): Governance audit for rider mobility plazas: consent, forbidden uses, advisory-only occupancy."
+    ]
+  },
+  "fingerprint": "f1fca65d83522136ddac9232d318edcb5d6564d073f1b62b4fa3348102b2250b",
+  "gates": {
+    "intent_dna_mutation": false,
+    "locked": false,
+    "review_status": "ETERNIAN_REVIEW_REQUIRED"
+  },
+  "pass_stage": 0,
+  "phase": "PASS0_SELF_GENERATED",
+  "schema_version": "apf.feature-intent-seed/v1"
+}

@@ -100,6 +100,7 @@ class PredeploymentReadinessHarness:
             self._check_resource_limits,
             self._check_accumulation_policy,
             self._check_learning_impediment_policy,
+            self._check_intent_dna_self_repair_policy,
             self._check_platforms_registry,
             self._check_admin_change_control,
             self._check_public_surface_policy,
@@ -168,6 +169,15 @@ class PredeploymentReadinessHarness:
 
         LearningImpedimentPolicy.load(self.foundry_root / "config" / "arkaon-learning-impediment.json")
         return "learning impediment policy valid"
+
+    def _check_intent_dna_self_repair_policy(self, registrations: tuple[PlatformRegistration, ...]) -> str:
+        del registrations
+        from .intent_dna_self_repair import IntentDnaSelfRepairPolicy
+
+        IntentDnaSelfRepairPolicy.load(
+            self.foundry_root / "config" / "arkaon-intent-dna-self-repair.json"
+        )
+        return "intent dna self-repair policy valid"
 
     def _check_platforms_registry(self, registrations: tuple[PlatformRegistration, ...]) -> str:
         del registrations

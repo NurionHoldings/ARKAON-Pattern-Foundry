@@ -446,6 +446,7 @@ class CentralOrchestrator:
                 demo_advisory=demo_map_ops_advisory,
             )
             impediment_paths = self._run_learning_impediment(run_id=run_id, dry_run=dry_run)
+            intent_repair_paths = self._run_intent_dna_self_repair(run_id=run_id, dry_run=dry_run)
             enabled_all = tuple(item for item in registrations if item.enabled)
             if self.limits.max_platforms_per_run is None:
                 enabled = enabled_all
@@ -460,6 +461,7 @@ class CentralOrchestrator:
                 + list(investigation_paths)
                 + list(map_ops_paths)
                 + list(impediment_paths)
+                + list(intent_repair_paths)
             )
             if self.limits.sequential_platform_analysis:
                 for registration in enabled:
@@ -816,6 +818,21 @@ class CentralOrchestrator:
                 now=self.clock(),
                 dry_run=dry_run,
             )
+        )
+
+    def _run_intent_dna_self_repair(self, *, run_id: str, dry_run: bool) -> list[str]:
+        from .intent_dna_self_repair import IntentDnaSelfRepairEngine
+        from .intent_dna_self_repair_bridge import bridge_intent_dna_self_repair_report
+
+        engine = IntentDnaSelfRepairEngine(foundry_root=self.foundry_root)
+        report = engine.analyze(now=self.clock(), dry_run=dry_run)
+        return bridge_intent_dna_self_repair_report(
+            foundry_root=self.foundry_root,
+            report=report,
+            policy=engine.policy,
+            run_id=run_id,
+            now=self.clock(),
+            dry_run=dry_run,
         )
 
     def _run_learning_impediment(self, *, run_id: str, dry_run: bool) -> list[str]:
