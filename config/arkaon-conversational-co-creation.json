@@ -9,7 +9,7 @@
   "production_change_allowed": false,
   "notes": [
     "phase-2 prototype: chat intake to template and platform blueprint proposals",
-    "payment entitlement verified via tenant-scoped digest — replace with billing SoT in production",
+    "payment entitlement verified via billing SoT API (docs/67) with digest dev fallback",
     "INSUFFICIENT_EXPERIENCE when landing patterns and cross-platform lessons are absent"
   ]
 }

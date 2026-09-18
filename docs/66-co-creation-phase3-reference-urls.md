@@ -34,12 +34,12 @@
 - `state/co-creation/scaffolds/` — template codegen scaffold (PENDING_REVIEW)
 - automatic deploy **금지**
 
-## Billing (보완 예정)
+## Billing
 
-`config/arkaon-billing-entitlement.json`
+`config/arkaon-billing-entitlement.json` — `docs/67-billing-api-entitlement.md`
 
-- `DIGEST` — 프로토타입 digest
-- `BILLING_API` — billing SoT 연동 (base URL 설정 후)
+- `DIGEST` — dev digest only
+- `BILLING_API` — billing SoT HTTPS verify
 - `DIGEST_THEN_API` — API 우선, digest fallback
 
 ## API 요약

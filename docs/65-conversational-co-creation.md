@@ -20,13 +20,15 @@ CHAT_INTAKE (tenant + principal + payment digest)
   → OPERATOR inbox CONVERSATIONAL_CO_CREATION_PROPOSAL
 ```
 
-## 결제 entitlement (프로토타입)
+## 결제 entitlement
+
+운영: billing SoT API (`docs/67-billing-api-entitlement.md`).
+
+Dev fallback digest:
 
 ```text
 sha256("{tenant_id}|{principal_id}|{platform_id}|paid")
 ```
-
-운영 환경에서는 billing SoT API로 교체한다.
 
 ## experience gate
 
