@@ -1,6 +1,7 @@
 param(
     [string]$FoundryRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path,
-    [int]$WatchSeconds = 15
+    [int]$WatchSeconds = 15,
+    [int]$MailboxBatchSize = 30
 )
 
 $ErrorActionPreference = "Stop"
@@ -25,7 +26,9 @@ $RelayArguments = @(
     "--repository",
     "NurionHoldings/ARKAON-Pattern-Foundry",
     "--watch-seconds",
-    $WatchSeconds
+    $WatchSeconds,
+    "--mailbox-batch-size",
+    $MailboxBatchSize
 )
 & $Python @RelayArguments
 
