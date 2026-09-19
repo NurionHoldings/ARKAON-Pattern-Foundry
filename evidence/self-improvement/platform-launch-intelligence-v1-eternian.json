@@ -15,18 +15,20 @@
     "Cosmetic-only changes are insufficient; two distinction categories and at least one workflow, accessibility, or domain-function improvement are required.",
     "Ambiguous functional-distinction wording was remediated with category-specific pass/fail examples, evidence requirements, and a minimum owner-approval work order.",
     "Repository-wide qualitative instruction self-diagnosis found five items; three were remediated, one was already measurable, and comprehension proof was held for separate approval scope.",
+    "User responsibility notice was narrowed so it cannot legalize unauthorized use or transfer all platform responsibility; direct reuse still requires rights evidence.",
     "The implementation imports the existing PlatformBrief contract instead of bypassing the visual understanding flow.",
     "The usability asset remains INDEPENDENT_IMPLEMENTATION until benchmark and owner approval."
   ],
   "post_remediation_checks": [
     "Focused launch and visual-dialogue tests: 23 PASS",
-    "Full repository regression: 657 PASS / 5 SKIP",
+    "Full repository regression: 665 PASS / 5 SKIP",
     "Changed Python files: ruff GREEN"
   ],
   "remaining_risks": [
     "Real novice usability has not yet been measured; do not advertise the flow as fastest before the benchmark passes.",
     "Official vendor pages can change; refresh and re-review the evidence ledger before a material pattern revision.",
     "Rights review reduces but cannot eliminate intellectual-property uncertainty; ambiguous cases remain HOLD.",
+    "User consent is evidence of request and understanding, not a legal determination; concrete disputes require professional legal review.",
     "This PR exposes a domain bridge, not an automatically deployed public platform service."
   ],
   "automatic_merge_allowed": false,

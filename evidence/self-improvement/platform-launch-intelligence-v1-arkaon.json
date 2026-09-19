@@ -18,10 +18,12 @@
     ,"src/apf/continuous_collection.py": "82b1c57682975ffe80b83e326e161673a65f8ce20c5788456aebe8d92e31313e"
     ,"tests/test_continuous_collection.py": "6599984ec782ff85913d880e6145da4d5d68fd23ed06e9f399b9fdf178e49b4e"
     ,"config/collector.default.json": "acd50710613698996ab7c532403113da3c59c301f24e39cfaeaa7d54c19b6366"
+    ,"src/apf/reference_material_consent.py": "6fb996cacc1d8884e296ac79d53546eef474a6d4ece53d1a8e7340fe3b8a0097"
+    ,"tests/test_reference_material_consent.py": "6aa9956f9a9a7cf9f33789d79ac51770c7f2298d8649901d74593ade56c0df7f"
   },
   "checks": [
     "Focused launch and visual-dialogue tests after distinctive-asset controls: 23 PASS",
-    "Full repository regression after abstract-instruction remediation: 657 PASS / 5 SKIP",
+    "Full repository regression after reference-material consent controls: 665 PASS / 5 SKIP",
     "Changed Python files: ruff GREEN"
   ],
   "automatic_merge_allowed": false,
