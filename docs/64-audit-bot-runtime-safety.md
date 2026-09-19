@@ -36,6 +36,21 @@ commit SHA와 보호 파일 해시를 사용자가 승인한 뒤
 `state/audit-bot-deployment-baseline.json`으로 저장해야 한다. 기준선 자체도 SHA-256으로
 봉인되며 승인 없이 자동 갱신되지 않는다.
 
+Windows에서는 다음 관리 명령만 사용한다.
+
+```powershell
+.\orchestrator\manage-audit-baseline.ps1 candidate -CommitSha <main SHA>
+.\orchestrator\manage-audit-baseline.ps1 activate -ApprovalReceiptPath <receipt.json>
+.\orchestrator\manage-audit-baseline.ps1 verify
+```
+
+후보 생성은 현재 `HEAD`와 지정 SHA가 다르면 차단된다. 활성화는 후보 digest에 결속된
+`apf.deployment-approval-receipt/1.0`만 허용하며 기존 기준선 파일을 덮어쓰지 않는다.
+모든 저장은 exclusive-create, flush, fsync를 거친다. PC 반영 전에는
+`audit-bot-preflight.ps1`, 반영 직후에는 명시적 `ExpectedCommit`을 전달한
+`audit-bot-smoke.ps1`을 실행한다. smoke는 활성 기준선이 없거나 내부감사가 PASS가
+아니면 예약 작업을 시작하지 않는다.
+
 ## 운영 안전 경계
 
 - 자동 병합·자동 배포 없음
