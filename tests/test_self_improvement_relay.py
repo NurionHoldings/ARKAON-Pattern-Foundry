@@ -126,6 +126,9 @@ def test_relay_cycle_delivers_then_archives_transport_packet(tmp_path) -> None:
 
     assert len(cycle.delivered) == 1
     assert cycle.blocked == ()
+    assert cycle.approvals is None
+    assert cycle.audits is None
+    assert cycle.internal_audit is None
     assert cycle.mailbox["counts"]["relayed"] == 1
     assert cycle.mailbox["counts"]["archived"] == 1
     assert not path.exists()
@@ -159,3 +162,27 @@ def test_corrupt_packet_does_not_block_later_valid_request(tmp_path) -> None:
     )
     assert evidence["state"] == "BLOCKED"
     assert evidence["evidence_digest"] == blocked[0].evidence_digest
+
+
+def test_audit_runtime_failure_does_not_stop_mailbox_cycle(tmp_path, monkeypatch) -> None:
+    now = datetime(2026, 9, 18, tzinfo=UTC)
+    post_self_improvement(request(now), inbox_root=tmp_path / "inbox", now=now)
+
+    def blocked(**kwargs):
+        from apf.arkaon_audit_bot import AuditBotError
+
+        raise AuditBotError("POLICY_INVALID")
+
+    monkeypatch.setattr("apf.self_improvement_relay.process_audit_queue", blocked)
+    monkeypatch.setattr("apf.self_improvement_relay.run_internal_integrity_audit", blocked)
+    cycle = relay_cycle(
+        foundry_root=tmp_path,
+        publisher=FakePublisher(),
+        audit_repository_root=tmp_path,
+        audit_policy_path=tmp_path / "missing-policy.json",
+        deployment_baseline_path=tmp_path / "missing-baseline.json",
+    )
+
+    assert len(cycle.delivered) == 1
+    assert cycle.audits.blocked == ("RUNTIME:POLICY_INVALID",)
+    assert cycle.internal_audit.decision.value == "BLOCKED"

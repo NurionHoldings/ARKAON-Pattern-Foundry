@@ -1,0 +1,23 @@
+{
+  "schema_version": "apf.self-improvement-result/1.0",
+  "request_id": "arkaon-audit-bot-v1-001",
+  "scope_digest": "b6faa3133c7b8f7bee4ff08d58b198c32ebbca6b1df416b8bb074b7c440ede35",
+  "state": "DEPLOYMENT_APPROVAL_PENDING",
+  "approval_receipt_file_digest": "sha256:c3975441e0bf8ab75c05d3a93e19f7b1b54bd461fe3ac9459b6734d7ed3cfe69",
+  "implementation_candidate_sha": "3db0a553accac40ddc38c8c28e7422d7ac8aaaa1",
+  "before": "Mailbox learning reports had no deterministic report-to-diff, protected-control, resource-bound, portable-path, or evidence gate and no governed feedback loop for improving the auditor.",
+  "after": "ARKAON Audit Bot emits sealed PASS/HOLD/BLOCKED manifests, blocks owner-scope escapes, and turns dual-role hash-bound learning feedback into propose-only upgrade requests.",
+  "arkaon_verification_digest": "sha256:d942b6eb30a7157334ac73fc2cba33408dd65f33bd82edc74aff47dd97431f65",
+  "eternian_audit_and_remediation_digest": "sha256:4a3230f8fbb2c2e37ef0656d81a3ba6b170507292b3e99127fc6c50bcfdde3e7",
+  "self_audit_evidence_digest": "sha256:e055474466cfb5e7bab175eab35e559dd8310b66bfc757e14bb6a4ee5ee7bc0f",
+  "regression": "603 PASS / 5 SKIP; Ruff PASS",
+  "remaining_risks": [
+    "Novel unsafe patterns remain dependent on governed rule upgrades.",
+    "Receipt identity authentication relies on the surrounding approval channel.",
+    "Windows scheduled relay integration remains untested in this Linux sandbox."
+  ],
+  "rollback": "Revert the two Audit Bot feature commits. Preserve audit manifests and the append-only learning ledger for forensic review; do not delete evidence receipts.",
+  "production_change_allowed": false,
+  "automatic_merge_allowed": false,
+  "deployment_allowed": false
+}
