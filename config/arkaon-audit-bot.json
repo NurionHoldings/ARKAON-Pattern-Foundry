@@ -1,0 +1,30 @@
+{
+  "schema_version": "apf.arkaon-audit-policy/1.0",
+  "protected_paths": [
+    "src/apf/self_improvement_execution.py",
+    "src/apf/self_improvement_relay.py",
+    "tests/test_self_improvement_execution.py",
+    "tests/test_self_improvement_relay.py",
+    ".github/workflows/ci.yml"
+  ],
+  "bounded_keys": [
+    "max_platforms_per_run",
+    "max_files_per_platform",
+    "max_inbox_packets_per_run",
+    "max_runtime_seconds",
+    "max_memory_mb",
+    "parallel_workers",
+    "failure_family_limit",
+    "recall_limit"
+  ],
+  "portable_path_keys": [
+    "foundry_root",
+    "repository_root",
+    "worktree_root"
+  ],
+  "intent_sensitive_prefixes": [
+    "src/apf/",
+    "config/",
+    "knowledge/feature-intents/"
+  ]
+}

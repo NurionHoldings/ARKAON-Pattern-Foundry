@@ -1,0 +1,30 @@
+{
+  "schema_version": "apf.self-improvement-request/1.0",
+  "request_id": "arkaon-audit-bot-v1-001",
+  "state": "OWNER_APPROVED",
+  "revision": 2,
+  "intent_dna": "Detect control regressions without granting the auditor authority to approve, merge, deploy, or directly rewrite its own policy.",
+  "capability_gap": "Mailbox learning reports can disagree with actual diffs, remove established controls, introduce unsafe defaults, or omit evidence without a deterministic local audit gate.",
+  "evidence_refs": [
+    "sha256:4eb65fbec71dca9b54b2d4c26362525cfe617954"
+  ],
+  "proposed_change": "Add a read-only ARKAON Audit Bot that binds reports to owner-approved scope, emits sealed PASS/HOLD/BLOCKED manifests, and learns from hash-chained dual-role feedback by generating propose-only upgrade requests.",
+  "expected_benefit": "Control regressions and report-to-diff mismatches are detected before merge, while repeated verified misses and false positives can produce governed improvement proposals.",
+  "risks": [
+    "Static rules can produce false positives or miss a new unsafe pattern.",
+    "Learning feedback could be forged or dominated by one actor.",
+    "A PASS could be misread as merge or deployment approval."
+  ],
+  "validation_plan": [
+    "Prove protected-control deletion and unbounded resources are BLOCKED.",
+    "Prove report/diff mismatch, machine-specific paths, and missing evidence cause HOLD.",
+    "Prove owner scope digest mismatch and out-of-scope changes are BLOCKED.",
+    "Prove the learning ledger detects tampering and requires ARKAON plus ETERNIAN receipts.",
+    "Run full regression and Ruff checks."
+  ],
+  "source_tier": "OWNER_APPROVED",
+  "scope_digest": "b6faa3133c7b8f7bee4ff08d58b198c32ebbca6b1df416b8bb074b7c440ede35",
+  "production_change_allowed": false,
+  "automatic_merge_allowed": false,
+  "deployment_allowed": false
+}
