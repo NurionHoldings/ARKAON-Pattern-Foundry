@@ -1,0 +1,38 @@
+{
+  "schema_version": "apf.arkaon-self-analysis/1.0",
+  "request_id": "purpose-payment-flow-v1",
+  "state": "ARKAON_ANALYZED",
+  "identified_blockers": [
+    "forged payment event",
+    "duplicate or conflicting webhook",
+    "amount or currency mismatch",
+    "stale checkout after retry",
+    "payment used to expand approved scope",
+    "payment success followed by local persistence failure",
+    "implementation continuing after reversal",
+    "ARKAON substituting for ETERNIAN audit"
+  ],
+  "implemented_controls": [
+    "injected trusted payment verifier boundary",
+    "idempotent event digest and conflicting-ID rejection",
+    "checkout amount, currency and digest binding",
+    "latest checkout requirement",
+    "owner approval and scope digest required before checkout",
+    "replayable payment event with atomic local state replacement",
+    "reversal transitions to evidence-preserving HOLD",
+    "role-specific implementation and audit transitions"
+  ],
+  "sha256": {
+    "src/apf/purpose_purchase_flow.py": "3e5ca8c20b55ce898d27d3c9d132d63e02a421deeb071de8d7248d402751230c",
+    "tests/test_purpose_purchase_flow.py": "13165c0dd401f5f36ccb56c7bef93a20466c7ff50d1e401c386ad18a5d957acb",
+    "docs/69-purpose-payment-implementation-flow.md": "59565a121c7d1b9bb54fe00f59edf0a887de5b9d48a3ea75f85a0795f4335121"
+  },
+  "verification": [
+    "Purpose-payment focused tests: 11 PASS",
+    "Full repository regression: 678 PASS / 5 SKIP",
+    "Changed Python files: ruff GREEN"
+  ],
+  "real_payment_enabled": false,
+  "automatic_merge_allowed": false,
+  "deployment_allowed": false
+}

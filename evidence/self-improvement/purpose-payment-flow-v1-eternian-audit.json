@@ -1,0 +1,24 @@
+{
+  "schema_version": "apf.eternian-audit-evidence/1.0",
+  "request_id": "purpose-payment-flow-v1",
+  "state": "ETERNIAN_REMEDIATED",
+  "independent_findings_and_remediation": [
+    "Allowed paths accepted traversal-like values; repository-relative path validation was added.",
+    "Concurrent webhook writers could both replace state; an exclusive per-order lock now surrounds compare-and-replace.",
+    "A reversal could name an unrelated provider payment; reversal now must target the verified success payment ID.",
+    "Checkout had no expiry; a digest-bound 15-minute expiry and event-time validation were added."
+  ],
+  "remaining_boundaries": [
+    "Only sandbox payment events are supported.",
+    "A real PG adapter, real credentials, capture, refund, and settlement require separate owner approval.",
+    "Deployment remains stopped at DEPLOYMENT_APPROVAL_PENDING."
+  ],
+  "post_remediation_checks": [
+    "End-to-end state flow reaches DEPLOYMENT_APPROVAL_PENDING and stops.",
+    "Purpose-payment focused tests: 11 PASS",
+    "Full repository regression: 678 PASS / 5 SKIP",
+    "Changed Python files: ruff GREEN"
+  ],
+  "automatic_merge_allowed": false,
+  "deployment_allowed": false
+}
