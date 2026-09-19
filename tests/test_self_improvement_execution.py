@@ -49,7 +49,7 @@ def test_receipt_is_bound_and_recorded_idempotently(tmp_path):
     )
 
     assert first == second == receipt.digest()
-    assert len(json.loads(ledger.read_text())["entries"]) == 1
+    assert len(json.loads(ledger.read_text(encoding="utf-8"))["entries"]) == 1
 
 
 def test_approval_ledger_rejects_concurrent_writer(tmp_path):
