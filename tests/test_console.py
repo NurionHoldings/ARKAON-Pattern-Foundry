@@ -7,6 +7,10 @@ from apf.api import create_app
 from apf.console import SESSION_COOKIE, ConsoleSecurity
 from apf.domain import AnalysisTargetCreate
 from apf.plain_language_approval import PlainLanguageApprovalStore
+from apf.reference_material_consent import (
+    REQUIRED_ACKNOWLEDGEMENTS,
+    ReferenceConsentStore,
+)
 from apf.repository import MemoryRepository
 from apf.visual_platform_dialogue import VisualPlatformDialogueStore
 
@@ -41,6 +45,73 @@ def target_payload(tenant_id, name="MJN"):
             "source_evidence_ids": [str(uuid4())],
         }
     )
+
+
+def test_reference_material_notice_checkboxes_and_receipt_are_owner_bound(tmp_path):
+    tenant_id, owner_id = uuid4(), uuid4()
+    app = create_app(
+        repository=MemoryRepository(),
+        console_security=ConsoleSecurity(
+            environment="test", secret="s" * 32, allow_dev_sessions=True
+        ),
+        reference_consent_store=ReferenceConsentStore(tmp_path),
+    )
+    client = TestClient(app, base_url="https://testserver")
+    session = client.post(
+        "/console/dev/session",
+        json={"tenant_id": str(tenant_id), "principal_id": str(owner_id), "role": "owner"},
+    )
+    csrf = session.json()["csrf_token"]
+    page = client.get("/reference-material-consent")
+    assert page.status_code == 200
+    assert "참고자료 사용 확인" in page.text
+    notice = client.get("/v1/console/reference-material-notice")
+    assert notice.status_code == 200
+    assert set(notice.json()["required_acknowledgements"]) == REQUIRED_ACKNOWLEDGEMENTS
+    payload = {
+        "request": {
+            "request_id": "reference-ui-001",
+            "source_id": "official-page",
+            "source_locator": "https://example.org/product",
+            "intended_use": "기능 원리만 참고하여 독립적인 이용 흐름을 구현한다.",
+            "mode": "CLEAN_ROOM_IMPLEMENTATION",
+            "rights_basis": "UNKNOWN",
+            "rights_evidence_digest": None,
+            "requested_paths": ["src/apf/example.py"],
+            "scope_digest": "sha256:" + "a" * 64,
+        },
+        "acknowledged_items": sorted(REQUIRED_ACKNOWLEDGEMENTS),
+        "nonce": str(uuid4()),
+    }
+    assert client.post(
+        "/v1/console/reference-material-consents", json=payload
+    ).status_code == 403
+    recorded = client.post(
+        "/v1/console/reference-material-consents",
+        headers={"X-CSRF-Token": csrf},
+        json=payload,
+    )
+    assert recorded.status_code == 201
+    assert recorded.json()["decision"]["decision"] == "SANDBOX_IMPLEMENTATION_ALLOWED"
+    assert recorded.json()["decision"]["merge_allowed"] is False
+    assert recorded.json()["decision"]["deployment_allowed"] is False
+
+
+def test_reference_material_ui_is_owner_only(tmp_path):
+    app = create_app(
+        repository=MemoryRepository(),
+        console_security=ConsoleSecurity(
+            environment="test", secret="s" * 32, allow_dev_sessions=True
+        ),
+        reference_consent_store=ReferenceConsentStore(tmp_path),
+    )
+    client = TestClient(app, base_url="https://testserver")
+    client.post(
+        "/console/dev/session",
+        json={"tenant_id": str(uuid4()), "principal_id": str(uuid4()), "role": "operator"},
+    )
+    assert client.get("/reference-material-consent").status_code == 403
+    assert client.get("/v1/console/reference-material-notice").status_code == 403
 
 
 def test_console_requires_session_and_has_security_headers():

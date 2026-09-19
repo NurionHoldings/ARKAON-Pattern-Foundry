@@ -30,3 +30,13 @@
 
 저작권법상 저작자에게 복제권과 공중송신권 등이 있으므로 책임 고지만으로 이용허락을
 대체하지 않는다. 구체적인 분쟁 가능성이 있는 경우 법률전문가의 검토 대상으로 `HOLD`한다.
+
+## 실제 승인 화면
+
+- 소유자 화면: `/reference-material-consent`
+- 고지 조회: `GET /v1/console/reference-material-notice`
+- receipt 기록: `POST /v1/console/reference-material-consents`
+
+다섯 항목을 모두 선택하기 전에는 제출 버튼이 비활성화된다. 서버는 owner 세션, CSRF,
+정확한 확인 항목 집합, 요청 digest를 다시 검증하므로 클라이언트 화면만 조작해서 우회할 수
+없다. 성공 화면에는 판정·사유·receipt digest와 병합·배포 미승인을 함께 표시한다.

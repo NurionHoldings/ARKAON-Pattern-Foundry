@@ -16,12 +16,13 @@
     "Ambiguous functional-distinction wording was remediated with category-specific pass/fail examples, evidence requirements, and a minimum owner-approval work order.",
     "Repository-wide qualitative instruction self-diagnosis found five items; three were remediated, one was already measurable, and comprehension proof was held for separate approval scope.",
     "User responsibility notice was narrowed so it cannot legalize unauthorized use or transfer all platform responsibility; direct reuse still requires rights evidence.",
+    "The owner-only consent UI was connected to server-side notice, exact checkbox-set validation, CSRF, durable receipt, and non-deployment boundaries.",
     "The implementation imports the existing PlatformBrief contract instead of bypassing the visual understanding flow.",
     "The usability asset remains INDEPENDENT_IMPLEMENTATION until benchmark and owner approval."
   ],
   "post_remediation_checks": [
     "Focused launch and visual-dialogue tests: 23 PASS",
-    "Full repository regression: 665 PASS / 5 SKIP",
+    "Full repository regression: 667 PASS / 5 SKIP",
     "Changed Python files: ruff GREEN"
   ],
   "remaining_risks": [

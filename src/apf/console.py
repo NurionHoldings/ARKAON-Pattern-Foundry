@@ -7,7 +7,7 @@ import secrets
 import sqlite3
 import time
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Annotated, Literal, Protocol
 from uuid import UUID
@@ -26,6 +26,18 @@ from .plain_language_approval import (
     ApprovalDecision,
     PlainApprovalError,
     PlainLanguageApprovalStore,
+)
+from .reference_material_consent import (
+    NOTICE_TEXT,
+    NOTICE_VERSION,
+    REQUIRED_ACKNOWLEDGEMENTS,
+    ReferenceConsentError,
+    ReferenceConsentStore,
+    ReferenceUseConsent,
+    ReferenceUseRequest,
+)
+from .reference_material_consent import (
+    digest as reference_digest,
 )
 from .repository import TargetRepository
 from .visual_platform_dialogue import (
@@ -74,6 +86,12 @@ class ReviewSubmission(BaseModel):
         for key in ("task_id", "job_id", "tenant_id", "principal_id", "nonce"):
             values[key] = str(values[key])
         return ReviewAttestation(**values)
+
+
+class ReferenceConsentSubmission(BaseModel):
+    request: ReferenceUseRequest
+    acknowledged_items: set[str]
+    nonce: UUID
 
 
 class ConsoleReviewStore(Protocol):
@@ -143,11 +161,13 @@ def install_console(
     application, *, security: ConsoleSecurity, review_store: ConsoleReviewStore | None = None,
     approval_store: PlainLanguageApprovalStore | None = None,
     visual_dialogue_store: VisualPlatformDialogueStore | None = None,
+    reference_consent_store: ReferenceConsentStore | None = None,
 ) -> None:
     application.state.console_security = security
     application.state.console_review_store = review_store
     application.state.plain_approval_store = approval_store
     application.state.visual_dialogue_store = visual_dialogue_store
+    application.state.reference_consent_store = reference_consent_store
 
     def principal(
         request: Request,
@@ -184,6 +204,12 @@ def install_console(
         store = request.app.state.visual_dialogue_store
         if store is None:
             raise HTTPException(status_code=503, detail="visual dialogue store unavailable")
+        return store
+
+    def reference_consents(request: Request) -> ReferenceConsentStore:
+        store = request.app.state.reference_consent_store
+        if store is None:
+            raise HTTPException(status_code=503, detail="reference consent store unavailable")
         return store
 
     def store_error(error: Exception) -> HTTPException:
@@ -246,6 +272,69 @@ def install_console(
                 "X-Content-Type-Options": "nosniff",
             },
         )
+
+    @application.get(
+        "/reference-material-consent", response_class=HTMLResponse, include_in_schema=False
+    )
+    def reference_material_consent_home(
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+    ) -> HTMLResponse:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        html_path = Path(__file__).with_name("reference_material_consent_ui.html")
+        return HTMLResponse(
+            html_path.read_text(encoding="utf-8"),
+            headers={
+                "Cache-Control": "no-store",
+                "Content-Security-Policy": (
+                    "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; "
+                    "connect-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'"
+                ),
+                "Referrer-Policy": "no-referrer",
+                "X-Content-Type-Options": "nosniff",
+            },
+        )
+
+    @application.get("/v1/console/reference-material-notice")
+    def reference_material_notice(
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+    ) -> dict[str, object]:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        return {
+            "notice_version": NOTICE_VERSION,
+            "notice_text": NOTICE_TEXT,
+            "notice_digest": reference_digest(NOTICE_TEXT),
+            "required_acknowledgements": sorted(REQUIRED_ACKNOWLEDGEMENTS),
+            "automatic_merge_allowed": False,
+            "deployment_allowed": False,
+        }
+
+    @application.post(
+        "/v1/console/reference-material-consents", status_code=status.HTTP_201_CREATED
+    )
+    def record_reference_material_consent(
+        payload: ReferenceConsentSubmission,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[ReferenceConsentStore, Depends(reference_consents)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        consent = ReferenceUseConsent(
+            request_digest=reference_digest(payload.request.model_dump(mode="json")),
+            notice_version=NOTICE_VERSION,
+            acknowledged_items=payload.acknowledged_items,
+            principal_id=actor.principal_id,
+            nonce=payload.nonce,
+            confirmed_at=datetime.now(UTC),
+        )
+        try:
+            return store.record(payload.request, consent)
+        except ReferenceConsentError as error:
+            code = 409 if str(error) == "REFERENCE_CONSENT_ALREADY_RECORDED" else 422
+            raise HTTPException(status_code=code, detail=str(error)) from None
 
     @application.get("/v1/console/summary")
     def summary(

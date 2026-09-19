@@ -15,6 +15,7 @@ from .console import (
 )
 from .domain import AnalysisTarget, AnalysisTargetCreate, TargetState
 from .plain_language_approval import PlainLanguageApprovalStore
+from .reference_material_consent import ReferenceConsentStore
 from .repository import (
     DuplicateTarget,
     MemoryRepository,
@@ -57,6 +58,7 @@ def create_app(
     console_review_store: ConsoleReviewStore | None = None,
     plain_approval_store: PlainLanguageApprovalStore | None = None,
     visual_dialogue_store: VisualPlatformDialogueStore | None = None,
+    reference_consent_store: ReferenceConsentStore | None = None,
 ) -> FastAPI:
     application = FastAPI(title="ARKAON Pattern Foundry", version="0.1.0")
     application.state.repository = repository or repository_from_config()
@@ -67,6 +69,9 @@ def create_app(
             Path(os.getenv("APF_FOUNDRY_ROOT", Path(__file__).parents[2]))
         ),
         visual_dialogue_store=visual_dialogue_store or VisualPlatformDialogueStore(
+            Path(os.getenv("APF_FOUNDRY_ROOT", Path(__file__).parents[2]))
+        ),
+        reference_consent_store=reference_consent_store or ReferenceConsentStore(
             Path(os.getenv("APF_FOUNDRY_ROOT", Path(__file__).parents[2]))
         ),
     )
