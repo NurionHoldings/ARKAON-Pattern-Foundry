@@ -11,12 +11,13 @@
   ],
   "sha256": {
     "src/apf/platform_launch_intelligence.py": "0a6aed710be76d6badc0dcc6e051eb28fb1e60e3934d00844e5e1398148f8e21",
-    "tests/test_platform_launch_intelligence.py": "f1908fc5dd7490b2a9cb87ba9831ca8a9fa32e8e6818720fd41fb1266ca7fdc3",
+    "tests/test_platform_launch_intelligence.py": "0f84a61a9bc755efd15fab256f1994f8972650032a2b2f322a84a9fac43d3c6c",
     "knowledge/platform-launch/official-flow-observations-v1.json": "e40f4505daa93004fffe8d3f79245e698c8728386edb40c433cb1230ffff5f1c",
-    "knowledge/platform-launch/arkaon-fast-launch-flow-v1.json": "ffbcba0ec23e3c38c71c029d5179fe73d635986b2abbcec253cc9cf7c5c09f86"
+    "knowledge/platform-launch/arkaon-fast-launch-flow-v1.json": "ffbcba0ec23e3c38c71c029d5179fe73d635986b2abbcec253cc9cf7c5c09f86",
+    "knowledge/platform-launch/distinctive-asset-guidelines-v1.json": "c23337d673849c127fd56860e6a05dd0929278b9d21ea41e6d4a40b1edcb87a2"
   },
   "checks": [
-    "Focused launch and visual-dialogue tests after distinctive-asset controls: 22 PASS",
+    "Focused launch and visual-dialogue tests after distinctive-asset controls: 23 PASS",
     "Full repository regression after exception controls: 649 PASS / 5 SKIP",
     "Changed Python files: ruff GREEN"
   ],

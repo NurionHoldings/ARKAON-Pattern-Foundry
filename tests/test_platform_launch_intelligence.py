@@ -163,3 +163,28 @@ def test_asset_does_not_claim_unproven_fastest_and_has_usability_gate():
     assert asset["usability_benchmark"]["promotion_gate"][
         "critical_misunderstanding_count_maximum"
     ] == 0
+
+
+def test_distinctive_asset_guide_gives_arkaon_deterministic_examples_and_evidence():
+    guide = json.loads(
+        (ROOT / "knowledge/platform-launch/distinctive-asset-guidelines-v1.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert set(guide["categories"]) == {"workflow", "accessibility", "domain_function"}
+    for category in guide["categories"].values():
+        assert len(category["minimum_evidence"]) >= 3
+        assert len(category["pass_examples"]) >= 3
+        assert len(category["fail_examples"]) >= 2
+    assert any(
+        "motion-reduced equivalent" in item
+        for item in guide["categories"]["accessibility"]["minimum_evidence"]
+    )
+    assert guide["arkaon_submission_template"]["rights_review"] == "HOLD"
+    assert guide["arkaon_submission_template"]["similarity_review"] == "HOLD"
+    assert guide["arkaon_submission_template"]["owner_approval_digest"] is None
+    work_order = guide["minimum_owner_approval_work_order"]
+    assert len(work_order["required_deliverables"]) >= 10
+    assert "HOLD" in work_order["decision_rule"]
+    assert "자동 승인하지 않고" in work_order["decision_rule"]
+    assert "승인되는 정확한 경로와 scope digest" in work_order["approval_request_must_show"]
