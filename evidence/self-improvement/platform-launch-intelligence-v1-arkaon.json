@@ -1,0 +1,25 @@
+{
+  "schema_version": "apf.arkaon-verification-evidence/1.0",
+  "request_id": "platform-launch-intelligence-v1",
+  "state": "ARKAON_VERIFIED",
+  "implementation_scope": [
+    "official-source flow observation ledger",
+    "multi-provider clean-room pattern abstraction",
+    "minimum adaptive plain-language questions",
+    "PlatformBrief bridge to visual platform dialogue",
+    "separate specification, sandbox implementation, and deployment gates"
+  ],
+  "sha256": {
+    "src/apf/platform_launch_intelligence.py": "b713705c77907afc1f0e27abc02cf5f4d5295f3927b2525abce3513974eeb87e",
+    "tests/test_platform_launch_intelligence.py": "ce47634e44620ddd238416842b1be25dcfc402808e06e42b0565f039e6b283a1",
+    "knowledge/platform-launch/official-flow-observations-v1.json": "e40f4505daa93004fffe8d3f79245e698c8728386edb40c433cb1230ffff5f1c",
+    "knowledge/platform-launch/arkaon-fast-launch-flow-v1.json": "78d9da0cd74c811b2806400e29ee90764d397c00ab4fe3a374b31af2b53ad9bc"
+  },
+  "checks": [
+    "Focused launch and visual-dialogue tests: 13 PASS",
+    "Full repository regression before audit remediation: 639 PASS / 5 SKIP",
+    "Changed Python files: ruff GREEN"
+  ],
+  "automatic_merge_allowed": false,
+  "deployment_allowed": false
+}

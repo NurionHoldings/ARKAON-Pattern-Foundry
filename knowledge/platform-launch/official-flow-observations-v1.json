@@ -1,0 +1,50 @@
+{
+  "schema_version": "apf.official-flow-observations/1.0",
+  "research_boundary": "Public official product pages only; factual flow summaries, no code, visual design, or marketing copy retained.",
+  "observations": [
+    {
+      "source_id": "wix-ai-builder-20260919",
+      "provider": "Wix",
+      "official_url": "https://www.wix.com/ai-website-builder",
+      "retrieved_at": "2026-09-19T00:00:00Z",
+      "observed_steps": ["describe intent", "generate site", "conversational or manual refinement", "publish"],
+      "generic_capabilities": ["prompt_to_draft", "editable_preview", "iterative_refinement", "responsive_output", "publish_gate"],
+      "copied_code": false,
+      "copied_visual_design": false,
+      "copied_marketing_copy": false
+    },
+    {
+      "source_id": "webflow-ai-builder-20260919",
+      "provider": "Webflow",
+      "official_url": "https://webflow.com/ai-site-builder",
+      "retrieved_at": "2026-09-19T00:00:00Z",
+      "observed_steps": ["describe product and audience", "generate site and design system", "reorder structure", "customize theme"],
+      "generic_capabilities": ["prompt_to_draft", "editable_preview", "iterative_refinement", "structured_design_system"],
+      "copied_code": false,
+      "copied_visual_design": false,
+      "copied_marketing_copy": false
+    },
+    {
+      "source_id": "framer-ai-20260919",
+      "provider": "Framer",
+      "official_url": "https://www.framer.com/ai/",
+      "retrieved_at": "2026-09-19T00:00:00Z",
+      "observed_steps": ["describe page", "generate editable result", "refine by conversation or canvas", "adjust responsive details"],
+      "generic_capabilities": ["prompt_to_draft", "editable_preview", "iterative_refinement", "responsive_output"],
+      "copied_code": false,
+      "copied_visual_design": false,
+      "copied_marketing_copy": false
+    },
+    {
+      "source_id": "bubble-mobile-ai-20260919",
+      "provider": "Bubble",
+      "official_url": "https://bubble.io/mobile",
+      "retrieved_at": "2026-09-19T00:00:00Z",
+      "observed_steps": ["describe app", "generate interface and data foundation", "connect logic", "preview on device", "publish"],
+      "generic_capabilities": ["prompt_to_draft", "editable_preview", "workflow_wiring", "data_model_generation", "publish_gate"],
+      "copied_code": false,
+      "copied_visual_design": false,
+      "copied_marketing_copy": false
+    }
+  ]
+}

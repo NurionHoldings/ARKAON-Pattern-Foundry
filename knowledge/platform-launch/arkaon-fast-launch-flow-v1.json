@@ -1,0 +1,35 @@
+{
+  "schema_version": "apf.platform-launch-flow/1.0",
+  "asset_id": "arkaon-fast-launch-flow-v1",
+  "status": "INDEPENDENT_IMPLEMENTATION",
+  "claim_boundary": "Designed for low interaction cost; not proven fastest until the usability benchmark passes.",
+  "design_rule": "Ask only questions that change the platform structure or its risk controls.",
+  "stages": [
+    "ONE_SENTENCE_INTENT",
+    "MINIMUM_ADAPTIVE_QUESTIONS",
+    "GENERATE_VISUAL_OPTIONS",
+    "CONVERSATIONAL_REFINEMENT",
+    "INTERACTIVE_PREVIEW",
+    "OWNER_UNDERSTANDING_CONFIRMATION",
+    "SPEC_APPROVAL",
+    "SANDBOX_IMPLEMENTATION_APPROVAL",
+    "DEPLOYMENT_APPROVAL"
+  ],
+  "controls": {
+    "personal_data": "ask collection and retention details only when applicable",
+    "permissions": "ask role boundaries only when applicable",
+    "payment": "sandbox only until separate financial approval",
+    "implementation": "disabled until explicit approval",
+    "deployment": "always requires separate approval"
+  },
+  "usability_benchmark": {
+    "minimum_participants": 5,
+    "tasks": ["describe an idea", "select a visual direction", "correct one mistake", "confirm the specification"],
+    "measurements": ["completion_seconds", "abandonment", "clarification_turns", "critical_misunderstanding"],
+    "promotion_gate": {
+      "task_completion_rate_minimum": 0.8,
+      "critical_misunderstanding_count_maximum": 0,
+      "median_clarification_turns_maximum": 3
+    }
+  }
+}
