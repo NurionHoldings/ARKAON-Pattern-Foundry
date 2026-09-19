@@ -1,0 +1,67 @@
+{
+  "schema_version": "apf.abstract-instruction-self-diagnosis/1.0",
+  "reporter": "ARKAON",
+  "reviewer": "ETERNIAN",
+  "scope": ["config", "docs", "knowledge", "src/apf"],
+  "method": "Search qualitative instruction terms, trace each term to executable thresholds and evidence, then classify REMEDIATE or HOLD.",
+  "findings_before_remediation": [
+    {
+      "finding_id": "AI-001",
+      "severity": "HIGH",
+      "location": "config/collector.default.json",
+      "abstract_instruction": "clean-room exception required only provenance and no source-code copy",
+      "missing_acceptance_evidence": "rights, owner scope, independent implementation, original-expression exclusion, distinction, similarity",
+      "decision": "REMEDIATE"
+    },
+    {
+      "finding_id": "AI-002",
+      "severity": "HIGH",
+      "location": "docs/65-plain-language-visual-approval.md",
+      "abstract_instruction": "owner sufficiently understands the change",
+      "missing_acceptance_evidence": "current confirmation proves checked topics, not comprehension",
+      "decision": "HOLD_SEPARATE_SCOPE"
+    },
+    {
+      "finding_id": "AI-003",
+      "severity": "MEDIUM",
+      "location": "docs/15-precedent-first-strategy.md",
+      "abstract_instruction": "verified and suitable precedent",
+      "missing_acceptance_evidence": "documentation did not state the thresholds already enforced in code",
+      "decision": "REMEDIATE"
+    },
+    {
+      "finding_id": "AI-004",
+      "severity": "LOW",
+      "location": "docs/36-arkaon-map-competency-evaluation.md",
+      "abstract_instruction": "appropriate refusal",
+      "missing_acceptance_evidence": "none; following section fixes precision, recall and zero-tolerance thresholds",
+      "decision": "NO_CHANGE"
+    },
+    {
+      "finding_id": "AI-005",
+      "severity": "HIGH",
+      "location": "docs/67-platform-launch-intelligence.md",
+      "abstract_instruction": "distinctive functional asset",
+      "missing_acceptance_evidence": "category-specific pass/fail and minimum owner work order",
+      "decision": "REMEDIATED_IN_THIS_PR"
+    }
+  ],
+  "remediation_after_report": [
+    "AI-001: added eight fail-closed clean-room exception gates to configuration, runtime decision, and tests.",
+    "AI-003: bound verified/suitable wording to score >= 0.70, intent relevance >= 0.50, provenance, and per-feature coverage.",
+    "AI-005: added machine-readable examples, evidence requirements, and minimum owner-approval work order."
+  ],
+  "held_item": {
+    "finding_id": "AI-002",
+    "reason": "Adding comprehension challenges changes the owner approval contract and UI; it requires a separately approved scope digest.",
+    "proposed_minimum": [
+      "one randomized question each for change, risk, rollback, and scope",
+      "four of four correct against digest-bound answer keys",
+      "wrong answer returns to explanation and invalidates the challenge nonce",
+      "approval button remains disabled until a fresh challenge passes",
+      "challenge receipt does not authorize merge or deployment"
+    ]
+  },
+  "automatic_merge_allowed": false,
+  "deployment_allowed": false
+}

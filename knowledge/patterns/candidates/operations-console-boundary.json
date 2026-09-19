@@ -10,7 +10,7 @@
     "Correctness requires that hidden buttons are never authorization controls",
     "Operational pressure can cause: client-supplied role unlocks an action"
   ],
-  "solution": "Implement server APIs enforce tenant and reviewer checks regardless of UI state. Verify the anchored symbol `ConsolePrincipal` with `test_console_requires_session_and_has_security_headers` before reuse.",
+  "solution": "Implement server APIs enforce tenant and reviewer checks regardless of UI state. Verify the anchored symbol `ConsolePrincipal` with `test_reference_material_notice_checkboxes_and_receipt_are_owner_bound` before reuse.",
   "invariants": [
     "hidden buttons are never authorization controls",
     "detail responses remain tenant scoped"
@@ -27,8 +27,8 @@
     "external_material_included": false
   },
   "evidence_hashes": {
-    "src/apf/console.py": "5781ab118f942ffbb2b2448698741698e74920159859f399c2f87bbefe9ae1da",
-    "tests/test_console.py": "b528d05f07e761164d1aa3540ea5734b8e6979803c06e74ab71e298200fb0f28"
+    "src/apf/console.py": "658edb5da31c8d94e20f9bf631b3bb4751ca9e0726368a488e9fdea63fdda928",
+    "tests/test_console.py": "e4af2ec6aa143befe3f3ae82f284934a70cbe7438150103617060af321335cb3"
   },
   "source_refs": [
     "src/apf/console.py"
@@ -37,7 +37,7 @@
     "tests/test_console.py"
   ],
   "verification_test_ids": [
-    "tests/test_console.py::test_console_requires_session_and_has_security_headers"
+    "tests/test_console.py::test_reference_material_notice_checkboxes_and_receipt_are_owner_bound"
   ],
   "reuse_constraints": [
     "Confirm the target still requires: operators inspect and decide queued work",
@@ -48,10 +48,10 @@
   "not_when": "no human operations interface exists",
   "evidence_anchors": {
     "source_symbol": "ConsolePrincipal",
-    "test_name": "test_console_requires_session_and_has_security_headers"
+    "test_name": "test_reference_material_notice_checkboxes_and_receipt_are_owner_bound"
   },
   "status": "ETHERNIAN_REVIEW_REQUIRED",
   "owned_asset": false,
   "semantic_fingerprint": "0f46a7ac8be519640ccd6520b0aec29b43fcd55fe79ba84f2cf0a66d0d201c25",
-  "package_hash": "2fcce3b1b75d229749f14066b9c9e357d084545dda8556a1684255d099f4f7f9"
+  "package_hash": "69cc536f3e754de9e4ecec5f1b79b9b261cf70d1d00d67795837388cd7c811d8"
 }
