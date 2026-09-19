@@ -24,6 +24,7 @@ from .repository import (
     TargetRepository,
 )
 from .state_machine import TARGET_TRANSITIONS, InvalidTransition, transition
+from .visual_platform_dialogue import VisualPlatformDialogueStore
 
 TenantHeader = Annotated[UUID, Header(alias="X-Tenant-ID")]
 RevisionHeader = Annotated[int, Header(alias="If-Match")]
@@ -55,6 +56,7 @@ def create_app(
     *, repository: TargetRepository | None = None, console_security: ConsoleSecurity | None = None,
     console_review_store: ConsoleReviewStore | None = None,
     plain_approval_store: PlainLanguageApprovalStore | None = None,
+    visual_dialogue_store: VisualPlatformDialogueStore | None = None,
 ) -> FastAPI:
     application = FastAPI(title="ARKAON Pattern Foundry", version="0.1.0")
     application.state.repository = repository or repository_from_config()
@@ -62,6 +64,9 @@ def create_app(
         application, security=console_security or console_security_from_config(),
         review_store=console_review_store,
         approval_store=plain_approval_store or PlainLanguageApprovalStore(
+            Path(os.getenv("APF_FOUNDRY_ROOT", Path(__file__).parents[2]))
+        ),
+        visual_dialogue_store=visual_dialogue_store or VisualPlatformDialogueStore(
             Path(os.getenv("APF_FOUNDRY_ROOT", Path(__file__).parents[2]))
         ),
     )

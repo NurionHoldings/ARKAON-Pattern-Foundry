@@ -8,6 +8,7 @@ from apf.console import SESSION_COOKIE, ConsoleSecurity
 from apf.domain import AnalysisTargetCreate
 from apf.plain_language_approval import PlainLanguageApprovalStore
 from apf.repository import MemoryRepository
+from apf.visual_platform_dialogue import VisualPlatformDialogueStore
 
 
 def make_client(*, role: str = "operator", approval_store=None):
@@ -154,3 +155,65 @@ def test_plain_approval_routes_require_owner_csrf_and_store(tmp_path):
         headers={"X-CSRF-Token": csrf},
     )
     assert response.status_code == 422
+
+
+def test_visual_platform_dialogue_api_separates_owner_and_arkaon_operator(tmp_path):
+    tenant_id, owner_id, operator_id = uuid4(), uuid4(), uuid4()
+    app = create_app(
+        repository=MemoryRepository(),
+        console_security=ConsoleSecurity(
+            environment="test", secret="s" * 32, allow_dev_sessions=True
+        ),
+        visual_dialogue_store=VisualPlatformDialogueStore(tmp_path),
+    )
+    client = TestClient(app, base_url="https://testserver")
+
+    owner_session = client.post(
+        "/console/dev/session",
+        json={"tenant_id": str(tenant_id), "principal_id": str(owner_id), "role": "owner"},
+    )
+    owner_csrf = owner_session.json()["csrf_token"]
+    created = client.post(
+        "/v1/console/platform-dialogues",
+        headers={"X-CSRF-Token": owner_csrf},
+        json={
+            "name": "부업장터", "purpose": "벌거리 연결", "audience": ["참여자"],
+            "required_capabilities": ["탐색", "정산"], "constraints": ["모바일 우선"],
+        },
+    )
+    assert created.status_code == 201
+    dialogue_id = created.json()["dialogue_id"]
+    assert client.post(
+        f"/v1/console/platform-dialogues/{dialogue_id}/revisions",
+        headers={"X-CSRF-Token": owner_csrf},
+        json={
+            "based_on_revision_digest": None, "change_summary": "첫 화면",
+            "screens": [{
+                "screen_id": "home", "title": "홈", "purpose": "탐색",
+                "components": ["검색", "추천"],
+            }],
+        },
+    ).status_code == 403
+
+    operator_session = client.post(
+        "/console/dev/session",
+        json={"tenant_id": str(tenant_id), "principal_id": str(operator_id), "role": "operator"},
+    )
+    operator_csrf = operator_session.json()["csrf_token"]
+    revised = client.post(
+        f"/v1/console/platform-dialogues/{dialogue_id}/revisions",
+        headers={"X-CSRF-Token": operator_csrf},
+        json={
+            "based_on_revision_digest": None, "change_summary": "첫 화면",
+            "screens": [{
+                "screen_id": "home", "title": "홈", "purpose": "탐색",
+                "components": ["검색", "추천"],
+            }],
+        },
+    )
+    assert revised.status_code == 200
+    image = client.get(
+        f"/v1/console/platform-dialogues/{dialogue_id}/revisions/1/preview.svg"
+    )
+    assert image.status_code == 200
+    assert image.headers["content-type"].startswith("image/svg+xml")

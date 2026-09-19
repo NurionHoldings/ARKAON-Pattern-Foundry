@@ -28,6 +28,14 @@ from .plain_language_approval import (
     PlainLanguageApprovalStore,
 )
 from .repository import TargetRepository
+from .visual_platform_dialogue import (
+    PlatformBrief,
+    RevisionFeedback,
+    RevisionSubmission,
+    UnderstandingConfirmation,
+    VisualDialogueError,
+    VisualPlatformDialogueStore,
+)
 
 SESSION_COOKIE = "apf_console_session"
 CSRF_COOKIE = "apf_console_csrf"
@@ -134,10 +142,12 @@ class ConsoleSecurity:
 def install_console(
     application, *, security: ConsoleSecurity, review_store: ConsoleReviewStore | None = None,
     approval_store: PlainLanguageApprovalStore | None = None,
+    visual_dialogue_store: VisualPlatformDialogueStore | None = None,
 ) -> None:
     application.state.console_security = security
     application.state.console_review_store = review_store
     application.state.plain_approval_store = approval_store
+    application.state.visual_dialogue_store = visual_dialogue_store
 
     def principal(
         request: Request,
@@ -168,6 +178,12 @@ def install_console(
         store = request.app.state.plain_approval_store
         if store is None:
             raise HTTPException(status_code=503, detail="plain-language approval store unavailable")
+        return store
+
+    def visual_dialogues(request: Request) -> VisualPlatformDialogueStore:
+        store = request.app.state.visual_dialogue_store
+        if store is None:
+            raise HTTPException(status_code=503, detail="visual dialogue store unavailable")
         return store
 
     def store_error(error: Exception) -> HTTPException:
@@ -204,6 +220,27 @@ def install_console(
                 "Content-Security-Policy": (
                     "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; "
                     "connect-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'"
+                ),
+                "Referrer-Policy": "no-referrer",
+                "X-Content-Type-Options": "nosniff",
+            },
+        )
+
+    @application.get("/platform-dialogue", response_class=HTMLResponse, include_in_schema=False)
+    def platform_dialogue_home(
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+    ) -> HTMLResponse:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        html_path = Path(__file__).with_name("visual_dialogue_ui.html")
+        return HTMLResponse(
+            html_path.read_text(encoding="utf-8"),
+            headers={
+                "Cache-Control": "no-store",
+                "Content-Security-Policy": (
+                    "default-src 'none'; img-src 'self'; style-src 'unsafe-inline'; "
+                    "script-src 'unsafe-inline'; connect-src 'self'; base-uri 'none'; "
+                    "frame-ancestors 'none'; form-action 'self'"
                 ),
                 "Referrer-Policy": "no-referrer",
                 "X-Content-Type-Options": "nosniff",
@@ -347,6 +384,143 @@ def install_console(
         except PlainApprovalError as error:
             code = 409 if str(error) == "PLAIN_APPROVAL_ALREADY_DECIDED" else 422
             raise HTTPException(status_code=code, detail=str(error)) from None
+
+    def visual_error(error: VisualDialogueError) -> HTTPException:
+        code = 409 if str(error) in {
+            "VISUAL_DIALOGUE_BUSY", "VISUAL_DIALOGUE_CONCURRENT_UPDATE",
+            "VISUAL_REVISION_STALE_BASE", "VISUAL_ARTIFACT_CONFLICT",
+        } else 422
+        return HTTPException(status_code=code, detail=str(error))
+
+    @application.post("/v1/console/platform-dialogues", status_code=status.HTTP_201_CREATED)
+    def create_platform_dialogue(
+        payload: PlatformBrief,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[VisualPlatformDialogueStore, Depends(visual_dialogues)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        return store.create(
+            tenant_id=str(actor.tenant_id), owner_principal_id=str(actor.principal_id), brief=payload
+        )
+
+    @application.get("/v1/console/platform-dialogues")
+    def list_platform_dialogues(
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[VisualPlatformDialogueStore, Depends(visual_dialogues)],
+    ) -> list[dict[str, object]]:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        return store.list_for_owner(
+            tenant_id=str(actor.tenant_id), owner_principal_id=str(actor.principal_id)
+        )
+
+    @application.get("/v1/console/platform-dialogues/{dialogue_id}")
+    def get_platform_dialogue(
+        dialogue_id: str,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[VisualPlatformDialogueStore, Depends(visual_dialogues)],
+    ) -> dict[str, object]:
+        if actor.role not in {"owner", "operator"}:
+            raise HTTPException(status_code=403, detail="platform dialogue role required")
+        try:
+            return store.get(dialogue_id, tenant_id=str(actor.tenant_id))
+        except VisualDialogueError as error:
+            raise visual_error(error) from None
+
+    @application.post("/v1/console/platform-dialogues/{dialogue_id}/revisions")
+    def submit_platform_revision(
+        dialogue_id: str,
+        payload: RevisionSubmission,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[VisualPlatformDialogueStore, Depends(visual_dialogues)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        if actor.role != "operator":
+            raise HTTPException(status_code=403, detail="ARKAON operator role required")
+        try:
+            return store.submit_revision(
+                dialogue_id, tenant_id=str(actor.tenant_id), submission=payload
+            )
+        except VisualDialogueError as error:
+            raise visual_error(error) from None
+
+    @application.get("/v1/console/platform-dialogues/{dialogue_id}/revisions/{number}/preview.svg")
+    def platform_revision_image(
+        dialogue_id: str,
+        number: int,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[VisualPlatformDialogueStore, Depends(visual_dialogues)],
+    ) -> Response:
+        if actor.role not in {"owner", "operator"}:
+            raise HTTPException(status_code=403, detail="platform dialogue role required")
+        try:
+            data = store.image(dialogue_id, number, tenant_id=str(actor.tenant_id))
+        except VisualDialogueError as error:
+            raise visual_error(error) from None
+        return Response(
+            content=data, media_type="image/svg+xml",
+            headers={"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"},
+        )
+
+    @application.post("/v1/console/platform-dialogues/{dialogue_id}/feedback")
+    def request_platform_revision(
+        dialogue_id: str,
+        payload: RevisionFeedback,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[VisualPlatformDialogueStore, Depends(visual_dialogues)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        try:
+            return store.add_feedback(
+                dialogue_id, tenant_id=str(actor.tenant_id),
+                owner_principal_id=str(actor.principal_id), feedback=payload,
+            )
+        except VisualDialogueError as error:
+            raise visual_error(error) from None
+
+    @application.post("/v1/console/platform-dialogues/{dialogue_id}/understanding")
+    def confirm_platform_understanding(
+        dialogue_id: str,
+        payload: UnderstandingConfirmation,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[VisualPlatformDialogueStore, Depends(visual_dialogues)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        try:
+            return store.confirm(
+                dialogue_id, tenant_id=str(actor.tenant_id),
+                owner_principal_id=str(actor.principal_id), confirmation=payload,
+            )
+        except VisualDialogueError as error:
+            raise visual_error(error) from None
+
+    @application.post("/v1/console/platform-dialogues/{dialogue_id}/seal")
+    def seal_platform_specification(
+        dialogue_id: str,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[VisualPlatformDialogueStore, Depends(visual_dialogues)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        try:
+            return store.seal(
+                dialogue_id, tenant_id=str(actor.tenant_id),
+                owner_principal_id=str(actor.principal_id),
+            )
+        except VisualDialogueError as error:
+            raise visual_error(error) from None
 
 
 def console_security_from_config(
