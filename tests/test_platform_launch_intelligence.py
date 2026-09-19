@@ -9,6 +9,7 @@ from apf.platform_launch_intelligence import (
     LaunchIntelligenceError,
     LaunchIntent,
     OfficialFlowObservation,
+    SingleSourceAssetException,
     abstract_patterns,
     build_blueprint,
     load_observations,
@@ -27,6 +28,69 @@ def test_official_evidence_is_diverse_clean_room_and_https():
     patterns = abstract_patterns(observations)
     assert patterns["prompt_to_draft"] == ("Bubble", "Framer", "Webflow", "Wix")
     assert "data_model_generation" not in patterns  # one provider is not a reusable pattern
+
+
+def single_source_exception(**overrides):
+    values = {
+        "source_id": "bubble-mobile-ai-20260919",
+        "capability": "data_model_generation",
+        "rights_review": "PASS",
+        "owner_approval_digest": "sha256:" + "a" * 64,
+        "independent_implementation": True,
+        "original_expression_excluded": True,
+        "distinctive_additions": [
+            {"category": "motion_interaction", "description": "상태 변화가 보이는 고유 텍스트 모션"},
+            {"category": "workflow", "description": "권한별 시각적 승인과 되돌리기 흐름"},
+        ],
+        "similarity_review": "PASS",
+        "approval_scope": "일반 기능 원리만 독립 구현하며 원본 표현과 화면 구성은 사용하지 않는다.",
+    }
+    values.update(overrides)
+    return SingleSourceAssetException.model_validate(values)
+
+
+def test_owner_approved_distinctive_clean_room_exception_can_promote_single_source_idea():
+    patterns = abstract_patterns(
+        load_observations(EVIDENCE), exceptions=[single_source_exception()]
+    )
+    assert patterns["data_model_generation"] == ("Bubble",)
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("rights_review", "HOLD"),
+        ("owner_approval_digest", "missing"),
+        ("independent_implementation", False),
+        ("original_expression_excluded", False),
+        (
+            "distinctive_additions",
+            [{"category": "visual_identity", "description": "고유 색상 체계 한 가지만 변경"}],
+        ),
+        ("similarity_review", "HOLD"),
+    ],
+)
+def test_single_source_exception_fails_closed_without_every_control(field, value):
+    with pytest.raises(ValueError):
+        single_source_exception(**{field: value})
+
+
+def test_single_source_exception_must_match_recorded_source_capability():
+    with pytest.raises(LaunchIntelligenceError, match="EVIDENCE_MISMATCH"):
+        abstract_patterns(
+            load_observations(EVIDENCE),
+            exceptions=[single_source_exception(capability="unobserved_feature")],
+        )
+
+
+def test_cosmetic_only_color_and_animation_do_not_pass_without_functional_distinction():
+    with pytest.raises(ValueError, match="functional distinction"):
+        single_source_exception(
+            distinctive_additions=[
+                {"category": "visual_identity", "description": "브랜드 고유 색상 토큰과 대비 체계"},
+                {"category": "motion_interaction", "description": "제목 텍스트의 고유 전환 애니메이션"},
+            ]
+        )
 
 
 def test_copied_material_is_rejected():

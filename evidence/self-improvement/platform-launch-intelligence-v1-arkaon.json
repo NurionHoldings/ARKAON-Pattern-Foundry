@@ -10,14 +10,14 @@
     "separate specification, sandbox implementation, and deployment gates"
   ],
   "sha256": {
-    "src/apf/platform_launch_intelligence.py": "b713705c77907afc1f0e27abc02cf5f4d5295f3927b2525abce3513974eeb87e",
-    "tests/test_platform_launch_intelligence.py": "ce47634e44620ddd238416842b1be25dcfc402808e06e42b0565f039e6b283a1",
+    "src/apf/platform_launch_intelligence.py": "0a6aed710be76d6badc0dcc6e051eb28fb1e60e3934d00844e5e1398148f8e21",
+    "tests/test_platform_launch_intelligence.py": "f1908fc5dd7490b2a9cb87ba9831ca8a9fa32e8e6818720fd41fb1266ca7fdc3",
     "knowledge/platform-launch/official-flow-observations-v1.json": "e40f4505daa93004fffe8d3f79245e698c8728386edb40c433cb1230ffff5f1c",
-    "knowledge/platform-launch/arkaon-fast-launch-flow-v1.json": "78d9da0cd74c811b2806400e29ee90764d397c00ab4fe3a374b31af2b53ad9bc"
+    "knowledge/platform-launch/arkaon-fast-launch-flow-v1.json": "ffbcba0ec23e3c38c71c029d5179fe73d635986b2abbcec253cc9cf7c5c09f86"
   },
   "checks": [
-    "Focused launch and visual-dialogue tests: 13 PASS",
-    "Full repository regression before audit remediation: 639 PASS / 5 SKIP",
+    "Focused launch and visual-dialogue tests after distinctive-asset controls: 22 PASS",
+    "Full repository regression after exception controls: 649 PASS / 5 SKIP",
     "Changed Python files: ruff GREEN"
   ],
   "automatic_merge_allowed": false,

@@ -20,7 +20,16 @@
     "permissions": "ask role boundaries only when applicable",
     "payment": "sandbox only until separate financial approval",
     "implementation": "disabled until explicit approval",
-    "deployment": "always requires separate approval"
+    "deployment": "always requires separate approval",
+    "single_source_exception": "allowed only after rights review, owner scope approval, clean-room implementation, distinctions in at least two categories including one functional distinction, and similarity review",
+    "distinctive_asset_focus": [
+      "original color and visual identity",
+      "typography system",
+      "text and interaction motion",
+      "user workflow",
+      "accessibility behavior",
+      "domain-specific function"
+    ]
   },
   "usability_benchmark": {
     "minimum_participants": 5,

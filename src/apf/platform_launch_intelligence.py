@@ -38,6 +38,38 @@ class OfficialFlowObservation(BaseModel):
         return self
 
 
+class DistinctiveAddition(BaseModel):
+    category: str = Field(
+        pattern=r"^(visual_identity|typography|motion_interaction|workflow|accessibility|domain_function)$"
+    )
+    description: str = Field(min_length=10, max_length=500)
+
+
+class SingleSourceAssetException(BaseModel):
+    """Owner-approved clean-room exception for a useful single-source idea."""
+
+    source_id: str = Field(pattern=r"^[a-z0-9][a-z0-9._-]{2,63}$")
+    capability: str = Field(min_length=1, max_length=120)
+    rights_review: str = Field(pattern=r"^PASS$")
+    owner_approval_digest: str = Field(pattern=r"^sha256:[0-9a-f]{64}$")
+    independent_implementation: bool
+    original_expression_excluded: bool
+    distinctive_additions: list[DistinctiveAddition] = Field(min_length=2, max_length=12)
+    similarity_review: str = Field(pattern=r"^PASS$")
+    approval_scope: str = Field(min_length=10, max_length=1000)
+
+    @model_validator(mode="after")
+    def validate_exception_controls(self) -> SingleSourceAssetException:
+        if not self.independent_implementation or not self.original_expression_excluded:
+            raise ValueError("independent clean-room implementation required")
+        categories = {item.category for item in self.distinctive_additions}
+        if len(categories) < 2:
+            raise ValueError("two categories of original additions required")
+        if not categories.intersection({"workflow", "accessibility", "domain_function"}):
+            raise ValueError("one functional distinction is required")
+        return self
+
+
 class LaunchIntent(BaseModel):
     name: str = Field(min_length=1, max_length=120)
     purpose: str = Field(min_length=1, max_length=2000)
@@ -90,17 +122,28 @@ def load_observations(path: Path) -> list[OfficialFlowObservation]:
     return observations
 
 
-def abstract_patterns(observations: list[OfficialFlowObservation]) -> dict[str, tuple[str, ...]]:
-    """Keep only generic capabilities independently evidenced by two providers."""
+def abstract_patterns(
+    observations: list[OfficialFlowObservation],
+    *, exceptions: list[SingleSourceAssetException] | None = None,
+) -> dict[str, tuple[str, ...]]:
+    """Promote multi-source principles plus explicitly approved clean-room exceptions."""
     support: dict[str, set[str]] = {}
+    sources: dict[str, OfficialFlowObservation] = {}
     for item in observations:
+        sources[item.source_id] = item
         for capability in item.generic_capabilities:
             support.setdefault(capability, set()).add(item.provider)
-    return {
+    result = {
         capability: tuple(sorted(providers))
         for capability, providers in sorted(support.items())
         if len(providers) >= 2
     }
+    for exception in exceptions or []:
+        source = sources.get(exception.source_id)
+        if source is None or exception.capability not in source.generic_capabilities:
+            raise LaunchIntelligenceError("SINGLE_SOURCE_EXCEPTION_EVIDENCE_MISMATCH")
+        result[exception.capability] = (source.provider,)
+    return dict(sorted(result.items()))
 
 
 def asset_digest(observations: list[OfficialFlowObservation]) -> str:
