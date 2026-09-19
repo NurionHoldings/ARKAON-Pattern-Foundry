@@ -17,6 +17,9 @@ PC 운영체제가 시작되면 ARKAON 수집 런타임을 자동 시작한다. 
 - 기능 구현을 우선한다. 라이선스 명확성 0.80 미만 자료도 소유권, 명시적 허가, 퍼블릭
   도메인 또는 클린룸 추상화 근거가 있고 출처계보를 기록했으며 원본 코드를 복제하지 않은
   경우에는 독립 자산화 예외를 적용한다.
+- 단, `CLEAN_ROOM_ABSTRACTION` 예외에는 권리검토 `PASS`, 사용자 승인 digest, 독립 구현,
+  원본 표현 배제, 서로 다른 차별화 범주 2개 이상, 기능적 차별화 1개 이상, 비유사성 검토
+  `PASS`가 모두 필요하다. 하나라도 없으면 참고자료 상태에 머문다.
 - 위 예외 근거가 없으면 참고자료로만 보관하고 재사용 자산으로 승격하지 않는다.
 - 참고자료는 종착점이 아니다. `REFERENCE_COLLECTED → PRINCIPLE_ABSTRACTED →
   INDEPENDENT_IMPLEMENTATION → INDEPENDENTLY_VERIFIED → OWNED_ASSET` 순서로 자체기능을

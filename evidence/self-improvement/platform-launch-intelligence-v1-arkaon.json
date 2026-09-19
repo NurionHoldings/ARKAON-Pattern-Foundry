@@ -15,10 +15,13 @@
     "knowledge/platform-launch/official-flow-observations-v1.json": "e40f4505daa93004fffe8d3f79245e698c8728386edb40c433cb1230ffff5f1c",
     "knowledge/platform-launch/arkaon-fast-launch-flow-v1.json": "ffbcba0ec23e3c38c71c029d5179fe73d635986b2abbcec253cc9cf7c5c09f86",
     "knowledge/platform-launch/distinctive-asset-guidelines-v1.json": "c23337d673849c127fd56860e6a05dd0929278b9d21ea41e6d4a40b1edcb87a2"
+    ,"src/apf/continuous_collection.py": "82b1c57682975ffe80b83e326e161673a65f8ce20c5788456aebe8d92e31313e"
+    ,"tests/test_continuous_collection.py": "6599984ec782ff85913d880e6145da4d5d68fd23ed06e9f399b9fdf178e49b4e"
+    ,"config/collector.default.json": "acd50710613698996ab7c532403113da3c59c301f24e39cfaeaa7d54c19b6366"
   },
   "checks": [
     "Focused launch and visual-dialogue tests after distinctive-asset controls: 23 PASS",
-    "Full repository regression after exception controls: 649 PASS / 5 SKIP",
+    "Full repository regression after abstract-instruction remediation: 657 PASS / 5 SKIP",
     "Changed Python files: ruff GREEN"
   ],
   "automatic_merge_allowed": false,
