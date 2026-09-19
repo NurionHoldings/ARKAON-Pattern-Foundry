@@ -23,3 +23,14 @@ The relay then continues with later packets. No invalid packet is silently delet
 Rollback is limited to reverting the feature commit. Quarantined source bytes and
 their evidence receipts are retained for diagnosis and can be manually restored to
 the inbox only after correction and a new scope validation.
+
+## Relay approval synchronization
+
+Every relay cycle also checks approval receipts for requests already delivered to
+GitHub. A missing receipt remains `PENDING`; malformed, scope-mismatched, unsafe-ID,
+or ledger-detached data becomes `BLOCKED`. Only an exact receipt creates
+`state/self-improvement-execution-queue/<request_id>.json` in `OWNER_APPROVED`.
+
+Queue creation is not code execution. The queue entry must remain bound to the
+append-only approval ledger, and implementation, merge, and deployment stay false
+until their separate governed stages run.

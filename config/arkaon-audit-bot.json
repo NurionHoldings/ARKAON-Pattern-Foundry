@@ -26,5 +26,16 @@
     "src/apf/",
     "config/",
     "knowledge/feature-intents/"
-  ]
+  ],
+  "runtime": {
+    "relay_interval_seconds": 15,
+    "max_audit_jobs_per_cycle": 30,
+    "internal_audit_each_cycle": true
+  },
+  "learning": {
+    "max_records_per_segment": 500,
+    "max_segments": 20,
+    "minimum_confirmations": 2,
+    "required_reviewer_roles": ["ARKAON", "ETERNIAN"]
+  }
 }
