@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://arkaon.local/schemas/intent-dna-review-report.schema.json",
+  "title": "Intent DNA Review Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "report_id", "intent_dna", "analysis", "cause", "improvement", "savings", "decision", "action_result"],
+  "properties": {
+    "schema_version": {"const": "apf.intent-dna-review-report/1.0"},
+    "report_id": {"type": "string", "minLength": 1},
+    "intent_dna": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["goal", "constraints", "prohibitions", "success_conditions", "authorized_scope", "confidence"],
+      "properties": {
+        "goal": {"type": "string", "minLength": 1},
+        "constraints": {"type": "array", "items": {"type": "string"}},
+        "prohibitions": {"type": "array", "items": {"type": "string"}},
+        "success_conditions": {"type": "array", "items": {"type": "string"}},
+        "authorized_scope": {"type": "array", "items": {"type": "string"}},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    },
+    "analysis": {
+      "type": "object",
+      "required": ["item_ids", "item_count", "cluster_count", "evidence_refs", "impact"],
+      "properties": {
+        "item_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
+        "item_count": {"type": "integer", "minimum": 1},
+        "cluster_count": {"type": "integer", "minimum": 1},
+        "evidence_refs": {"type": "array", "items": {"type": "string"}},
+        "impact": {"type": "string", "minLength": 1}
+      }
+    },
+    "cause": {
+      "type": "object",
+      "required": ["direct", "structural", "recurrence_condition"],
+      "properties": {
+        "direct": {"type": "string", "minLength": 1},
+        "structural": {"type": "string", "minLength": 1},
+        "recurrence_condition": {"type": "string", "minLength": 1}
+      }
+    },
+    "improvement": {
+      "type": "object",
+      "required": ["minimal_change", "prevention", "apply_when", "forbidden_when", "verification"],
+      "properties": {
+        "minimal_change": {"type": "string", "minLength": 1},
+        "prevention": {"type": "string", "minLength": 1},
+        "apply_when": {"type": "array", "items": {"type": "string"}},
+        "forbidden_when": {"type": "array", "items": {"type": "string"}},
+        "verification": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "savings": {
+      "type": "object",
+      "required": ["status", "basis"],
+      "properties": {
+        "status": {"enum": ["ESTIMATED", "NOT_ESTIMATED"]},
+        "baseline_minutes": {"type": "number", "minimum": 0},
+        "projected_minutes": {"type": "number", "minimum": 0},
+        "saved_minutes": {"type": "number", "minimum": 0},
+        "effort_reduction_percent": {"type": "number", "minimum": 0, "maximum": 100},
+        "basis": {"type": "string", "minLength": 1}
+      }
+    },
+    "decision": {"enum": ["APPROVE_FOR_REVIEW_STAGE", "HOLD", "BLOCKED", "OPERATOR_DECISION_REQUIRED"]},
+    "action_result": {
+      "type": "object",
+      "required": ["executed", "not_executed", "verification", "residual_risk", "next_authority"],
+      "properties": {
+        "executed": {"type": "array", "items": {"type": "string"}},
+        "not_executed": {"type": "array", "items": {"type": "string"}},
+        "verification": {"type": "array", "items": {"type": "string"}},
+        "residual_risk": {"type": "array", "items": {"type": "string"}},
+        "next_authority": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}
