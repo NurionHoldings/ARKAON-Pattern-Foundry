@@ -1,0 +1,17 @@
+{
+  "schema_version": "apf.eternian-audit/1.0",
+  "request_id": "relay-quarantine-001",
+  "role": "ETERNIAN",
+  "scope_digest": "9f17275acb2a7bd27974d2cb3e53ca49115d3e3218afed7559a60ff2583382c2",
+  "intent_dna_assessment": "The implementation preserves availability while keeping invalid input fail-closed, evidenced, and outside the normal inbox.",
+  "finding": "The first approval-source implementation fetched current content separately from its latest modifying commit, permitting a TOCTOU mismatch. Live runner use also proved that accepting only 64-character object IDs rejects GitHub's current 40-character SHA-1 commits.",
+  "remediation": "Resolve the approval commit first, then fetch receipt content at that exact ref; accept only exact 40- or 64-character lowercase Git object IDs; add regression tests for ref binding and malformed object IDs.",
+  "post_remediation_result": "594 PASS / 5 SKIP; Ruff PASS",
+  "remaining_risks": [
+    "Windows Scheduled Task and GitHub CLI integration still require execution on the owner's PC.",
+    "Quarantine growth requires normal mailbox retention monitoring.",
+    "Verification completion does not authorize merge or deployment."
+  ],
+  "rollback": "Revert the feature commit; retain quarantine bytes and BLOCKED receipts for diagnosis.",
+  "outcome": "ETERNIAN_VERIFIED"
+}

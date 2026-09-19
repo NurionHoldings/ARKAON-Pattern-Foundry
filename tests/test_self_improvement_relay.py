@@ -2,11 +2,9 @@ import json
 import subprocess
 from datetime import UTC, datetime
 
-import pytest
-
 from apf.evidence_capability import CollectedEvidence, EvidenceKind
 from apf.self_improvement import detect_self_improvement, post_self_improvement
-from apf.self_improvement_relay import RelayError, relay_cycle, relay_once
+from apf.self_improvement_relay import relay_cycle, relay_once
 
 
 class FakePublisher:
@@ -50,21 +48,20 @@ def test_relay_is_durable_and_idempotent(tmp_path) -> None:
     post_self_improvement(request(now), inbox_root=tmp_path / "inbox", now=now)
     publisher = FakePublisher()
 
-    first = relay_once(foundry_root=tmp_path, publisher=publisher)
-    second = relay_once(foundry_root=tmp_path, publisher=publisher)
+    first, first_blocked = relay_once(foundry_root=tmp_path, publisher=publisher)
+    second, second_blocked = relay_once(foundry_root=tmp_path, publisher=publisher)
 
     assert len(first) == 1
     assert second == ()
+    assert first_blocked == second_blocked == ()
     assert len(publisher.calls) == 1
     state = json.loads(
-        (tmp_path / "state" / "self-improvement-relay.json").read_text(
-            encoding="utf-8"
-        )
+        (tmp_path / "state" / "self-improvement-relay.json").read_text(encoding="utf-8")
     )
     assert state["receipts"]["relay-001"]["pull_request_url"].endswith("/1")
 
 
-def test_relay_rejects_scope_tampering(tmp_path) -> None:
+def test_relay_quarantines_scope_tampering(tmp_path) -> None:
     now = datetime(2026, 9, 18, tzinfo=UTC)
     _, path = post_self_improvement(
         request(now),
@@ -75,11 +72,13 @@ def test_relay_rejects_scope_tampering(tmp_path) -> None:
     document["proposed_change"] = "Tampered scope"
     path.write_text(json.dumps(document), encoding="utf-8")
 
-    with pytest.raises(RelayError, match="SCOPE_DIGEST_MISMATCH"):
-        relay_once(foundry_root=tmp_path, publisher=FakePublisher())
+    delivered, blocked = relay_once(foundry_root=tmp_path, publisher=FakePublisher())
+    assert delivered == ()
+    assert blocked[0].reason == "SCOPE_DIGEST_MISMATCH"
+    assert not path.exists()
 
 
-def test_relay_rejects_permission_escalation(tmp_path) -> None:
+def test_relay_quarantines_permission_escalation(tmp_path) -> None:
     now = datetime(2026, 9, 18, tzinfo=UTC)
     _, path = post_self_improvement(
         request(now),
@@ -90,8 +89,9 @@ def test_relay_rejects_permission_escalation(tmp_path) -> None:
     document["deployment_allowed"] = True
     path.write_text(json.dumps(document), encoding="utf-8")
 
-    with pytest.raises(RelayError, match="PROPOSE_ONLY_BOUNDARY_REQUIRED"):
-        relay_once(foundry_root=tmp_path, publisher=FakePublisher())
+    delivered, blocked = relay_once(foundry_root=tmp_path, publisher=FakePublisher())
+    assert delivered == ()
+    assert blocked[0].reason == "PROPOSE_ONLY_BOUNDARY_REQUIRED"
 
 
 def test_gh_publisher_forces_utf8_and_tolerates_empty_stdout(monkeypatch) -> None:
@@ -125,6 +125,7 @@ def test_relay_cycle_delivers_then_archives_transport_packet(tmp_path) -> None:
     cycle = relay_cycle(foundry_root=tmp_path, publisher=FakePublisher())
 
     assert len(cycle.delivered) == 1
+    assert cycle.blocked == ()
     assert cycle.mailbox["counts"]["relayed"] == 1
     assert cycle.mailbox["counts"]["archived"] == 1
     assert not path.exists()
@@ -134,3 +135,27 @@ def test_relay_cycle_delivers_then_archives_transport_packet(tmp_path) -> None:
         (tmp_path / "state" / "mailbox-maintenance-latest.json").read_text(encoding="utf-8")
     )
     assert report["counts"]["pending"] == 0
+
+
+def test_corrupt_packet_does_not_block_later_valid_request(tmp_path) -> None:
+    inbox = tmp_path / "inbox" / "self-improvement"
+    inbox.mkdir(parents=True)
+    corrupt = inbox / "000-corrupt.json"
+    corrupt.write_text('{"broken":', encoding="utf-8")
+    now = datetime(2026, 9, 18, tzinfo=UTC)
+    post_self_improvement(request(now), inbox_root=tmp_path / "inbox", now=now)
+    publisher = FakePublisher()
+
+    delivered, blocked = relay_once(foundry_root=tmp_path, publisher=publisher)
+
+    assert [item.request_id for item in delivered] == ["relay-001"]
+    assert len(blocked) == 1
+    assert blocked[0].source_name == corrupt.name
+    assert blocked[0].reason == "JSONDECODEERROR"
+    quarantine = tmp_path / "quarantine" / "self-improvement"
+    assert (quarantine / blocked[0].quarantine_name).is_file()
+    evidence = json.loads(
+        (quarantine / blocked[0].quarantine_name).with_suffix(".blocked.json").read_text()
+    )
+    assert evidence["state"] == "BLOCKED"
+    assert evidence["evidence_digest"] == blocked[0].evidence_digest

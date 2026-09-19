@@ -18,7 +18,7 @@ from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
 from enum import Enum
 from hashlib import sha256
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 from typing import Any
 
 from .accumulation_policy import (
@@ -37,7 +37,9 @@ _FORBIDDEN_NAME = re.compile(
     r"node_modules/|__pycache__/|\.git/)(/|$|\.)",
     re.IGNORECASE,
 )
-_FORBIDDEN_SUFFIXES = frozenset({".pem", ".key", ".p12", ".pfx", ".sqlite", ".sqlite3", ".db", ".mdb"})
+_FORBIDDEN_SUFFIXES = frozenset(
+    {".pem", ".key", ".p12", ".pfx", ".sqlite", ".sqlite3", ".db", ".mdb"}
+)
 _FORBIDDEN_KNOWLEDGE_KEYS = frozenset(
     {
         "member",
@@ -60,17 +62,25 @@ class OrchestratorError(ValueError):
 
 
 def _normalize_platform_path(path: Path, *, foundry_root: Path) -> Path:
+    if os.name != "nt" and PureWindowsPath(str(path)).is_absolute():
+        return path
     try:
         resolved = path.expanduser().resolve(strict=False)
     except OSError as exc:
-        raise OrchestratorError("PLATFORM_PATH_INVALID", f"cannot resolve platform path: {path}") from exc
+        raise OrchestratorError(
+            "PLATFORM_PATH_INVALID", f"cannot resolve platform path: {path}"
+        ) from exc
     if not resolved.is_absolute():
-        raise OrchestratorError("PLATFORM_PATH_RELATIVE", "platform path must be absolute after normalization")
+        raise OrchestratorError(
+            "PLATFORM_PATH_RELATIVE", "platform path must be absolute after normalization"
+        )
     try:
         resolved.relative_to(foundry_root.resolve())
     except ValueError:
         return resolved
-    raise OrchestratorError("PLATFORM_INSIDE_FOUNDRY", "platform workspace must stay outside foundry root")
+    raise OrchestratorError(
+        "PLATFORM_INSIDE_FOUNDRY", "platform workspace must stay outside foundry root"
+    )
 
 
 def _resolve_analysis_root(platform_path: Path, root_name: str) -> Path:
@@ -80,7 +90,9 @@ def _resolve_analysis_root(platform_path: Path, root_name: str) -> Path:
     try:
         candidate.relative_to(platform_path.resolve())
     except ValueError as exc:
-        raise OrchestratorError("ANALYSIS_ROOT_ESCAPE", f"analysis root escapes platform: {root_name}") from exc
+        raise OrchestratorError(
+            "ANALYSIS_ROOT_ESCAPE", f"analysis root escapes platform: {root_name}"
+        ) from exc
     return candidate
 
 
@@ -203,10 +215,14 @@ class PlatformWorkspace:
         if document.get("schema_version") != SCHEMA_WORKSPACE:
             raise OrchestratorError("WORKSPACE_SCHEMA", "unsupported workspace schema")
         if document.get("production_change_allowed"):
-            raise OrchestratorError("PRODUCTION_CHANGE_FORBIDDEN", "workspace cannot allow production changes")
+            raise OrchestratorError(
+                "PRODUCTION_CHANGE_FORBIDDEN", "workspace cannot allow production changes"
+            )
         roots = tuple(document.get("allowed_analysis_roots") or ())
         if not roots:
-            raise OrchestratorError("WORKSPACE_ROOTS_REQUIRED", "allowed analysis roots are required")
+            raise OrchestratorError(
+                "WORKSPACE_ROOTS_REQUIRED", "allowed analysis roots are required"
+            )
         return cls(
             platform_id=str(document["platform_id"]),
             foundry_root=Path(str(document["foundry_root"])),
@@ -222,7 +238,13 @@ class SharedPolicy:
     production_change_allowed: bool = False
     collect_platform_operational_data: bool = False
     knowledge_allowed_kinds: frozenset[str] = frozenset(
-        {"public_reference", "policy", "schema", "synthetic_test_pattern", "generalized_dev_knowledge"}
+        {
+            "public_reference",
+            "policy",
+            "schema",
+            "synthetic_test_pattern",
+            "generalized_dev_knowledge",
+        }
     )
 
     @classmethod
@@ -231,25 +253,29 @@ class SharedPolicy:
         if document.get("automatic_learning") or document.get("production_change_allowed"):
             raise OrchestratorError("POLICY_FORBIDDEN", "central policy must remain propose-only")
         if document.get("collect_platform_operational_data"):
-            raise OrchestratorError("OPERATIONAL_DATA_FORBIDDEN", "platform operational data stays isolated")
+            raise OrchestratorError(
+                "OPERATIONAL_DATA_FORBIDDEN", "platform operational data stays isolated"
+            )
         return cls(
             automatic_learning=bool(document.get("automatic_learning")),
             production_change_allowed=bool(document.get("production_change_allowed")),
-            collect_platform_operational_data=bool(document.get("collect_platform_operational_data")),
+            collect_platform_operational_data=bool(
+                document.get("collect_platform_operational_data")
+            ),
             knowledge_allowed_kinds=frozenset(document.get("knowledge_allowed_kinds") or ()),
         )
 
 
 @dataclass(frozen=True)
 class ResourceLimits:
-    accumulation_mode: str = "unbounded"
-    max_platforms_per_run: int | None = None
-    max_files_per_platform: int | None = None
-    max_inbox_packets: int | None = None
-    max_seconds_per_platform: int | None = None
-    max_memory_mb_per_platform: int | None = None
-    sequential_platform_analysis: bool = False
-    parallel_platform_workers: int | None = None
+    accumulation_mode: str = "bounded"
+    max_platforms_per_run: int | None = 8
+    max_files_per_platform: int | None = 5000
+    max_inbox_packets: int | None = 32
+    max_seconds_per_platform: int | None = 120
+    max_memory_mb_per_platform: int | None = 512
+    sequential_platform_analysis: bool = True
+    parallel_platform_workers: int | None = 1
 
     @property
     def is_unbounded(self) -> bool:
@@ -262,16 +288,30 @@ class ResourceLimits:
         accumulation_mode = str(document.get("accumulation_mode", "bounded")).strip().lower()
         if schema == "apf.resource-limits/v2" or accumulation_mode == "unbounded":
             limits = cls(
-                accumulation_mode=accumulation_mode if accumulation_mode in {"bounded", "unbounded"} else "unbounded",
-                max_platforms_per_run=parse_optional_limit(document.get("max_platforms_per_run"), default=None),
-                max_files_per_platform=parse_optional_limit(document.get("max_files_per_platform"), default=None),
-                max_inbox_packets=parse_optional_limit(document.get("max_inbox_packets"), default=None),
-                max_seconds_per_platform=parse_optional_limit(document.get("max_seconds_per_platform"), default=None),
-                max_memory_mb_per_platform=parse_optional_limit(
-                    document.get("max_memory_mb_per_platform"), default=None
+                accumulation_mode=accumulation_mode
+                if accumulation_mode in {"bounded", "unbounded"}
+                else "bounded",
+                max_platforms_per_run=parse_optional_limit(
+                    document.get("max_platforms_per_run"), default=8
                 ),
-                sequential_platform_analysis=bool(document.get("sequential_platform_analysis", False)),
-                parallel_platform_workers=parse_optional_limit(document.get("parallel_platform_workers"), default=None),
+                max_files_per_platform=parse_optional_limit(
+                    document.get("max_files_per_platform"), default=5000
+                ),
+                max_inbox_packets=parse_optional_limit(
+                    document.get("max_inbox_packets"), default=32
+                ),
+                max_seconds_per_platform=parse_optional_limit(
+                    document.get("max_seconds_per_platform"), default=120
+                ),
+                max_memory_mb_per_platform=parse_optional_limit(
+                    document.get("max_memory_mb_per_platform"), default=512
+                ),
+                sequential_platform_analysis=bool(
+                    document.get("sequential_platform_analysis", True)
+                ),
+                parallel_platform_workers=parse_optional_limit(
+                    document.get("parallel_platform_workers"), default=1
+                ),
             )
         else:
             limits = cls(
@@ -281,8 +321,12 @@ class ResourceLimits:
                 max_inbox_packets=int(document.get("max_inbox_packets", 32)),
                 max_seconds_per_platform=int(document.get("max_seconds_per_platform", 120)),
                 max_memory_mb_per_platform=int(document.get("max_memory_mb_per_platform", 512)),
-                sequential_platform_analysis=bool(document.get("sequential_platform_analysis", True)),
-                parallel_platform_workers=parse_optional_limit(document.get("parallel_platform_workers"), default=1),
+                sequential_platform_analysis=bool(
+                    document.get("sequential_platform_analysis", True)
+                ),
+                parallel_platform_workers=parse_optional_limit(
+                    document.get("parallel_platform_workers"), default=1
+                ),
             )
         positive_limits = [
             value
@@ -329,7 +373,10 @@ class InboxPacket:
     def to_document(self) -> dict[str, Any]:
         return {
             "schema_version": "apf.orchestrator-inbox/v1",
-            **{key: (value.value if isinstance(value, Enum) else value) for key, value in asdict(self).items()},
+            **{
+                key: (value.value if isinstance(value, Enum) else value)
+                for key, value in asdict(self).items()
+            },
             "created_at": self.created_at.isoformat(),
         }
 
@@ -379,11 +426,18 @@ class CentralOrchestrator:
         return cls(foundry_root=root, policy=policy, limits=limits)
 
     @staticmethod
-    def load_platforms(config_path: Path, *, foundry_root: Path) -> tuple[PlatformRegistration, ...]:
+    def load_platforms(
+        config_path: Path, *, foundry_root: Path
+    ) -> tuple[PlatformRegistration, ...]:
         document = json.loads(config_path.read_text(encoding="utf-8"))
         if document.get("schema_version") != SCHEMA_PLATFORMS:
             raise OrchestratorError("PLATFORMS_SCHEMA", "unsupported platforms schema")
-        configured_root = Path(str(document["foundry_root"])).resolve()
+        configured_value = str(document["foundry_root"])
+        configured_root = (
+            foundry_root.resolve()
+            if configured_value == "${FOUNDRY_ROOT}"
+            else Path(configured_value).resolve()
+        )
         if configured_root != foundry_root.resolve():
             raise OrchestratorError("FOUNDRY_ROOT_MISMATCH", "platforms.json foundry_root mismatch")
         registrations: list[PlatformRegistration] = []
@@ -550,8 +604,12 @@ class CentralOrchestrator:
             )
             if review_path:
                 extra_paths.append(review_path)
-        slots = remaining_capacity(len(packet_paths) + len(extra_paths), self.limits.max_inbox_packets)
-        if analysis.candidate_commit and has_capacity(len(packet_paths) + len(extra_paths), self.limits.max_inbox_packets):
+        slots = remaining_capacity(
+            len(packet_paths) + len(extra_paths), self.limits.max_inbox_packets
+        )
+        if analysis.candidate_commit and has_capacity(
+            len(packet_paths) + len(extra_paths), self.limits.max_inbox_packets
+        ):
             extra_paths.extend(
                 self._write_experience_proposals(
                     registration=registration,
@@ -561,7 +619,9 @@ class CentralOrchestrator:
                     remaining_slots=slots,
                 )
             )
-            slots = remaining_capacity(len(packet_paths) + len(extra_paths), self.limits.max_inbox_packets)
+            slots = remaining_capacity(
+                len(packet_paths) + len(extra_paths), self.limits.max_inbox_packets
+            )
         if analysis.stage != PlatformStage.BLOCKED and has_capacity(
             len(packet_paths) + len(extra_paths), self.limits.max_inbox_packets
         ):
@@ -573,7 +633,9 @@ class CentralOrchestrator:
                     remaining_slots=slots,
                 )
             )
-            slots = remaining_capacity(len(packet_paths) + len(extra_paths), self.limits.max_inbox_packets)
+            slots = remaining_capacity(
+                len(packet_paths) + len(extra_paths), self.limits.max_inbox_packets
+            )
         if analysis.stage != PlatformStage.BLOCKED and has_capacity(
             len(packet_paths) + len(extra_paths), self.limits.max_inbox_packets
         ):
@@ -585,7 +647,9 @@ class CentralOrchestrator:
                     remaining_slots=slots,
                 )
             )
-            slots = remaining_capacity(len(packet_paths) + len(extra_paths), self.limits.max_inbox_packets)
+            slots = remaining_capacity(
+                len(packet_paths) + len(extra_paths), self.limits.max_inbox_packets
+            )
         if analysis.stage != PlatformStage.BLOCKED and has_capacity(
             len(packet_paths) + len(extra_paths), self.limits.max_inbox_packets
         ):
@@ -607,7 +671,9 @@ class CentralOrchestrator:
                     return future.result()
                 return future.result(timeout=self.limits.max_seconds_per_platform)
         except FuturesTimeoutError:
-            candidate_commit = _read_candidate_commit(registration.path) if registration.path.is_dir() else None
+            candidate_commit = (
+                _read_candidate_commit(registration.path) if registration.path.is_dir() else None
+            )
             return PlatformAnalysis(
                 platform_id=registration.platform_id,
                 workspace_valid=False,
@@ -624,7 +690,9 @@ class CentralOrchestrator:
                 stage=PlatformStage.BLOCKED,
             )
         except OrchestratorError as error:
-            candidate_commit = _read_candidate_commit(registration.path) if registration.path.is_dir() else None
+            candidate_commit = (
+                _read_candidate_commit(registration.path) if registration.path.is_dir() else None
+            )
             return PlatformAnalysis(
                 platform_id=registration.platform_id,
                 workspace_valid=False,
@@ -638,7 +706,9 @@ class CentralOrchestrator:
                 stage=PlatformStage.BLOCKED,
             )
         except (OSError, json.JSONDecodeError, KeyError, TypeError, ValueError) as error:
-            candidate_commit = _read_candidate_commit(registration.path) if registration.path.is_dir() else None
+            candidate_commit = (
+                _read_candidate_commit(registration.path) if registration.path.is_dir() else None
+            )
             return PlatformAnalysis(
                 platform_id=registration.platform_id,
                 workspace_valid=False,
@@ -670,9 +740,13 @@ class CentralOrchestrator:
             )
         workspace = PlatformWorkspace.load(workspace_path)
         if workspace.platform_id != registration.platform_id:
-            raise OrchestratorError("PLATFORM_ID_MISMATCH", "workspace platform_id does not match registration")
+            raise OrchestratorError(
+                "PLATFORM_ID_MISMATCH", "workspace platform_id does not match registration"
+            )
         if workspace.foundry_root.resolve() != self.foundry_root:
-            raise OrchestratorError("WORKSPACE_FOUNDRY_MISMATCH", "workspace must point to this foundry root")
+            raise OrchestratorError(
+                "WORKSPACE_FOUNDRY_MISMATCH", "workspace must point to this foundry root"
+            )
         inventory: list[str] = []
         file_count = 0
         for root_name in workspace.allowed_analysis_roots:
@@ -707,7 +781,9 @@ class CentralOrchestrator:
             stage=PlatformStage.GUIDE_UPDATED,
         )
 
-    def _run_map_ops_gate(self, *, run_id: str, dry_run: bool, demo_advisory: bool = False) -> list[str]:
+    def _run_map_ops_gate(
+        self, *, run_id: str, dry_run: bool, demo_advisory: bool = False
+    ) -> list[str]:
         from .map_ops_bridge import bridge_map_ops_gate_report
         from .map_ops_gate import EtaShadowObservation, MapOpsGateHarness
 
@@ -806,7 +882,9 @@ class CentralOrchestrator:
         registry = SNSWatchRegistry(foundry_root=self.foundry_root)
         return registry.analyze(now=self.clock())
 
-    def _bridge_sns_watch_events(self, events: tuple, *, run_id_prefix: str, dry_run: bool) -> list[str]:
+    def _bridge_sns_watch_events(
+        self, events: tuple, *, run_id_prefix: str, dry_run: bool
+    ) -> list[str]:
         from .sns_watch_bridge import bridge_sns_watch_events
 
         run_id = sha256(run_id_prefix.encode()).hexdigest()[:24]
@@ -901,7 +979,9 @@ class CentralOrchestrator:
         registry = EmergingMarketWatchRegistry(foundry_root=self.foundry_root)
         return registry.analyze(now=self.clock())
 
-    def _bridge_emerging_market_events(self, events: tuple, *, run_id_prefix: str, dry_run: bool) -> list[str]:
+    def _bridge_emerging_market_events(
+        self, events: tuple, *, run_id_prefix: str, dry_run: bool
+    ) -> list[str]:
         from .emerging_market_watch_bridge import bridge_emerging_market_events
 
         run_id = sha256(run_id_prefix.encode()).hexdigest()[:24]
@@ -1063,7 +1143,10 @@ class CentralOrchestrator:
         dry_run: bool,
     ) -> str:
         stage_dir = self.inbox_root / InboxStage.RESEARCH.value
-        target = stage_dir / f"{run_id}-{proposal.platform_id}-experience-{proposal.finding.finding_id}.json"
+        target = (
+            stage_dir
+            / f"{run_id}-{proposal.platform_id}-experience-{proposal.finding.finding_id}.json"
+        )
         if dry_run:
             return target.as_posix()
         stage_dir.mkdir(parents=True, exist_ok=True)
@@ -1131,13 +1214,17 @@ class CentralOrchestrator:
                 "operator-decision requires eternian review first",
             )
         if packet.stage not in (InboxStage.RESEARCH, InboxStage.ETHERNIAN_REVIEW):
-            raise OrchestratorError("INBOX_STAGE_FORBIDDEN", f"unsupported inbox stage: {packet.stage.value}")
+            raise OrchestratorError(
+                "INBOX_STAGE_FORBIDDEN", f"unsupported inbox stage: {packet.stage.value}"
+            )
         if packet.production_change_allowed or packet.automatic_learning:
             raise OrchestratorError("INBOX_FORBIDDEN", "inbox packets must remain propose-only")
         for key in _FORBIDDEN_KNOWLEDGE_KEYS:
             if key in packet.summary.casefold():
                 self._quarantine(packet)
-                raise OrchestratorError("KNOWLEDGE_BOUNDARY", "summary touched forbidden operational category")
+                raise OrchestratorError(
+                    "KNOWLEDGE_BOUNDARY", "summary touched forbidden operational category"
+                )
         stage_dir = self.inbox_root / packet.stage.value
         target = stage_dir / f"{packet.packet_id}.json"
         if dry_run:
@@ -1159,7 +1246,9 @@ class CentralOrchestrator:
     def _quarantine(self, packet: InboxPacket) -> None:
         self.quarantine_root.mkdir(parents=True, exist_ok=True)
         target = self.quarantine_root / f"{packet.packet_id}.json"
-        target.write_text(json.dumps(packet.to_document(), ensure_ascii=False, indent=2), encoding="utf-8")
+        target.write_text(
+            json.dumps(packet.to_document(), ensure_ascii=False, indent=2), encoding="utf-8"
+        )
 
     def _write_report(self, report: OrchestratorRunReport) -> Path:
         day = report.completed_at.astimezone(UTC).strftime("%Y-%m-%d")
@@ -1189,7 +1278,9 @@ class CentralOrchestrator:
         }
         canonical = json.dumps(document, ensure_ascii=False, indent=2, sort_keys=True)
         document["report_sha256"] = sha256(canonical.encode()).hexdigest()
-        target.write_text(json.dumps(document, ensure_ascii=False, indent=2, sort_keys=True), encoding="utf-8")
+        target.write_text(
+            json.dumps(document, ensure_ascii=False, indent=2, sort_keys=True), encoding="utf-8"
+        )
         return target
 
     def _write_state(self, report: OrchestratorRunReport) -> None:
@@ -1200,7 +1291,9 @@ class CentralOrchestrator:
             last_completed_at=report.completed_at.isoformat(),
             platforms={item.platform_id: item.stage.value for item in report.platform_reports},
         )
-        state_path.write_text(json.dumps(asdict(state), ensure_ascii=False, indent=2), encoding="utf-8")
+        state_path.write_text(
+            json.dumps(asdict(state), ensure_ascii=False, indent=2), encoding="utf-8"
+        )
 
     def _append_log(self, report: OrchestratorRunReport) -> None:
         self.logs_root.mkdir(parents=True, exist_ok=True)

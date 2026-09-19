@@ -1,0 +1,16 @@
+{
+  "schema_version": "apf.arkaon-verification/1.0",
+  "request_id": "relay-quarantine-001",
+  "role": "ARKAON",
+  "scope_digest": "9f17275acb2a7bd27974d2cb3e53ca49115d3e3218afed7559a60ff2583382c2",
+  "checks": [
+    "Malformed JSON is quarantined with a BLOCKED receipt.",
+    "Scope tampering and permission escalation are quarantined.",
+    "A later valid request is delivered in the same relay pass.",
+    "Approval receipt binding and worktree command denial are tested."
+  ],
+  "focused_result": "19 PASS",
+  "full_regression_result": "594 PASS / 5 SKIP",
+  "ruff_result": "PASS",
+  "outcome": "ARKAON_VERIFIED"
+}

@@ -27,8 +27,8 @@
     "external_material_included": false
   },
   "evidence_hashes": {
-    "src/apf/mediated_auth.py": "299860fbf60940703cc5055866907f4262e6296a9ea69b4cf31bd77459a2515d",
-    "tests/test_mediated_auth.py": "8c1375c3233d8d4611f621a90628788844a27bbe0fd6b93ba9efee51f62259b2"
+    "src/apf/mediated_auth.py": "bf3e2379e1a899a381155dacd0f367c08ce5f41392c08f8112479e8b08efd282",
+    "tests/test_mediated_auth.py": "31ba6f399afe86ce5c4382400d5b5cdd95f3ff4312a5285abe7325464c2c3b81"
   },
   "source_refs": [
     "src/apf/mediated_auth.py"
@@ -53,5 +53,5 @@
   "status": "ETHERNIAN_REVIEW_REQUIRED",
   "owned_asset": false,
   "semantic_fingerprint": "0072fb62bd10cecc52a3af31b21cf4933e6d7bf3dabdca7b675e09539a5f1038",
-  "package_hash": "7db41741b2609864262ebc4adc11850c9748a4f9d55a0f6bf4657b477bb6b18b"
+  "package_hash": "a47a1a910377b3aa601f8846090e8928d295baffdbdbfb61d753c41f59870b4b"
 }

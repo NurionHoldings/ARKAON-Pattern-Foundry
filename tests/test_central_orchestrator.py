@@ -72,11 +72,27 @@ def test_shared_policy_rejects_operational_collection() -> None:
 
 
 def test_platforms_json_must_match_foundry_root() -> None:
+    registrations = CentralOrchestrator.load_platforms(
+        FOUNDRY / "config" / "platforms.json",
+        foundry_root=FOUNDRY,
+    )
+    assert registrations
+
+
+def test_platforms_json_rejects_wrong_literal_foundry_root(tmp_path: Path) -> None:
+    config = tmp_path / "platforms.json"
+    config.write_text(
+        json.dumps(
+            {
+                "schema_version": "apf.central-platforms/v1",
+                "foundry_root": str(tmp_path / "other"),
+                "platforms": [{"id": "DEMO", "path": str(tmp_path / "demo")}],
+            }
+        ),
+        encoding="utf-8",
+    )
     with pytest.raises(OrchestratorError) as caught:
-        CentralOrchestrator.load_platforms(
-            FOUNDRY / "config" / "platforms.json",
-            foundry_root=Path("C:/wrong"),
-        )
+        CentralOrchestrator.load_platforms(config, foundry_root=tmp_path)
     assert caught.value.code == "FOUNDRY_ROOT_MISMATCH"
 
 
@@ -147,7 +163,9 @@ def test_demo_map_ops_advisory_includes_map_ops_packet(tmp_path: Path) -> None:
     ):
         source = FOUNDRY / "config" / name
         if source.is_file():
-            (foundry / "config" / name).write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
+            (foundry / "config" / name).write_text(
+                source.read_text(encoding="utf-8"), encoding="utf-8"
+            )
     platform = tmp_path / "demo-platform"
     write_platform(platform, "DEMO", foundry_root=foundry)
     orchestrator = CentralOrchestrator.from_config(foundry)

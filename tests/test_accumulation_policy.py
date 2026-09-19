@@ -11,18 +11,18 @@ FOUNDRY = Path(__file__).resolve().parents[1]
 NOW = datetime(2026, 9, 17, 12, 0, tzinfo=UTC)
 
 
-def test_resource_limits_v2_unbounded_defaults():
+def test_resource_limits_v2_bounded_defaults():
     limits = ResourceLimits.load(FOUNDRY / "config" / "resource-limits.json")
-    assert limits.is_unbounded
-    assert limits.max_inbox_packets is None
-    assert limits.max_platforms_per_run is None
-    assert limits.sequential_platform_analysis is False
+    assert not limits.is_unbounded
+    assert limits.max_inbox_packets == 32
+    assert limits.max_platforms_per_run == 8
+    assert limits.sequential_platform_analysis is True
 
 
-def test_accumulation_policy_loads_unbounded_memory():
+def test_accumulation_policy_loads_bounded_memory():
     policy = AccumulationPolicy.load(FOUNDRY / "config" / "arkaon-accumulation-policy.json")
-    assert policy.is_unbounded
-    assert policy.failure_family_limit is None
+    assert not policy.is_unbounded
+    assert policy.failure_family_limit == 100
     memory = LearningMemory.from_foundry(FOUNDRY)
     for index in range(5):
         memory.remember(
@@ -66,7 +66,7 @@ def test_plan_curriculum_unbounded_selects_all_candidates():
     assert len(plan.items) == 6
 
 
-def test_orchestrator_unbounded_inbox(tmp_path: Path):
+def test_orchestrator_bounded_inbox(tmp_path: Path):
     foundry = tmp_path / "foundry"
     for folder in ("config", "inbox", "reports", "logs", "state"):
         (foundry / folder).mkdir(parents=True, exist_ok=True)
@@ -78,7 +78,9 @@ def test_orchestrator_unbounded_inbox(tmp_path: Path):
     ):
         source = FOUNDRY / "config" / name
         if source.is_file():
-            (foundry / "config" / name).write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
+            (foundry / "config" / name).write_text(
+                source.read_text(encoding="utf-8"), encoding="utf-8"
+            )
 
     platform_a = tmp_path / "platform-a"
     platform_b = tmp_path / "platform-b"

@@ -27,8 +27,8 @@
     "external_material_included": false
   },
   "evidence_hashes": {
-    "src/apf/migrations.py": "e6cbd2a7f92a1fc7ad94f97abcae803bb2c9fa15dc0b7c045aa5d7f01fe5c343",
-    "tests/test_migrations.py": "340ef49cdb07adc19b64940fde9a17881b03afd1388c7ab672d1d7379e8968b4"
+    "src/apf/migrations.py": "c80f0fc7db74181257fc3a9e3f6489d0c6bab6699d598bf20e80f7bd39179bfc",
+    "tests/test_migrations.py": "264cd0f251d1984e9719080416be02b766a907d830cb1fd890b0e477bd107ca1"
   },
   "source_refs": [
     "src/apf/migrations.py"
@@ -53,5 +53,5 @@
   "status": "ETHERNIAN_REVIEW_REQUIRED",
   "owned_asset": false,
   "semantic_fingerprint": "ca50913d21c0a280479606840eede0e0b457a216803feaace611003f73c5e8c1",
-  "package_hash": "632c1c05fae9f7f0b1d51b91667057119b528f4a7862822c5257d852a7137a43"
+  "package_hash": "380b5916aa315e705d336d095012d5cfcd6218a020e96f2cffe7fe3e7a801dfc"
 }

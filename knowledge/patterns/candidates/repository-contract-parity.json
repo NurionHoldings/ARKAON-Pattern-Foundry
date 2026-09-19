@@ -27,8 +27,8 @@
     "external_material_included": false
   },
   "evidence_hashes": {
-    "src/apf/db.py": "4ea0b24765ded190b18d5bfbc425b156c9d4adc36cdbcdb29acd0ecd5be8f2f8",
-    "tests/test_postgres_repository.py": "4b0406cd98d1c35af5046e3f918687c0bfde3a73bdbf9538f7bdcd5070b5f0a4"
+    "src/apf/db.py": "5bca32a2aa84df171f807d2bdd6f20f4b1e12126d73439b5965bdaa3d835d790",
+    "tests/test_postgres_repository.py": "6e2bc0afb37777c4b4891cf93c72f713d8eca935e0b7772543472a9677cb2533"
   },
   "source_refs": [
     "src/apf/db.py"
@@ -53,5 +53,5 @@
   "status": "ETHERNIAN_REVIEW_REQUIRED",
   "owned_asset": false,
   "semantic_fingerprint": "ddaa331539d0f2ce9c881792c46a51d3733a58dd356fd54b6b4f7b538e5ed46d",
-  "package_hash": "b4be694b9fc6ef399e1bc4e131fe201fa0d8f322b4a7d783430867bb099693bf"
+  "package_hash": "01c0906559046e49ee0cff3a0092dc4dfeed7792b255c2f9a2a5615129739bbb"
 }

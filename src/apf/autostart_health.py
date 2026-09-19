@@ -78,7 +78,7 @@ def _daemon_worker_ok(root: Path, daemon_name: str, worker_hint: str) -> bool:
         return False
     stamp = lines[-1].split("orchestrator cycle at ", 1)[-1].strip()
     try:
-        cycle_at = datetime.fromisoformat(stamp.replace("Z", "+00:00"))
+        cycle_at = datetime.fromisoformat(stamp)
     except ValueError:
         return False
     return (datetime.now(UTC) - cycle_at.astimezone(UTC)).total_seconds() <= 1200
