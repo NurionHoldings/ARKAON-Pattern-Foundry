@@ -1,0 +1,26 @@
+{
+  "schema_version": "apf.self-improvement-result/1.0",
+  "request_id": "audit-bot-runtime-safety-002",
+  "scope_digest": "5b93a54db6d09cdfaf5d8675b07c4a8548de4f6358e6e322481978a7c942eb08",
+  "state": "DEPLOYMENT_APPROVAL_PENDING",
+  "approval_receipt_file_digest": "sha256:1ebe3b7afe6e8e251a6317091973e660d05ed6621b613563821a08bd10a0a9bd",
+  "implementation_candidate_sha": "dca637ee0e699e58c7858e80be19df646aecfbb0",
+  "before": "Audit Bot was manual, approval synchronization was unmerged, learning and approval ledgers lacked complete concurrency and retention controls, and no deployment-baseline internal audit existed.",
+  "after": "The 15-second relay performs approval synchronization, mandatory post-ARKAON change audits, and deployment-baseline internal audits; ledgers are locked, atomic, bounded, duplicate-resistant and tamper-evident.",
+  "applies_when": [
+    "every realtime relay cycle",
+    "after every ARKAON_VERIFIED approved modification",
+    "every internal integrity audit cycle"
+  ],
+  "arkaon_verification_digest": "sha256:aa7063fd529153c963b328bd27305c20e2a420a61bc28775ef3dbf385c4363c8",
+  "eternian_audit_and_remediation_digest": "sha256:531fdd3f336f92a02aa4ce08feae0ee536ee4d96fcc142a04e2c045e55d4f850",
+  "regression": "619 PASS / 5 SKIP; Ruff PASS; Linux CI GREEN; PostgreSQL CI GREEN; Windows audit-controls CI GREEN",
+  "remaining_risks": [
+    "The owner's actual Windows Scheduled Task and existing gh authentication require one post-merge live smoke cycle.",
+    "The deployment baseline remains inactive until separately approved after merge."
+  ],
+  "rollback": "Revert the runtime-safety commits, restore the previous relay command, preserve all approval/audit/learning ledgers and quarantine receipts, then restart the Scheduled Task.",
+  "production_change_allowed": false,
+  "automatic_merge_allowed": false,
+  "deployment_allowed": false
+}
