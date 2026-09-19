@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+from pathlib import Path
 from typing import Annotated
 from uuid import UUID
 
@@ -13,6 +14,7 @@ from .console import (
     install_console,
 )
 from .domain import AnalysisTarget, AnalysisTargetCreate, TargetState
+from .plain_language_approval import PlainLanguageApprovalStore
 from .repository import (
     DuplicateTarget,
     MemoryRepository,
@@ -52,12 +54,16 @@ def repository_from_config(
 def create_app(
     *, repository: TargetRepository | None = None, console_security: ConsoleSecurity | None = None,
     console_review_store: ConsoleReviewStore | None = None,
+    plain_approval_store: PlainLanguageApprovalStore | None = None,
 ) -> FastAPI:
     application = FastAPI(title="ARKAON Pattern Foundry", version="0.1.0")
     application.state.repository = repository or repository_from_config()
     install_console(
         application, security=console_security or console_security_from_config(),
         review_store=console_review_store,
+        approval_store=plain_approval_store or PlainLanguageApprovalStore(
+            Path(os.getenv("APF_FOUNDRY_ROOT", Path(__file__).parents[2]))
+        ),
     )
 
     @application.get("/health")

@@ -6,16 +6,18 @@ from fastapi.testclient import TestClient
 from apf.api import create_app
 from apf.console import SESSION_COOKIE, ConsoleSecurity
 from apf.domain import AnalysisTargetCreate
+from apf.plain_language_approval import PlainLanguageApprovalStore
 from apf.repository import MemoryRepository
 
 
-def make_client(*, role: str = "operator"):
+def make_client(*, role: str = "operator", approval_store=None):
     repository = MemoryRepository()
     app = create_app(
         repository=repository,
         console_security=ConsoleSecurity(
             environment="test", secret="s" * 32, allow_dev_sessions=True
         ),
+        plain_approval_store=approval_store,
     )
     client = TestClient(app, base_url="https://testserver")
     tenant_id, principal_id = uuid4(), uuid4()
@@ -127,3 +129,28 @@ def test_summary_exposes_no_secret_or_raw_material():
     body = client.get("/v1/console/summary").text.lower()
     for forbidden in ("password", "authorization", "cookie", "raw_material", "session"):
         assert forbidden not in body
+
+
+def test_plain_approval_routes_require_owner_csrf_and_store(tmp_path):
+    operator, _, _, _ = make_client(
+        role="operator", approval_store=PlainLanguageApprovalStore(tmp_path)
+    )
+    assert operator.get("/v1/console/self-improvement-reports").status_code == 403
+
+    owner, _, _, csrf = make_client(
+        role="owner", approval_store=PlainLanguageApprovalStore(tmp_path)
+    )
+    assert owner.get("/v1/console/self-improvement-reports").status_code == 200
+    payload = {
+        "decision": "APPROVE", "scope_digest": "a" * 64,
+        "nonce": str(uuid4()), "expires_at": "2031-01-01T01:00:00+00:00",
+    }
+    request_id = "missing"
+    assert owner.post(
+        f"/v1/console/self-improvement-reports/{request_id}/decision", json=payload
+    ).status_code == 403
+    response = owner.post(
+        f"/v1/console/self-improvement-reports/{request_id}/decision", json=payload,
+        headers={"X-CSRF-Token": csrf},
+    )
+    assert response.status_code == 422

@@ -22,6 +22,11 @@ from .durable_review import (
     ReviewDecision,
     ReviewStage,
 )
+from .plain_language_approval import (
+    ApprovalDecision,
+    PlainApprovalError,
+    PlainLanguageApprovalStore,
+)
 from .repository import TargetRepository
 
 SESSION_COOKIE = "apf_console_session"
@@ -33,13 +38,13 @@ SAFE_METHODS = frozenset({"GET", "HEAD", "OPTIONS"})
 class ConsolePrincipal:
     tenant_id: UUID
     principal_id: UUID
-    role: Literal["operator", "reviewer", "auditor"]
+    role: Literal["owner", "operator", "reviewer", "auditor"]
 
 
 class DevSessionRequest(BaseModel):
     tenant_id: UUID
     principal_id: UUID
-    role: Literal["operator", "reviewer", "auditor"] = "operator"
+    role: Literal["owner", "operator", "reviewer", "auditor"] = "operator"
 
 
 class ReviewSubmission(BaseModel):
@@ -128,9 +133,11 @@ class ConsoleSecurity:
 
 def install_console(
     application, *, security: ConsoleSecurity, review_store: ConsoleReviewStore | None = None,
+    approval_store: PlainLanguageApprovalStore | None = None,
 ) -> None:
     application.state.console_security = security
     application.state.console_review_store = review_store
+    application.state.plain_approval_store = approval_store
 
     def principal(
         request: Request,
@@ -155,6 +162,12 @@ def install_console(
         store = request.app.state.console_review_store
         if store is None:
             raise HTTPException(status_code=503, detail="durable review store unavailable")
+        return store
+
+    def approvals(request: Request) -> PlainLanguageApprovalStore:
+        store = request.app.state.plain_approval_store
+        if store is None:
+            raise HTTPException(status_code=503, detail="plain-language approval store unavailable")
         return store
 
     def store_error(error: Exception) -> HTTPException:
@@ -293,6 +306,47 @@ def install_console(
             raise store_error(error) from None
         return {"task_id": decided.task_id, "decision": payload.decision.value,
                 "status": decided.status.value}
+
+    @application.get("/v1/console/self-improvement-reports")
+    def plain_reports(
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[PlainLanguageApprovalStore, Depends(approvals)],
+    ) -> list[dict[str, object]]:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        return store.list_reports()
+
+    @application.get("/v1/console/self-improvement-reports/{request_id}")
+    def plain_report(
+        request_id: str,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[PlainLanguageApprovalStore, Depends(approvals)],
+    ) -> dict[str, object]:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        try:
+            return store.get_report(request_id)
+        except PlainApprovalError as error:
+            raise HTTPException(status_code=404, detail=str(error)) from None
+
+    @application.post("/v1/console/self-improvement-reports/{request_id}/decision")
+    def decide_plain_report(
+        request_id: str,
+        payload: ApprovalDecision,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[PlainLanguageApprovalStore, Depends(approvals)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        try:
+            return store.decide(
+                request_id=request_id, decision=payload, principal_id=str(actor.principal_id)
+            )
+        except PlainApprovalError as error:
+            code = 409 if str(error) == "PLAIN_APPROVAL_ALREADY_DECIDED" else 422
+            raise HTTPException(status_code=code, detail=str(error)) from None
 
 
 def console_security_from_config(
