@@ -71,6 +71,7 @@ REGISTER → AUTHORIZE → SNAPSHOT → EXTRACT_INTENT_DNA → ANALYZE
 40. [ARKAON 통제된 성찰학습·교훈기억](docs/40-arkaon-reflective-learning.md)
 41. [우편함 유지관리](docs/41-mailbox-maintenance.md)
 42. [승인 기반 자기개선 실행](docs/42-self-improvement-execution.md)
+43. [신규사업 사전준비 지능](docs/69-venture-preflight-intelligence.md)
 
 ## 중앙 오케스트레이터
 
