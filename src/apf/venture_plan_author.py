@@ -7,7 +7,6 @@ from typing import Literal
 
 from pydantic import BaseModel, Field, model_validator
 
-
 EvidenceState = Literal["MISSING", "PENDING", "VERIFIED"]
 SectionState = Literal["DRAFT", "RESEARCH_REQUIRED", "READY_FOR_REVIEW"]
 
