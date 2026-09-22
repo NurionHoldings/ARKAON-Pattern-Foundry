@@ -1,9 +1,12 @@
 """Evidence-first preflight for new ventures and real-person IP projects."""
 from __future__ import annotations
+
 import json
 from hashlib import sha256
 from urllib.parse import urlparse
+
 from pydantic import BaseModel, Field, model_validator
+
 
 class VenturePreflightError(ValueError):
     pass
@@ -19,7 +22,7 @@ class VentureIntent(BaseModel):
     public_figure_name: str | None = Field(default=None, max_length=120)
 
     @model_validator(mode="after")
-    def require_figure_name(self) -> "VentureIntent":
+    def require_figure_name(self) -> VentureIntent:
         if self.public_figure_inspired and not self.public_figure_name:
             raise ValueError("public figure name required")
         return self
@@ -49,7 +52,7 @@ class EvidenceCandidate(BaseModel):
     verification_status: str = Field(default="PENDING", pattern=r"^(PENDING|VERIFIED|REJECTED|STALE)$")
 
     @model_validator(mode="after")
-    def require_https(self) -> "EvidenceCandidate":
+    def require_https(self) -> EvidenceCandidate:
         parsed = urlparse(self.source_url)
         if parsed.scheme != "https" or not parsed.hostname:
             raise ValueError("HTTPS evidence source required")
