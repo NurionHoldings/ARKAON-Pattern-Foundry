@@ -1,5 +1,13 @@
 import pytest
-from apf.venture_preflight import EvidenceCandidate, RightsEnvelope, VentureIntent, VenturePreflightError, build_preflight
+
+from apf.venture_preflight import (
+    EvidenceCandidate,
+    RightsEnvelope,
+    VentureIntent,
+    VenturePreflightError,
+    build_preflight,
+)
+
 
 def intent():
     return VentureIntent(project_id="park-se-ri-character-ip", working_title="세리의 드림라운드",
