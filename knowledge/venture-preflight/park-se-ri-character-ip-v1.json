@@ -1,0 +1,61 @@
+{
+  "schema_version": "apf.venture-seed/1.0",
+  "project_id": "park-se-ri-character-ip",
+  "working_title": "세리의 드림라운드",
+  "recorded_at": "2026-09-22T00:00:00Z",
+  "status": "RESEARCH_AND_PLANNING_ONLY",
+  "intent": {
+    "public_figure": "박세리",
+    "purpose": "한국을 세계에 알린 개척 정신을 국민 친화적 캐릭터, 콘텐츠, 교육, 굿즈와 디지털 경험으로 확장한다.",
+    "audiences": ["어린이와 가족", "골프 비이용자", "골프 팬", "여성·청소년", "해외 K-컬처 이용자"],
+    "markets": ["대한민국", "북미", "일본", "동남아시아", "기타 검증 대상 지역"]
+  },
+  "non_negotiable_boundaries": [
+    "박세리 또는 정당한 권리자의 서면 허락 전에는 이름, 얼굴, 목소리, 서명, 경기 영상과 유사 캐릭터를 상업 사용하지 않는다.",
+    "승인 전 결과물은 텍스트 기획과 비식별 와이어프레임으로 제한한다.",
+    "사실, 추론, 아이디어, 미검증 가설을 분리한다.",
+    "타사 코드, 캐릭터 표현, 문구, 화면 구성과 브랜드 자산을 복제하지 않는다.",
+    "어린이 대상 콘텐츠는 광고·결제·개인정보·확률형 보상 위험을 별도 심사한다.",
+    "공익기금과 상업 수익의 회계·표현을 구분한다."
+  ],
+  "value_hypotheses": [
+    "박세리의 핵심 자산은 골프 기술만이 아니라 개척, 회복, 자신감과 후배 양성의 서사다.",
+    "골프 비이용자도 참여 가능한 생활 도전 콘텐츠가 국민 친화성을 넓힐 수 있다.",
+    "캐릭터와 실존 인물을 분리한 이중 IP 구조가 세대 확장과 장기 운영에 유리할 수 있다.",
+    "한국적 동반 캐릭터와 세계 18개 코스 구조는 관광·교육·애니메이션 확장에 적합할 수 있다."
+  ],
+  "candidate_products": [
+    {"id": "short-animation", "name": "다국어 숏폼 애니메이션", "validation": "완주율·공유율·캐릭터 회상"},
+    {"id": "challenge-app", "name": "국민 도전 기록 서비스", "validation": "7일·30일 과제 유지율"},
+    {"id": "kids-program", "name": "모두의 첫 스윙 교육", "validation": "비골프 시설 참여성과 보호자 만족"},
+    {"id": "goods-scan", "name": "굿즈 찍어찾기·정품 연결", "validation": "인식 정확도·구매전환·위조 신고"},
+    {"id": "k-golf-passport", "name": "K-골프 관광 패스포트", "validation": "지역 방문·제휴 사용·재방문"},
+    {"id": "archive", "name": "도전 아카이브·그림책", "validation": "교육기관 채택·독서 이해도"}
+  ],
+  "case_families_to_verify": [
+    {"family": "athlete-symbol-brand", "examples": ["Michael Jordan / Jordan Brand"], "questions": ["선수와 독립 브랜드의 관계", "상징 동작·로고의 장기 확장", "품질 통제"]},
+    {"family": "athlete-character-story", "examples": ["Serena Williams / Qai Qai", "Lionel Messi animation projects"], "questions": ["캐릭터 독립성", "아동 콘텐츠 확장", "다국어·플랫폼 유통"]},
+    {"family": "sports-legacy-education", "examples": ["선수 재단·아카데미·아동 전기"], "questions": ["공익성과 상업성 분리", "교육 성과", "후배 양성 구조"]},
+    {"family": "national-sports-icon-tourism", "examples": ["스포츠 박물관·명예의 전당·지역 관광 연계"], "questions": ["국가 이미지 기여", "지역경제 효과", "상시 방문 동기"]}
+  ],
+  "research_queries": {
+    "identity_and_rights": ["박세리 공식 권리 주체 성명 초상 음성 서명", "대한민국 유명인 성명 초상 상업 이용 최신 법령", "Park Se Ri trademark character merchandise"],
+    "market": ["Korea character licensing market official statistics", "global sports licensing market official report", "children sports character media safety guidelines"],
+    "cases": ["official athlete character animation merchandise", "official athlete foundation education licensing", "official national sports icon tourism museum"],
+    "consumer": ["한국 가족 캐릭터 콘텐츠 이용 공식 조사", "골프 비이용자 스포츠 영웅 인식 조사", "해외 K-sports character demand survey"]
+  },
+  "required_decisions_before_prototype": [
+    "권리 협의 전 제안서의 공개 범위", "실존 박세리와 독립 캐릭터의 시각적 거리",
+    "우선 대상 연령과 국가", "공익사업과 수익사업의 법인·회계 구조",
+    "첫 검증제품 한 가지와 중단 기준"
+  ],
+  "rights_state": {
+    "identity_license_verified": false, "trademark_clearance_verified": false,
+    "archive_media_rights_verified": false, "territory_and_term_defined": false,
+    "revenue_share_defined": false, "evidence_digest": null
+  },
+  "implementation_policy": {
+    "planning_allowed": true, "prototype_allowed": false,
+    "commercial_use_allowed": false, "deployment_allowed": false
+  }
+}
