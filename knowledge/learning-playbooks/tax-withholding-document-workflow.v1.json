@@ -4,16 +4,36 @@
   "domain": "tax-document-preparation",
   "status": "CANDIDATE",
   "review_gate": "ETHERNIAN_REVIEW_REQUIRED",
-  "problem": "급여 지급 사실을 월별 원천세 신고서와 검토용 합계표로 일관되게 변환한다.",
-  "principle": "최신 공식근거를 매 실행마다 확인하고 지급월별 신고, 사회보험 자격판정, 예정분 분리, 개인정보 최소화를 함께 수행한다.",
-  "reusable_pattern": "SOURCE_REFRESH -> INPUT_CONFIRMATION -> ELIGIBILITY_DECISION -> MONTHLY_CALCULATION -> FORM_GENERATION -> RECONCILIATION -> PRIVACY_AND_RENDER_QA -> HUMAN_SUBMISSION",
+  "problem": "사용자가 직접 입력한 급여 지급 사실을 월별 원천세 신고서와 검토용 합계표로 일관되게 변환하고 승인 후 저장한다.",
+  "principle": "기본정보·개인정보는 사용자 직접입력만 허용하고, 최신 공식근거에 따른 산출·검증과 사용자 승인 후 저장만 수행한다.",
+  "reusable_pattern": "DIRECT_USER_INPUT -> SOURCE_REFRESH -> INPUT_VALIDATION -> ELIGIBILITY_DECISION -> MONTHLY_CALCULATION -> FORM_GENERATION -> RECONCILIATION -> PRIVACY_AND_RENDER_QA -> USER_STORAGE_APPROVAL -> SAVE",
+  "allowed_capabilities": [
+    "CALCULATE",
+    "GENERATE",
+    "VERIFY",
+    "SAVE_AFTER_USER_APPROVAL"
+  ],
+  "forbidden_capabilities": [
+    "PERSONAL_DATA_LOOKUP",
+    "PERSONAL_DATA_INFERENCE",
+    "CROSS_CASE_PERSONAL_DATA_REUSE",
+    "LOGIN",
+    "SIGN",
+    "SUBMIT",
+    "PAY",
+    "SHARE",
+    "TRANSMIT"
+  ],
   "negative_lessons": [
     "대표자라는 이유만으로 모든 사회보험을 동일 적용하면 안 된다.",
-    "연령만으로 국민연금 공제를 적용하거나 제외하지 않고 실제 가입상태를 확인한다.",
+    "연령만으로 국민연금 공제를 적용하거나 제외하지 않고 사용자가 입력한 실제 가입상태를 확인한다.",
     "월별 신고 대상과 내부 합계표를 혼동하면 안 된다.",
     "신고 전 예정 급여를 실제 신고 합계에 넣으면 안 된다.",
-    "주민등록번호를 학습기억이나 공개 저장소에 남기면 안 된다."
+    "주민등록번호를 학습기억이나 공개 저장소에 남기면 안 된다.",
+    "사용자 저장 승인 없이 개인정보 포함 산출물을 저장하면 안 된다."
   ],
   "operational_data_included": false,
-  "automatic_operational_application": false
+  "automatic_operational_application": false,
+  "automatic_submission": false,
+  "automatic_transmission": false
 }
