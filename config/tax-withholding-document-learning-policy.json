@@ -1,0 +1,43 @@
+{
+  "schema_version": "apf.tax-withholding-document-learning/v1",
+  "pattern_id": "tax-withholding-document-workflow",
+  "status": "ETHERNIAN_REVIEW_REQUIRED",
+  "mode": "PROPOSE_ONLY",
+  "source_refresh_required_each_run": true,
+  "steps": [
+    "CONFIRM_SCOPE",
+    "VERIFY_CURRENT_OFFICIAL_FORM",
+    "SEPARATE_ACCRUAL_AND_PAYMENT_MONTH",
+    "CLASSIFY_TAXABLE_AND_NONTAXABLE_PAY",
+    "CONFIRM_DEPENDENT_INPUTS",
+    "CALCULATE_INCOME_TAX_FROM_CURRENT_TABLE",
+    "CALCULATE_LOCAL_INCOME_TAX_SEPARATELY",
+    "ASSESS_SOCIAL_INSURANCE_ELIGIBILITY",
+    "GENERATE_MONTHLY_FORMS",
+    "SEPARATE_ACTUAL_AND_PLANNED_PAYMENTS",
+    "GENERATE_RECONCILIATION_SUMMARY",
+    "VERIFY_ARITHMETIC_RENDERING_AND_PRIVACY",
+    "HUMAN_REVIEW_REQUIRED"
+  ],
+  "required_evidence_classes": [
+    "CURRENT_NTS_FORM",
+    "CURRENT_NTS_WITHHOLDING_TABLE",
+    "CURRENT_SOCIAL_INSURANCE_RULES",
+    "REPRODUCIBLE_CALCULATION",
+    "RENDER_VERIFICATION"
+  ],
+  "privacy": {
+    "store_raw_resident_registration_number": false,
+    "store_credentials_or_certificates": false,
+    "store_taxpayer_specific_documents_as_learning_memory": false,
+    "allow_abstracted_rules_and_redacted_test_vectors": true
+  },
+  "guards": {
+    "automatic_submission": false,
+    "automatic_payment": false,
+    "automatic_tax_amount_finalization_without_current_sources": false,
+    "combine_monthly_filings_into_single_submission": false,
+    "treat_planned_payment_as_filed": false,
+    "human_review_required": true
+  }
+}
