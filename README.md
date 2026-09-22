@@ -70,7 +70,7 @@ REGISTER → AUTHORIZE → SNAPSHOT → EXTRACT_INTENT_DNA → ANALYZE
 39. [ARKAON 화면·콘텐츠·운영 정합성 감사](docs/39-arkaon-experience-operations-audit.md)
 40. [ARKAON 통제된 성찰학습·교훈기억](docs/40-arkaon-reflective-learning.md)
 41. [우편함 유지관리](docs/41-mailbox-maintenance.md)
-42. [승인 기반 자기개선 실행](docs/42-self-improvement-execution.md)
+42. [승인 기반 자기개선 실행](docs/42-self-improvement-execution.md)\n43. [원천세·급여공제 문서학습 패턴](docs/43-tax-withholding-document-learning.md)
 
 ## 중앙 오케스트레이터
 
@@ -86,7 +86,7 @@ powershell.exe -ExecutionPolicy Bypass -File "D:\ARKAON_Pattern Foundry\orchestr
 
 ## 구현 게이트
 
-현재 상태는 **#047 CENTRAL ARKAON ORCHESTRATOR FOUNDATION / PRODUCT IMPLEMENTATION HOLD**입니다. 정확히 30개 후보와 검증·외부서명 승격·재사용 proof harness가 있지만, 모든 후보는 `ETHERNIAN_REVIEW_REQUIRED`이며 운영 승격은 0건입니다. 테스트 전용 서명은 `TEST_VECTOR`일 뿐 운영 승인이 아닙니다. PostgreSQL 대상 저장소와 CI 경로는 구현됐지만 live Green 증거 및 PostgreSQL 검토·후보 어댑터는 아직 없습니다. 노가다뉴스·부업장터는 제공된 구조 메타데이터 기반 읽기 전용 파일럿만 구현됐고 실제 저장소 연결·코드 분석은 `NOT_RUN_UNAVAILABLE`입니다. UI 상세 렌더링, 외부 서명에 의한 30개 개별 승격과 실제 재사용 증명도 미완료입니다. 상세 상태는 `knowledge/readiness/v0.1-readiness.json`이 기준입니다.
+현재 상태는 **#050 GOVERNED TAX-DOCUMENT LEARNING CANDIDATE / PRODUCT IMPLEMENTATION HOLD**입니다. 정확히 30개 후보와 검증·외부서명 승격·재사용 proof harness가 있지만, 모든 후보는 `ETHERNIAN_REVIEW_REQUIRED`이며 운영 승격은 0건입니다. 테스트 전용 서명은 `TEST_VECTOR`일 뿐 운영 승인이 아닙니다. PostgreSQL 대상 저장소와 CI 경로는 구현됐지만 live Green 증거 및 PostgreSQL 검토·후보 어댑터는 아직 없습니다. 노가다뉴스·부업장터는 제공된 구조 메타데이터 기반 읽기 전용 파일럿만 구현됐고 실제 저장소 연결·코드 분석은 `NOT_RUN_UNAVAILABLE`입니다. UI 상세 렌더링, 외부 서명에 의한 30개 개별 승격과 실제 재사용 증명도 미완료입니다. 상세 상태는 `knowledge/readiness/v0.1-readiness.json`이 기준입니다.
 
 ## 공개 저장소 정책
 
