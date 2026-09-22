@@ -70,7 +70,7 @@ REGISTER → AUTHORIZE → SNAPSHOT → EXTRACT_INTENT_DNA → ANALYZE
 39. [ARKAON 화면·콘텐츠·운영 정합성 감사](docs/39-arkaon-experience-operations-audit.md)
 40. [ARKAON 통제된 성찰학습·교훈기억](docs/40-arkaon-reflective-learning.md)
 41. [우편함 유지관리](docs/41-mailbox-maintenance.md)
-42. [승인 기반 자기개선 실행](docs/42-self-improvement-execution.md)
+42. [승인 기반 자기개선 실행](docs/42-self-improvement-execution.md)\n43. [SERI ON 72 템플릿·플랫폼 ARKAON 준비팩](docs/43-serion72-template-platform-arkaon.md)
 
 ## 중앙 오케스트레이터
 
