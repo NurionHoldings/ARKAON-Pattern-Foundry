@@ -1,0 +1,19 @@
+{
+  "schema_version": "apf.learning-playbook/v1",
+  "playbook_id": "tax-withholding-document-workflow-v1",
+  "domain": "tax-document-preparation",
+  "status": "CANDIDATE",
+  "review_gate": "ETHERNIAN_REVIEW_REQUIRED",
+  "problem": "급여 지급 사실을 월별 원천세 신고서와 검토용 합계표로 일관되게 변환한다.",
+  "principle": "최신 공식근거를 매 실행마다 확인하고 지급월별 신고, 사회보험 자격판정, 예정분 분리, 개인정보 최소화를 함께 수행한다.",
+  "reusable_pattern": "SOURCE_REFRESH -> INPUT_CONFIRMATION -> ELIGIBILITY_DECISION -> MONTHLY_CALCULATION -> FORM_GENERATION -> RECONCILIATION -> PRIVACY_AND_RENDER_QA -> HUMAN_SUBMISSION",
+  "negative_lessons": [
+    "대표자라는 이유만으로 모든 사회보험을 동일 적용하면 안 된다.",
+    "연령만으로 국민연금 공제를 적용하거나 제외하지 않고 실제 가입상태를 확인한다.",
+    "월별 신고 대상과 내부 합계표를 혼동하면 안 된다.",
+    "신고 전 예정 급여를 실제 신고 합계에 넣으면 안 된다.",
+    "주민등록번호를 학습기억이나 공개 저장소에 남기면 안 된다."
+  ],
+  "operational_data_included": false,
+  "automatic_operational_application": false
+}
