@@ -35,7 +35,6 @@ from .durable_review import (
     ReviewDecision,
     ReviewStage,
 )
-from .logo_motion import Motion
 from .logo_draft import (
     LogoDraftError,
     LogoDraftRequest,
@@ -43,6 +42,7 @@ from .logo_draft import (
     LogoRevisionRequest,
     LogoRollbackRequest,
 )
+from .logo_motion import Motion
 from .plain_language_approval import (
     ApprovalDecision,
     PlainApprovalError,
