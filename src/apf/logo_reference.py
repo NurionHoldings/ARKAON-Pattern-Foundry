@@ -61,7 +61,7 @@ def _features(image: Image.Image, raw: bytes, kind: str) -> dict[str, object]:
     sample = image.resize((64, 64), Image.Resampling.LANCZOS)
     colors = sample.quantize(colors=5).convert("RGB").getcolors(4096) or []
     colors.sort(reverse=True, key=lambda pair: pair[0])
-    palette = ["#%02x%02x%02x" % rgb for _, rgb in colors[:5]]
+    palette = [f"#{rgb[0]:02x}{rgb[1]:02x}{rgb[2]:02x}" for _, rgb in colors[:5]]
     return {
         "digest": "sha256:" + sha256(raw).hexdigest(),
         "format": kind.lower(),
