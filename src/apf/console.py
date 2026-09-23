@@ -43,6 +43,7 @@ from .logo_draft import (
     LogoRollbackRequest,
 )
 from .logo_motion import Motion
+from .logo_reference import ImageReferenceError, ImageReferenceRequest, analyze_reference
 from .plain_language_approval import (
     ApprovalDecision,
     PlainApprovalError,
@@ -734,6 +735,20 @@ def install_console(
                 "X-Content-Type-Options": "nosniff",
             },
         )
+
+    @application.post("/v1/console/logo-reference/analyze")
+    def analyze_logo_reference(
+        payload: ImageReferenceRequest,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        try:
+            return analyze_reference(payload)
+        except ImageReferenceError as error:
+            raise HTTPException(status_code=422, detail=str(error)) from None
 
     @application.post("/v1/console/logo-drafts", status_code=status.HTTP_201_CREATED)
     def create_logo_draft(
