@@ -1,0 +1,128 @@
+{
+  "analysis_run_id": "060-business-card-mvp",
+  "axes": {
+    "why": [
+      {
+        "canonical_text": "소유자가 저장한 로고를 사용해 검토 가능한 명함 SVG를 빠르게 만든다.",
+        "evidence_refs": [
+          "060-business-card"
+        ],
+        "confidence": 0.95,
+        "stability": "CORE",
+        "disputed": false
+      }
+    ],
+    "who": [
+      {
+        "canonical_text": "tenant에 속한 owner만 로고와 명함을 생성·조회·수정·다운로드한다.",
+        "evidence_refs": [
+          "060-business-card"
+        ],
+        "confidence": 0.98,
+        "stability": "CORE",
+        "disputed": false
+      }
+    ],
+    "outcome": [
+      {
+        "canonical_text": "앞면과 뒷면의 결정적 SVG 명함, revision, rollback, 소유자 다운로드를 제공한다.",
+        "evidence_refs": [
+          "060-business-card"
+        ],
+        "confidence": 0.96,
+        "stability": "CORE",
+        "disputed": false
+      }
+    ],
+    "journey": [
+      {
+        "canonical_text": "저장 로고 선택→연락처 입력→미리보기→수정 또는 rollback→SVG 다운로드",
+        "evidence_refs": [
+          "060-business-card"
+        ],
+        "confidence": 0.96,
+        "stability": "CORE",
+        "disputed": false
+      }
+    ],
+    "object": [
+      {
+        "canonical_text": "owner-bound business_card_svg와 immutable revision",
+        "evidence_refs": [
+          "060-business-card"
+        ],
+        "confidence": 0.96,
+        "stability": "CONFIGURABLE",
+        "disputed": false
+      }
+    ],
+    "owner": [
+      {
+        "canonical_text": "tenant owner가 로고 선택 및 명함 상태의 권위 원천이다.",
+        "evidence_refs": [
+          "060-business-card"
+        ],
+        "confidence": 0.98,
+        "stability": "CORE",
+        "disputed": false
+      }
+    ],
+    "invariant": [
+      {
+        "canonical_text": "CSRF, tenant·owner 경계, stale digest, XML 이스케이프를 항상 검증한다.",
+        "evidence_refs": [
+          "060-business-card"
+        ],
+        "confidence": 0.99,
+        "stability": "CORE",
+        "disputed": false
+      }
+    ],
+    "constraint": [
+      {
+        "canonical_text": "외부 호출·운영 메시지·배포 없이 연락처를 체크아웃 밖의 runtime 상태에만 평문으로 저장하며 기본 임시 경로는 휘발성이고 암호화·백업·보존 자동화는 제공하지 않는다. 운영 환경에서는 APF_RUNTIME_ROOT가 필수다.",
+        "evidence_refs": [
+          "060-business-card"
+        ],
+        "confidence": 0.98,
+        "stability": "CORE",
+        "disputed": false
+      }
+    ],
+    "risk": [
+      {
+        "canonical_text": "다른 소유자의 로고나 연락처 노출을 not found로 실패 닫기 한다.",
+        "evidence_refs": [
+          "060-business-card"
+        ],
+        "confidence": 0.98,
+        "stability": "CORE",
+        "disputed": false
+      }
+    ],
+    "signal": [
+      {
+        "canonical_text": "앞·뒤 SVG XML 파싱, 소유자 경계, stale digest, CSRF 검증이 통과한다.",
+        "evidence_refs": [
+          "060-business-card"
+        ],
+        "confidence": 0.94,
+        "stability": "CONFIGURABLE",
+        "disputed": false
+      }
+    ],
+    "evolution": [
+      {
+        "canonical_text": "인쇄 규격과 추가 레이아웃은 명시 승인 후 별도 revision 계약으로 확장한다.",
+        "evidence_refs": [
+          "060-business-card"
+        ],
+        "confidence": 0.86,
+        "stability": "EXPERIMENTAL",
+        "disputed": false
+      }
+    ]
+  },
+  "fingerprint": "060-business-card-owner-bound-deterministic-svg",
+  "completeness": 0.95
+}

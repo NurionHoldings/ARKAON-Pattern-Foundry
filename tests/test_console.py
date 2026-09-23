@@ -415,3 +415,47 @@ def test_logo_draft_api_requires_owner_and_authorizes_download(tmp_path):
         json={"based_on_revision_digest": "sha256:" + "0" * 64},
     )
     assert stale.status_code == 409 and stale.json()["detail"] == "LOGO_DRAFT_STALE_REVISION"
+
+
+def test_business_card_api_uses_owned_logo_and_csrf(tmp_path):
+    from apf.business_card import BusinessCardStore
+    from apf.logo_draft import LogoDraftStore
+
+    tenant_id, owner_id = uuid4(), uuid4()
+    logos = LogoDraftStore(tmp_path)
+    app = create_app(
+        repository=MemoryRepository(),
+        console_security=ConsoleSecurity(
+            environment="test", secret="s" * 32, allow_dev_sessions=True
+        ),
+        logo_draft_store=logos,
+        business_card_store=BusinessCardStore(tmp_path, logos),
+    )
+    client = TestClient(app, base_url="https://testserver")
+    session = client.post(
+        "/console/dev/session",
+        json={"tenant_id": str(tenant_id), "principal_id": str(owner_id), "role": "owner"},
+    )
+    csrf = session.json()["csrf_token"]
+    logo = client.post(
+        "/v1/console/logo-drafts",
+        headers={"X-CSRF-Token": csrf},
+        json={"name": "마루", "tagline": "문구", "color": "#2563eb", "shape": "orbit"},
+    ).json()
+    assert "저장한 로고를 선택" in client.get("/business-cards").text
+    body = {
+        "logo_draft_id": logo["draft_id"],
+        "name": "김인석",
+        "title": "대표",
+        "phone": "010",
+        "email": "a@example.com",
+        "brand_text": "ARKAON",
+    }
+    assert client.post("/v1/console/business-cards", json=body).status_code == 403
+    card = client.post("/v1/console/business-cards", headers={"X-CSRF-Token": csrf}, json=body)
+    assert card.status_code == 201 and "front_svg" in card.json()["revisions"][0]
+    assert (
+        client.get(f"/v1/console/business-cards/{card.json()['card_id']}/download/front.svg")
+        .headers["content-security-policy"]
+        .endswith("sandbox")
+    )

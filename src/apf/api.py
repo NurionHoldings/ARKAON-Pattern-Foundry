@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import os
+import tempfile
 from pathlib import Path
 from typing import Annotated
 from uuid import UUID
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Request, status
 
+from .business_card import BusinessCardStore
 from .console import (
     ConsoleReviewStore,
     ConsoleSecurity,
@@ -55,6 +57,14 @@ def repository_from_config(
     return MemoryRepository()
 
 
+def runtime_root() -> Path:
+    """Keep the new logo and business-card artifacts outside the checkout by default."""
+    configured = os.getenv("APF_RUNTIME_ROOT")
+    if not configured and os.getenv("APF_ENV", "development").lower() in {"production", "prod"}:
+        raise RuntimeError("APF_RUNTIME_ROOT is required in production")
+    return Path(configured or Path(tempfile.gettempdir()) / "apf-runtime")
+
+
 def create_app(
     *,
     repository: TargetRepository | None = None,
@@ -64,10 +74,12 @@ def create_app(
     visual_dialogue_store: VisualPlatformDialogueStore | None = None,
     conversational_site_draft_store: ConversationalSiteDraftStore | None = None,
     logo_draft_store: LogoDraftStore | None = None,
+    business_card_store: BusinessCardStore | None = None,
     reference_consent_store: ReferenceConsentStore | None = None,
 ) -> FastAPI:
     application = FastAPI(title="ARKAON Pattern Foundry", version="0.1.0")
     application.state.repository = repository or repository_from_config()
+    logo_store = logo_draft_store or LogoDraftStore(runtime_root())
     install_console(
         application,
         security=console_security or console_security_from_config(),
@@ -84,8 +96,8 @@ def create_app(
         or ConversationalSiteDraftStore(
             Path(os.getenv("APF_FOUNDRY_ROOT", Path(__file__).parents[2]))
         ),
-        logo_draft_store=logo_draft_store
-        or LogoDraftStore(Path(os.getenv("APF_FOUNDRY_ROOT", Path(__file__).parents[2]))),
+        logo_draft_store=logo_store,
+        business_card_store=business_card_store or BusinessCardStore(runtime_root(), logo_store),
         reference_consent_store=reference_consent_store
         or ReferenceConsentStore(Path(os.getenv("APF_FOUNDRY_ROOT", Path(__file__).parents[2]))),
     )
