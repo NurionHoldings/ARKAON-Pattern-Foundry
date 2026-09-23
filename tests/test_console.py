@@ -83,9 +83,7 @@ def test_reference_material_notice_checkboxes_and_receipt_are_owner_bound(tmp_pa
         "acknowledged_items": sorted(REQUIRED_ACKNOWLEDGEMENTS),
         "nonce": str(uuid4()),
     }
-    assert client.post(
-        "/v1/console/reference-material-consents", json=payload
-    ).status_code == 403
+    assert client.post("/v1/console/reference-material-consents", json=payload).status_code == 403
     recorded = client.post(
         "/v1/console/reference-material-consents",
         headers={"X-CSRF-Token": csrf},
@@ -133,7 +131,7 @@ def test_console_requires_session_and_has_security_headers():
 
 def test_cookie_flags_and_tenant_scoped_targets():
     client, repository, tenant_id, _ = make_client()
-    repository.create_target(target_payload(tenant_id, "<img src=x onerror=alert(1)>") )
+    repository.create_target(target_payload(tenant_id, "<img src=x onerror=alert(1)>"))
     repository.create_target(target_payload(uuid4(), "다른 임차인 비밀"))
     response = client.get("/v1/console/targets")
     assert response.status_code == 200
@@ -145,7 +143,10 @@ def test_cookie_flags_and_tenant_scoped_targets():
         "/console/dev/session",
         json={"tenant_id": str(tenant_id), "principal_id": str(uuid4()), "role": "operator"},
     ).headers.get_list("set-cookie")
-    assert any("HttpOnly" in value and "Secure" in value and "SameSite=strict" in value for value in login_headers)
+    assert any(
+        "HttpOnly" in value and "Secure" in value and "SameSite=strict" in value
+        for value in login_headers
+    )
 
 
 def test_tampered_session_is_rejected():
@@ -157,22 +158,35 @@ def test_tampered_session_is_rejected():
 def test_review_submission_requires_csrf_and_reviewer_and_store():
     task_id = uuid4()
     payload = {
-        "task_fingerprint": "sha256:" + "a" * 64, "task_id": str(task_id),
-        "job_id": str(uuid4()), "request_fingerprint": "sha256:" + "b" * 64,
-        "tenant_id": str(uuid4()), "principal_id": str(uuid4()), "stage": "RIGHTS",
-        "evidence_fingerprint": "sha256:" + "c" * 64, "decision": "APPROVE",
-        "expires_at": "2031-01-01T01:00:00+00:00", "nonce": str(uuid4()),
+        "task_fingerprint": "sha256:" + "a" * 64,
+        "task_id": str(task_id),
+        "job_id": str(uuid4()),
+        "request_fingerprint": "sha256:" + "b" * 64,
+        "tenant_id": str(uuid4()),
+        "principal_id": str(uuid4()),
+        "stage": "RIGHTS",
+        "evidence_fingerprint": "sha256:" + "c" * 64,
+        "decision": "APPROVE",
+        "expires_at": "2031-01-01T01:00:00+00:00",
+        "nonce": str(uuid4()),
         "signature": "d" * 128,
     }
     operator, _, _, csrf = make_client(role="operator")
-    assert operator.post(
-        f"/v1/console/reviews/{task_id}/decisions", json=payload,
-        headers={"X-CSRF-Token": csrf},
-    ).status_code == 403
+    assert (
+        operator.post(
+            f"/v1/console/reviews/{task_id}/decisions",
+            json=payload,
+            headers={"X-CSRF-Token": csrf},
+        ).status_code
+        == 403
+    )
     reviewer, _, _, csrf = make_client(role="reviewer")
-    assert reviewer.post(f"/v1/console/reviews/{task_id}/decisions", json=payload).status_code == 403
+    assert (
+        reviewer.post(f"/v1/console/reviews/{task_id}/decisions", json=payload).status_code == 403
+    )
     unavailable = reviewer.post(
-        f"/v1/console/reviews/{task_id}/decisions", json=payload,
+        f"/v1/console/reviews/{task_id}/decisions",
+        json=payload,
         headers={"X-CSRF-Token": csrf},
     )
     assert unavailable.status_code in {403, 503}
@@ -214,15 +228,21 @@ def test_plain_approval_routes_require_owner_csrf_and_store(tmp_path):
     )
     assert owner.get("/v1/console/self-improvement-reports").status_code == 200
     payload = {
-        "decision": "APPROVE", "scope_digest": "a" * 64,
-        "nonce": str(uuid4()), "expires_at": "2031-01-01T01:00:00+00:00",
+        "decision": "APPROVE",
+        "scope_digest": "a" * 64,
+        "nonce": str(uuid4()),
+        "expires_at": "2031-01-01T01:00:00+00:00",
     }
     request_id = "missing"
-    assert owner.post(
-        f"/v1/console/self-improvement-reports/{request_id}/decision", json=payload
-    ).status_code == 403
+    assert (
+        owner.post(
+            f"/v1/console/self-improvement-reports/{request_id}/decision", json=payload
+        ).status_code
+        == 403
+    )
     response = owner.post(
-        f"/v1/console/self-improvement-reports/{request_id}/decision", json=payload,
+        f"/v1/console/self-improvement-reports/{request_id}/decision",
+        json=payload,
         headers={"X-CSRF-Token": csrf},
     )
     assert response.status_code == 422
@@ -248,23 +268,34 @@ def test_visual_platform_dialogue_api_separates_owner_and_arkaon_operator(tmp_pa
         "/v1/console/platform-dialogues",
         headers={"X-CSRF-Token": owner_csrf},
         json={
-            "name": "부업장터", "purpose": "벌거리 연결", "audience": ["참여자"],
-            "required_capabilities": ["탐색", "정산"], "constraints": ["모바일 우선"],
+            "name": "부업장터",
+            "purpose": "벌거리 연결",
+            "audience": ["참여자"],
+            "required_capabilities": ["탐색", "정산"],
+            "constraints": ["모바일 우선"],
         },
     )
     assert created.status_code == 201
     dialogue_id = created.json()["dialogue_id"]
-    assert client.post(
-        f"/v1/console/platform-dialogues/{dialogue_id}/revisions",
-        headers={"X-CSRF-Token": owner_csrf},
-        json={
-            "based_on_revision_digest": None, "change_summary": "첫 화면",
-            "screens": [{
-                "screen_id": "home", "title": "홈", "purpose": "탐색",
-                "components": ["검색", "추천"],
-            }],
-        },
-    ).status_code == 403
+    assert (
+        client.post(
+            f"/v1/console/platform-dialogues/{dialogue_id}/revisions",
+            headers={"X-CSRF-Token": owner_csrf},
+            json={
+                "based_on_revision_digest": None,
+                "change_summary": "첫 화면",
+                "screens": [
+                    {
+                        "screen_id": "home",
+                        "title": "홈",
+                        "purpose": "탐색",
+                        "components": ["검색", "추천"],
+                    }
+                ],
+            },
+        ).status_code
+        == 403
+    )
 
     operator_session = client.post(
         "/console/dev/session",
@@ -275,16 +306,112 @@ def test_visual_platform_dialogue_api_separates_owner_and_arkaon_operator(tmp_pa
         f"/v1/console/platform-dialogues/{dialogue_id}/revisions",
         headers={"X-CSRF-Token": operator_csrf},
         json={
-            "based_on_revision_digest": None, "change_summary": "첫 화면",
-            "screens": [{
-                "screen_id": "home", "title": "홈", "purpose": "탐색",
-                "components": ["검색", "추천"],
-            }],
+            "based_on_revision_digest": None,
+            "change_summary": "첫 화면",
+            "screens": [
+                {
+                    "screen_id": "home",
+                    "title": "홈",
+                    "purpose": "탐색",
+                    "components": ["검색", "추천"],
+                }
+            ],
         },
     )
     assert revised.status_code == 200
-    image = client.get(
-        f"/v1/console/platform-dialogues/{dialogue_id}/revisions/1/preview.svg"
-    )
+    image = client.get(f"/v1/console/platform-dialogues/{dialogue_id}/revisions/1/preview.svg")
     assert image.status_code == 200
     assert image.headers["content-type"].startswith("image/svg+xml")
+
+
+def test_site_draft_home_and_api_keep_owner_and_deployment_boundary(tmp_path):
+    from apf.conversational_site_draft import ConversationalSiteDraftStore
+
+    tenant_id, owner_id = uuid4(), uuid4()
+    app = create_app(
+        repository=MemoryRepository(),
+        console_security=ConsoleSecurity(
+            environment="test", secret="s" * 32, allow_dev_sessions=True
+        ),
+        conversational_site_draft_store=ConversationalSiteDraftStore(tmp_path),
+    )
+    client = TestClient(app, base_url="https://testserver")
+    session = client.post(
+        "/console/dev/session",
+        json={"tenant_id": str(tenant_id), "principal_id": str(owner_id), "role": "owner"},
+    )
+    csrf = session.json()["csrf_token"]
+    home = client.get("/site-drafts")
+    assert home.status_code == 200
+    assert "GitHub 회원가입" in home.text and "Meshy 가입" in home.text
+    assert "Netlify 가입" in home.text and "API 키는 이 화면에 붙여넣지 마세요" in home.text
+    assert "ARKAON GitHub 연결 기능은 아직 준비 중입니다" in home.text
+    created = client.post(
+        "/v1/console/site-drafts",
+        headers={"X-CSRF-Token": csrf},
+        json={"name": "부업장터", "request": "참여자를 위한 소개 홈페이지를 만들어줘"},
+    )
+    assert created.status_code == 201
+    draft_id = created.json()["draft_id"]
+    assert created.json()["artifact_type"] == "static_landing_page"
+    readiness = created.json()["external_connection_readiness"]
+    assert readiness["mode"] == "GUIDANCE_ONLY"
+    assert readiness["controls"]["deployment_created"] is False
+    assert (
+        client.get(f"/v1/console/site-drafts/{draft_id}/revisions/1/preview.html")
+        .headers["content-security-policy"]
+        .endswith("sandbox")
+    )
+    approval = client.post(
+        f"/v1/console/site-drafts/{draft_id}/approval-request", headers={"X-CSRF-Token": csrf}
+    )
+    assert approval.status_code == 200 and approval.json()["deployment_allowed"] is False
+
+
+def test_logo_draft_api_requires_owner_and_authorizes_download(tmp_path):
+    from apf.logo_draft import LogoDraftStore
+
+    tenant_id, owner_id = uuid4(), uuid4()
+    app = create_app(
+        repository=MemoryRepository(),
+        console_security=ConsoleSecurity(
+            environment="test", secret="s" * 32, allow_dev_sessions=True
+        ),
+        logo_draft_store=LogoDraftStore(tmp_path),
+    )
+    client = TestClient(app, base_url="https://testserver")
+    session = client.post(
+        "/console/dev/session",
+        json={"tenant_id": str(tenant_id), "principal_id": str(owner_id), "role": "owner"},
+    )
+    csrf = session.json()["csrf_token"]
+    assert "도형·텍스트 기반 SVG 시안" in client.get("/logo-drafts").text
+    created = client.post(
+        "/v1/console/logo-drafts",
+        headers={"X-CSRF-Token": csrf},
+        json={"name": "마루", "tagline": "일상을 가볍게", "color": "#2563eb", "shape": "orbit"},
+    )
+    assert (
+        created.status_code == 201 and created.json()["generation"] == "DETERMINISTIC_VECTOR_ONLY"
+    )
+    draft_id = created.json()["draft_id"]
+    download = client.get(f"/v1/console/logo-drafts/{draft_id}/download.svg")
+    assert download.status_code == 200 and download.headers["content-disposition"].startswith(
+        "attachment;"
+    )
+    client.post(
+        "/console/dev/session",
+        json={"tenant_id": str(tenant_id), "principal_id": str(uuid4()), "role": "owner"},
+    )
+    assert client.get(f"/v1/console/logo-drafts/{draft_id}/download.svg").status_code == 422
+    # A missing or stale revision receipt fails before any rollback write.
+    owner_session = client.post(
+        "/console/dev/session",
+        json={"tenant_id": str(tenant_id), "principal_id": str(owner_id), "role": "owner"},
+    )
+    stale = client.post(
+        f"/v1/console/logo-drafts/{draft_id}/rollback/1",
+        headers={"X-CSRF-Token": owner_session.json()["csrf_token"]},
+        json={"based_on_revision_digest": "sha256:" + "0" * 64},
+    )
+    assert stale.status_code == 409 and stale.json()["detail"] == "LOGO_DRAFT_STALE_REVISION"

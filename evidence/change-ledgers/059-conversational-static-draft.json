@@ -1,0 +1,81 @@
+{
+  "schema_version": "apf.change-ledger/1.0",
+  "change_id": "059-conversational-static-draft",
+  "intent_dna_ref": "knowledge/intent-dna/059-conversational-static-draft.json",
+  "source_base": "32af99aa9e7f2389977b1ad4bc6ff167a270df26",
+  "scope_decision": "Implement only static_landing_page drafts: Korean request, deterministic HTML/CSS preview, revision, rollback, and owner approval pending. Keep visual platform dialogue and tenant console authentication intact. 3D character Addon is documented as future architecture and labelled readying only; no external service, upload, download, or generation is wired. Add a guidance-only external connection readiness contract and a beginner journey UI linking to official GitHub, Meshy, and Netlify onboarding documentation. No external authorization, credential handling, Meshy job, repository write, or deploy is implemented. Follow-up correction: legacy schema 1.0 documents without readiness remain readable after their original digest check; the public response injects the immutable guidance contract. ARKAON has no GitHub App or Netlify connection, so UI says those features are unavailable and links are reference only. Delta-audit correction: new documents do not persist readiness; it is a response projection only. Read compatibility accepts recognized prior readiness variants or absence after validating the original document digest, but no persisted readiness is trusted as authorization or connection evidence. Visual exploration is explicitly HOLD. Add a first complete artifact, logo_svg: deterministic geometry/text SVG only, three local studies, selection, edit, rollback, and owner-authorized download. Credit cap is now 500; no meter is available, so no consumption claim is made. Sol review delta: restore logo revisit through owner list and draft_id URL, synchronize loaded revision inputs, mark previews separately from saved selection, require latest revision digest for rollback, and limit SVG text to XML 1.0 allowed code points. UX delta: reshape the local logo UI into a guided owner journey with explicit input, three previews, saved selection, revision restore, SVG download, accessible loading/error states, and navigation to site drafts and console. This remains deterministic SVG only; no external image generation, external integration, repository write, deploy, or credit consumption claim is added.",
+  "investigation": "Luna findings supplied through the orchestrator: consumer path needs a coherent home-to-preview journey; no executable generation or deployment in the first vertical slice. Official public documentation checked 2026-09-23: GitHub Apps provide repository-scoped installation/authorization; Meshy requires an account and API key for API use; Netlify installs its GitHub App when linking a repository and deploys after a repository push. User authorized a 500-credit cap and requested the simplest artifact first; no consumption meter exists in this environment.",
+  "verification": [
+    "2026-09-23 local: pytest tests/test_conversational_site_draft.py tests/test_visual_platform_dialogue.py tests/test_console.py = 20 passed",
+    "2026-09-23 static: ruff check targeted changed Python files = passed",
+    "2026-09-23 static: ruff format targeted changed Python files = clean",
+    "2026-09-23 audit-finding delta: pytest tests/test_conversational_site_draft.py tests/test_console.py = 16 passed; ruff changed code/tests passed; git diff --check clean",
+    "2026-09-23 re-baseline: refreshed operations-console-boundary exact console.py and test_console.py evidence hashes before one final full local regression.",
+    "2026-09-23 first full local regression after evidence hash refresh: 667 passed, 5 skipped, 5 failed only from PACKAGE_HASH_MISMATCH; package hash re-baselined before the required final rerun.",
+    "2026-09-23 final full local regression after package-hash re-baseline: 672 passed, 5 skipped; ruff check src tests passed; git diff --check clean.",
+    "2026-09-23 local: pytest tests/test_conversational_site_draft.py tests/test_console.py = 17 passed; guidance-only readiness controls and onboarding links covered.",
+    "2026-09-23 final full local regression: pytest = 673 passed, 5 skipped; ruff check src tests passed; git diff --check clean.",
+    "2026-09-23 corrective targeted: pytest tests/test_conversational_site_draft.py tests/test_console.py = 18 passed; ruff changed Python files passed.",
+    "2026-09-23 corrective final full local regression: pytest = 674 passed, 5 skipped; ruff check src tests passed; git diff --check clean.",
+    "2026-09-23 delta-audit final full local regression: pytest = 675 passed, 5 skipped; ruff check src tests passed; git diff --check clean.",
+    "2026-09-23 targeted: pytest tests/test_logo_draft.py tests/test_conversational_site_draft.py tests/test_console.py = 22 passed; ruff changed Python files passed.",
+    "2026-09-23 final full local regression after logo SVG MVP: pytest = 678 passed, 5 skipped; ruff check src tests passed; git diff --check clean.",
+    "2026-09-23 Sol delta targeted: pytest tests/test_logo_draft.py tests/test_console.py = 16 passed; ruff changed Python files passed.",
+    "2026-09-23 Sol delta final full local regression: pytest = 679 passed, 5 skipped; ruff check src tests passed; git diff --check clean.",
+    "2026-09-23 UX targeted: pytest tests/test_logo_draft.py tests/test_logo_draft_ui.py tests/test_console.py = 18 passed; ruff check changed Python files passed; git diff --check clean.",
+    "2026-09-23 UX final full local regression: pytest = 681 passed, 5 skipped; ruff check changed Python files passed; git diff --check clean."
+  ],
+  "commit": {
+    "base": "32af99aa9e7f2389977b1ad4bc6ff167a270df26",
+    "ref_expression": "refs/heads/feat/059-conversational-static-draft",
+    "receipt_rule": "The final immutable SHA is recorded by the audit/CI receipt outside this commit; this ledger does not self-reference a changing commit hash."
+  },
+  "failures": [
+    {
+      "cause": "Primary Python runtime has no pytest installed.",
+      "resolution": "Used the repository's existing isolated virtual environment for local test execution; no dependency or production change made."
+    },
+    {
+      "cause": "Sol review found same-tenant cross-owner detail and preview exposure, non-re-rendered rollback HTML, and incomplete navigation/wording.",
+      "resolution": "Owner binding is now required for get/preview and fails closed as not found; rollback re-renders the selected source into the new version; console and draft pages link each way; wording states supported deterministic edit scope."
+    },
+    {
+      "cause": "Eternian audit found that the revision UI called a change note “modify” despite not editing site body text.",
+      "resolution": "Added explicit title and description fields to the deterministic revision contract, rendered them into the preview, and renamed the UI to distinguish content edits from a change note."
+    },
+    {
+      "cause": "Eternian full regression initially reported 5 EVIDENCE_HASH_MISMATCH failures in tests/test_pattern_catalog.py after this change updated src/apf/console.py and tests/test_console.py.",
+      "resolution": "Re-baselined only the existing evidence_hashes entries in the non-promoted operations-console-boundary candidate. Its evidence structure, references, status, and owned_asset value are unchanged."
+    },
+    {
+      "cause": "The evidence-hash-only re-baseline caused the candidate integrity check to fail with PACKAGE_HASH_MISMATCH.",
+      "resolution": "Recomputed only the existing candidate package_hash, which cryptographically commits its changed evidence_hashes; no candidate field, reference, status, or promotion state changed."
+    },
+    {
+      "cause": "Full regression detected EVIDENCE_HASH_MISMATCH after the onboarding change updated the already referenced console and console test files.",
+      "resolution": "Re-baselined only existing evidence hashes and package hash in the non-promoted operations-console-boundary candidate; its scope, references, status, and owned_asset did not change."
+    },
+    {
+      "cause": "Review identified that adding readiness to persisted documents would reject valid legacy schema 1.0 drafts, and the UI implied an ARKAON GitHub App existed.",
+      "resolution": "Legacy documents validate against their original signed content and receive readiness only in public responses; copy and state labels now say ARKAON GitHub/Netlify connection features are not available."
+    },
+    {
+      "cause": "Corrective full regression again reported EVIDENCE_HASH_MISMATCH because the legacy/UI tests changed the existing console candidate evidence.",
+      "resolution": "Re-baselined only existing evidence hashes and package hash in the non-promoted operations-console-boundary candidate; no candidate scope, references, status, or owned_asset changed."
+    },
+    {
+      "cause": "Delta audit found that the prior strict readiness equality rejected a previous transient persisted variant created on this branch.",
+      "resolution": "Stopped persisting readiness in new drafts; accept only recognized old/current variants or absence for read compatibility after original digest validation, and always project the current guidance contract in responses."
+    },
+    {
+      "cause": "Full regression detected EVIDENCE_HASH_MISMATCH after the logo routes and coverage updated existing console.py and test_console.py evidence.",
+      "resolution": "Re-baselined only existing evidence hashes and package hash in non-promoted operations-console-boundary candidate; scope, references, status, and owned_asset are unchanged."
+    },
+    {
+      "cause": "Sol delta changed existing console.py and test_console.py, so the pattern catalog rejected their old evidence hashes.",
+      "resolution": "Re-baselined only the existing operations-console-boundary evidence hashes and package hash; its scope, references, status, and owned_asset remain unchanged."
+    }
+  ],
+  "external_effects": "none; official documentation links only",
+  "ci": "not started by Terra; final HEAD CI is reserved for post-audit execution"
+}
