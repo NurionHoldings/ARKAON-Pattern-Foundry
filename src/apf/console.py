@@ -29,6 +29,12 @@ from .conversational_site_draft import (
     SiteDraftRequest,
     SiteDraftRevisionRequest,
 )
+from .design_reference_urls import (
+    DesignReferenceBatch,
+    DesignReferenceError,
+    DesignReferenceStore,
+    SubjectType,
+)
 from .durable_review import (
     DurableStoreError,
     ReviewAttestation,
@@ -207,6 +213,7 @@ def install_console(
     logo_draft_store: LogoDraftStore | None = None,
     business_card_store: BusinessCardStore | None = None,
     reference_consent_store: ReferenceConsentStore | None = None,
+    design_reference_store: DesignReferenceStore | None = None,
 ) -> None:
     application.state.console_security = security
     application.state.console_review_store = review_store
@@ -216,6 +223,7 @@ def install_console(
     application.state.logo_draft_store = logo_draft_store
     application.state.business_card_store = business_card_store
     application.state.reference_consent_store = reference_consent_store
+    application.state.design_reference_store = design_reference_store
 
     def principal(
         request: Request,
@@ -272,6 +280,12 @@ def install_console(
         store = request.app.state.business_card_store
         if store is None:
             raise HTTPException(status_code=503, detail="business card store unavailable")
+        return store
+
+    def design_references(request: Request) -> DesignReferenceStore:
+        store = request.app.state.design_reference_store
+        if store is None:
+            raise HTTPException(status_code=503, detail="design reference store unavailable")
         return store
 
     def reference_consents(request: Request) -> ReferenceConsentStore:
@@ -1149,6 +1163,89 @@ def install_console(
             )
         except VisualDialogueError as error:
             raise visual_error(error) from None
+
+    def design_reference_subject(
+        subject_type: SubjectType, subject_id: str, actor: ConsolePrincipal,
+        site_store: ConversationalSiteDraftStore,
+        dialogue_store: VisualPlatformDialogueStore,
+    ) -> None:
+        try:
+            if subject_type == "site_draft":
+                site_store.get(
+                    subject_id, tenant_id=str(actor.tenant_id),
+                    owner_principal_id=str(actor.principal_id),
+                )
+            else:
+                dialogue_store.get_for_owner(
+                    subject_id, tenant_id=str(actor.tenant_id),
+                    owner_principal_id=str(actor.principal_id),
+                )
+        except SiteDraftError as error:
+            raise site_draft_error(error) from None
+        except VisualDialogueError as error:
+            raise visual_error(error) from None
+
+    def design_reference_error(error: DesignReferenceError) -> HTTPException:
+        code = str(error)
+        return HTTPException(
+            status_code=404 if code == "DESIGN_REFERENCES_NOT_FOUND"
+            else 409 if code in {"DESIGN_REFERENCES_STALE", "DESIGN_REFERENCES_BUSY"}
+            else 422,
+            detail=code,
+        )
+
+    @application.get("/v1/console/design-references/{subject_type}/{subject_id}")
+    def get_design_references(
+        subject_type: SubjectType,
+        subject_id: UUID,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[DesignReferenceStore, Depends(design_references)],
+        site_store: Annotated[ConversationalSiteDraftStore, Depends(site_drafts)],
+        dialogue_store: Annotated[VisualPlatformDialogueStore, Depends(visual_dialogues)],
+    ) -> dict[str, object]:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        design_reference_subject(
+            subject_type, str(subject_id), actor, site_store, dialogue_store
+        )
+        try:
+            return store.get(
+                subject_type, str(subject_id), tenant_id=str(actor.tenant_id),
+                owner_principal_id=str(actor.principal_id),
+            )
+        except DesignReferenceError as error:
+            if str(error) == "DESIGN_REFERENCES_NOT_FOUND":
+                return {
+                    "subject_type": subject_type, "subject_id": str(subject_id),
+                    "references": [], "set_digest": None, "status": "WAITING_FOR_CAPTURE",
+                    "capture_performed": False, "style_applied": False,
+                }
+            raise design_reference_error(error) from None
+
+    @application.post("/v1/console/design-references/{subject_type}/{subject_id}")
+    def append_design_references(
+        subject_type: SubjectType,
+        subject_id: UUID,
+        payload: DesignReferenceBatch,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[DesignReferenceStore, Depends(design_references)],
+        site_store: Annotated[ConversationalSiteDraftStore, Depends(site_drafts)],
+        dialogue_store: Annotated[VisualPlatformDialogueStore, Depends(visual_dialogues)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        design_reference_subject(
+            subject_type, str(subject_id), actor, site_store, dialogue_store
+        )
+        try:
+            return store.append(
+                subject_type, str(subject_id), tenant_id=str(actor.tenant_id),
+                owner_principal_id=str(actor.principal_id), batch=payload,
+            )
+        except DesignReferenceError as error:
+            raise design_reference_error(error) from None
 
     @application.get("/v1/console/platform-dialogues/{dialogue_id}/revisions/{number}/preview.svg")
     def platform_revision_image(
