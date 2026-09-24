@@ -33,6 +33,7 @@ packages = ["src/apf"]
 "src/apf/business_card_ui.html" = "apf/business_card_ui.html"
 "src/apf/reference_material_consent_ui.html" = "apf/reference_material_consent_ui.html"
 "src/apf/design_reference_ui.html" = "apf/design_reference_ui.html"
+"src/apf/railway_setup_ui.html" = "apf/railway_setup_ui.html"
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
