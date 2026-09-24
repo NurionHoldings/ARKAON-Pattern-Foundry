@@ -123,8 +123,8 @@
     "app_variables": "No APF service variables observed; Railway-generated variables do not satisfy APF requirements",
     "github_app": "Railway App repository access saved for ARKAON-Pattern-Foundry only in addition to pre-existing mjn and aibaeby; broad app permissions disclosed and approved",
     "database_tables": "No tables displayed in Railway database view at observation time; migration not verified",
-    "railway_change_count": "Apply 3 changes pending; do not apply while deployment=false",
-    "ci_gate": "Wait for CI enabled on staged service; does not override deployment lock",
+    "railway_change_count": "Apply 4 changes pending; do not apply while deployment=false",
+    "ci_gate": "Wait for CI enabled on staged service; updated GitHub permissions warning shown, effectiveness unverified; does not override deployment lock",
     "public_networking": "Could not load public networking in UI; domain unverified"
   },
   "references": [

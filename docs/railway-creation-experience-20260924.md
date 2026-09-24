@@ -27,8 +27,8 @@
 
 - GitHub의 기존 Railway App 설치는 `Only select repositories`였으며 `mjn`, `aibaeby`가 이미 선택되어 있었다. 사용자가 추가 승인을 한 뒤 `NurionHoldings/ARKAON-Pattern-Foundry`만 더해 총 3개가 됐다. 기존 두 저장소를 제거하거나 `All repositories`로 바꾸지 않았다.
 - 이 App은 metadata 읽기와 actions·administration·checks·code·commit statuses·deployments·pull requests·workflows 읽기/쓰기 권한을 요청한다. 아르카온은 저장소 추가 직전 **권한의 종류와 범위**를 화면에 밝혀야 한다.
-- Railway의 `Connect Repo` 목록에서 대상 저장소를 다시 확인하고 대기 중인 앱 서비스에 소스 연결을 추가했다. 서비스는 여전히 `production`에서 생성 대기 상태이며 `Apply 3 changes`로 표시됐다. **Deploy를 누르지 않았다.**
-- Railway는 연결 즉시 `main`을 production 브랜치로 선택하며 변경 시 자동 배포를 안내했다. `Wait for CI`를 켰지만 이는 CI 통과 후 배포를 허용하는 조건일 뿐, readiness 잠금이나 자동 배포 자체를 대체하지 않는다. 브랜치 분리 동작은 설정 손상 가능성 때문에 진행하지 않았다. 따라서 **대기 변경을 적용하면 안 된다.**
+- Railway의 `Connect Repo` 목록에서 대상 저장소를 다시 확인하고 대기 중인 앱 서비스에 소스 연결을 추가했다. 서비스는 여전히 `production`에서 생성 대기 상태이며 `Wait for CI` 설정 전 `Apply 3 changes`, 설정 후 `Apply 4 changes`로 표시됐다. **Deploy를 누르지 않았다.**
+- Railway는 연결 즉시 `main`을 production 브랜치로 선택하며 변경 시 자동 배포를 안내했다. `Wait for CI`를 켰지만 Railway 화면이 업데이트된 GitHub 권한 수락 필요를 안내했다. 이 기능의 실제 효력은 아직 검증되지 않았으며 CI 통과 후 배포를 허용하는 조건일 뿐, readiness 잠금이나 자동 배포 자체를 대체하지 않는다. 브랜치 분리 동작은 설정 손상 가능성 때문에 진행하지 않았다. 따라서 **대기 변경을 적용하면 안 된다.**
 - `New Environment`에는 production 복제와 빈 환경 선택지가 있었다. 새 환경은 생성하지 않았다. 복제는 서비스·변수·구성을 복사하므로 비용·데이터 범위를 확인해야 한다.
 - 앱 전용 볼륨, 필수 서비스 변수, OAuth callback, DB 마이그레이션과 테넌트, 백업 복구는 아직 확인되지 않았다. 화면에 `Could not load public networking`이 보였으므로 공용 도메인도 검증하지 못했다.
 
