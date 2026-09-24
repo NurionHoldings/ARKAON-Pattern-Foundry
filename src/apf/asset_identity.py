@@ -23,7 +23,7 @@ def make_asset_identity(
     key = uuid5(NAMESPACE_URL, f"apf:asset:{tenant}:{owner}:{artifact_type}:{asset}")
     clean_dna = json.loads(json.dumps(dna, sort_keys=True, ensure_ascii=False))
     if not isinstance(clean_dna, dict):
-        raise ValueError("asset DNA must be an object")
+        raise TypeError("asset DNA must be an object")
     return {
         "schema_version": "apf.asset-intent-dna/1.0",
         "asset_id": str(key),
