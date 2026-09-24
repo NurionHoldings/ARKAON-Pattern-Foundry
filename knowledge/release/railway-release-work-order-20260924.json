@@ -10,8 +10,7 @@
     "railway_environment": "production",
     "railway_pending_changes": 4,
     "railway_app": "staged, not deployed",
-    "candidate_sha": "452d4374190e45a80480fc24d424e885c9e7b618",
-    "candidate_kind": "PR_71_HEAD_ONLY_NOT_RELEASE_SHA",
+    "candidate_kind": "PRE_HANDOFF_SNAPSHOT_SHA; MUST_REQUERY_LATEST_PR_71_HEAD",
     "prs": [
       {
         "number": 58,
@@ -181,7 +180,9 @@
         "review_submissions": 0,
         "draft": true
       }
-    ]
+    ],
+    "pre_handoff_sha": "452d4374190e45a80480fc24d424e885c9e7b618",
+    "pr_71_head_must_be_refetched": true
   },
   "arkaon_actions": [
     {
