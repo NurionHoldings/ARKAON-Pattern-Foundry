@@ -1,0 +1,63 @@
+{
+  "schema_version": "apf.railway-activation-playbook/1.0",
+  "status": "PROPOSE_ONLY",
+  "authority": {
+    "automatic_merge": false,
+    "automatic_deploy": false,
+    "readiness_override": false,
+    "secret_collection_in_chat": false,
+    "operator_confirmation_required_for_activation": true
+  },
+  "scope": "ARKAON Pattern Foundry: Railway preparation through reviewed activation",
+  "operator_language": "Explain one visible Railway action at a time. Distinguish PostgreSQL's own postgres-volume from the web service volume. A staged service is not an active deployment. Deploy Changes can launch it.",
+  "phases": [
+    {
+      "id": "01-review-source",
+      "action": "Record repository, exact branch and commit, chained PR order, draft and CI state, and readiness locks.",
+      "proof": ["PR head SHA", "successful CI for the exact SHA", "deployment lock separately authorized"],
+      "hold_when": ["a required PR is draft or conflicting", "CI is missing or failing", "deployment lock is false"]
+    },
+    {
+      "id": "02-create-database",
+      "action": "Add Railway PostgreSQL in the project; keep its network private. It owns its own volume.",
+      "proof": ["Postgres service Online", "Postgres volume attached", "DATABASE_URL exposed for service reference"],
+      "hold_when": ["database is unavailable", "database credentials are copied into the repository or chat"]
+    },
+    {
+      "id": "03-configure-app",
+      "action": "Create web service from the reviewed GitHub commit; attach a separate volume at /data; use one replica.",
+      "proof": ["exact deployment SHA", "web volume mounted /data", "APF_RUNTIME_ROOT=/data/runtime", "APF_FOUNDRY_ROOT=/data/foundry", "DATABASE_URL references Postgres.DATABASE_URL"],
+      "hold_when": ["web volume is confused with postgres-volume", "service creation is staged but settings cannot be configured", "application writes are routed to ephemeral checkout"]
+    },
+    {
+      "id": "04-owner-sign-in",
+      "action": "Allocate an HTTPS web domain; register a GitHub OAuth App with exact callback /console/auth/callback; set client ID, client secret, numeric allowed owner ID, tenant UUID, public origin, and session secret in Railway service variables.",
+      "proof": ["exact HTTPS origin and callback match", "production dev-session disabled", "non-owner login denied"],
+      "hold_when": ["OAuth variables are incomplete", "secrets appear in logs, source or chat", "public console has no verified owner login"]
+    },
+    {
+      "id": "05-provision-and-verify",
+      "action": "Apply reversible DB migrations to Railway Postgres; provision the designated tenant; confirm volume persistence, process health, owner-only console, URL observation egress, and backup/restore process.",
+      "proof": ["migration ledger", "tenant row for APF_TENANT_ID", "restart persistence check", "health and authenticated smoke checks", "backup and restore evidence"],
+      "hold_when": ["health is the only evidence", "tenant is not provisioned", "migration or restore is untested"]
+    },
+    {
+      "id": "06-activate",
+      "action": "Present evidence and exact change to the operator; update readiness only after each required gap is closed and reviewed; activate only the approved scope and record rollback.",
+      "proof": ["reviewed approval scope", "release commit", "activation record and rollback target"],
+      "hold_when": ["PRODUCT_IMPLEMENT_HOLD remains", "deployment lock remains false", "any evidence is stale"]
+    }
+  ],
+  "current_observation_2026_09_24": {
+    "railway": "Postgres Online with postgres-volume; web service remains staged as one change; web volume and variables not verified",
+    "repository": "PR 58-71 stacked drafts; PR 61 merge conflict being resolved; CI for latest commit pending",
+    "readiness": "PRODUCT_IMPLEMENT_HOLD, deployment=false",
+    "decision": "HOLD_ACTIVATION"
+  },
+  "references": [
+    "docs/railway-staging.md",
+    "knowledge/readiness/v0.1-readiness.json",
+    "src/apf/migrations.py",
+    "src/apf/repository.py"
+  ]
+}
