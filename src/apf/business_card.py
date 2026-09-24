@@ -90,6 +90,25 @@ class BusinessCardStore:
     def __init__(self, root: Path, logo_store: LogoDraftStore) -> None:
         self.root, self.logo_store = root.resolve(), logo_store
 
+    def preview(
+        self, *, tenant_id: str, owner_principal_id: str, request: BusinessCardRequest
+    ) -> dict[str, str]:
+        """Render an owner-bound SVG pair without persisting a card or contact details."""
+        UUID(tenant_id)
+        UUID(owner_principal_id)
+        try:
+            logo_svg, _ = self.logo_store.download(
+                request.logo_draft_id, tenant_id=tenant_id, owner_principal_id=owner_principal_id
+            )
+        except LogoDraftError as exc:
+            raise BusinessCardError("BUSINESS_CARD_LOGO_NOT_FOUND") from exc
+        return {
+            "front_svg": _front(
+                logo_svg, request.name, request.title, request.phone, request.email, request.brand_text
+            ),
+            "back_svg": _back(logo_svg, request.brand_text),
+        }
+
     def create(
         self, *, tenant_id: str, owner_principal_id: str, request: BusinessCardRequest
     ) -> dict[str, object]:
