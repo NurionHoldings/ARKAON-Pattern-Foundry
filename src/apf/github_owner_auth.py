@@ -56,7 +56,7 @@ class GitHubOwnerAuth:
             "APF_CONSOLE_SESSION_SECRET",
         )
         values = [os.getenv(name) for name in names]
-        if not any(values):
+        if not any(values[:5]):
             return None
         if not all(values):
             raise OwnerAuthError("OWNER_AUTH_CONFIG_INCOMPLETE")
