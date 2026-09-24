@@ -13,6 +13,7 @@ from xml.etree import ElementTree
 
 from pydantic import BaseModel, Field
 
+from .asset_identity import make_asset_identity
 from .logo_draft import LogoDraftError, LogoDraftStore
 
 
@@ -127,6 +128,14 @@ class BusinessCardStore:
             "state": "OWNER_REVIEW_REQUIRED",
             "generation": "DETERMINISTIC_VECTOR_ONLY",
             "revisions": [revision],
+            "intent_dna": make_asset_identity(
+                tenant_id=tenant_id, owner_principal_id=owner_principal_id,
+                artifact_type="business_card_svg", artifact_id=card_id,
+                original_intent=request.model_dump(mode="json"),
+                dna={"logo_draft_id": request.logo_draft_id,
+                     "faces": ["front", "back"], "layout": "SVG",
+                     "contact_content": "NOT_STORED_IN_DNA"},
+            ),
         }
         doc["card_digest"] = _digest(doc)
         self._exclusive_json(self._path(card_id), doc)
@@ -332,6 +341,7 @@ class BusinessCardStore:
             "generation": "DETERMINISTIC_VECTOR_ONLY",
             "credit_cap": 500,
             "credit_meter": "UNAVAILABLE",
+            "intent_dna": doc.get("intent_dna"),
         }
         if detail:
             result["revisions"] = [cls._public_revision(item) for item in doc["revisions"]]
