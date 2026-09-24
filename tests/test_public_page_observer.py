@@ -104,3 +104,12 @@ def test_capture_requires_scope_bound_receipt_and_owner(tmp_path):
     })
     assert client.post(base + "/capture", headers={"X-CSRF-Token": csrf},
                        json=payload).status_code != 200
+
+
+def test_extractor_accepts_rgb_and_inline_style_signals():
+    result = extract_observation(
+        "<html></html>", "body{background:rgb(240, 245, 250); color:#123456}"
+        ":root{--primary:#176b82}", uuid4()
+    )
+    assert result["background"] == "#f0f5fa"
+    assert result["text"] == "#123456"
