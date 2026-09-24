@@ -158,10 +158,11 @@ class DesignReferenceStore:
             doc = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError) as exc:
             raise DesignReferenceError("DESIGN_REFERENCES_NOT_FOUND") from exc
+        if not isinstance(doc, dict):
+            raise DesignReferenceError("DESIGN_REFERENCES_TAMPERED")
         unsigned = {key: value for key, value in doc.items() if key != "set_digest"}
         if (
-            not isinstance(doc, dict)
-            or doc.get("schema_version") != "apf.design-reference-set/1.0"
+            doc.get("schema_version") != "apf.design-reference-set/1.0"
             or not _DIGEST.fullmatch(str(doc.get("set_digest", "")))
             or doc["set_digest"] != _digest(unsigned)
         ):
