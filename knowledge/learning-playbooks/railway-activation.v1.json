@@ -62,7 +62,10 @@
       "hold_when": [
         "web volume is confused with postgres-volume",
         "service creation is staged but settings cannot be configured",
-        "application writes are routed to ephemeral checkout"
+        "application writes are routed to ephemeral checkout",
+        "Railway GitHub App does not list the exact repository",
+        "GitHub App authorization scope exceeds the one approved repository",
+        "GitHub authentication is incomplete"
       ]
     },
     {
@@ -114,13 +117,18 @@
     "railway": "Postgres Online with postgres-volume; web service remains staged as one change; web volume and variables not verified",
     "repository": "PR 58-71 remain stacked drafts; PR 61 conflict resolved and its 3 CI jobs passed; no merge or deployment approval",
     "readiness": "PRODUCT_IMPLEMENT_HOLD, deployment=false",
-    "decision": "HOLD_ACTIVATION"
+    "decision": "HOLD_ACTIVATION",
+    "app_source": "NONE; repository selector showed only mjn and aibaeby, not ARKAON-Pattern-Foundry",
+    "app_variables": "No APF service variables observed; Railway-generated variables do not satisfy APF requirements",
+    "github_app": "Configuration reached GitHub login; installation scope and success remain unverified",
+    "database_tables": "No tables displayed in Railway database view at observation time; migration not verified"
   },
   "references": [
     "docs/railway-staging.md",
     "knowledge/readiness/v0.1-readiness.json",
     "src/apf/migrations.py",
-    "src/apf/repository.py"
+    "src/apf/repository.py",
+    "docs/railway-creation-experience-20260924.md"
   ],
   "user_interaction": {
     "mode": "RESULTS_FIRST_THEN_OWNER_GUIDED_CLICK_THROUGH",
