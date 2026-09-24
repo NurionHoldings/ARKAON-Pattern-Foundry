@@ -92,6 +92,7 @@ def build(payload: ProposalRequest, identity: dict, owner: str, tenant: str) -> 
                                      "purpose": data["purpose"], "description": method,
                                      "aspect_ratio": "9:16" if idx != 1 else "16:9"},
                          "why": f"{data['audience']}에게 {data['purpose']}을 설명하는 독립 구성",
+                         "observed_principles": list(dict.fromkeys(item["principle"] for item in data["evidence"])),
                          "changes": method})
     proposal = {"proposal_id": str(uuid4()), "state": "OWNER_REVIEW_REQUIRED",
                 "owner_principal_id": owner, "tenant_id": tenant,
