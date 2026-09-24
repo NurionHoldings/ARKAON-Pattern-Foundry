@@ -333,7 +333,7 @@ def install_console(
                 "Cache-Control": "no-store",
                 "Content-Security-Policy": (
                     "default-src 'none'; img-src 'self'; style-src 'unsafe-inline'; "
-                    "script-src 'unsafe-inline'; connect-src 'self'; base-uri 'none'; "
+                    "script-src 'unsafe-inline'; connect-src 'self'; frame-src 'self'; base-uri 'none'; "
                     "frame-ancestors 'none'; form-action 'self'"
                 ),
                 "Referrer-Policy": "no-referrer",
