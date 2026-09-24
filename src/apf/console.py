@@ -1194,6 +1194,26 @@ def install_console(
             detail=code,
         )
 
+    @application.get(
+        "/design-references", response_class=HTMLResponse, include_in_schema=False
+    )
+    def design_reference_home(
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+    ) -> HTMLResponse:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        return HTMLResponse(
+            Path(__file__).with_name("design_reference_ui.html").read_text(encoding="utf-8"),
+            headers={
+                "Cache-Control": "no-store",
+                "Content-Security-Policy": (
+                    "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; "
+                    "connect-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'"
+                ),
+                "X-Content-Type-Options": "nosniff",
+            },
+        )
+
     @application.get("/v1/console/design-references/{subject_type}/{subject_id}")
     def get_design_references(
         subject_type: SubjectType,
