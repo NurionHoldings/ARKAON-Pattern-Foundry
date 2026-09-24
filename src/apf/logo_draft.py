@@ -107,7 +107,7 @@ class LogoDraftStore:
             "intent_dna": make_asset_identity(
                 tenant_id=tenant_id, owner_principal_id=owner_principal_id,
                 artifact_type="logo_svg", artifact_id=draft_id,
-                original_intent=request.model_dump(mode="json"),
+                original_intent={"purpose": "brand_logo", "shape": request.shape},
                 dna={"shape": request.shape, "color": request.color.lower(),
                      "variants": 3, "generation": "DETERMINISTIC_VECTOR_ONLY"},
             ),
