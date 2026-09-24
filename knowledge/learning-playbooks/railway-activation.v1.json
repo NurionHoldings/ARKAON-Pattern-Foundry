@@ -139,7 +139,7 @@
     "screen": "/console/railway-setup",
     "steps": 8,
     "meaning_of_confirmation": "Step 1 means the user inspected the current artifact; later clicks are user assertions about external screens, not provider verification.",
-    "automated_railway_write": false,
+    "automated_railway_write": "EMPTY_SERVICE_ONLY_WHEN_READINESS_UNLOCKED_AND_SERVER_CREDENTIALS_CONFIGURED",
     "secrets_entered_only_on_provider_console": true,
     "future_write_requirements": [
       "provider OAuth with least privilege",

@@ -42,5 +42,6 @@ def guidance() -> dict[str, object]:
             "Recheck provider evidence and obtain the reviewed activation scope before Apply/Deploy."
         ),
         "phases": phases,
-        "automated_railway_write": False,
+        "automated_railway_write": allowed,
+        "automated_railway_write_scope": "EMPTY_SERVICE_ONLY_WITH_OWNER_PREVIEW_AND_SERVER_CREDENTIALS",
     }

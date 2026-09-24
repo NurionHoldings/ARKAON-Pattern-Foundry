@@ -38,4 +38,11 @@ GitHub App을 승인해도 Railway의 서비스 소스 연결과 서비스 생�
 
 ## 아르카온 안내 화면에 연결
 
-`GET /v1/console/railway-guidance`는 owner 인증 후 이 플레이북과 현재 저장소 readiness를 읽어 단계별 행동, 필요한 증거, 중단 조건을 제공한다. `/console/railway-setup`은 이를 보여 주면서 과거 관찰 날짜와 재조회 필요성을 분명히 표시한다. 공급자 실시간 조회, 비밀값 입력, 설정 적용 또는 배포는 수행하지 않는다. 플레이북을 바꾸면 안내 화면의 판단 자료도 함께 바뀌며, readiness 읽기에 실패하면 진행을 중단한다.
+`GET /v1/console/railway-guidance`는 owner 인증 후 이 플레이북과 현재 저장소 readiness를 읽어 단계별 행동, 필요한 증거, 중단 조건을 제공한다. `/console/railway-setup`은 이를 보여 주면서 과거 관찰 날짜와 재조회 필요성을 분명히 표시한다. 플레이북을 바꾸면 안내 화면의 판단 자료도 함께 바뀌며, readiness 읽기에 실패하면 진행을 중단한다. 실시간 조회와 빈 서비스 생성 경로는 아래 별도 API를 사용한다.
+
+## Railway API 연결 구현
+
+- 서버 환경에 `APF_RAILWAY_PROJECT_TOKEN`, `APF_RAILWAY_PROJECT_ID`, `APF_RAILWAY_ENVIRONMENT_ID`를 설정하면 owner 전용 `GET /v1/console/railway-live`가 공식 GraphQL API에서 토큰의 프로젝트·환경 범위를 먼저 대조하고, 프로젝트의 서비스 목록을 재조회한다. 토큰은 응답에 포함되지 않는다. 현재 운영 환경에 이 토큰이 설치됐다는 증거는 없다.
+- `APF_RAILWAY_ACTION_SECRET`(32자 이상)과 영속적인 `APF_RUNTIME_ROOT`가 추가로 구성돼야 빈 서비스 생성 미리보기가 열린다. 한 번의 확인 토큰은 5분 유효하며 소유자·프로젝트·환경·서비스 이름을 묶는다. 실행 시 SQLite 원장에 1회 사용을 먼저 기록하고, Railway 생성 응답 뒤 서비스를 다시 읽어 확인한다. 응답이 불확실하면 같은 토큰으로 재시도하지 않고 공급자 화면을 재조회한다.
+- **현재 `deployment=false`에서는 생성 API가 423으로 거부**된다. 실시간 조회와 미리보기는 안전하게 가능하지만 실제 생성은 현재 잠금에 걸린다. 자원 생성은 Railway 과금 대상일 수 있다. GitHub 소스·DB·볼륨·변수·도메인·마이그레이션·배포는 이 경로에서 만들지 않는다.
+- Railway는 프로젝트 토큰을 프로젝트 내 단일 환경으로 제한한다. `serviceCreate`가 연결된 토큰에 허용되는지 실환경 검증이 필요하며, 거절될 경우 더 넓은 토큰으로 자동 대체하지 않는다. 다중 고객용으로 넓히려면 프로젝트 선택 OAuth, 암호화 토큰 저장·갱신·철회 및 비용·범위별 추가 승인 흐름을 별도 구현한다.

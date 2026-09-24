@@ -69,7 +69,10 @@ from .popular_format import Decision as FormatDecision
 from .popular_format import ProposalRequest, ProposalStore
 from .popular_format import build as build_format
 from .public_page_observer import ObservationError, PublicPageObserver
+from .railway_actions import execute as execute_railway_action
+from .railway_actions import preview as preview_railway_action
 from .railway_advisor import guidance as railway_guidance
+from .railway_provider import RailwayClient, RailwayProviderError
 from .reference_material_consent import (
     NOTICE_TEXT,
     NOTICE_VERSION,
@@ -96,6 +99,14 @@ SESSION_COOKIE = "apf_console_session"
 CSRF_COOKIE = "apf_console_csrf"
 OAUTH_STATE_COOKIE = "apf_console_oauth_state"
 SAFE_METHODS = frozenset({"GET", "HEAD", "OPTIONS"})
+
+
+class RailwayServicePreviewRequest(BaseModel):
+    name: str = Field(min_length=3, max_length=40)
+
+
+class RailwayServiceCreateRequest(BaseModel):
+    approval_token: str = Field(min_length=40, max_length=2048)
 
 
 @dataclass(frozen=True)
@@ -425,6 +436,57 @@ def install_console(
             return railway_guidance()
         except (OSError, ValueError, KeyError, TypeError):
             raise HTTPException(status_code=503, detail="Railway guidance unavailable") from None
+
+    @application.get("/v1/console/railway-live")
+    def railway_live(
+        actor: Annotated[ConsolePrincipal, Depends(principal)], response: Response,
+    ) -> dict:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        response.headers["Cache-Control"] = "no-store"
+        try:
+            return RailwayClient.from_environment().snapshot()
+        except RailwayProviderError as error:
+            raise HTTPException(status_code=503, detail=str(error)) from None
+
+    @application.post("/v1/console/railway-service-preview")
+    def railway_service_preview(
+        payload: RailwayServicePreviewRequest,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)], response: Response,
+    ) -> dict:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        response.headers["Cache-Control"] = "no-store"
+        try:
+            return preview_railway_action(
+                RailwayClient.from_environment(), payload.name, str(actor.principal_id),
+            )
+        except RailwayProviderError as error:
+            raise HTTPException(status_code=503, detail=str(error)) from None
+
+    @application.post("/v1/console/railway-service-create")
+    def railway_service_create(
+        payload: RailwayServiceCreateRequest,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)], response: Response,
+    ) -> dict:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        try:
+            if not railway_guidance()["deployment_allowed"]:
+                raise HTTPException(status_code=423, detail="deployment readiness lock is active")
+            response.headers["Cache-Control"] = "no-store"
+            return execute_railway_action(
+                RailwayClient.from_environment(), payload.approval_token,
+                str(actor.principal_id),
+            )
+        except RailwayProviderError as error:
+            raise HTTPException(status_code=503, detail=str(error)) from None
+        except (OSError, ValueError, KeyError, TypeError):
+            raise HTTPException(status_code=503, detail="readiness evidence unavailable") from None
 
     @application.get("/console/railway-setup", response_class=HTMLResponse, include_in_schema=False)
     def railway_setup(actor: Annotated[ConsolePrincipal, Depends(principal)]) -> HTMLResponse:

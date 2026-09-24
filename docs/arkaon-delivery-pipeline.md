@@ -39,7 +39,7 @@ Railway 계정 자체는 Railway가 관리한다. 여기서 말하는 ‘계정 
 
 ## 구현 단계와 현재 경계
 
-현재 `/console/railway-setup`은 소유자 전용 클릭형 수동 안내이고, 실제 GitHub 저장·Railway 생성·Netlify 배포 호출은 하지 않는다. 아래의 검증을 각각 별도 PR로 진행한다.
+현재 `/console/railway-setup`은 소유자 전용 안내에 더해, 환경별 서버 프로젝트 토큰이 있을 때 Railway 서비스 목록을 실시간으로 조회한다. 빈 서비스 하나의 미리보기·일회 승인·생성·응답 재조회 경로가 구현되어 있지만 저장소의 `deployment=false` 잠금이 실행을 거부한다. OAuth 기반 다중 고객 연결, DB·볼륨·변수·배포 및 Netlify 배포는 아직 구현되지 않았다. 아래의 검증을 각각 별도 PR로 진행한다.
 
 1. 산출물 패키저: 정적/서버 성과물의 출력 경로, 빌드 계약, 비밀값 검사, SHA manifest.
 2. GitHub App 연결과 검토 브랜치 쓰기: 설치 범위·권한, 사용자 클릭, 커밋/PR read-back.
