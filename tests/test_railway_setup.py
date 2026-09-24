@@ -29,7 +29,10 @@ def test_railway_guide_requires_owner_and_preserves_deployment_lock():
     )
     page = client.get("/console/railway-setup")
     assert page.status_code == 200
-    assert "Railway 구축 도우미" in page.text
+    assert "결과물 확인과 운영 준비" in page.text
+    assert "지금 확인할 수 있는 결과물" in page.text
+    assert "다음 개발 단계" in page.text
+    assert page.text.index("지금 확인할 수 있는 결과물") < page.text.index("단계별 진행")
     assert "안내 전용" in page.text
     assert page.headers["cache-control"] == "no-store"
     status = client.get("/v1/console/railway-readiness")
