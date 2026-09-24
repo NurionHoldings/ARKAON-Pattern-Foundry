@@ -69,6 +69,7 @@ from .popular_format import Decision as FormatDecision
 from .popular_format import ProposalRequest, ProposalStore
 from .popular_format import build as build_format
 from .public_page_observer import ObservationError, PublicPageObserver
+from .railway_advisor import guidance as railway_guidance
 from .reference_material_consent import (
     NOTICE_TEXT,
     NOTICE_VERSION,
@@ -411,6 +412,19 @@ def install_console(
             }
         except (OSError, ValueError, KeyError, TypeError):
             raise HTTPException(status_code=503, detail="readiness evidence unavailable") from None
+
+    @application.get("/v1/console/railway-guidance")
+    def railway_guidance_view(
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        response: Response,
+    ) -> dict[str, object]:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        try:
+            response.headers["Cache-Control"] = "no-store"
+            return railway_guidance()
+        except (OSError, ValueError, KeyError, TypeError):
+            raise HTTPException(status_code=503, detail="Railway guidance unavailable") from None
 
     @application.get("/console/railway-setup", response_class=HTMLResponse, include_in_schema=False)
     def railway_setup(actor: Annotated[ConsolePrincipal, Depends(principal)]) -> HTMLResponse:
