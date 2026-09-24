@@ -23,6 +23,7 @@ from .design_style_proposal import PublicObservation
 _HTML_LIMIT = 512 * 1024
 _CSS_LIMIT = 256 * 1024
 _HEX = re.compile(r"#[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?\b")
+_RGB = re.compile(r"\brgba?\(\s*(\d{1,3})\s*[, ]\s*(\d{1,3})\s*[, ]\s*(\d{1,3})", re.IGNORECASE)
 _DECLARATION = re.compile(r"(?P<name>--[a-z-]+|[a-z-]+)\s*:\s*(?P<value>[^;{}]+)", re.IGNORECASE)
 _GAP = re.compile(r"(?:gap|padding)\s*:\s*(\d{1,3})px", re.IGNORECASE)
 
@@ -154,6 +155,8 @@ class _StylesheetParser(HTMLParser):
         data = dict(attrs)
         if tag == "style":
             self._style = True
+        if data.get("style") and len(data["style"]) <= 4096:
+            self.inline.append(data["style"])
         if tag == "link" and "stylesheet" in (data.get("rel") or "").lower().split():
             href = data.get("href")
             if href and len(href) < 2048:
@@ -171,6 +174,11 @@ class _StylesheetParser(HTMLParser):
 def _color(value: str) -> str | None:
     match = _HEX.search(value)
     if not match:
+        rgb = _RGB.search(value)
+        if rgb:
+            channels = [int(part) for part in rgb.groups()]
+            if all(channel <= 255 for channel in channels):
+                return "#" + "".join(f"{channel:02x}" for channel in channels)
         return None
     found = match.group().lower()
     if len(found) == 4:
