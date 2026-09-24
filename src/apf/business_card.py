@@ -131,7 +131,8 @@ class BusinessCardStore:
             "intent_dna": make_asset_identity(
                 tenant_id=tenant_id, owner_principal_id=owner_principal_id,
                 artifact_type="business_card_svg", artifact_id=card_id,
-                original_intent=request.model_dump(mode="json"),
+                original_intent={"logo_draft_id": request.logo_draft_id,
+                                 "purpose": "business_card_front_back"},
                 dna={"logo_draft_id": request.logo_draft_id,
                      "faces": ["front", "back"], "layout": "SVG",
                      "contact_content": "NOT_STORED_IN_DNA"},
