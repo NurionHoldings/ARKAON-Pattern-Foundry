@@ -12,6 +12,7 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
+from .asset_identity import make_asset_identity
 from .logo_motion import Motion, animate_generated_logo
 
 
@@ -103,6 +104,13 @@ class LogoDraftStore:
             "revisions": [revision],
             "generation": "DETERMINISTIC_VECTOR_ONLY",
             "approval": None,
+            "intent_dna": make_asset_identity(
+                tenant_id=tenant_id, owner_principal_id=owner_principal_id,
+                artifact_type="logo_svg", artifact_id=draft_id,
+                original_intent=request.model_dump(mode="json"),
+                dna={"shape": request.shape, "color": request.color.lower(),
+                     "variants": 3, "generation": "DETERMINISTIC_VECTOR_ONLY"},
+            ),
         }
         doc["draft_digest"] = _digest(doc)
         self._exclusive_json(self._path(draft_id), doc)
@@ -301,6 +309,7 @@ class LogoDraftStore:
             "generation": "DETERMINISTIC_VECTOR_ONLY",
             "credit_cap": 500,
             "credit_meter": "UNAVAILABLE",
+            "intent_dna": doc.get("intent_dna"),
         }
         if detail:
             result["revisions"] = [cls._public_revision(item) for item in doc["revisions"]]
