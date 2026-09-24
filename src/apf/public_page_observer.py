@@ -11,6 +11,7 @@ import ipaddress
 import re
 import socket
 import ssl
+import time
 from hashlib import sha256
 from html.parser import HTMLParser
 from urllib.parse import urljoin, urlsplit
@@ -22,8 +23,8 @@ from .design_style_proposal import PublicObservation
 _HTML_LIMIT = 512 * 1024
 _CSS_LIMIT = 256 * 1024
 _HEX = re.compile(r"#[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?\b")
-_DECLARATION = re.compile(r"(?P<name>--[a-z-]+|[a-z-]+)\s*:\s*(?P<value>[^;{}]+)", re.I)
-_GAP = re.compile(r"(?:gap|padding)\s*:\s*(\d{1,3})px", re.I)
+_DECLARATION = re.compile(r"(?P<name>--[a-z-]+|[a-z-]+)\s*:\s*(?P<value>[^;{}]+)", re.IGNORECASE)
+_GAP = re.compile(r"(?:gap|padding)\s*:\s*(\d{1,3})px", re.IGNORECASE)
 
 
 class ObservationError(ValueError):
@@ -56,13 +57,14 @@ class PublicPageObserver:
             raise ObservationError("DESIGN_CAPTURE_DNS_FAILED") from exc
         if not addresses or any(not ipaddress.ip_address(ip).is_global for ip in addresses):
             raise ObservationError("DESIGN_CAPTURE_NON_PUBLIC_ADDRESS")
-        return sorted(addresses)[0]
+        return min(addresses)
 
     def _get(self, url: str, *, limit: int, media_type: str) -> bytes:
         try:
             url = canonical_public_url(url)
         except DesignReferenceError as exc:
             raise ObservationError("DESIGN_CAPTURE_URL_INVALID") from exc
+        deadline = time.monotonic() + 10
         parsed = urlsplit(url)
         host = parsed.hostname
         assert host is not None
@@ -85,10 +87,22 @@ class PublicPageObserver:
             length = response.getheader("Content-Length")
             if length and int(length) > limit:
                 raise ObservationError("DESIGN_CAPTURE_TOO_LARGE")
-            data = response.read(limit + 1)
-            if len(data) > limit:
-                raise ObservationError("DESIGN_CAPTURE_TOO_LARGE")
-            return data
+            chunks = []
+            size = 0
+            while True:
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    raise ObservationError("DESIGN_CAPTURE_TIMEOUT")
+                if connection.sock is not None:
+                    connection.sock.settimeout(min(self.timeout, remaining))
+                chunk = response.read(min(16384, limit + 1 - size))
+                if not chunk:
+                    break
+                size += len(chunk)
+                if size > limit:
+                    raise ObservationError("DESIGN_CAPTURE_TOO_LARGE")
+                chunks.append(chunk)
+            return b"".join(chunks)
         except (OSError, ssl.SSLError, http.client.HTTPException, TimeoutError, ValueError) as exc:
             if isinstance(exc, ObservationError):
                 raise
