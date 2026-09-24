@@ -663,6 +663,8 @@ def install_console(
         number: int,
         actor: Annotated[ConsolePrincipal, Depends(principal)],
         store: Annotated[ConversationalSiteDraftStore, Depends(site_drafts)],
+        references: Annotated[DesignReferenceStore, Depends(design_references)],
+        proposals: Annotated[StyleProposalStore, Depends(style_proposals)],
     ) -> Response:
         if actor.role != "owner":
             raise HTTPException(status_code=403, detail="owner role required")
@@ -675,6 +677,7 @@ def install_console(
             )
         except SiteDraftError as error:
             raise site_draft_error(error) from None
+        page = approved_style(page, "site_draft", draft_id, actor, references, proposals)
         return Response(
             page,
             media_type="text/html",
@@ -1425,6 +1428,32 @@ def install_console(
             },
         )
 
+    def approved_style(
+        page: str, subject_type: SubjectType, subject_id: str, actor: ConsolePrincipal,
+        references: DesignReferenceStore, proposals: StyleProposalStore,
+    ) -> str:
+        try:
+            selected = references.get(
+                subject_type, subject_id, tenant_id=str(actor.tenant_id),
+                owner_principal_id=str(actor.principal_id),
+            )
+            proposal = proposals.get(
+                subject_type, subject_id, tenant_id=str(actor.tenant_id),
+                owner_principal_id=str(actor.principal_id),
+                reference_set_digest=str(selected["set_digest"]),
+            )
+        except DesignReferenceError as error:
+            if str(error) == "DESIGN_REFERENCES_NOT_FOUND":
+                return page
+            raise design_reference_error(error) from None
+        except StyleProposalError as error:
+            if str(error) in {"STYLE_NOT_FOUND", "STYLE_REFERENCES_STALE"}:
+                return page
+            raise style_error(error) from None
+        if proposal["status"] == "APPLIED":
+            return inject_preview_style(page, render_style_css(proposal["tokens"]))
+        return page
+
     @application.get("/v1/console/platform-dialogues/{dialogue_id}/revisions/{number}/preview.svg")
     def platform_revision_image(
         dialogue_id: str,
@@ -1454,6 +1483,8 @@ def install_console(
         kind: PageKind,
         actor: Annotated[ConsolePrincipal, Depends(principal)],
         store: Annotated[VisualPlatformDialogueStore, Depends(visual_dialogues)],
+        references: Annotated[DesignReferenceStore, Depends(design_references)],
+        proposals: Annotated[StyleProposalStore, Depends(style_proposals)],
     ) -> HTMLResponse:
         if actor.role != "owner":
             raise HTTPException(status_code=403, detail="owner role required")
@@ -1465,6 +1496,7 @@ def install_console(
             )
         except VisualDialogueError as error:
             raise visual_error(error) from None
+        page = approved_style(page, "platform_dialogue", dialogue_id, actor, references, proposals)
         return HTMLResponse(
             page,
             headers={
