@@ -29,6 +29,12 @@ from .conversational_site_draft import (
     SiteDraftRequest,
     SiteDraftRevisionRequest,
 )
+from .design_reference_urls import (
+    DesignReferenceBatch,
+    DesignReferenceError,
+    DesignReferenceStore,
+    SubjectType,
+)
 from .design_style_proposal import (
     StyleDecision,
     StyleProposalError,
@@ -36,12 +42,6 @@ from .design_style_proposal import (
     StyleProposalStore,
     inject_preview_style,
     render_style_css,
-)
-from .design_reference_urls import (
-    DesignReferenceBatch,
-    DesignReferenceError,
-    DesignReferenceStore,
-    SubjectType,
 )
 from .durable_review import (
     DurableStoreError,
