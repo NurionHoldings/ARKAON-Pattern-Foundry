@@ -20,8 +20,8 @@ def test_preview_pages_share_tokens_and_distinct_layouts():
         assert "<script" not in page
         assert "https://" not in page
     assert "landing-hero" in landing
-    assert "preview-hero" in home and "detail-stage" not in home
-    assert "detail-stage" in detail and "preview-hero" not in detail
+    assert '<section class="preview-hero"' in home and '<section class="detail-stage"' not in home
+    assert '<section class="detail-stage"' in detail and '<section class="preview-hero"' not in detail
 
 
 def test_preview_escapes_user_text_and_marks_decorative_content():
