@@ -17,6 +17,7 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
+from .asset_identity import make_asset_identity
 from .preview_design import FOUNDATION_CSS, LANDING_CSS
 
 
@@ -173,6 +174,13 @@ class ConversationalSiteDraftStore:
             "approval": None,
             "automatic_implementation": False,
             "automatic_deployment": False,
+            "intent_dna": make_asset_identity(
+                tenant_id=tenant_id, owner_principal_id=owner_principal_id,
+                artifact_type="static_landing_page", artifact_id=draft_id,
+                original_intent={"purpose": "static_landing_page"},
+                dna={"output": "HTML_CSS", "preview": ["desktop", "mobile"],
+                     "deployment": "NOT_CONNECTED", "source_revision": 1},
+            ),
         }
         document["draft_digest"] = _digest(document)
         self._exclusive_json(self._path(draft_id), document)
@@ -398,6 +406,7 @@ class ConversationalSiteDraftStore:
             "automatic_implementation": False,
             "automatic_deployment": False,
             "external_connection_readiness": _EXTERNAL_CONNECTION_READINESS,
+            "intent_dna": doc.get("intent_dna"),
         }
         if detail:
             value.update(
