@@ -28,6 +28,7 @@ def make_asset_identity(
         "schema_version": "apf.asset-intent-dna/1.0",
         "asset_id": str(key),
         "artifact_type": artifact_type,
+        "source_record_id": asset,
         "intent_digest": _digest(original_intent),
         "dna": clean_dna,
         "dna_digest": _digest(clean_dna),
