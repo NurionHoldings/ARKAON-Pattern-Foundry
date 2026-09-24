@@ -9,8 +9,19 @@
     "operator_confirmation_required_for_activation": true
   },
   "scope": "ARKAON Pattern Foundry: Railway preparation through reviewed activation",
-  "operator_language": "Explain one visible Railway action at a time. Distinguish PostgreSQL's own postgres-volume from the web service volume. A staged service is not an active deployment. Deploy Changes can launch it.",
+  "operator_language": "Present implemented deliverables and previews first. When the user elects actual operations, explain development and verification needed for GitHub, Railway when backend is needed, and Netlify. Then guide one visible action at a time. A staged service is not an active deployment.",
   "phases": [
+    {
+      "id": "00-present-current-result",
+      "action": "Show implemented artifact, preview and exact available/pending capabilities before any deployment setup request.",
+      "proof": [
+        "artifact revision and preview link",
+        "available/pending feature summary"
+      ],
+      "hold_when": [
+        "a preview is claimed as a functioning public service"
+      ]
+    },
     {
       "id": "01-review-source",
       "action": "Record repository, exact branch and commit, chained PR order, draft and CI state, and readiness locks.",
@@ -112,10 +123,10 @@
     "src/apf/repository.py"
   ],
   "user_interaction": {
-    "mode": "OWNER_GUIDED_CLICK_THROUGH",
+    "mode": "RESULTS_FIRST_THEN_OWNER_GUIDED_CLICK_THROUGH",
     "screen": "/console/railway-setup",
-    "steps": 7,
-    "meaning_of_confirmation": "User states they inspected the external screen; it is not provider verification.",
+    "steps": 8,
+    "meaning_of_confirmation": "Step 1 means the user inspected the current artifact; later clicks are user assertions about external screens, not provider verification.",
     "automated_railway_write": false,
     "secrets_entered_only_on_provider_console": true,
     "future_write_requirements": [
