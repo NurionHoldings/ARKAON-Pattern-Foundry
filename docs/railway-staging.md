@@ -4,7 +4,7 @@ This branch adds a Railway service command and owner-only GitHub OAuth login. Ke
 
 ## 초보 사용자 클릭형 진행 화면
 
-로그인한 owner는 관리 화면의 **Railway 구축 안내**를 열어 7개 단계를 하나씩 확인합니다. 각 단계에서 Railway 또는 GitHub의 공식 설명을 새 탭으로 열 수 있습니다. 화면의 '확인했어요'는 사용자의 자가 확인이며 서비스 생성, 변수 설정, 배포, 상태 검증을 대신 수행하지 않습니다. 계정 비밀번호, PostgreSQL URL, OAuth Client Secret은 안내 화면에 입력받지 않습니다.
+로그인한 owner는 관리 화면의 **Railway 구축 안내**를 열어 현재 결과물 확인을 먼저 보여 주고, 운영을 원하는 경우 8개 단계를 하나씩 확인합니다. 각 단계에서 Railway 또는 GitHub의 공식 설명을 새 탭으로 열 수 있습니다. 화면의 '확인했어요'는 사용자의 자가 확인이며 서비스 생성, 변수 설정, 배포, 상태 검증을 대신 수행하지 않습니다. 계정 비밀번호, PostgreSQL URL, OAuth Client Secret은 안내 화면에 입력받지 않습니다.
 
 상태 배지는 서버의 `knowledge/readiness/v0.1-readiness.json`을 읽어 배포 잠금을 표시합니다. 읽기 실패 시 진행 불가로 표시합니다. 최종 단계에도 배포 실행 버튼을 두지 않았습니다. 실제 클릭 한 번으로 서비스를 생성하려면 Railway 계정 연결, 최소 권한 범위, 사용자별 실행 동의, Railway 응답 재조회, 중복 실행 방지, 비용 표시, 되돌리기 절차를 별도 PR에서 구현하고 검증해야 합니다.
 
