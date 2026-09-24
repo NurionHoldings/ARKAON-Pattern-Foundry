@@ -22,6 +22,7 @@ from .domain import AnalysisTarget, AnalysisTargetCreate, TargetState
 from .github_owner_auth import GitHubOwnerAuth
 from .logo_draft import LogoDraftStore
 from .plain_language_approval import PlainLanguageApprovalStore
+from .popular_format import ProposalStore
 from .public_page_observer import PublicPageObserver
 from .reference_material_consent import ReferenceConsentStore
 from .repository import (
@@ -86,6 +87,7 @@ def create_app(
     design_reference_store: DesignReferenceStore | None = None,
     style_proposal_store: StyleProposalStore | None = None,
     public_page_observer: PublicPageObserver | None = None,
+    format_proposal_store: ProposalStore | None = None,
 ) -> FastAPI:
     application = FastAPI(title="ARKAON Pattern Foundry", version="0.1.0")
     application.state.repository = repository or repository_from_config()
@@ -112,6 +114,7 @@ def create_app(
         design_reference_store=design_reference_store or DesignReferenceStore(runtime_root()),
         style_proposal_store=style_proposal_store or StyleProposalStore(runtime_root()),
         public_page_observer=public_page_observer or PublicPageObserver(),
+        format_proposal_store=format_proposal_store or ProposalStore(runtime_root()),
         reference_consent_store=reference_consent_store
         or ReferenceConsentStore(Path(os.getenv("APF_FOUNDRY_ROOT", Path(__file__).parents[2]))),
     )

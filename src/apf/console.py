@@ -65,6 +65,9 @@ from .plain_language_approval import (
     PlainLanguageApprovalStore,
 )
 from .platform_page_preview import PageKind
+from .popular_format import Decision as FormatDecision
+from .popular_format import ProposalRequest, ProposalStore
+from .popular_format import build as build_format
 from .public_page_observer import ObservationError, PublicPageObserver
 from .reference_material_consent import (
     NOTICE_TEXT,
@@ -234,6 +237,7 @@ def install_console(
     design_reference_store: DesignReferenceStore | None = None,
     style_proposal_store: StyleProposalStore | None = None,
     public_page_observer: PublicPageObserver | None = None,
+    format_proposal_store: ProposalStore | None = None,
 ) -> None:
     application.state.console_security = security
     application.state.console_review_store = review_store
@@ -246,6 +250,7 @@ def install_console(
     application.state.design_reference_store = design_reference_store
     application.state.style_proposal_store = style_proposal_store
     application.state.public_page_observer = public_page_observer
+    application.state.format_proposal_store = format_proposal_store
 
     def principal(
         request: Request,
@@ -705,6 +710,85 @@ def install_console(
                 "X-Content-Type-Options": "nosniff",
             },
         )
+
+    def format_asset(actor: ConsolePrincipal, kind: str, record_id: str) -> dict:
+        stores = {
+            "site_draft": application.state.conversational_site_draft_store,
+            "logo_draft": application.state.logo_draft_store,
+            "business_card": application.state.business_card_store,
+            "platform_dialogue": application.state.visual_dialogue_store,
+        }
+        store = stores.get(kind)
+        if store is None:
+            raise HTTPException(status_code=404, detail="asset not found")
+        try:
+            if kind == "platform_dialogue":
+                asset = store.get_for_owner(record_id, tenant_id=str(actor.tenant_id), owner_principal_id=str(actor.principal_id))
+            else:
+                asset = store.get(record_id, tenant_id=str(actor.tenant_id), owner_principal_id=str(actor.principal_id))
+        except (SiteDraftError, LogoDraftError, BusinessCardError, VisualDialogueError, ValueError, KeyError):
+            raise HTTPException(status_code=404, detail="asset not found") from None
+        if not asset.get("intent_dna") or not asset.get("revisions"):
+            raise HTTPException(status_code=422, detail="asset has no current intent/DNA revision")
+        return asset
+
+    def format_store(request: Request) -> ProposalStore:
+        store = request.app.state.format_proposal_store
+        if store is None:
+            raise HTTPException(status_code=503, detail="format proposal store unavailable")
+        return store
+
+    @application.get("/format-proposals", response_class=HTMLResponse, include_in_schema=False)
+    def format_proposals_page(actor: Annotated[ConsolePrincipal, Depends(principal)]) -> HTMLResponse:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        return HTMLResponse(Path(__file__).with_name("popular_format_ui.html").read_text(encoding="utf-8"),
+            headers={"Cache-Control": "no-store", "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'"})
+
+    @application.post("/v1/console/format-proposals", status_code=201)
+    def create_format_proposal(payload: ProposalRequest, request: Request,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)]) -> dict:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        asset = format_asset(actor, payload.artifact_type, payload.record_id)
+        latest = asset["revisions"][-1]["revision_digest"]
+        if payload.source_revision_digest != latest:
+            raise HTTPException(status_code=409, detail="SOURCE_REVISION_CHANGED")
+        try:
+            proposal = build_format(payload, asset["intent_dna"], str(actor.principal_id), str(actor.tenant_id))
+        except ValueError as error:
+            raise HTTPException(status_code=422, detail=str(error)) from None
+        return format_store(request).create(proposal)
+
+    @application.get("/v1/console/format-proposals/{proposal_id}")
+    def get_format_proposal(proposal_id: UUID, request: Request,
+        actor: Annotated[ConsolePrincipal, Depends(principal)]) -> dict:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        try:
+            return format_store(request).get(str(proposal_id), str(actor.tenant_id), str(actor.principal_id))
+        except KeyError:
+            raise HTTPException(status_code=404, detail="proposal not found") from None
+
+    @application.post("/v1/console/format-proposals/{proposal_id}/decision")
+    def decide_format_proposal(proposal_id: UUID, payload: FormatDecision, request: Request,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)]) -> dict:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        store = format_store(request)
+        try:
+            doc = store.get(str(proposal_id), str(actor.tenant_id), str(actor.principal_id))
+            asset = format_asset(actor, doc["artifact_type"], doc["record_id"])
+            return store.decide(str(proposal_id), str(actor.tenant_id), str(actor.principal_id), payload,
+                                asset["intent_dna"], asset["revisions"][-1]["revision_digest"])
+        except KeyError:
+            raise HTTPException(status_code=404, detail="proposal not found") from None
+        except ValueError as error:
+            raise HTTPException(status_code=409, detail=str(error)) from None
 
     @application.post("/v1/console/site-drafts", status_code=status.HTTP_201_CREATED)
     def create_site_draft(

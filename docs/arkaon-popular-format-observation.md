@@ -35,3 +35,9 @@
 - YouTube Data API: https://developers.google.com/youtube/v3/docs/videos/list
 - TikTok Research API: https://developers.tiktok.com/docs/en/research-api-specs-query-videos
 - CapCut Materials License: https://www.capcut.com/clause/material-license-agreement
+
+## 수동 관찰 시안 MVP (#71 후속)
+
+`/format-proposals`에서 소유자가 자기 자산을 선택하고 출처 URL, 관찰 시각, 지역, 분류, 공개 신호, 권리 상태를 직접 입력한다. 서버는 자산의 소유권·intent/DNA digest·최신 revision digest를 확인한 다음 3가지 독립적인 구성 시안을 저장한다. URL 호스트는 해당 플랫폼의 HTTPS 도메인만 허용한다. 기록의 인기 여부는 항상 `POPULARITY_NOT_VERIFIED`다. 최근 30일 여부는 별도로 표시하며, 수동 기록을 공식 인기 순위로 승격하지 않는다. 출처 미디어와 템플릿 파일은 요청하거나 저장하지 않는다.
+
+소유자는 반응형 화면에서 시안을 미리보고 한 가지를 승인하거나 거절할 수 있다. 결정 시 최신 원본 revision을 재확인하고 추천 revision digest를 남긴다. **이 승인은 추천 선택만 기록하며 원본 자산을 수정하거나 게시·배포하지 않는다.** 운영 배포 잠금은 그대로 유지된다. 외부 API 연동과 검증된 최신 인기 데이터, 원본 자산 수정 작업은 별도 구현 및 검증 대상이다. 제안 기록은 런타임 SQLite에 저장되므로 운영 단계에는 영속 저장소 연계가 필요하다.
