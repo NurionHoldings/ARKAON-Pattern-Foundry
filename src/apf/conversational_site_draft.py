@@ -131,7 +131,7 @@ def _static_page(
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{title}</title><style>{FOUNDATION_CSS}{LANDING_CSS}</style></head>
 <body><header class="site-header"><div class="wrap">
-<strong class="site-brand">{title}</strong><span class="site-tag">검토 중인 웹사이트 시안 · v{revision}</span>
+<strong class="site-brand">{title}</strong><span class="site-tag">웹사이트 초안 · v{revision} · 검토 중</span>
 </div></header>
 <main class="wrap landing-main">
 <section class="landing-hero" aria-label="첫 화면">
