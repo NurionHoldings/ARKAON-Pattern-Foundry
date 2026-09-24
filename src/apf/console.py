@@ -29,6 +29,14 @@ from .conversational_site_draft import (
     SiteDraftRequest,
     SiteDraftRevisionRequest,
 )
+from .design_style_proposal import (
+    StyleDecision,
+    StyleProposalError,
+    StyleProposalRequest,
+    StyleProposalStore,
+    inject_preview_style,
+    render_style_css,
+)
 from .design_reference_urls import (
     DesignReferenceBatch,
     DesignReferenceError,
@@ -214,6 +222,7 @@ def install_console(
     business_card_store: BusinessCardStore | None = None,
     reference_consent_store: ReferenceConsentStore | None = None,
     design_reference_store: DesignReferenceStore | None = None,
+    style_proposal_store: StyleProposalStore | None = None,
 ) -> None:
     application.state.console_security = security
     application.state.console_review_store = review_store
@@ -224,6 +233,7 @@ def install_console(
     application.state.business_card_store = business_card_store
     application.state.reference_consent_store = reference_consent_store
     application.state.design_reference_store = design_reference_store
+    application.state.style_proposal_store = style_proposal_store
 
     def principal(
         request: Request,
@@ -286,6 +296,12 @@ def install_console(
         store = request.app.state.design_reference_store
         if store is None:
             raise HTTPException(status_code=503, detail="design reference store unavailable")
+        return store
+
+    def style_proposals(request: Request) -> StyleProposalStore:
+        store = request.app.state.style_proposal_store
+        if store is None:
+            raise HTTPException(status_code=503, detail="style proposal store unavailable")
         return store
 
     def reference_consents(request: Request) -> ReferenceConsentStore:
@@ -1266,6 +1282,148 @@ def install_console(
             )
         except DesignReferenceError as error:
             raise design_reference_error(error) from None
+
+    def style_error(error: StyleProposalError) -> HTTPException:
+        code = str(error)
+        return HTTPException(
+            status_code=404 if code == "STYLE_NOT_FOUND"
+            else 409 if code in {"STYLE_BUSY", "STYLE_REFERENCES_STALE", "STYLE_DECISION_STALE"}
+            else 422, detail=code,
+        )
+
+    def reference_set(
+        subject_type: SubjectType, subject_id: str, actor: ConsolePrincipal,
+        references: DesignReferenceStore,
+    ) -> dict[str, object]:
+        try:
+            return references.get(
+                subject_type, subject_id, tenant_id=str(actor.tenant_id),
+                owner_principal_id=str(actor.principal_id),
+            )
+        except DesignReferenceError as error:
+            raise design_reference_error(error) from None
+
+    @application.post("/v1/console/design-references/{subject_type}/{subject_id}/style")
+    def propose_reference_style(
+        subject_type: SubjectType, subject_id: UUID, payload: StyleProposalRequest,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        references: Annotated[DesignReferenceStore, Depends(design_references)],
+        proposals: Annotated[StyleProposalStore, Depends(style_proposals)],
+        site_store: Annotated[ConversationalSiteDraftStore, Depends(site_drafts)],
+        dialogue_store: Annotated[VisualPlatformDialogueStore, Depends(visual_dialogues)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        design_reference_subject(subject_type, str(subject_id), actor, site_store, dialogue_store)
+        selected = reference_set(subject_type, str(subject_id), actor, references)
+        try:
+            return proposals.propose(
+                subject_type, str(subject_id), tenant_id=str(actor.tenant_id),
+                owner_principal_id=str(actor.principal_id),
+                references=selected, request=payload,
+            )
+        except StyleProposalError as error:
+            raise style_error(error) from None
+
+    @application.get("/v1/console/design-references/{subject_type}/{subject_id}/style")
+    def get_reference_style(
+        subject_type: SubjectType, subject_id: UUID,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        references: Annotated[DesignReferenceStore, Depends(design_references)],
+        proposals: Annotated[StyleProposalStore, Depends(style_proposals)],
+        site_store: Annotated[ConversationalSiteDraftStore, Depends(site_drafts)],
+        dialogue_store: Annotated[VisualPlatformDialogueStore, Depends(visual_dialogues)],
+    ) -> dict[str, object]:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        design_reference_subject(subject_type, str(subject_id), actor, site_store, dialogue_store)
+        selected = reference_set(subject_type, str(subject_id), actor, references)
+        try:
+            return proposals.get(
+                subject_type, str(subject_id), tenant_id=str(actor.tenant_id),
+                owner_principal_id=str(actor.principal_id),
+                reference_set_digest=str(selected["set_digest"]),
+            )
+        except StyleProposalError as error:
+            raise style_error(error) from None
+
+    @application.post("/v1/console/design-references/{subject_type}/{subject_id}/style/decision")
+    def decide_reference_style(
+        subject_type: SubjectType, subject_id: UUID, payload: StyleDecision,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        references: Annotated[DesignReferenceStore, Depends(design_references)],
+        proposals: Annotated[StyleProposalStore, Depends(style_proposals)],
+        site_store: Annotated[ConversationalSiteDraftStore, Depends(site_drafts)],
+        dialogue_store: Annotated[VisualPlatformDialogueStore, Depends(visual_dialogues)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        design_reference_subject(subject_type, str(subject_id), actor, site_store, dialogue_store)
+        selected = reference_set(subject_type, str(subject_id), actor, references)
+        try:
+            return proposals.decide(
+                subject_type, str(subject_id), tenant_id=str(actor.tenant_id),
+                owner_principal_id=str(actor.principal_id),
+                reference_set_digest=str(selected["set_digest"]), decision=payload,
+            )
+        except StyleProposalError as error:
+            raise style_error(error) from None
+
+    @application.get("/v1/console/design-references/{subject_type}/{subject_id}/style/preview/{kind}")
+    def preview_reference_style(
+        subject_type: SubjectType, subject_id: UUID, kind: PageKind,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        references: Annotated[DesignReferenceStore, Depends(design_references)],
+        proposals: Annotated[StyleProposalStore, Depends(style_proposals)],
+        site_store: Annotated[ConversationalSiteDraftStore, Depends(site_drafts)],
+        dialogue_store: Annotated[VisualPlatformDialogueStore, Depends(visual_dialogues)],
+    ) -> HTMLResponse:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        design_reference_subject(subject_type, str(subject_id), actor, site_store, dialogue_store)
+        selected = reference_set(subject_type, str(subject_id), actor, references)
+        try:
+            proposal = proposals.get(
+                subject_type, str(subject_id), tenant_id=str(actor.tenant_id),
+                owner_principal_id=str(actor.principal_id),
+                reference_set_digest=str(selected["set_digest"]),
+            )
+            if proposal["status"] == "REJECTED":
+                raise StyleProposalError("STYLE_REJECTED")
+            if subject_type == "site_draft":
+                if kind != "home":
+                    raise StyleProposalError("STYLE_PREVIEW_KIND_INVALID")
+                draft = site_store.get(
+                    str(subject_id), tenant_id=str(actor.tenant_id),
+                    owner_principal_id=str(actor.principal_id),
+                )
+                page = site_store.preview(
+                    str(subject_id), int(draft["revision_count"]),
+                    tenant_id=str(actor.tenant_id), owner_principal_id=str(actor.principal_id),
+                )
+            else:
+                dialogue = dialogue_store.get_for_owner(
+                    str(subject_id), tenant_id=str(actor.tenant_id),
+                    owner_principal_id=str(actor.principal_id),
+                )
+                page = dialogue_store.page_preview(
+                    str(subject_id), int(dialogue["revision_count"]), kind,
+                    tenant_id=str(actor.tenant_id), owner_principal_id=str(actor.principal_id),
+                )
+            page = inject_preview_style(page, render_style_css(proposal["tokens"]))
+        except StyleProposalError as error:
+            raise style_error(error) from None
+        return HTMLResponse(
+            page, headers={
+                "Cache-Control": "no-store",
+                "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-ancestors 'self'; sandbox",
+                "X-Content-Type-Options": "nosniff",
+            },
+        )
 
     @application.get("/v1/console/platform-dialogues/{dialogue_id}/revisions/{number}/preview.svg")
     def platform_revision_image(
