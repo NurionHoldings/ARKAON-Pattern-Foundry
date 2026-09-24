@@ -79,3 +79,24 @@ def test_duplicate_and_limit_fail_without_partial_write(tmp_path):
     assert store.get(
         "platform_dialogue", subject, tenant_id=tenant, owner_principal_id=owner
     )["set_digest"] == doc["set_digest"]
+
+
+def test_total_limit_is_twelve_and_rejected_batch_is_atomic(tmp_path):
+    store = DesignReferenceStore(tmp_path)
+    subject, tenant, owner = str(uuid4()), str(uuid4()), str(uuid4())
+    digest = None
+    for start in (0, 4, 8):
+        saved = store.append(
+            "site_draft", subject, tenant_id=tenant, owner_principal_id=owner,
+            batch=batch(*(f"https://reference-{n}.example.com/" for n in range(start, start + 4)),
+                        digest=digest),
+        )
+        digest = saved["set_digest"]
+    with pytest.raises(DesignReferenceError, match="DESIGN_URL_LIMIT"):
+        store.append(
+            "site_draft", subject, tenant_id=tenant, owner_principal_id=owner,
+            batch=batch("https://another.example.com/", digest=digest),
+        )
+    assert store.get(
+        "site_draft", subject, tenant_id=tenant, owner_principal_id=owner
+    )["set_digest"] == digest
