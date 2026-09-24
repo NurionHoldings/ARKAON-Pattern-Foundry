@@ -13,7 +13,15 @@ def render_page_mockup(brief: dict[str, object], screens: list[dict[str, object]
         raise ValueError("PLATFORM_PREVIEW_KIND_INVALID")
     if not screens:
         raise ValueError("PLATFORM_PREVIEW_SCREENS_REQUIRED")
-    chosen = screens[0] if kind == "home" else (screens[1] if len(screens) > 1 else None)
+    home = next(
+        (screen for screen in screens if str(screen["screen_id"]).lower() == "home"), screens[0]
+    )
+    detail = next(
+        (screen for screen in screens if str(screen["screen_id"]).lower() == "detail"
+         and screen is not home),
+        next((screen for screen in screens if screen is not home), None),
+    )
+    chosen = home if kind == "home" else detail
     brand = escape(str(brief["name"]))
     purpose = escape(str(brief["purpose"]))
     title = escape(str(chosen["title"])) if chosen else "상세 화면 명세가 필요합니다"
