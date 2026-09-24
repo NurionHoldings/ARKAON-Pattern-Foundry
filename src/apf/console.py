@@ -13,7 +13,7 @@ from typing import Annotated, Literal, Protocol
 from uuid import UUID
 
 from fastapi import Cookie, Depends, Header, HTTPException, Query, Request, Response, status
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import BaseModel, Field
 
 from .business_card import (
@@ -49,6 +49,7 @@ from .durable_review import (
     ReviewDecision,
     ReviewStage,
 )
+from .github_owner_auth import GitHubOwnerAuth, OwnerAuthError
 from .logo_draft import (
     LogoDraftError,
     LogoDraftRequest,
@@ -89,6 +90,7 @@ from .visual_platform_dialogue import (
 
 SESSION_COOKIE = "apf_console_session"
 CSRF_COOKIE = "apf_console_csrf"
+OAUTH_STATE_COOKIE = "apf_console_oauth_state"
 SAFE_METHODS = frozenset({"GET", "HEAD", "OPTIONS"})
 
 
@@ -221,6 +223,7 @@ def install_console(
     application,
     *,
     security: ConsoleSecurity,
+    owner_auth: GitHubOwnerAuth | None = None,
     review_store: ConsoleReviewStore | None = None,
     approval_store: PlainLanguageApprovalStore | None = None,
     visual_dialogue_store: VisualPlatformDialogueStore | None = None,
@@ -347,6 +350,46 @@ def install_console(
         response.set_cookie(SESSION_COOKIE, token, httponly=True, secure=True, samesite="strict")
         response.set_cookie(CSRF_COOKIE, csrf, httponly=False, secure=True, samesite="strict")
         return {"csrf_token": csrf}
+
+    @application.get("/console/auth/github", include_in_schema=False)
+    def start_owner_sign_in() -> RedirectResponse:
+        if owner_auth is None:
+            raise HTTPException(status_code=503, detail="owner sign-in unavailable")
+        destination, state_cookie = owner_auth.start()
+        response = RedirectResponse(destination, status_code=302)
+        response.set_cookie(
+            OAUTH_STATE_COOKIE, state_cookie, max_age=300, httponly=True,
+            secure=True, samesite="lax", path="/console/auth",
+        )
+        response.headers["Cache-Control"] = "no-store"
+        return response
+
+    @application.get("/console/auth/callback", include_in_schema=False)
+    def finish_owner_sign_in(
+        code: str, state: str,
+        state_cookie: Annotated[str | None, Cookie(alias=OAUTH_STATE_COOKIE)] = None,
+    ) -> RedirectResponse:
+        if owner_auth is None:
+            raise HTTPException(status_code=503, detail="owner sign-in unavailable")
+        try:
+            identity = owner_auth.verify_callback(code=code, state=state, cookie=state_cookie)
+        except OwnerAuthError as error:
+            raise HTTPException(status_code=403, detail=str(error)) from None
+        token = security.issue(ConsolePrincipal(
+            tenant_id=identity.tenant_id, principal_id=identity.principal_id, role="owner",
+        ))
+        response = RedirectResponse("/console", status_code=303)
+        response.set_cookie(
+            SESSION_COOKIE, token, max_age=3600, httponly=True,
+            secure=True, samesite="strict", path="/",
+        )
+        response.set_cookie(
+            CSRF_COOKIE, secrets.token_urlsafe(32), max_age=3600,
+            httponly=False, secure=True, samesite="strict", path="/",
+        )
+        response.delete_cookie(OAUTH_STATE_COOKIE, path="/console/auth", secure=True, httponly=True, samesite="lax")
+        response.headers["Cache-Control"] = "no-store"
+        return response
 
     @application.get("/console", response_class=HTMLResponse, include_in_schema=False)
     def console_home(actor: Annotated[ConsolePrincipal, Depends(principal)]) -> HTMLResponse:
