@@ -173,3 +173,22 @@ def test_business_card_malformed_document_fails_closed(tmp_path):
     store._path(card["card_id"]).write_text("[]", encoding="utf-8")
     with pytest.raises(BusinessCardError, match="TAMPERED"):
         store.get(card["card_id"], tenant_id=tenant, owner_principal_id=owner)
+
+
+def test_unsaved_card_preview_uses_owned_logo_without_writing_contact_state(tmp_path):
+    tenant, owner = str(uuid4()), str(uuid4())
+    logos = LogoDraftStore(tmp_path)
+    source = logo(logos, tenant, owner)
+    store = BusinessCardStore(tmp_path, logos)
+    draft = store.preview(
+        tenant_id=tenant, owner_principal_id=owner, request=request(source["draft_id"])
+    )
+    assert "&lt;인석&gt;" in draft["front_svg"]
+    ElementTree.fromstring(draft["back_svg"])
+    assert not (tmp_path / "state" / "business-cards").exists()
+    with pytest.raises(BusinessCardError, match="LOGO_NOT_FOUND"):
+        store.preview(
+            tenant_id=tenant,
+            owner_principal_id=str(uuid4()),
+            request=request(source["draft_id"]),
+        )
