@@ -2,7 +2,7 @@
 
 ## 대상과 역할
 
-아르카온이 만든 랜딩·템플릿·플랫폼마다 별도 `delivery_id`와 소유자, 테넌트, 산출물 종류, 검토된 버전 SHA를 기록한다. 하나의 ARKAON 자체 운영 배포와 각 고객 성과물의 배포를 구분한다.
+아르카온이 만든 랜딩·템플릿·플랫폼마다 생성 시 부여한 `intent_dna.asset_id`, 원본 기록 ID, 소유자, 테넌트, 검토된 revision digest를 결속하고 배포 작업에는 별도 `delivery_id`를 둔다. `asset_id`로 기존 의도와 시안 특성을 찾고, 실제 수정은 소유자 검증 뒤 최신 원장 revision에서 이어 간다. 자세한 계약은 `docs/asset-intent-dna-continuity.md`를 따른다. 하나의 ARKAON 자체 운영 배포와 각 고객 성과물의 배포를 구분한다.
 
 | 종류 | GitHub | Railway | Netlify |
 | --- | --- | --- | --- |
