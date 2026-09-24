@@ -654,6 +654,29 @@ def install_console(
             },
         )
 
+    @application.post("/v1/console/site-drafts/{draft_id}/revisions/preview")
+    def preview_site_revision(
+        draft_id: str,
+        payload: SiteDraftRevisionRequest,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[ConversationalSiteDraftStore, Depends(site_drafts)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, str]:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        try:
+            return {
+                "html": store.preview_revision(
+                    draft_id,
+                    tenant_id=str(actor.tenant_id),
+                    owner_principal_id=str(actor.principal_id),
+                    request=payload,
+                )
+            }
+        except SiteDraftError as error:
+            raise site_draft_error(error) from None
+
     @application.post("/v1/console/site-drafts/{draft_id}/revisions")
     def revise_site_draft(
         draft_id: str,
