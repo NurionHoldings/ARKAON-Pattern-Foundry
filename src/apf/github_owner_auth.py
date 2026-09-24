@@ -15,7 +15,7 @@ import secrets
 import time
 from dataclasses import dataclass
 from urllib.parse import urlencode, urlsplit
-from uuid import UUID, NAMESPACE_URL, uuid5
+from uuid import NAMESPACE_URL, UUID, uuid5
 
 import httpx
 
