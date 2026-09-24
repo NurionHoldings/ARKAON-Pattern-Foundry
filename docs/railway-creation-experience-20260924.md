@@ -22,3 +22,16 @@
 ## 재사용 규칙
 
 이 기록은 특정 사용자의 화면 관찰에서 얻은 **절차적 경험**이다. 저장소 권한, 토큰, DB URL, 비밀번호, 쿠키를 학습 자산에 넣지 않는다. 상태는 관찰 시점에만 유효하며 재사용 시 Railway 및 GitHub를 다시 조회한다. 실패나 보류도 기록하고 자동으로 권한을 넓히거나 배포 잠금을 풀지 않는다.
+
+## 후속 관찰: 저장소 권한·소스 연결
+
+- GitHub의 기존 Railway App 설치는 `Only select repositories`였으며 `mjn`, `aibaeby`가 이미 선택되어 있었다. 사용자가 추가 승인을 한 뒤 `NurionHoldings/ARKAON-Pattern-Foundry`만 더해 총 3개가 됐다. 기존 두 저장소를 제거하거나 `All repositories`로 바꾸지 않았다.
+- 이 App은 metadata 읽기와 actions·administration·checks·code·commit statuses·deployments·pull requests·workflows 읽기/쓰기 권한을 요청한다. 아르카온은 저장소 추가 직전 **권한의 종류와 범위**를 화면에 밝혀야 한다.
+- Railway의 `Connect Repo` 목록에서 대상 저장소를 다시 확인하고 대기 중인 앱 서비스에 소스 연결을 추가했다. 서비스는 여전히 `production`에서 생성 대기 상태이며 `Apply 3 changes`로 표시됐다. **Deploy를 누르지 않았다.**
+- Railway는 연결 즉시 `main`을 production 브랜치로 선택하며 변경 시 자동 배포를 안내했다. `Wait for CI`를 켰지만 이는 CI 통과 후 배포를 허용하는 조건일 뿐, readiness 잠금이나 자동 배포 자체를 대체하지 않는다. 브랜치 분리 동작은 설정 손상 가능성 때문에 진행하지 않았다. 따라서 **대기 변경을 적용하면 안 된다.**
+- `New Environment`에는 production 복제와 빈 환경 선택지가 있었다. 새 환경은 생성하지 않았다. 복제는 서비스·변수·구성을 복사하므로 비용·데이터 범위를 확인해야 한다.
+- 앱 전용 볼륨, 필수 서비스 변수, OAuth callback, DB 마이그레이션과 테넌트, 백업 복구는 아직 확인되지 않았다. 화면에 `Could not load public networking`이 보였으므로 공용 도메인도 검증하지 못했다.
+
+## 추가 재사용 규칙
+
+GitHub App을 승인해도 Railway의 서비스 소스 연결과 서비스 생성·배포는 각각 별도 상태다. `Wait for CI`만 켜져 있으면 안전한 배포 잠금으로 오판하지 않는다. 대기 변경 수와 자동 배포 브랜치를 보여 주고, readiness가 false일 때 Apply/Deploy를 금지한다. 브랜치 연결을 변경할 때 기존 설정 영향이 불확실하면 중단하고 정확한 변경 범위를 다시 확인한다.

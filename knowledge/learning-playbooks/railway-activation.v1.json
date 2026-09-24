@@ -65,7 +65,8 @@
         "application writes are routed to ephemeral checkout",
         "Railway GitHub App does not list the exact repository",
         "GitHub App authorization scope exceeds the one approved repository",
-        "GitHub authentication is incomplete"
+        "GitHub authentication is incomplete",
+        "production branch is auto-connected to main while deployment lock remains false"
       ]
     },
     {
@@ -118,10 +119,13 @@
     "repository": "PR 58-71 remain stacked drafts; PR 61 conflict resolved and its 3 CI jobs passed; no merge or deployment approval",
     "readiness": "PRODUCT_IMPLEMENT_HOLD, deployment=false",
     "decision": "HOLD_ACTIVATION",
-    "app_source": "NONE; repository selector showed only mjn and aibaeby, not ARKAON-Pattern-Foundry",
+    "app_source": "ARKAON repository linked as staged change, production defaults to main auto-deploy; no active app deployment",
     "app_variables": "No APF service variables observed; Railway-generated variables do not satisfy APF requirements",
-    "github_app": "Configuration reached GitHub login; installation scope and success remain unverified",
-    "database_tables": "No tables displayed in Railway database view at observation time; migration not verified"
+    "github_app": "Railway App repository access saved for ARKAON-Pattern-Foundry only in addition to pre-existing mjn and aibaeby; broad app permissions disclosed and approved",
+    "database_tables": "No tables displayed in Railway database view at observation time; migration not verified",
+    "railway_change_count": "Apply 3 changes pending; do not apply while deployment=false",
+    "ci_gate": "Wait for CI enabled on staged service; does not override deployment lock",
+    "public_networking": "Could not load public networking in UI; domain unverified"
   },
   "references": [
     "docs/railway-staging.md",
