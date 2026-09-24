@@ -1,0 +1,28 @@
+{
+  "schema_version": "apf.popular-format-observation/1.0",
+  "state": "PROPOSE_ONLY",
+  "source_policy": {
+    "platforms": ["capcut", "youtube", "tiktok", "instagram"],
+    "current_access": "NO_AUTOMATIC_PLATFORM_CONNECTION",
+    "collect": ["public_source_url", "observed_at", "region", "category", "permitted_public_metrics", "general_editing_principles"],
+    "exclude": ["original_video", "original_audio", "template_project_file", "private_account_metrics", "personal_comment_data"],
+    "rights": "Verify each source and asset's permitted use before external material use"
+  },
+  "priority": {
+    "default": "RECENT_RELEVANT_WITH_EVIDENCE",
+    "compare_within": ["platform", "region", "category", "time_window"],
+    "signals": ["freshness", "views_when_available", "engagement_when_available", "observed_reuse_when_available"],
+    "when_unverifiable": "POPULARITY_NOT_VERIFIED",
+    "cross_platform_raw_metric_ranking": false
+  },
+  "asset_binding": ["asset_id", "owner", "tenant", "source_revision_digest", "intent_digest", "dna_digest"],
+  "workflow": [
+    "RESOLVE_OWNER_ASSET", "OBTAIN_REFERENCE_CONSENT", "OBSERVE_PUBLIC_EVIDENCE",
+    "EXTRACT_ABSTRACT_PATTERN", "PROPOSE_2_TO_3_ORIGINAL_VARIANTS",
+    "PREVIEW_TARGET_FORMAT", "OWNER_SELECTS_OR_REJECTS", "SAVE_NEW_REVISION"
+  ],
+  "automatic_copy": false,
+  "automatic_publication": false,
+  "implementation": "DESIGN_ONLY",
+  "source": "docs/arkaon-popular-format-observation.md"
+}
