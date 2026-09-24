@@ -44,12 +44,12 @@ from .logo_draft import (
 )
 from .logo_motion import Motion
 from .logo_reference import ImageReferenceError, ImageReferenceRequest, analyze_reference
-from .platform_page_preview import PageKind
 from .plain_language_approval import (
     ApprovalDecision,
     PlainApprovalError,
     PlainLanguageApprovalStore,
 )
+from .platform_page_preview import PageKind
 from .reference_material_consent import (
     NOTICE_TEXT,
     NOTICE_VERSION,
