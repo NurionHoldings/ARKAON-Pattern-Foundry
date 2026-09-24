@@ -19,6 +19,7 @@ from .conversational_site_draft import ConversationalSiteDraftStore
 from .design_reference_urls import DesignReferenceStore
 from .design_style_proposal import StyleProposalStore
 from .domain import AnalysisTarget, AnalysisTargetCreate, TargetState
+from .github_owner_auth import GitHubOwnerAuth
 from .logo_draft import LogoDraftStore
 from .plain_language_approval import PlainLanguageApprovalStore
 from .public_page_observer import PublicPageObserver
@@ -52,6 +53,8 @@ def repository_from_config(
     environment = (environment or os.getenv("APF_ENV", "development")).lower()
     database_url = database_url or os.getenv("DATABASE_URL")
     if database_url:
+        if database_url.startswith("postgres://"):
+            database_url = "postgresql://" + database_url[len("postgres://"):]
         if not database_url.startswith(("postgresql://", "postgresql+psycopg://")):
             raise RuntimeError("DATABASE_URL must use PostgreSQL")
         return PostgresRepository(database_url)
@@ -72,6 +75,7 @@ def create_app(
     *,
     repository: TargetRepository | None = None,
     console_security: ConsoleSecurity | None = None,
+    owner_auth: GitHubOwnerAuth | None = None,
     console_review_store: ConsoleReviewStore | None = None,
     plain_approval_store: PlainLanguageApprovalStore | None = None,
     visual_dialogue_store: VisualPlatformDialogueStore | None = None,
@@ -89,6 +93,7 @@ def create_app(
     install_console(
         application,
         security=console_security or console_security_from_config(),
+        owner_auth=owner_auth or GitHubOwnerAuth.from_environment(),
         review_store=console_review_store,
         approval_store=plain_approval_store
         or PlainLanguageApprovalStore(
