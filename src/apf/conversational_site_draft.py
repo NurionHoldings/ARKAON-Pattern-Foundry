@@ -172,6 +172,29 @@ class ConversationalSiteDraftStore:
     def get(self, draft_id: str, *, tenant_id: str, owner_principal_id: str) -> dict[str, object]:
         return self._public(self._owner_bound(draft_id, tenant_id, owner_principal_id), detail=True)
 
+    def preview_revision(
+        self,
+        draft_id: str,
+        *,
+        tenant_id: str,
+        owner_principal_id: str,
+        request: SiteDraftRevisionRequest,
+    ) -> str:
+        """Render current edits without adding a revision or approving publication."""
+        doc = self._owner_bound(draft_id, tenant_id, owner_principal_id)
+        latest = doc["revisions"][-1]
+        if (
+            doc["state"] != "OWNER_REVIEW_REQUIRED"
+            or request.based_on_revision_digest != latest["revision_digest"]
+        ):
+            raise SiteDraftError("SITE_DRAFT_STALE_REVISION")
+        return _static_page(
+            request.title or str(latest["title"]),
+            request.description or str(latest["description"]),
+            len(doc["revisions"]) + 1,
+            request.change_note,
+        )
+
     def revise(
         self,
         draft_id: str,
