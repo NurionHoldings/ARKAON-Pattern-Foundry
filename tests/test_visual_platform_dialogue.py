@@ -160,7 +160,7 @@ def test_home_and_detail_page_mockups_are_owner_bound_and_inert(tmp_path):
     assert "벌거리 홈" in home and "검색" in home
     assert "&lt;script&gt;" in detail and "<script>alert" not in detail
     assert "<script" not in home and "<script" not in detail
-    assert "@media(max-width:700px)" in detail
+    assert "@media (max-width: 760px)" in detail
     with pytest.raises(VisualDialogueError, match="OWNER_MISMATCH"):
         store.page_preview(
             dialogue_id, 1, "home", tenant_id=tenant, owner_principal_id=str(uuid4())
