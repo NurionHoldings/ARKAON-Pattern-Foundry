@@ -391,6 +391,39 @@ def install_console(
         response.headers["Cache-Control"] = "no-store"
         return response
 
+    @application.get("/v1/console/railway-readiness")
+    def railway_readiness(
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+    ) -> dict[str, object]:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        path = Path(__file__).resolve().parents[2] / "knowledge/readiness/v0.1-readiness.json"
+        try:
+            readiness = json.loads(path.read_text(encoding="utf-8"))
+            return {
+                "overall_status": readiness["overall_status"],
+                "deployment_allowed": readiness["locks"]["deployment"] is True,
+            }
+        except (OSError, ValueError, KeyError, TypeError):
+            raise HTTPException(status_code=503, detail="readiness evidence unavailable") from None
+
+    @application.get("/console/railway-setup", response_class=HTMLResponse, include_in_schema=False)
+    def railway_setup(actor: Annotated[ConsolePrincipal, Depends(principal)]) -> HTMLResponse:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        return HTMLResponse(
+            Path(__file__).with_name("railway_setup_ui.html").read_text(encoding="utf-8"),
+            headers={
+                "Cache-Control": "no-store",
+                "Content-Security-Policy": (
+                    "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; "
+                    "connect-src 'self'; base-uri 'none'; frame-ancestors 'none'"
+                ),
+                "Referrer-Policy": "no-referrer",
+                "X-Content-Type-Options": "nosniff",
+            },
+        )
+
     @application.get("/console", response_class=HTMLResponse, include_in_schema=False)
     def console_home(actor: Annotated[ConsolePrincipal, Depends(principal)]) -> HTMLResponse:
         del actor
