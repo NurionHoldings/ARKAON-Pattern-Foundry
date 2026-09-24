@@ -134,6 +134,14 @@
     "src/apf/repository.py",
     "docs/railway-creation-experience-20260924.md"
   ],
+  "execution_handoff": {
+    "work_order": "knowledge/release/railway-release-work-order-20260924.json",
+    "executor": "ARKAON",
+    "independent_auditor": "ETERNIAN",
+    "approval_after_audit": true,
+    "release_sha_rule": "A PR head is a candidate only; record the exact final main SHA after the reviewed ordered merges and successful CI.",
+    "production_apply_while_deployment_false": false
+  },
   "user_interaction": {
     "mode": "RESULTS_FIRST_THEN_OWNER_GUIDED_CLICK_THROUGH",
     "screen": "/console/railway-setup",
