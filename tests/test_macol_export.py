@@ -27,6 +27,10 @@ def test_export_is_independent_and_runnable(tmp_path: Path) -> None:
     assert "제휴문의&#10;개발문의&#10;개인적인 통화" in page
     assert "__MACOL_" not in page
     assert (output / "Dockerfile").is_file()
+    assert (output / "android-caller/app/src/main/AndroidManifest.xml").is_file()
+    bridge = (output / "call_bridge.py").read_text(encoding="utf-8")
+    assert "홍길동" in bridge and "제휴문의,개발문의,개인적인 통화" in bridge
+    assert "__MACOL_PROFILE_" not in bridge
     assert (output / ".github/workflows/test.yml").is_file()
     assert json.loads((output / "manifest.webmanifest").read_text())["name"].endswith("홍길동의 전화응대")
     asset = json.loads((output / "template.json").read_text())
