@@ -89,6 +89,14 @@ def create_app(
     def health() -> dict[str, str]:
         return {"status": "ok"}
 
+    @application.get("/ready")
+    def ready() -> dict[str, str]:
+        if os.getenv("APF_NAME_AT_ENABLED") == "1":
+            data = Path(os.environ["APF_NAME_AT_DATA"])
+            if not (data / "name-at.sqlite3").is_file() or not os.access(data, os.W_OK):
+                raise HTTPException(status_code=503, detail="name-at storage unavailable")
+        return {"status": "ready"}
+
     @application.post("/v1/targets", response_model=AnalysisTarget, status_code=status.HTTP_201_CREATED)
     def create_target(
         payload: AnalysisTargetCreate,
