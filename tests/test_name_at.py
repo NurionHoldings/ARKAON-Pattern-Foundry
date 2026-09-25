@@ -21,7 +21,7 @@ def test_owner_approval_search_collision_and_withdrawal():
             service.publish(tenant_id="tenant", owner_id=owner, profile_id=item["id"],
                             expected_revision=1, approved_digest=service.digest(item))
         assert len(service.search("홍길동@")) == 2
-        assert len(ElementTree.fromstring(service.sitemap())) == 2
+        assert len(ElementTree.fromstring(service.sitemap())) == 3  # two profiles and name hub
         service.withdraw(tenant_id="tenant", owner_id="a", profile_id=first["id"])
         assert len(service.search("홍길동@")) == 1
         assert service.discovery_jobs(first["id"])[0]["action"] == "deleted"

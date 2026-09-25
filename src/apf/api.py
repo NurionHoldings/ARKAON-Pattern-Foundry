@@ -26,6 +26,7 @@ from .repository import (
 )
 from .state_machine import TARGET_TRANSITIONS, InvalidTransition, transition
 from .visual_platform_dialogue import VisualPlatformDialogueStore
+from .name_at_service import install_name_at
 
 TenantHeader = Annotated[UUID, Header(alias="X-Tenant-ID")]
 RevisionHeader = Annotated[int, Header(alias="If-Match")]
@@ -75,6 +76,14 @@ def create_app(
             Path(os.getenv("APF_FOUNDRY_ROOT", Path(__file__).parents[2]))
         ),
     )
+
+    if os.getenv("APF_NAME_AT_ENABLED") == "1":
+        origin = os.getenv("APF_NAME_AT_ORIGIN")
+        secret = os.getenv("APF_NAME_AT_SECRET")
+        data = os.getenv("APF_NAME_AT_DATA")
+        if not origin or not secret or not data:
+            raise RuntimeError("APF_NAME_AT_ORIGIN, SECRET and DATA are required")
+        install_name_at(application, root=Path(data), origin=origin.rstrip("/"), secret=secret)
 
     @application.get("/health")
     def health() -> dict[str, str]:

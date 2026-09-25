@@ -15,7 +15,7 @@ from datetime import UTC, datetime
 from hashlib import sha256
 from html import escape
 from pathlib import Path
-from urllib.parse import urlsplit
+from urllib.parse import quote, urlsplit
 from uuid import uuid4
 
 
@@ -161,11 +161,23 @@ class NameAtRegistry:
                 WHERE name_key=? AND state='PUBLISHED' ORDER BY id""", (key,)).fetchall()
         return [dict(row) | {"url": f"{self.origin}/p/{row['id']}"} for row in rows]
 
+    def public_profile(self, profile_id: str) -> dict:
+        with self._connect() as db:
+            row = db.execute("SELECT * FROM name_at_profiles WHERE id=? AND state='PUBLISHED'",
+                             (profile_id,)).fetchone()
+        if row is None:
+            raise ProfileError("PROFILE_NOT_FOUND")
+        return dict(row)
+
     def sitemap(self) -> str:
         with self._connect() as db:
             rows = db.execute("SELECT id, updated_at FROM name_at_profiles WHERE state='PUBLISHED' ORDER BY id").fetchall()
+            names = db.execute("SELECT DISTINCT display_name FROM name_at_profiles "
+                               "WHERE state='PUBLISHED' ORDER BY display_name").fetchall()
         items = "".join(f"<url><loc>{escape(self.origin)}/p/{row['id']}</loc>"
                         f"<lastmod>{escape(row['updated_at'][:10])}</lastmod></url>" for row in rows)
+        items += "".join(f"<url><loc>{escape(self.origin)}/at/"
+                         f"{quote(row['display_name'], safe='')}</loc></url>" for row in names)
         return ('<?xml version="1.0" encoding="UTF-8"?>'
                 '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
                 f'{items}</urlset>')
