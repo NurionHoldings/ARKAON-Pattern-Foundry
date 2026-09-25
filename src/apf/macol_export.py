@@ -12,7 +12,7 @@ from apf.call_template import CallTemplateRequest, build_call_template
 SEED = Path(__file__).with_name("macol_seed")
 PERSONAL_CALL = "개인적인 통화"
 FILES = (
-    "app.py", "index.html", "manifest.webmanifest", "icon.svg", "requirements.txt",
+    "app.py", "call_bridge.py", "index.html", "manifest.webmanifest", "icon.svg", "requirements.txt",
     "Dockerfile", "test_app.py", ".github/workflows/test.yml",
 )
 
@@ -58,6 +58,10 @@ def export_macol(request: CallTemplateRequest, output: Path) -> Path:
         f"ARKAON이 `{asset.content_digest}`에서 생성한 독립 브라우저 앱 초안입니다. "
         "010 발신 감지·발신자 화면 자동 열림·실회선 ARS는 구현되지 않았습니다. "
         "방 생성과 초대 링크는 메뉴/브라우저 음성 수동 시험 전용입니다.\n\n"
+        "서명된 발신 이벤트용 `/integrations/dial-events`는 `call_bridge.py`에 있습니다. "
+        "`MACOL_DIAL_EVENT_SECRET`, `MACOL_RECEIVER_NUMBER`, "
+        "`MACOL_PUBLIC_TEMPLATE_URL`을 설정하고 실제 통화망 사업자 또는 발신자 앱이 "
+        "이벤트를 보내야 합니다. 서버 응답만으로 발신자 화면이 자동 실행되지는 않습니다.\n\n"
         "`python -m pip install -r requirements.txt pytest httpx` 후 "
         "`python -m pytest -q`로 검사합니다. "
         "`MACOL_OWNER_KEY`를 별도로 설정하고 `uvicorn app:app --host 127.0.0.1 --port 8000`"
