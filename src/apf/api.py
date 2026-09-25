@@ -23,6 +23,7 @@ from .github_owner_auth import GitHubOwnerAuth
 from .logo_draft import LogoDraftStore
 from .plain_language_approval import PlainLanguageApprovalStore
 from .popular_format import ProposalStore
+from .production_readiness import production_ready
 from .public_page_observer import PublicPageObserver
 from .reference_material_consent import ReferenceConsentStore
 from .repository import (
@@ -122,6 +123,12 @@ def create_app(
     @application.get("/health")
     def health() -> dict[str, str]:
         return {"status": "ok"}
+
+    @application.get("/ready")
+    def ready() -> dict[str, str]:
+        if not production_ready(application.state.repository):
+            raise HTTPException(status_code=503, detail="deployment not ready")
+        return {"status": "ready"}
 
     @application.post(
         "/v1/targets", response_model=AnalysisTarget, status_code=status.HTTP_201_CREATED
