@@ -27,6 +27,7 @@ packages = ["src/apf"]
 "src/apf/console_ui.html" = "apf/console_ui.html"
 "src/apf/visual_dialogue_ui.html" = "apf/visual_dialogue_ui.html"
 "src/apf/reference_material_consent_ui.html" = "apf/reference_material_consent_ui.html"
+"src/apf/call_template_ui.html" = "apf/call_template_ui.html"
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]

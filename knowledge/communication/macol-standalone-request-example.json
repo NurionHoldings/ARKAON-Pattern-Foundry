@@ -1,0 +1,10 @@
+{
+  "tenant_id": "example-tenant",
+  "owner_id": "example-owner",
+  "slug": "personal-profile",
+  "display_name": "예시 사용자",
+  "introduction": "안녕하세요. 용건을 선택해 남겨주세요.",
+  "purpose_prompts": ["플랫폼 제휴문의", "개발문의", "이용문의"],
+  "material_titles": [],
+  "allow_call_request": true
+}

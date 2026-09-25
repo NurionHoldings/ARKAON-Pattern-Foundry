@@ -16,6 +16,7 @@ from fastapi import Cookie, Depends, Header, HTTPException, Query, Request, Resp
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
+from .call_template import CallTemplateRequest, build_call_template
 from .durable_review import (
     DurableStoreError,
     ReviewAttestation,
@@ -65,6 +66,15 @@ class DevSessionRequest(BaseModel):
     tenant_id: UUID
     principal_id: UUID
     role: Literal["owner", "operator", "reviewer", "auditor"] = "operator"
+
+
+class CallTemplateSubmission(BaseModel):
+    slug: str = Field(min_length=1, max_length=40)
+    display_name: str = Field(min_length=1, max_length=80)
+    introduction: str = Field(min_length=1, max_length=500)
+    purpose_prompts: list[str] = Field(min_length=1, max_length=8)
+    material_titles: list[str] = Field(default_factory=list, max_length=12)
+    allow_call_request: bool = True
 
 
 class ReviewSubmission(BaseModel):
@@ -272,6 +282,38 @@ def install_console(
                 "X-Content-Type-Options": "nosniff",
             },
         )
+
+    @application.get("/call-template", response_class=HTMLResponse, include_in_schema=False)
+    def call_template_page(actor: Annotated[ConsolePrincipal, Depends(principal)]) -> HTMLResponse:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        return HTMLResponse(
+            Path(__file__).with_name("call_template_ui.html").read_text(encoding="utf-8"),
+            headers={
+                "Cache-Control": "no-store",
+                "Content-Security-Policy": (
+                    "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; "
+                    "connect-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'"
+                ),
+                "Referrer-Policy": "no-referrer",
+                "X-Content-Type-Options": "nosniff",
+            },
+        )
+
+    @application.post("/v1/console/call-templates/preview")
+    def preview_call_template(
+        payload: CallTemplateSubmission,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        draft = build_call_template(CallTemplateRequest(
+            tenant_id=str(actor.tenant_id), owner_id=str(actor.principal_id),
+            **payload.model_dump(),
+        ))
+        return draft.model_dump(mode="json")
 
     @application.get(
         "/reference-material-consent", response_class=HTMLResponse, include_in_schema=False

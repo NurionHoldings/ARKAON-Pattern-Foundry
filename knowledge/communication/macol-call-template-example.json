@@ -1,0 +1,72 @@
+{
+  "schema_version": "apf.call-template/1.0",
+  "tenant_id": "example-tenant",
+  "owner_id": "example-owner",
+  "slug": "my-intro",
+  "display_name": "예시 사용자",
+  "introduction": "안녕하세요. 소개와 상담을 함께 진행합니다.",
+  "purpose_prompts": [
+    "소개 요청",
+    "상담 요청"
+  ],
+  "material_titles": [
+    "소개서"
+  ],
+  "menus": [
+    {
+      "menu_id": "introduction",
+      "title": "소개",
+      "synchronization": "shared_navigation",
+      "visibility": "both",
+      "actions": [
+        "read"
+      ]
+    },
+    {
+      "menu_id": "purpose",
+      "title": "용건",
+      "synchronization": "shared_navigation",
+      "visibility": "both",
+      "actions": [
+        "visitor_write",
+        "owner_read"
+      ]
+    },
+    {
+      "menu_id": "materials",
+      "title": "자료",
+      "synchronization": "shared_navigation",
+      "visibility": "both",
+      "actions": [
+        "read",
+        "user_initiated_download"
+      ]
+    },
+    {
+      "menu_id": "next_step",
+      "title": "다음 단계",
+      "synchronization": "shared_navigation",
+      "visibility": "both",
+      "actions": [
+        "request_call",
+        "owner_decide"
+      ]
+    }
+  ],
+  "session_contract": {
+    "participants": [
+      "owner",
+      "visitor"
+    ],
+    "menu_navigation": "server_authorized_broadcast_to_both",
+    "form_editing": "field_role_authorized",
+    "conflict_resolution": "explicit_review_required",
+    "file_download": "each_participant_explicit_action",
+    "reconnect": "requires_session_reauthorization"
+  },
+  "publication_state": "DRAFT",
+  "telephony_state": "NOT_CONNECTED",
+  "implementation_allowed": false,
+  "deployment_allowed": false,
+  "content_digest": "sha256:584226cfb69a80abbdfa91947bf1af82e7599911e565bce69038a69960c175f1"
+}
