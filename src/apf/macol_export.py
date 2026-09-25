@@ -14,6 +14,7 @@ PERSONAL_CALL = "개인적인 통화"
 FILES = (
     "app.py", "call_bridge.py", "index.html", "manifest.webmanifest", "icon.svg", "requirements.txt",
     "Dockerfile", "test_app.py", ".github/workflows/test.yml",
+    ".github/workflows/android-caller.yml",
     "android-caller/README.md", "android-caller/settings.gradle", "android-caller/build.gradle",
     "android-caller/app/build.gradle", "android-caller/app/src/main/AndroidManifest.xml",
     "android-caller/app/src/main/java/com/nurion/macol/caller/MainActivity.java",
