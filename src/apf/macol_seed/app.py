@@ -10,10 +10,10 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from urllib.parse import urlsplit
 
+from call_bridge import router as call_bridge_router
 from fastapi import FastAPI, Header, HTTPException, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel, Field
-from call_bridge import router as call_bridge_router
 
 
 class RoomRequest(BaseModel):
