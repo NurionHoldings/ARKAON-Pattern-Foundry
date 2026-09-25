@@ -1,6 +1,6 @@
 # #073 마컬 전화응대 템플릿 자산 초안
 
-상태: 독립 코어 / 실통화·실시간 동기화·배포 미구현. [마컬 제품 기준](https://github.com/NurionHoldings/macol/blob/main/README.md)을 참고한다.
+상태: 독립 템플릿 생성기와 수동 브라우저 통화·메뉴 동기화 앱 초안. 010 발신 감지·발신자 화면 자동 표시·실제 회선 연동 미구현. [마컬 제품 기준](https://github.com/NurionHoldings/macol/blob/main/README.md)을 참고한다.
 
 `apf.call_template.CallTemplateRequest`를 입력하여 `build_call_template`로 재현 가능한 초안 자산을 생성한다. 개인 소개, 용건 선택, 자료 목록, 통화 요청 또는 메시지 남기기 메뉴가 포함된다. 내용과 소유자 ID에 묶인 SHA-256 식별자를 제공하며, 자산은 항상 `DRAFT`, `NOT_CONNECTED`로 시작한다.
 
@@ -37,3 +37,20 @@ ARKAON에서 개인별 템플릿을 만들고, 소유자 승인 뒤 공개 웹 �
 3. SDK가 설치·허용된 Android에서는 앱이 화면을 자동 표시할 수 있다. 앱이 없는 단말에 일반 URL SMS만 도착한 경우에는 브라우저 자동 실행을 전제로 하지 않고, 링크를 누르면 만료 가능한 통화 세션으로 진입한다. iOS는 알림·링크 선택 흐름을 별도 검증한다. 문자 거절·전송 실패·데이터 불능 시 음성 안내 또는 일반 전화로 돌아간다.
 
 실회선 연결 규격이 확정되기 전에는 `publication_state=DRAFT`, `telephony_state=NOT_CONNECTED`를 유지한다. 게시 기능, 음성 안내/선택, 메시지 발송, 일회용 링크, 실회선 통화 식별자, 통화 종료 및 삭제 정책은 각각 테스트 및 감사 후에 구현한다.
+
+## 독립 앱 초안 생성 (마컬 저장소 불필요)
+
+```bash
+python -m apf.macol_export \
+  --request knowledge/communication/macol-standalone-request-example.json \
+  --output /tmp/example-macol-app
+cd /tmp/example-macol-app
+python -m pip install -r requirements.txt pytest httpx
+python -m pytest -q
+```
+
+`apf.macol_export`는 패키지 내부에 포함된 MACOL 브라우저 실험실의 FastAPI 서버, 프로필 화면, 설치형 웹앱 자산, Dockerfile, CI, 시험 코드를 새 디렉터리로 복제하고 입력 소유자의 이름·소개·용건을 반영한다. 기존 경로에는 덮어쓰지 않는다. 템플릿 초안과 콘텐츠 digest는 `template.json`에 남는다. 생성물은 새 계정 인증이나 010 전화망을 자동으로 개설하지 않으며 게시·배포도 자동 수행하지 않는다.
+
+### 2026-09-25 실기기 보고: FAIL (전화망 연결과 화면 자동 표시)
+
+수신 010 번호와 발신 010 번호로 일반 전화 앱의 발신 시험을 수행했으나 사용자는 "바로 연결되지도 않고 아예 연결되지 않음"을 보고했다. 두 번호는 공개 코드·문서에 기록하지 않는다. 현재 마컬에는 PSTN 수신 이벤트, 발신 단말 자동 표시 SDK, 통신망 착신/ARS 연결이 없으므로 **템플릿 자동 열림은 미구현·실증 FAIL**이다. 일반 음성통화 자체가 실패했는지는 단말 통화 기록·통신사 오류 표시로 별도 확인해야 하며, 브라우저 앱의 실패와 혼동하지 않는다. 다음 실증은 발신 단말 OS·앱 설치 상태·통화 연결 상태를 분리 기록하고, Android 통화 이벤트 감지 후 템플릿 표시가 가능한 설치형 구성요소를 별도 개발·검증하는 단계다.
