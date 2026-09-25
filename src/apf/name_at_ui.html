@@ -16,19 +16,37 @@ small{color:#455570}#message{min-height:2rem}#preview{white-space:pre-line;backg
 <label for="password">비밀번호 · 12자 이상</label><input id="password" type="password" autocomplete="current-password">
 <button id="register" class="secondary">계정 만들기</button><button id="login">로그인</button>
 <p><small>로그인 후 페이지를 작성할 수 있습니다.</small></p></section>
-<section><h2>내 소개</h2><label for="displayName">표시 이름</label><input id="displayName" placeholder="예: 홍길동">
+<section><h2>내 소개</h2><label for="myProfiles">저장된 페이지</label><select id="myProfiles"><option value="">새 페이지</option></select>
+<label for="displayName">표시 이름</label><input id="displayName" placeholder="예: 홍길동">
 <label for="introduction">소개와 작업 내용</label><textarea id="introduction" placeholder="무슨 일을 하고 어떤 작업을 해왔는지 적어주세요."></textarea>
 <label for="images">사진 · 최대 3장, 각 8MB</label><input id="images" type="file" accept="image/png,image/jpeg,image/webp" multiple>
 <label for="video">영상 · 1개, 최대 50MB</label><input id="video" type="file" accept="video/mp4,video/webm">
-<button id="save">초안 저장</button><div id="preview" hidden></div><button id="publish" disabled>내용 확인 후 게시</button>
+<button id="save">초안 저장</button><div id="preview" hidden></div><div id="previewMedia"></div><button id="publish" disabled>내용 확인 후 게시</button>
+<button id="withdraw" class="secondary" disabled>게시 철회</button>
 <p id="published"></p></section></div>
 <section><h2>이름@로 찾기</h2><label for="query">검색어</label><input id="query" placeholder="홍길동@">
 <button id="find" class="secondary">검색</button></section><p role="status" id="message"></p></main>
 <script>
-let csrf='',draft=null;
+let csrf='',draft=null,selected=null;
 const $=id=>document.getElementById(id);
+function showMedia(images,video){const wrap=$('previewMedia');wrap.replaceChildren();
+ for(const item of images){const img=document.createElement('img');img.src=item.url;img.alt=item.description;img.style.maxWidth='100%';wrap.append(img)}
+ if(video){const player=document.createElement('video');player.src=video.url;player.controls=true;player.style.maxWidth='100%';wrap.append(player)}
+}
 fetch('/name-at/session',{credentials:'same-origin'}).then(r=>r.ok?r.json():null)
- .then(data=>{if(data){csrf=data.csrf_token;message('로그인 상태입니다.')}}).catch(()=>{});
+ .then(data=>{if(data){csrf=data.csrf_token;message('로그인 상태입니다.');loadProfiles()}}).catch(()=>{});
+async function loadProfiles(){const r=await fetch('/name-at/profiles',{credentials:'same-origin'});
+ if(!r.ok)return;const items=await r.json();$('myProfiles').replaceChildren(new Option('새 페이지',''));
+ for(const item of items){const option=new Option(`${item.display_name} · ${item.state}`,item.id);option.data=item;$('myProfiles').add(option)}
+ if(draft){$('myProfiles').value=draft.id;selected=items.find(i=>i.id===draft.id)??null}
+}
+$('myProfiles').onchange=()=>{selected=$('myProfiles').selectedOptions[0].data??null;
+ draft=selected?{id:selected.id,revision:selected.revision,approval_digest:selected.approval_digest}:null;
+ $('displayName').value=selected?.display_name??'';$('introduction').value=selected?.introduction??'';
+ $('preview').hidden=!selected;$('preview').textContent=selected?`${selected.display_name}@\n\n${selected.introduction}`:'';
+ showMedia(selected?.images??[],selected?.video??null);
+ $('publish').disabled=!selected||selected.state!=='DRAFT';$('withdraw').disabled=!selected||selected.state!=='PUBLISHED';
+};
 async function api(path,body,method='POST'){
  const headers={'X-CSRF-Token':csrf};if(!(body instanceof File))headers['Content-Type']='application/json';
  const response=await fetch(path,{method,credentials:'same-origin',headers,body:body instanceof File?body:JSON.stringify(body)});
@@ -36,25 +54,35 @@ async function api(path,body,method='POST'){
 }
 function message(text){$('message').textContent=text}
 async function auth(path){try{const value=await api(path,{username:$('username').value,password:$('password').value});
- if(value.csrf_token)csrf=value.csrf_token;message(path.endsWith('login')?'로그인했습니다.':'계정을 만들었습니다. 로그인해 주세요.');}
+ if(value.csrf_token){csrf=value.csrf_token;await loadProfiles()}message(path.endsWith('login')?'로그인했습니다.':'계정을 만들었습니다. 로그인해 주세요.');}
  catch(error){message(error.message)}}
 $('register').onclick=()=>auth('/name-at/register');$('login').onclick=()=>auth('/name-at/login');
 $('save').onclick=async()=>{try{
- const selected=[...$('images').files];if(selected.length>3)throw new Error('사진은 최대 3장입니다.');
- const uploads=[];for(const file of selected)uploads.push(await api('/name-at/media',file));
+ const selectedFiles=[...$('images').files];if(selectedFiles.length>3)throw new Error('사진은 최대 3장입니다.');
+ const uploads=[];for(const file of selectedFiles)uploads.push(await api('/name-at/media',file));
  const video=$('video').files[0], videoUpload=video?await api('/name-at/media',video):null;
+ const existingImages=selectedFiles.length?[]:(selected?.images??[]);
+ const currentVideo=videoUpload?.id??(selected?.video?.url.split('/').pop()??null);
  const payload={display_name:$('displayName').value,introduction:$('introduction').value,
- image_ids:uploads.map(i=>i.id),image_descriptions:selected.map(i=>i.name),video_id:videoUpload?.id??null,
- video_description:video?.name??null};
+ image_ids:selectedFiles.length?uploads.map(i=>i.id):existingImages.map(i=>i.url.split('/').pop()),
+ image_descriptions:selectedFiles.length?selectedFiles.map(i=>i.name):existingImages.map(i=>i.description),
+ video_id:currentVideo,video_description:video?.name??(selected?.video?.description??null)};
  if(draft){payload.profile_id=draft.id;payload.expected_revision=draft.revision}
  draft=await api('/name-at/profiles',payload);$('preview').hidden=false;
- $('preview').textContent=`${payload.display_name}@\n\n${payload.introduction}\n사진 ${selected.length}장 · 영상 ${video?1:0}개`;
- $('publish').disabled=false;message('초안을 저장했습니다. 내용을 확인한 뒤 게시해 주세요.');
+ $('preview').textContent=`${payload.display_name}@\n\n${payload.introduction}\n사진 ${payload.image_ids.length}장 · 영상 ${currentVideo?1:0}개`;
+ showMedia(payload.image_ids.map((id,i)=>({url:`/name-at/media/${id}`,description:payload.image_descriptions[i]})),
+ currentVideo?{url:`/name-at/media/${currentVideo}`,description:payload.video_description}:null);
+ $('publish').disabled=false;$('withdraw').disabled=true;await loadProfiles();message('초안을 저장했습니다. 내용을 확인한 뒤 게시해 주세요.');
 }catch(error){message(error.message)}};
 $('publish').onclick=async()=>{try{if(!draft)return;
  const value=await api(`/name-at/profiles/${draft.id}/publish`,{expected_revision:draft.revision,approved_digest:draft.approval_digest});
  const link=document.createElement('a');link.href=value.url;link.textContent='게시된 페이지 보기';
- $('published').replaceChildren(link);$('publish').disabled=true;message('페이지를 게시했습니다. 검색 반영은 별도로 확인해야 합니다.');
+ $('published').replaceChildren(link);$('publish').disabled=true;$('withdraw').disabled=false;
+ await loadProfiles();message('페이지를 게시했습니다. 검색 반영은 별도로 확인해야 합니다.');
+}catch(error){message(error.message)}};
+$('withdraw').onclick=async()=>{try{if(!draft)return;
+ await api(`/name-at/profiles/${draft.id}/withdraw`,{});$('publish').disabled=true;$('withdraw').disabled=true;
+ await loadProfiles();message('게시를 철회했습니다. 검색 결과 반영에는 시간이 걸릴 수 있습니다.');
 }catch(error){message(error.message)}};
 $('find').onclick=()=>{const q=$('query').value.trim();if(!q.endsWith('@')){message('이름 뒤에 @를 붙여 입력해 주세요.');return}
  location.href='/at/'+encodeURIComponent(q.slice(0,-1))};

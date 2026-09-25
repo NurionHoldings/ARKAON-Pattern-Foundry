@@ -119,6 +119,13 @@ class NameAtRegistry:
             raise ProfileError("PROFILE_NOT_FOUND")
         return dict(row)
 
+    def list_for_owner(self, *, tenant_id: str, owner_id: str) -> list[dict]:
+        with self._connect() as db:
+            rows = db.execute("""SELECT * FROM name_at_profiles
+                WHERE tenant_id=? AND owner_id=? ORDER BY updated_at DESC LIMIT 20""",
+                (tenant_id, owner_id)).fetchall()
+        return [dict(row) for row in rows]
+
     @staticmethod
     def digest(row: dict) -> str:
         fields = ("id", "tenant_id", "owner_id", "display_name", "introduction",

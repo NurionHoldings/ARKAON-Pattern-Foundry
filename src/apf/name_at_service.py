@@ -343,6 +343,17 @@ def install_name_at(app: FastAPI, *, root: Path, origin: str, secret: str) -> No
         return {"id": item["id"], "revision": item["revision"],
                 "approval_digest": registry.digest(item), "state": "DRAFT"}
 
+    @app.get("/name-at/profiles")
+    def my_profiles(request: Request) -> list[dict]:
+        account = owner(request)
+        rows = registry.list_for_owner(tenant_id=tenant, owner_id=account)
+        return [{"id": item["id"], "revision": item["revision"], "state": item["state"],
+                 "display_name": item["display_name"], "introduction": item["introduction"],
+                 "images": json.loads(item["images_json"]),
+                 "video": json.loads(item["video_json"]) if item["video_json"] else None,
+                 "approval_digest": registry.digest(item) if item["state"] == "DRAFT" else None}
+                for item in rows]
+
     @app.post("/name-at/profiles/{profile_id}/publish")
     def publish(profile_id: str, payload: PublishInput, request: Request) -> dict:
         account = owner(request, mutate=True)
@@ -464,6 +475,7 @@ def install_name_at(app: FastAPI, *, root: Path, origin: str, secret: str) -> No
     def homepage() -> HTMLResponse:
         page = HTMLResponse(Path(__file__).with_name("name_at_ui.html").read_text(encoding="utf-8"))
         page.headers["Content-Security-Policy"] = ("default-src 'none'; style-src 'unsafe-inline'; "
-            "script-src 'unsafe-inline'; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'")
+            "script-src 'unsafe-inline'; connect-src 'self'; img-src 'self'; media-src 'self'; "
+            "base-uri 'none'; frame-ancestors 'none'")
         page.headers["X-Content-Type-Options"] = "nosniff"
         return page

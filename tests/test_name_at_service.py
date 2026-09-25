@@ -49,6 +49,18 @@ def test_complete_private_to_public_flow(tmp_path: Path):
         assert "홍길동" in client.get("/name-at/find?q=홍길동@").text
         assert "홍길동@" in client.get("/at/홍길동").text
         assert item["id"] in client.get("/sitemap.xml").text
+        saved = client.get("/name-at/profiles").json()
+        assert saved[0]["images"][0]["description"] == "작업 사진"
+        revised = client.post("/name-at/profiles", headers={"X-CSRF-Token": csrf}, json={
+            "profile_id": item["id"], "expected_revision": 1,
+            "display_name": "홍길동", "introduction": "새 목공 작업",
+            "image_ids": [image_id], "image_descriptions": ["작업 사진"],
+        }).json()
+        assert client.get(f"/p/{item['id']}").status_code == 404
+        client.post(f"/name-at/profiles/{item['id']}/publish", headers={"X-CSRF-Token": csrf},
+                    json={"expected_revision": revised["revision"],
+                          "approved_digest": revised["approval_digest"]})
+        assert "새 목공 작업" in client.get(f"/p/{item['id']}").text
         client.post(f"/name-at/profiles/{item['id']}/withdraw", headers={"X-CSRF-Token": csrf})
         assert client.get(f"/p/{item['id']}").status_code == 404
 
