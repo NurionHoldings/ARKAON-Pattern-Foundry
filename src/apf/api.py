@@ -14,6 +14,7 @@ from .console import (
     install_console,
 )
 from .domain import AnalysisTarget, AnalysisTargetCreate, TargetState
+from .name_at_service import install_name_at
 from .plain_language_approval import PlainLanguageApprovalStore
 from .reference_material_consent import ReferenceConsentStore
 from .repository import (
@@ -26,7 +27,6 @@ from .repository import (
 )
 from .state_machine import TARGET_TRANSITIONS, InvalidTransition, transition
 from .visual_platform_dialogue import VisualPlatformDialogueStore
-from .name_at_service import install_name_at
 
 TenantHeader = Annotated[UUID, Header(alias="X-Tenant-ID")]
 RevisionHeader = Annotated[int, Header(alias="If-Match")]
