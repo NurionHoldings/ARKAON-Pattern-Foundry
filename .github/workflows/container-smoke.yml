@@ -1,0 +1,31 @@
+name: Container smoke
+
+on:
+  pull_request:
+    paths:
+      - Dockerfile
+      - .dockerignore
+      - pyproject.toml
+      - src/**
+      - db/**
+      - .github/workflows/container-smoke.yml
+
+permissions:
+  contents: read
+
+jobs:
+  boot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t arkaon:smoke .
+      - run: |
+          docker run -d --name arkaon-smoke -e APF_ENV=development -p 127.0.0.1:18000:8000 arkaon:smoke
+          trap 'docker logs arkaon-smoke; docker rm -f arkaon-smoke' EXIT
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:18000/health; then
+              exit 0
+            fi
+            sleep 1
+          done
+          exit 1
