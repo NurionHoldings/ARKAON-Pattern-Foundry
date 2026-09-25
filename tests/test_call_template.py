@@ -1,7 +1,13 @@
+from uuid import uuid4
+
 import pytest
+from fastapi.testclient import TestClient
 from pydantic import ValidationError
 
+from apf.api import create_app
 from apf.call_template import CallTemplateRequest, build_call_template
+from apf.console import ConsoleSecurity
+from apf.repository import MemoryRepository
 
 
 def request(**changes):
@@ -46,3 +52,28 @@ def test_rejects_unsafe_or_ambiguous_template(change):
 def test_disabling_calls_keeps_message_route():
     result = build_call_template(request(allow_call_request=False))
     assert result.menus[-1].actions == ["leave_message", "owner_decide"]
+
+
+def test_console_generates_owner_bound_preview_with_csrf():
+    app = create_app(repository=MemoryRepository(), console_security=ConsoleSecurity(
+        environment="test", secret="s" * 32, allow_dev_sessions=True,
+    ))
+    client = TestClient(app, base_url="https://testserver")
+    tenant_id, owner_id = str(uuid4()), str(uuid4())
+    session = client.post("/console/dev/session", json={
+        "tenant_id": tenant_id, "principal_id": owner_id, "role": "owner",
+    })
+    assert client.get("/call-template").status_code == 200
+    payload = request().model_dump(exclude={"tenant_id", "owner_id"})
+    assert client.post("/v1/console/call-templates/preview", json=payload).status_code == 403
+    result = client.post("/v1/console/call-templates/preview", json=payload, headers={
+        "X-CSRF-Token": session.json()["csrf_token"],
+    })
+    assert result.status_code == 200
+    assert result.json()["tenant_id"] == tenant_id
+    assert result.json()["owner_id"] == owner_id
+    assert result.json()["publication_state"] == "DRAFT"
+    client.post("/console/dev/session", json={
+        "tenant_id": tenant_id, "principal_id": str(uuid4()), "role": "operator",
+    })
+    assert client.get("/call-template").status_code == 403
