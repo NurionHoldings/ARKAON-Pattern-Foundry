@@ -14,6 +14,10 @@ PERSONAL_CALL = "개인적인 통화"
 FILES = (
     "app.py", "call_bridge.py", "index.html", "manifest.webmanifest", "icon.svg", "requirements.txt",
     "Dockerfile", "test_app.py", ".github/workflows/test.yml",
+    "android-caller/README.md", "android-caller/settings.gradle", "android-caller/build.gradle",
+    "android-caller/app/build.gradle", "android-caller/app/src/main/AndroidManifest.xml",
+    "android-caller/app/src/main/java/com/nurion/macol/caller/MainActivity.java",
+    "android-caller/app/src/main/java/com/nurion/macol/caller/DialScreeningService.java",
 )
 
 
@@ -51,6 +55,10 @@ def export_macol(request: CallTemplateRequest, output: Path) -> Path:
                 '"__MACOL_TEST_CALL__"',
                 repr(PERSONAL_CALL if request.allow_call_request else purposes[0]),
             )
+        elif relative == "call_bridge.py":
+            content = content.replace('"__MACOL_PROFILE_NAME__"', repr(asset.display_name))
+            content = content.replace('"__MACOL_PROFILE_INTRO__"', repr(asset.introduction))
+            content = content.replace('"__MACOL_PROFILE_MENUS__"', repr(",".join(purposes)))
         rendered[relative] = content
     rendered["template.json"] = asset.model_dump_json(indent=2) + "\n"
     rendered["README.md"] = (
@@ -62,6 +70,9 @@ def export_macol(request: CallTemplateRequest, output: Path) -> Path:
         "`MACOL_DIAL_EVENT_SECRET`, `MACOL_RECEIVER_NUMBER`, "
         "`MACOL_PUBLIC_TEMPLATE_URL`을 설정하고 실제 통화망 사업자 또는 발신자 앱이 "
         "이벤트를 보내야 합니다. 서버 응답만으로 발신자 화면이 자동 실행되지는 않습니다.\n\n"
+        "발신자 Android 시험 앱은 `android-caller/`에 있습니다. "
+        "공개 템플릿 조회는 `/public/templates/{called_number}`, 읽기 전용 화면은 `/profile`입니다. "
+        "통화 중 알림을 눌러 여는 방식이며, APK 빌드와 실기기 시험은 별도로 필요합니다.\n\n"
         "`python -m pip install -r requirements.txt pytest httpx` 후 "
         "`python -m pytest -q`로 검사합니다. "
         "`MACOL_OWNER_KEY`를 별도로 설정하고 `uvicorn app:app --host 127.0.0.1 --port 8000`"
