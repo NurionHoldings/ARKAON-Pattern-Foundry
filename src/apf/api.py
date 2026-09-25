@@ -14,6 +14,7 @@ from .console import (
     install_console,
 )
 from .domain import AnalysisTarget, AnalysisTargetCreate, TargetState
+from .name_at_service import install_name_at
 from .plain_language_approval import PlainLanguageApprovalStore
 from .reference_material_consent import ReferenceConsentStore
 from .repository import (
@@ -76,9 +77,25 @@ def create_app(
         ),
     )
 
+    if os.getenv("APF_NAME_AT_ENABLED") == "1":
+        origin = os.getenv("APF_NAME_AT_ORIGIN")
+        secret = os.getenv("APF_NAME_AT_SECRET")
+        data = os.getenv("APF_NAME_AT_DATA")
+        if not origin or not secret or not data:
+            raise RuntimeError("APF_NAME_AT_ORIGIN, SECRET and DATA are required")
+        install_name_at(application, root=Path(data), origin=origin.rstrip("/"), secret=secret)
+
     @application.get("/health")
     def health() -> dict[str, str]:
         return {"status": "ok"}
+
+    @application.get("/ready")
+    def ready() -> dict[str, str]:
+        if os.getenv("APF_NAME_AT_ENABLED") == "1":
+            data = Path(os.environ["APF_NAME_AT_DATA"])
+            if not (data / "name-at.sqlite3").is_file() or not os.access(data, os.W_OK):
+                raise HTTPException(status_code=503, detail="name-at storage unavailable")
+        return {"status": "ready"}
 
     @application.post("/v1/targets", response_model=AnalysisTarget, status_code=status.HTTP_201_CREATED)
     def create_target(
