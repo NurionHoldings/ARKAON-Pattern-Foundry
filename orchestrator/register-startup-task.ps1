@@ -1,44 +1,79 @@
 param(
     [string]$FoundryRoot = "D:\ARKAON_Pattern Foundry",
     [string]$TaskName = "ARKAON_Pattern_Foundry",
-    [ValidateSet("Auto", "TaskScheduler", "StartupFolder")]
-    [string]$Method = "Auto"
+    [string]$WatchdogTaskName = "ARKAON_Watchdog",
+    [ValidateSet("Auto", "TaskScheduler", "StartupFolder", "All")]
+    [string]$Method = "All",
+    [switch]$KeepLauncherShortcut
 )
 
 $ErrorActionPreference = "Stop"
 $FoundryRoot = (Resolve-Path -LiteralPath $FoundryRoot).Path
+$StartupScript = Join-Path $FoundryRoot "orchestrator\arkaon-startup.ps1"
+$WatchdogScript = Join-Path $FoundryRoot "orchestrator\arkaon-watchdog.ps1"
 $LauncherScript = Join-Path $FoundryRoot "orchestrator\arkaon-launcher.ps1"
+$LegacyTaskNames = @("ARKAON-Central-Orchestrator")
 
-if (-not (Test-Path -LiteralPath $LauncherScript)) {
-    throw "Launcher script not found: $LauncherScript"
+if (-not (Test-Path -LiteralPath $StartupScript)) {
+    throw "Startup script not found: $StartupScript"
+}
+if (-not (Test-Path -LiteralPath $WatchdogScript)) {
+    throw "Watchdog script not found: $WatchdogScript"
 }
 
-$command = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$LauncherScript`" -FoundryRoot `"$FoundryRoot`""
+function Remove-LegacyStartupEntries {
+    foreach ($legacyName in $LegacyTaskNames) {
+        $existing = Get-ScheduledTask -TaskName $legacyName -ErrorAction SilentlyContinue
+        if ($existing) {
+            Unregister-ScheduledTask -TaskName $legacyName -Confirm:$false
+            Write-Output "Removed legacy scheduled task '$legacyName'."
+        }
+    }
+
+    $startupFolder = [Environment]::GetFolderPath("Startup")
+    $legacyShortcut = Join-Path $startupFolder "ARKAON-Central-Orchestrator.lnk"
+    if (Test-Path -LiteralPath $legacyShortcut) {
+        Remove-Item -LiteralPath $legacyShortcut -Force
+        Write-Output "Removed legacy startup shortcut at $legacyShortcut."
+    }
+}
 
 function Install-StartupFolderShortcut {
+    param(
+        [string]$ShortcutName,
+        [string]$TargetScript
+    )
+
     $startupFolder = [Environment]::GetFolderPath("Startup")
-    $shortcutPath = Join-Path $startupFolder "$TaskName.lnk"
+    $shortcutPath = Join-Path $startupFolder "$ShortcutName.lnk"
     $shell = New-Object -ComObject WScript.Shell
     $shortcut = $shell.CreateShortcut($shortcutPath)
     $shortcut.TargetPath = "powershell.exe"
-    $shortcut.Arguments = "-NoProfile -ExecutionPolicy Bypass -File `"$LauncherScript`" -FoundryRoot `"$FoundryRoot`""
+    $shortcut.Arguments = "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$TargetScript`" -FoundryRoot `"$FoundryRoot`""
     $shortcut.WorkingDirectory = $FoundryRoot
-    $shortcut.WindowStyle = 1
-    $shortcut.Description = "ARKAON central orchestrator at Windows logon"
+    $shortcut.WindowStyle = 7
+    $shortcut.Description = "ARKAON automatic collection and analysis at Windows logon"
     $shortcut.Save()
     return $shortcutPath
 }
 
-function Install-ScheduledTaskCmdlet {
-    $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument (
-        "-NoProfile -ExecutionPolicy Bypass -File `"$LauncherScript`" -FoundryRoot `"$FoundryRoot`""
-    )
-    $trigger = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME
-    $settings = New-ScheduledTaskSettingsSet `
+function New-ArkaonTaskSettings {
+    return New-ScheduledTaskSettingsSet `
         -AllowStartIfOnBatteries `
         -DontStopIfGoingOnBatteries `
         -StartWhenAvailable `
-        -ExecutionTimeLimit ([TimeSpan]::FromMinutes(30))
+        -MultipleInstances IgnoreNew `
+        -RestartCount 3 `
+        -RestartInterval (New-TimeSpan -Minutes 1) `
+        -ExecutionTimeLimit ([TimeSpan]::Zero)
+}
+
+function Install-AutostartScheduledTask {
+    $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument (
+        "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$StartupScript`" -FoundryRoot `"$FoundryRoot`""
+    )
+    $trigger = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME
+    $settings = New-ArkaonTaskSettings
     $principal = New-ScheduledTaskPrincipal `
         -UserId ([System.Security.Principal.WindowsIdentity]::GetCurrent().Name) `
         -LogonType Interactive `
@@ -52,56 +87,73 @@ function Install-ScheduledTaskCmdlet {
         -Force | Out-Null
 }
 
-function Install-SchtasksEntry {
-    $existing = schtasks /Query /TN $TaskName 2>$null
-    if ($LASTEXITCODE -eq 0) {
-        schtasks /Delete /TN $TaskName /F | Out-Null
-    }
-    schtasks /Create `
-        /TN $TaskName `
-        /TR $command `
-        /SC ONLOGON `
-        /RL LIMITED `
-        /F | Out-Null
-    if ($LASTEXITCODE -ne 0) {
-        throw "schtasks registration failed with exit code $LASTEXITCODE"
-    }
+function Install-WatchdogScheduledTask {
+    $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument (
+        "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$WatchdogScript`" -FoundryRoot `"$FoundryRoot`""
+    )
+    $settings = New-ArkaonTaskSettings
+    $principal = New-ScheduledTaskPrincipal `
+        -UserId ([System.Security.Principal.WindowsIdentity]::GetCurrent().Name) `
+        -LogonType Interactive `
+        -RunLevel Limited
+    Register-ScheduledTask `
+        -TaskName $WatchdogTaskName `
+        -Action $action `
+        -Trigger @(
+            (New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME),
+            (New-ScheduledTaskTrigger -Once -At (Get-Date) -RepetitionInterval (New-TimeSpan -Minutes 5) -RepetitionDuration ([TimeSpan]::MaxValue))
+        ) `
+        -Settings $settings `
+        -Principal $principal `
+        -Force | Out-Null
 }
 
-$methods = switch ($Method) {
-    "TaskScheduler" { @("TaskScheduler", "StartupFolder") }
-    "StartupFolder" { @("StartupFolder") }
-    default { @("TaskScheduler", "StartupFolder") }
-}
+Remove-LegacyStartupEntries
 
-$lastError = $null
-foreach ($candidate in $methods) {
+$installTask = $Method -in @("Auto", "TaskScheduler", "All")
+$installShortcut = $Method -in @("Auto", "StartupFolder", "All")
+$errors = @()
+
+if ($installTask) {
     try {
-        if ($candidate -eq "TaskScheduler") {
-            try {
-                Install-ScheduledTaskCmdlet
-                Write-Output "Registered scheduled task '$TaskName' via Register-ScheduledTask for $FoundryRoot"
-                return
-            }
-            catch {
-                Install-SchtasksEntry
-                Write-Output "Registered scheduled task '$TaskName' via schtasks for $FoundryRoot"
-                return
-            }
-        }
-        if ($candidate -eq "StartupFolder") {
-            $shortcut = Install-StartupFolderShortcut
-            Write-Output "Registered startup shortcut at $shortcut (no administrator rights required)"
-            return
-        }
+        Install-AutostartScheduledTask
+        Write-Output "Registered scheduled task '$TaskName'."
     }
     catch {
-        $lastError = $_
+        $errors += "autostart task: $($_.Exception.Message)"
+    }
+
+    try {
+        Install-WatchdogScheduledTask
+        Write-Output "Registered watchdog task '$WatchdogTaskName' (logon + every 5 minutes)."
+    }
+    catch {
+        $errors += "watchdog task: $($_.Exception.Message)"
     }
 }
 
-if ($lastError) {
-    throw $lastError
+if ($installShortcut) {
+    try {
+        $shortcut = Install-StartupFolderShortcut -ShortcutName $TaskName -TargetScript $StartupScript
+        Write-Output "Registered startup shortcut at $shortcut."
+    }
+    catch {
+        $errors += "startup shortcut: $($_.Exception.Message)"
+    }
 }
 
-throw "Startup registration failed"
+if ($KeepLauncherShortcut -and (Test-Path -LiteralPath $LauncherScript)) {
+    $launcherShortcut = Install-StartupFolderShortcut -ShortcutName "ARKAON-Manual-Launcher" -TargetScript $LauncherScript
+    Write-Output "Optional manual launcher shortcut registered at $launcherShortcut."
+}
+
+if ($errors.Count -gt 0 -and -not ($installTask -and $installShortcut)) {
+    throw ($errors -join "; ")
+}
+if ($errors.Count -gt 0) {
+    Write-Output "Partial registration warnings: $($errors -join '; ')"
+}
+
+Write-Output "Autostart entrypoint: $StartupScript"
+Write-Output "Watchdog entrypoint: $WatchdogScript"
+Write-Output "Diagnose with: powershell.exe -File `"$FoundryRoot\orchestrator\arkaon-autostart-diagnose.ps1`""

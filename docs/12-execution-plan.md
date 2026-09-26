@@ -58,6 +58,12 @@ main은 승인된 문서와 Green 결과만 유지한다. 구현부터 feature b
 `APPROVED_FOR_PATTERN_PROMOTION`에서 멈추며 Intent_DNA 변경, MJN 쓰기, `OWNED_ASSET`
 승격을 허용하지 않는다.
 
+#050–#085까지 admin change control, reflection bridge, public surface observation,
+predeployment readiness, research watch를 연결했고, #079 plaza governance와
+#071–#076 map ops gates를 오케스트레이터·predeploy·콘솔에 배선했다.
+map production activation과 plaza dispatch는 BLOCKED를 유지한다. live 플랫폼
+mutation, 30개 Pattern 운영 승격, 실제 재사용 proof는 여전히 외부 승인·측정이 필요하다.
+
 다음 제품 게이트는 PostgreSQL 실연결 CI Green 증거, PostgreSQL 검토·후보 어댑터와
 운영 UI 상세 렌더링,
 노가다뉴스·부업장터의 실제 저장소 연결 분석, 30개 후보의 외부 서명 개별 승격, 실제 플랫폼

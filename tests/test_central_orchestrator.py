@@ -72,11 +72,27 @@ def test_shared_policy_rejects_operational_collection() -> None:
 
 
 def test_platforms_json_must_match_foundry_root() -> None:
+    registrations = CentralOrchestrator.load_platforms(
+        FOUNDRY / "config" / "platforms.json",
+        foundry_root=FOUNDRY,
+    )
+    assert registrations
+
+
+def test_platforms_json_rejects_wrong_literal_foundry_root(tmp_path: Path) -> None:
+    config = tmp_path / "platforms.json"
+    config.write_text(
+        json.dumps(
+            {
+                "schema_version": "apf.central-platforms/v1",
+                "foundry_root": str(tmp_path / "other"),
+                "platforms": [{"id": "DEMO", "path": str(tmp_path / "demo")}],
+            }
+        ),
+        encoding="utf-8",
+    )
     with pytest.raises(OrchestratorError) as caught:
-        CentralOrchestrator.load_platforms(
-            FOUNDRY / "config" / "platforms.json",
-            foundry_root=Path("C:/wrong"),
-        )
+        CentralOrchestrator.load_platforms(config, foundry_root=tmp_path)
     assert caught.value.code == "FOUNDRY_ROOT_MISMATCH"
 
 
@@ -132,6 +148,57 @@ def test_run_lock_prevents_duplicate_execution(tmp_path: Path) -> None:
         assert caught.value.code == "RUN_LOCK_HELD"
     finally:
         first.release()
+
+
+def test_demo_map_ops_advisory_includes_map_ops_packet(tmp_path: Path) -> None:
+    foundry = tmp_path / "foundry"
+    for folder in ("config", "inbox", "reports", "logs", "state"):
+        (foundry / folder).mkdir(parents=True, exist_ok=True)
+    for name in (
+        "shared-policy.json",
+        "resource-limits.json",
+        "arkaon-map-ops-gate.json",
+        "map-competency-profile.json",
+        "map-provider-knowledge.provisional.json",
+    ):
+        source = FOUNDRY / "config" / name
+        if source.is_file():
+            (foundry / "config" / name).write_text(
+                source.read_text(encoding="utf-8"), encoding="utf-8"
+            )
+    platform = tmp_path / "demo-platform"
+    write_platform(platform, "DEMO", foundry_root=foundry)
+    orchestrator = CentralOrchestrator.from_config(foundry)
+    report = orchestrator.run(
+        (PlatformRegistration("DEMO", platform),),
+        dry_run=True,
+        demo_map_ops_advisory=True,
+    )
+    from apf.central_orchestrator import classify_inbox_packet_path
+
+    kinds = {classify_inbox_packet_path(path) for path in report.inbox_packets}
+    assert "map_ops_gate" in kinds
+
+
+def test_dry_run_reports_inbox_packet_plan(tmp_path: Path) -> None:
+    foundry = tmp_path / "foundry"
+    for folder in ("config", "inbox", "reports", "logs", "state"):
+        (foundry / folder).mkdir(parents=True, exist_ok=True)
+    for name in ("shared-policy.json", "resource-limits.json"):
+        (foundry / "config" / name).write_text(
+            (FOUNDRY / "config" / name).read_text(encoding="utf-8"),
+            encoding="utf-8",
+        )
+    platform = tmp_path / "demo-platform"
+    write_platform(platform, "DEMO", foundry_root=foundry)
+    orchestrator = CentralOrchestrator.from_config(foundry)
+    report = orchestrator.run((PlatformRegistration("DEMO", platform),), dry_run=True)
+    assert report.inbox_packets
+    from apf.central_orchestrator import classify_inbox_packet_path
+
+    kinds = {classify_inbox_packet_path(path) for path in report.inbox_packets}
+    assert "platform_research" in kinds
+    assert "platform_eternian_review" in kinds
 
 
 def test_dry_run_writes_no_artifacts(tmp_path: Path) -> None:
@@ -204,6 +271,20 @@ def test_equivalent_pending_packet_is_reused_instead_of_duplicated(tmp_path: Pat
 
 def test_pending_limit_activates_single_backpressure_state(tmp_path: Path) -> None:
     foundry = make_isolated_foundry(tmp_path)
+    (foundry / "config" / "resource-limits.json").write_text(
+        json.dumps(
+            {
+                "schema_version": "apf.resource-limits/v1",
+                "max_platforms_per_run": 8,
+                "max_files_per_platform": 5000,
+                "max_inbox_packets": 2,
+                "max_seconds_per_platform": 120,
+                "max_memory_mb_per_platform": 512,
+                "sequential_platform_analysis": True,
+            }
+        ),
+        encoding="utf-8",
+    )
     orchestrator = CentralOrchestrator.from_config(foundry)
     for index in range(orchestrator.limits.max_inbox_packets):
         (foundry / "inbox" / "research" / f"pending-{index}.json").write_text(

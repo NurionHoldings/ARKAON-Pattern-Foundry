@@ -1,0 +1,14 @@
+{
+  "schema_version": "apf.analysis-target-resolution/v1",
+  "enabled": true,
+  "emit_research_packet": true,
+  "scan_operator_inbox": true,
+  "max_targets_per_run": 3,
+  "automatic_implement_allowed": false,
+  "production_change_allowed": false,
+  "notes": [
+    "when analysis target is ambiguous, continue cross-platform learning from last user site intent",
+    "never duplicate platform+capability analysis recorded in the ledger",
+    "research packets only — no auto-implementation"
+  ]
+}

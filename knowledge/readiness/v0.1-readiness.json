@@ -1,14 +1,14 @@
 {
   "schema_version": "apf.readiness-matrix/v1",
-  "as_of_phase": "049",
+  "as_of_phase": "050-gates",
   "overall_status": "PRODUCT_IMPLEMENT_HOLD",
   "implemented": [
     {"phase": "013-019", "capability": "intent, execution, learning, evidence, collection and clean-room synthesis foundations", "evidence": "src/apf"},
     {"phase": "027-031", "capability": "role campaign, observation/evidence pilots, MJN read-only analysis and three analog candidates", "evidence": "docs/15-synthetic-role-campaign.md"},
     {"phase": "032-036", "capability": "mediated auth, authorized material acquisition, orchestration, durable review and local certification", "evidence": "docs/20-mediated-auth-acquisition.md"},
     {"phase": "037", "capability": "externally signed per-candidate Ethernian review gate", "evidence": "docs/26-analog-review-gate.md"},
-    {"phase": "038", "capability": "production PostgreSQL repository, reversible migrations and CI integration path", "evidence": "docs/27-postgresql-repository.md"}
-    ,{"phase": "039", "capability": "tenant-scoped authenticated operations and review console shell", "evidence": "docs/28-operations-review-console.md"},
+    {"phase": "038", "capability": "production PostgreSQL repository, reversible migrations and CI integration path", "evidence": "docs/27-postgresql-repository.md"},
+    {"phase": "039", "capability": "tenant-scoped authenticated operations and review console shell", "evidence": "docs/28-operations-review-console.md"},
     {"phase": "040", "capability": "tenant/principal-scoped SQLite durable review and candidate console adapters with externally signed decisions", "evidence": "tests/test_console_durable.py"},
     {"phase": "041", "capability": "노가다뉴스 and 부업장터 deterministic read-only pilots from supplied/public architecture metadata", "evidence": "docs/29-owned-platform-metadata-pilots.md"},
     {"phase": "042", "capability": "exactly 30 evidence-bound public Pattern candidates, catalog validation, external Ed25519 promotion verification and fail-closed reuse proof harness", "evidence": "docs/30-public-pattern-catalog.md"},
@@ -18,13 +18,27 @@
     {"phase": "046", "capability": "rider mobility plaza foundation: coarse-cell commons, consent membership, occupancy counts, advisory-only ARKAON, no dispatch or surveillance", "evidence": "docs/37-rider-mobility-plaza-foundation.md"},
     {"phase": "047", "capability": "central ARKAON orchestrator with registered platform workspaces, inbox quarantine, reports/logs/state, and Windows startup registration scripts", "evidence": "docs/38-central-arkaon-orchestrator.md"},
     {"phase": "048", "capability": "ARKAON experience and operations consistency audit: content, UX, official benchmark, route-contract checks with IMPROVEMENT_PROPOSAL-only admin inbox output", "evidence": "docs/39-arkaon-experience-operations-audit.md"},
-    {"phase": "049", "capability": "governed reflective learning memory: observation-to-lesson state machine, immutable rejected/failed/regression lessons, append-only store, no self-modification", "evidence": "docs/40-arkaon-reflective-learning.md"}
+    {"phase": "049", "capability": "governed reflective learning memory: observation-to-lesson state machine, immutable rejected/failed/regression lessons, append-only store, no self-modification", "evidence": "docs/40-arkaon-reflective-learning.md"},
+    {"phase": "050", "capability": "admin change control and reflection bridge: preview-only diff, eternian→operator gated partial-apply intent, rollback token, #048→#049→inbox wiring, console inbox and change-proposal APIs", "evidence": "docs/41-admin-change-control.md"},
+    {"phase": "051", "capability": "public surface observation and parser-only minified JS de-obfuscation: structural digest, copy-prohibited lawful indirect observation, no eval or verbatim competitor storage", "evidence": "docs/42-public-surface-observation.md"},
+    {"phase": "082", "capability": "predeployment readiness harness: mandatory config and directory checks before orchestrator startup, fail-closed gate, console status API", "evidence": "docs/43-predeployment-readiness.md"},
+    {"phase": "085", "capability": "research watch registry: digest-based local manifest change detection, inbox research packets, orchestrator startup integration", "evidence": "docs/44-research-watch.md"},
+    {"phase": "079", "capability": "mobility plaza governance: consent and forbidden-use audit, platform plaza config review, eternian-review inbox and console reports", "evidence": "docs/45-mobility-plaza-governance.md"},
+    {"phase": "071-076", "capability": "map ops gates: knowledge, sandbox, device auth, ETA shadow, resilience, release profile checks with eternian-review packets on fail or advisory", "evidence": "docs/46-map-ops-gates.md"},
+    {"phase": "042-runner", "capability": "pattern promotion status runner: catalog validation, external Ed25519 manifest verification, reuse proof digest assembly, orchestrator dry-run inbox plan reporting", "evidence": "docs/47-pattern-promotion-reuse-proof.md"},
+    {"phase": "R-011", "capability": "asset investigation ranking: research watch, pattern evidence, owned pilot gaps, surface signals scored for best-next eternian review priorities", "evidence": "docs/49-asset-investigation.md"},
+    {"phase": "050-gates", "capability": "PostgreSQL live proof harness, PostgreSQL durable review adapter, console review/candidate detail APIs and UI, owned-platform structural connection harness, M6 synthetic reuse measurement harness", "evidence": "docs/50-v0.1-gates-progress.md"}
+  ],
+  "partial": [
+    {"id": "closed-loop-approval", "capability": "inbox eternian-review → operator-decision → reflective-lessons closed loop with intent-only partial apply; live platform mutation and pattern promotion remain external", "evidence": "src/apf/reflection_bridge.py, src/apf/admin_change_control.py"},
+    {"id": "pattern-promotion-external", "capability": "30 external eternian signatures and production promotion decisions remain outside Foundry; runner verifies supplied manifest only", "evidence": "config/pattern-promotion-manifest.json"},
+    {"id": "postgres-live-proof", "capability": "harness and CI path implemented; local proof requires TEST_DATABASE_URL or CI postgres job Green artifact", "evidence": "src/apf/postgres_live_proof.py, .github/workflows/ci.yml"},
+    {"id": "postgres-review-adapter", "capability": "PostgreSQL durable review adapter covers job/review/decide path; candidate manifest listing remains SQLite-only", "evidence": "src/apf/postgres_durable_review.py"},
+    {"id": "ui-detail-rendering", "capability": "review and candidate detail rendering backed by console APIs; decision submission remains external signer workflow", "evidence": "src/apf/console_ui.html"},
+    {"id": "owned-platform-live-connection", "capability": "structural digest harness implemented; full authorized code-level analysis requires configured repo paths and external review", "evidence": "src/apf/owned_platform_connection.py"},
+    {"id": "reuse-proof-measurement", "capability": "M6 synthetic baseline harness validates 50% planning reduction target; production 부업장터 measurement remains external", "evidence": "src/apf/reuse_proof_measurement.py"}
   ],
   "not_implemented": [
-    {"id": "postgres-live-proof", "capability": "successful live PostgreSQL migration, tenant, JSONB, idempotency and concurrency CI evidence"},
-    {"id": "postgres-review-adapter", "capability": "PostgreSQL durable review/candidate schema, adapter and live CI proof"},
-    {"id": "ui-detail-rendering", "capability": "review and candidate detail rendering backed by the live console APIs"},
-    {"id": "owned-platform-live-connection", "capability": "노가다뉴스 and 부업장터 actual repository connection and authorized code-level analysis"},
     {"id": "pattern-30-promotion", "capability": "external Ethernian review signatures and individual production promotion for the 30 candidates"},
     {"id": "reuse-proof", "capability": "real reuse of at least three production-approved patterns in another platform and measured planning reduction"}
   ],
