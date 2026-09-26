@@ -419,7 +419,7 @@ def install_console(
     @application.get("/v1/console/inbox")
     def inbox_packets(
         actor: Annotated[ConsolePrincipal, Depends(principal)],
-        stage: Annotated[str | None, Query()] = None,
+        stage: Annotated[Literal["research", "eternian-review", "operator-decision"] | None, Query()] = None,
         limit: Annotated[int, Query(ge=1, le=100)] = 50,
     ) -> list[dict[str, object]]:
         del actor
@@ -466,11 +466,18 @@ def install_console(
         session_id: str,
         actor: Annotated[ConsolePrincipal, Depends(principal)],
     ) -> dict[str, object]:
-        del actor
-        path = foundry_root() / "state" / "co-creation" / "sessions" / f"{session_id}.json"
+        try:
+            safe_session_id = str(UUID(session_id))
+        except ValueError:
+            raise HTTPException(status_code=404, detail="session not found") from None
+        path = foundry_root() / "state" / "co-creation" / "sessions" / f"{safe_session_id}.json"
         if not path.is_file():
             raise HTTPException(status_code=404, detail="session not found")
-        return json.loads(path.read_text(encoding="utf-8"))
+        document = json.loads(path.read_text(encoding="utf-8"))
+        if (document.get("tenant_id") != str(actor.tenant_id)
+                or document.get("principal_id") != str(actor.principal_id)):
+            raise HTTPException(status_code=404, detail="session not found")
+        return document
 
     @application.post("/v1/console/co-creation/chat")
     def co_creation_chat(
@@ -479,7 +486,11 @@ def install_console(
         csrf_verified: Annotated[None, Depends(csrf_guard)],
     ) -> dict[str, object]:
         del csrf_verified
-        from .conversational_co_creation import CoCreationRejected, CoCreationScope, ConversationalCoCreationEngine
+        from .conversational_co_creation import (
+            CoCreationRejected,
+            CoCreationScope,
+            ConversationalCoCreationEngine,
+        )
         from .conversational_co_creation_bridge import bridge_co_creation_proposal
 
         engine = ConversationalCoCreationEngine(foundry_root=foundry_root())
@@ -807,7 +818,11 @@ def install_console(
         csrf_verified: Annotated[None, Depends(csrf_guard)],
     ) -> dict[str, object]:
         del csrf_verified
-        from .co_creation_deploy import CoCreationDeployEngine, CoCreationDeployRejected, DeployRolloutStage
+        from .co_creation_deploy import (
+            CoCreationDeployEngine,
+            CoCreationDeployRejected,
+            DeployRolloutStage,
+        )
 
         engine = CoCreationDeployEngine(foundry_root=foundry_root())
         try:
@@ -904,7 +919,11 @@ def install_console(
             ProposalQualityReplenishRejected,
             user_dissatisfaction_detected,
         )
-        from .proposal_quality_score import ProposalQualityScorer, assert_proposal_quality_gate
+        from .proposal_quality_score import (
+            ProposalQualityRejected,
+            ProposalQualityScorer,
+            assert_proposal_quality_gate,
+        )
 
         now = datetime.now().astimezone()
         engine = ProposalQualityReplenishEngine(foundry_root=foundry_root())
@@ -928,7 +947,7 @@ def install_console(
             raise HTTPException(status_code=422, detail=error.code) from None
         try:
             quality = assert_proposal_quality_gate(foundry_root=foundry_root())
-        except Exception:
+        except ProposalQualityRejected:
             quality = ProposalQualityScorer(foundry_root=foundry_root()).evaluate(now=now)
         return {
             "replenished": True,
@@ -955,8 +974,14 @@ def install_console(
         include_analysis: Annotated[bool, Query()] = False,
     ) -> dict[str, object]:
         del actor
-        from .arkaon_self_evolution_compare import ArkaonSelfEvolutionCompareEngine, SelfEvolutionRejected
-        from .arkaon_self_evolution_analysis import ArkaonSelfEvolutionAnalysisEngine, SelfEvolutionAnalysisRejected
+        from .arkaon_self_evolution_analysis import (
+            ArkaonSelfEvolutionAnalysisEngine,
+            SelfEvolutionAnalysisRejected,
+        )
+        from .arkaon_self_evolution_compare import (
+            ArkaonSelfEvolutionCompareEngine,
+            SelfEvolutionRejected,
+        )
 
         engine = ArkaonSelfEvolutionCompareEngine(foundry_root=foundry_root())
         now = datetime.now().astimezone()
@@ -988,7 +1013,10 @@ def install_console(
         candidate_snapshot_id: Annotated[str | None, Query()] = None,
     ) -> dict[str, object]:
         del actor
-        from .arkaon_self_evolution_analysis import ArkaonSelfEvolutionAnalysisEngine, SelfEvolutionAnalysisRejected
+        from .arkaon_self_evolution_analysis import (
+            ArkaonSelfEvolutionAnalysisEngine,
+            SelfEvolutionAnalysisRejected,
+        )
 
         engine = ArkaonSelfEvolutionAnalysisEngine(foundry_root=foundry_root())
         now = datetime.now().astimezone()
@@ -1012,7 +1040,10 @@ def install_console(
         csrf_verified: Annotated[None, Depends(csrf_guard)],
     ) -> dict[str, object]:
         del csrf_verified
-        from .arkaon_user_feature_proposal import ArkaonUserFeatureProposalEngine, UserFeatureProposalRejected
+        from .arkaon_user_feature_proposal import (
+            ArkaonUserFeatureProposalEngine,
+            UserFeatureProposalRejected,
+        )
 
         engine = ArkaonUserFeatureProposalEngine(foundry_root=foundry_root())
         try:

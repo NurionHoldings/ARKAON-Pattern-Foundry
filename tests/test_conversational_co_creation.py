@@ -13,7 +13,6 @@ from apf.conversational_co_creation import (
     CoCreationRejected,
     CoCreationScope,
     ConversationalCoCreationEngine,
-    count_experience_artifacts,
     verify_payment_entitlement,
 )
 from apf.conversational_co_creation_bridge import bridge_co_creation_proposal

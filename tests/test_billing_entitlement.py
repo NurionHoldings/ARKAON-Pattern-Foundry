@@ -1,6 +1,5 @@
 import json
 from hashlib import sha256
-from pathlib import Path
 from uuid import uuid4
 
 import pytest

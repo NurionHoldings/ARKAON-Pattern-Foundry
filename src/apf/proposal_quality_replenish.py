@@ -14,7 +14,6 @@ from .proposal_quality_score import (
     ProposalQualityReport,
     ProposalQualityScorer,
     assert_proposal_quality_gate,
-    count_learning_artifacts,
 )
 
 _DISSATISFACTION = re.compile(
@@ -228,7 +227,7 @@ class ProposalQualityReplenishEngine:
         now: datetime,
     ) -> ReplenishAction:
         tokens = _tokens_from_message(message)
-        token = sorted(tokens)[0] if tokens else "landing-pattern:hero-single-cta"
+        token = min(tokens) if tokens else "landing-pattern:hero-single-cta"
         pattern_id = f"landing.replenish.{platform_id.lower()}.{token.split(':')[-1]}"
         digest = sha256(f"{platform_id}|{message}|{token}|{now.isoformat()}".encode()).hexdigest()
         path = (
@@ -324,8 +323,14 @@ class ProposalQualityReplenishEngine:
         )
 
     def _add_self_evolution_analysis(self, *, platform_id: str, now: datetime) -> ReplenishAction:
-        from .arkaon_self_evolution_analysis import ArkaonSelfEvolutionAnalysisEngine
-        from .arkaon_self_evolution_compare import ArkaonSelfEvolutionCompareEngine, ImprovementContributor
+        from .arkaon_self_evolution_analysis import (
+            ArkaonSelfEvolutionAnalysisEngine,
+            SelfEvolutionAnalysisRejected,
+        )
+        from .arkaon_self_evolution_compare import (
+            ArkaonSelfEvolutionCompareEngine,
+            ImprovementContributor,
+        )
 
         compare = ArkaonSelfEvolutionCompareEngine(foundry_root=self.foundry_root)
         compare.capture_snapshot(
@@ -338,7 +343,7 @@ class ProposalQualityReplenishEngine:
         try:
             analysis = analysis_engine.analyze_latest(now=now)
             target = f"state/self-evolution/analyses/{analysis.analysis_digest[:16]}.json"
-        except Exception:
+        except SelfEvolutionAnalysisRejected:
             target = "state/self-evolution/analyses/"
         return ReplenishAction(
             action_type="SELF_EVOLUTION_ANALYSIS",

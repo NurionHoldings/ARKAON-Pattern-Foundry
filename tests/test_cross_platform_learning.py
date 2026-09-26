@@ -12,7 +12,6 @@ from apf.cross_platform_learning import (
     build_surface_observation_document,
     compare_and_abstract_patterns,
     flow_markers_from_html,
-    infer_routes_from_landing_intent,
 )
 from apf.cross_platform_learning_bridge import bridge_cross_platform_learning_report
 

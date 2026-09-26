@@ -7,8 +7,14 @@ from uuid import uuid4
 import pytest
 
 from apf.arkaon_self_evolution_analysis import ArkaonSelfEvolutionAnalysisEngine
-from apf.arkaon_self_evolution_compare import ArkaonSelfEvolutionCompareEngine, ImprovementContributor
-from apf.arkaon_user_feature_proposal import ArkaonUserFeatureProposalEngine, UserFeatureProposalRejected
+from apf.arkaon_self_evolution_compare import (
+    ArkaonSelfEvolutionCompareEngine,
+    ImprovementContributor,
+)
+from apf.arkaon_user_feature_proposal import (
+    ArkaonUserFeatureProposalEngine,
+    UserFeatureProposalRejected,
+)
 
 NOW = datetime(2031, 9, 1, 12, 0, tzinfo=UTC)
 LATER = datetime(2031, 9, 2, 12, 0, tzinfo=UTC)

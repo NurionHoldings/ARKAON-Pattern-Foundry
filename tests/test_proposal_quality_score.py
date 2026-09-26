@@ -6,7 +6,11 @@ from uuid import uuid4
 
 import pytest
 
-from apf.conversational_co_creation import CoCreationRejected, CoCreationScope, ConversationalCoCreationEngine
+from apf.conversational_co_creation import (
+    CoCreationRejected,
+    CoCreationScope,
+    ConversationalCoCreationEngine,
+)
 from apf.proposal_quality_score import (
     ProposalQualityRejected,
     ProposalQualityScorer,

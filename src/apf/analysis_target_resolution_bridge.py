@@ -6,7 +6,10 @@ import json
 from datetime import datetime
 from pathlib import Path
 
-from .analysis_target_resolution import AnalysisTargetResolutionPolicy, AnalysisTargetResolutionReport
+from .analysis_target_resolution import (
+    AnalysisTargetResolutionPolicy,
+    AnalysisTargetResolutionReport,
+)
 from .central_orchestrator import InboxStage, OrchestratorError
 
 SCHEMA_ANALYSIS_TARGET_RESOLUTION_INBOX = "apf.analysis-target-resolution-inbox/v1"

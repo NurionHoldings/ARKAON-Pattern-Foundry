@@ -5,8 +5,8 @@ from __future__ import annotations
 import json
 import re
 import urllib.request
-from dataclasses import dataclass
 from collections.abc import Callable
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from hashlib import sha256
 from pathlib import Path
@@ -199,7 +199,7 @@ def resolve_platform_url(
 
 def flow_markers_from_html(text: str) -> tuple[str, ...]:
     markers: list[str] = []
-    if re.search(r"step\s*1|step\s*2|step\s*3|step\s*4", text, re.I):
+    if re.search(r"step\s*1|step\s*2|step\s*3|step\s*4", text, re.IGNORECASE):
         markers.extend(
             [
                 "flow/step-select",
@@ -208,15 +208,15 @@ def flow_markers_from_html(text: str) -> tuple[str, ...]:
                 "flow/step-complete",
             ]
         )
-    if re.search(r"전자|계약|esign|sign", text, re.I):
+    if re.search(r"전자|계약|esign|sign", text, re.IGNORECASE):
         markers.append("flow/electronic-contract")
-    if re.search(r"비교|comparison|others", text, re.I):
+    if re.search(r"비교|comparison|others", text, re.IGNORECASE):
         markers.append("surface/comparison-matrix")
-    if re.search(r"마이페이지|dashboard|대시보드", text, re.I):
+    if re.search(r"마이페이지|dashboard|대시보드", text, re.IGNORECASE):
         markers.append("surface/mypage-dashboard")
-    if re.search(r"faq|자주하는\s*질문", text, re.I):
+    if re.search(r"faq|자주하는\s*질문", text, re.IGNORECASE):
         markers.append("surface/faq-accordion")
-    if re.search(r"cta|계약하기|시작", text, re.I):
+    if re.search(r"cta|계약하기|시작", text, re.IGNORECASE):
         markers.append("surface/hero-primary-cta")
     return tuple(sorted(set(markers)))
 

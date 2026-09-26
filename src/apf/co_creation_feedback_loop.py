@@ -9,9 +9,8 @@ from hashlib import sha256
 from pathlib import Path
 
 from .arkaon_self_evolution_compare import ArkaonSelfEvolutionCompareEngine, ImprovementContributor
-from .conversational_co_creation import CoCreationProposal
+from .conversational_co_creation import CoCreationPolicy, CoCreationProposal
 from .conversational_co_creation_bridge import bridge_co_creation_proposal
-from .conversational_co_creation import CoCreationPolicy
 
 
 class CoCreationFeedbackRejected(ValueError):

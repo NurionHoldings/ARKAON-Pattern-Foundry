@@ -6,14 +6,22 @@ from uuid import uuid4
 
 import pytest
 
-from apf.conversational_co_creation import CoCreationRejected, CoCreationScope, ConversationalCoCreationEngine
+from apf.conversational_co_creation import (
+    CoCreationRejected,
+    CoCreationScope,
+    ConversationalCoCreationEngine,
+)
 from apf.proposal_quality_replenish import (
     ProposalQualityReplenishEngine,
     assets_insufficient_for_better_proposal,
     resolve_proposal_quality_with_replenish,
     user_dissatisfaction_detected,
 )
-from apf.proposal_quality_score import ProposalQualityRejected, ProposalQualityScorer, assert_proposal_quality_gate
+from apf.proposal_quality_score import (
+    ProposalQualityRejected,
+    ProposalQualityScorer,
+    assert_proposal_quality_gate,
+)
 
 NOW = datetime(2031, 9, 1, tzinfo=UTC)
 

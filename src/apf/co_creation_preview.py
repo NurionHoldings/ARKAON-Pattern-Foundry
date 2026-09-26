@@ -12,8 +12,12 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 from .co_creation_codegen import CoCreationCodegenEngine
-from .conversational_co_creation import CoCreationRejected, CoCreationScope, ConversationalCoCreationEngine
-from .conversational_co_creation import verify_payment_entitlement
+from .conversational_co_creation import (
+    CoCreationRejected,
+    CoCreationScope,
+    ConversationalCoCreationEngine,
+    verify_payment_entitlement,
+)
 
 
 class CoCreationPreviewRejected(ValueError):

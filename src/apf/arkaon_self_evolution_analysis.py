@@ -12,7 +12,6 @@ from .arkaon_self_evolution_compare import (
     ArkaonSelfEvolutionCompareEngine,
     CapabilitySnapshot,
     EvolutionComparisonReport,
-    ImprovementContributor,
     SelfEvolutionRejected,
 )
 
