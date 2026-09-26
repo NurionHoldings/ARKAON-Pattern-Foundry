@@ -13,7 +13,9 @@ from .console import (
     console_security_from_config,
     install_console,
 )
+from .conversational_site_draft import ConversationalSiteDraftStore
 from .domain import AnalysisTarget, AnalysisTargetCreate, TargetState
+from .logo_draft import LogoDraftStore
 from .plain_language_approval import PlainLanguageApprovalStore
 from .reference_material_consent import ReferenceConsentStore
 from .repository import (
@@ -54,33 +56,47 @@ def repository_from_config(
 
 
 def create_app(
-    *, repository: TargetRepository | None = None, console_security: ConsoleSecurity | None = None,
+    *,
+    repository: TargetRepository | None = None,
+    console_security: ConsoleSecurity | None = None,
     console_review_store: ConsoleReviewStore | None = None,
     plain_approval_store: PlainLanguageApprovalStore | None = None,
     visual_dialogue_store: VisualPlatformDialogueStore | None = None,
+    conversational_site_draft_store: ConversationalSiteDraftStore | None = None,
+    logo_draft_store: LogoDraftStore | None = None,
     reference_consent_store: ReferenceConsentStore | None = None,
 ) -> FastAPI:
     application = FastAPI(title="ARKAON Pattern Foundry", version="0.1.0")
     application.state.repository = repository or repository_from_config()
     install_console(
-        application, security=console_security or console_security_from_config(),
+        application,
+        security=console_security or console_security_from_config(),
         review_store=console_review_store,
-        approval_store=plain_approval_store or PlainLanguageApprovalStore(
+        approval_store=plain_approval_store
+        or PlainLanguageApprovalStore(
             Path(os.getenv("APF_FOUNDRY_ROOT", Path(__file__).parents[2]))
         ),
-        visual_dialogue_store=visual_dialogue_store or VisualPlatformDialogueStore(
+        visual_dialogue_store=visual_dialogue_store
+        or VisualPlatformDialogueStore(
             Path(os.getenv("APF_FOUNDRY_ROOT", Path(__file__).parents[2]))
         ),
-        reference_consent_store=reference_consent_store or ReferenceConsentStore(
+        conversational_site_draft_store=conversational_site_draft_store
+        or ConversationalSiteDraftStore(
             Path(os.getenv("APF_FOUNDRY_ROOT", Path(__file__).parents[2]))
         ),
+        logo_draft_store=logo_draft_store
+        or LogoDraftStore(Path(os.getenv("APF_FOUNDRY_ROOT", Path(__file__).parents[2]))),
+        reference_consent_store=reference_consent_store
+        or ReferenceConsentStore(Path(os.getenv("APF_FOUNDRY_ROOT", Path(__file__).parents[2]))),
     )
 
     @application.get("/health")
     def health() -> dict[str, str]:
         return {"status": "ok"}
 
-    @application.post("/v1/targets", response_model=AnalysisTarget, status_code=status.HTTP_201_CREATED)
+    @application.post(
+        "/v1/targets", response_model=AnalysisTarget, status_code=status.HTTP_201_CREATED
+    )
     def create_target(
         payload: AnalysisTargetCreate,
         tenant_id: Annotated[UUID, Depends(tenant)],

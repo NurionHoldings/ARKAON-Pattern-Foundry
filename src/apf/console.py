@@ -17,11 +17,24 @@ from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
 from .admin_change_control import AdminChangeController, ChangeControlRejected
+from .conversational_site_draft import (
+    ConversationalSiteDraftStore,
+    SiteDraftError,
+    SiteDraftRequest,
+    SiteDraftRevisionRequest,
+)
 from .durable_review import (
     DurableStoreError,
     ReviewAttestation,
     ReviewDecision,
     ReviewStage,
+)
+from .logo_draft import (
+    LogoDraftError,
+    LogoDraftRequest,
+    LogoDraftStore,
+    LogoRevisionRequest,
+    LogoRollbackRequest,
 )
 from .plain_language_approval import (
     ApprovalDecision,
@@ -191,7 +204,12 @@ class ReferenceConsentSubmission(BaseModel):
 
 class ConsoleReviewStore(Protocol):
     def list_reviews_for_principal(
-        self, tenant_id: str, principal_id: str, *, limit: int, offset: int,
+        self,
+        tenant_id: str,
+        principal_id: str,
+        *,
+        limit: int,
+        offset: int,
     ): ...
 
     def get_review_for_principal(
@@ -199,11 +217,19 @@ class ConsoleReviewStore(Protocol):
     ): ...
 
     def list_candidate_manifests_for_principal(
-        self, tenant_id: str, principal_id: str, *, limit: int, offset: int,
+        self,
+        tenant_id: str,
+        principal_id: str,
+        *,
+        limit: int,
+        offset: int,
     ): ...
 
     def decide_review(
-        self, tenant_id: str, task_id: str, attestation: ReviewAttestation,
+        self,
+        tenant_id: str,
+        task_id: str,
+        attestation: ReviewAttestation,
     ): ...
 
 
@@ -213,7 +239,10 @@ class ConsoleSecurity:
     ) -> None:
         self.environment = environment.lower()
         self.secret = secret.encode() if secret else None
-        self.allow_dev_sessions = allow_dev_sessions and self.environment not in {"production", "prod"}
+        self.allow_dev_sessions = allow_dev_sessions and self.environment not in {
+            "production",
+            "prod",
+        }
         if self.environment in {"production", "prod"} and not self.secret:
             raise RuntimeError("APF_CONSOLE_SESSION_SECRET is required in production")
 
@@ -257,15 +286,22 @@ class ConsoleSecurity:
 
 
 def install_console(
-    application, *, security: ConsoleSecurity, review_store: ConsoleReviewStore | None = None,
+    application,
+    *,
+    security: ConsoleSecurity,
+    review_store: ConsoleReviewStore | None = None,
     approval_store: PlainLanguageApprovalStore | None = None,
     visual_dialogue_store: VisualPlatformDialogueStore | None = None,
+    conversational_site_draft_store: ConversationalSiteDraftStore | None = None,
+    logo_draft_store: LogoDraftStore | None = None,
     reference_consent_store: ReferenceConsentStore | None = None,
 ) -> None:
     application.state.console_security = security
     application.state.console_review_store = review_store
     application.state.plain_approval_store = approval_store
     application.state.visual_dialogue_store = visual_dialogue_store
+    application.state.conversational_site_draft_store = conversational_site_draft_store
+    application.state.logo_draft_store = logo_draft_store
     application.state.reference_consent_store = reference_consent_store
 
     def principal(
@@ -308,6 +344,20 @@ def install_console(
         store = request.app.state.visual_dialogue_store
         if store is None:
             raise HTTPException(status_code=503, detail="visual dialogue store unavailable")
+        return store
+
+    def site_drafts(request: Request) -> ConversationalSiteDraftStore:
+        store = request.app.state.conversational_site_draft_store
+        if store is None:
+            raise HTTPException(
+                status_code=503, detail="conversational site draft store unavailable"
+            )
+        return store
+
+    def logo_drafts(request: Request) -> LogoDraftStore:
+        store = request.app.state.logo_draft_store
+        if store is None:
+            raise HTTPException(status_code=503, detail="logo draft store unavailable")
         return store
 
     def reference_consents(request: Request) -> ReferenceConsentStore:
@@ -1539,11 +1589,18 @@ def install_console(
             )
         except (DurableStoreError, sqlite3.Error, OSError) as error:
             raise store_error(error) from None
-        return [{
-            "task_id": item.task_id, "job_id": item.job_id, "stage": item.stage.value,
-            "reason_code": item.reason_code, "evidence_fingerprint": item.evidence_fingerprint,
-            "expires_at": item.expires_at.isoformat(), "status": item.status.value,
-        } for item in items]
+        return [
+            {
+                "task_id": item.task_id,
+                "job_id": item.job_id,
+                "stage": item.stage.value,
+                "reason_code": item.reason_code,
+                "evidence_fingerprint": item.evidence_fingerprint,
+                "expires_at": item.expires_at.isoformat(),
+                "status": item.status.value,
+            }
+            for item in items
+        ]
 
     @application.get("/v1/console/reviews/{task_id}")
     def review_detail(
@@ -1577,9 +1634,11 @@ def install_console(
         offset: Annotated[int, Query(ge=0)] = 0,
     ) -> list[dict[str, object]]:
         try:
-            return list(store.list_candidate_manifests_for_principal(
-                str(actor.tenant_id), str(actor.principal_id), limit=limit, offset=offset
-            ))
+            return list(
+                store.list_candidate_manifests_for_principal(
+                    str(actor.tenant_id), str(actor.principal_id), limit=limit, offset=offset
+                )
+            )
         except (DurableStoreError, sqlite3.Error, OSError) as error:
             raise store_error(error) from None
 
@@ -1640,10 +1699,13 @@ def install_console(
         return {"overall": overall, "reports": items}
 
     @application.post(
-        "/console/api/reviews/{task_id}/decisions", status_code=status.HTTP_202_ACCEPTED,
+        "/console/api/reviews/{task_id}/decisions",
+        status_code=status.HTTP_202_ACCEPTED,
         include_in_schema=False,
     )
-    @application.post("/v1/console/reviews/{task_id}/decisions", status_code=status.HTTP_202_ACCEPTED)
+    @application.post(
+        "/v1/console/reviews/{task_id}/decisions", status_code=status.HTTP_202_ACCEPTED
+    )
     def submit_review(
         task_id: UUID,
         payload: ReviewSubmission,
@@ -1655,15 +1717,21 @@ def install_console(
         if actor.role != "reviewer":
             raise HTTPException(status_code=403, detail="reviewer role required")
         store = durable(request)
-        if (payload.task_id != task_id or payload.tenant_id != actor.tenant_id
-                or payload.principal_id != actor.principal_id):
+        if (
+            payload.task_id != task_id
+            or payload.tenant_id != actor.tenant_id
+            or payload.principal_id != actor.principal_id
+        ):
             raise HTTPException(status_code=403, detail="review binding mismatch")
         try:
             decided = store.decide_review(str(actor.tenant_id), str(task_id), payload.attestation())
         except (DurableStoreError, sqlite3.Error, OSError) as error:
             raise store_error(error) from None
-        return {"task_id": decided.task_id, "decision": payload.decision.value,
-                "status": decided.status.value}
+        return {
+            "task_id": decided.task_id,
+            "decision": payload.decision.value,
+            "status": decided.status.value,
+        }
 
     @application.get("/v1/console/self-improvement-reports")
     def plain_reports(
@@ -1706,11 +1774,306 @@ def install_console(
             code = 409 if str(error) == "PLAIN_APPROVAL_ALREADY_DECIDED" else 422
             raise HTTPException(status_code=code, detail=str(error)) from None
 
+    def site_draft_error(error: SiteDraftError) -> HTTPException:
+        return HTTPException(
+            status_code=409
+            if str(error)
+            in {"SITE_DRAFT_BUSY", "SITE_DRAFT_CONCURRENT_UPDATE", "SITE_DRAFT_STALE_REVISION"}
+            else 422,
+            detail=str(error),
+        )
+
+    @application.get("/site-drafts", response_class=HTMLResponse, include_in_schema=False)
+    def site_drafts_home(actor: Annotated[ConsolePrincipal, Depends(principal)]) -> HTMLResponse:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        return HTMLResponse(
+            Path(__file__)
+            .with_name("conversational_site_draft_ui.html")
+            .read_text(encoding="utf-8"),
+            headers={
+                "Cache-Control": "no-store",
+                "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; frame-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'",
+                "Referrer-Policy": "no-referrer",
+                "X-Content-Type-Options": "nosniff",
+            },
+        )
+
+    @application.post("/v1/console/site-drafts", status_code=status.HTTP_201_CREATED)
+    def create_site_draft(
+        payload: SiteDraftRequest,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[ConversationalSiteDraftStore, Depends(site_drafts)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        return store.create(
+            tenant_id=str(actor.tenant_id),
+            owner_principal_id=str(actor.principal_id),
+            request=payload,
+        )
+
+    @application.get("/v1/console/site-drafts")
+    def list_site_drafts(
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[ConversationalSiteDraftStore, Depends(site_drafts)],
+    ) -> list[dict[str, object]]:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        return store.list_for_owner(
+            tenant_id=str(actor.tenant_id), owner_principal_id=str(actor.principal_id)
+        )
+
+    @application.get("/v1/console/site-drafts/{draft_id}")
+    def get_site_draft(
+        draft_id: str,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[ConversationalSiteDraftStore, Depends(site_drafts)],
+    ) -> dict[str, object]:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        try:
+            return store.get(
+                draft_id, tenant_id=str(actor.tenant_id), owner_principal_id=str(actor.principal_id)
+            )
+        except SiteDraftError as error:
+            raise site_draft_error(error) from None
+
+    @application.get("/v1/console/site-drafts/{draft_id}/revisions/{number}/preview.html")
+    def site_draft_preview(
+        draft_id: str,
+        number: int,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[ConversationalSiteDraftStore, Depends(site_drafts)],
+    ) -> Response:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        try:
+            page = store.preview(
+                draft_id,
+                number,
+                tenant_id=str(actor.tenant_id),
+                owner_principal_id=str(actor.principal_id),
+            )
+        except SiteDraftError as error:
+            raise site_draft_error(error) from None
+        return Response(
+            page,
+            media_type="text/html",
+            headers={
+                "Cache-Control": "no-store",
+                "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-ancestors 'self'; sandbox",
+                "X-Content-Type-Options": "nosniff",
+            },
+        )
+
+    @application.post("/v1/console/site-drafts/{draft_id}/revisions")
+    def revise_site_draft(
+        draft_id: str,
+        payload: SiteDraftRevisionRequest,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[ConversationalSiteDraftStore, Depends(site_drafts)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        try:
+            return store.revise(
+                draft_id,
+                tenant_id=str(actor.tenant_id),
+                owner_principal_id=str(actor.principal_id),
+                request=payload,
+            )
+        except SiteDraftError as error:
+            raise site_draft_error(error) from None
+
+    @application.post("/v1/console/site-drafts/{draft_id}/rollback/{number}")
+    def rollback_site_draft(
+        draft_id: str,
+        number: int,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[ConversationalSiteDraftStore, Depends(site_drafts)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        try:
+            return store.rollback(
+                draft_id,
+                tenant_id=str(actor.tenant_id),
+                owner_principal_id=str(actor.principal_id),
+                revision_number=number,
+            )
+        except SiteDraftError as error:
+            raise site_draft_error(error) from None
+
+    @application.post("/v1/console/site-drafts/{draft_id}/approval-request")
+    def request_site_draft_approval(
+        draft_id: str,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[ConversationalSiteDraftStore, Depends(site_drafts)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        try:
+            return store.request_approval(
+                draft_id, tenant_id=str(actor.tenant_id), owner_principal_id=str(actor.principal_id)
+            )
+        except SiteDraftError as error:
+            raise site_draft_error(error) from None
+
+    def logo_draft_error(error: LogoDraftError) -> HTTPException:
+        return HTTPException(
+            status_code=409
+            if str(error)
+            in {"LOGO_DRAFT_BUSY", "LOGO_DRAFT_CONCURRENT_UPDATE", "LOGO_DRAFT_STALE_REVISION"}
+            else 422,
+            detail=str(error),
+        )
+
+    @application.get("/logo-drafts", response_class=HTMLResponse, include_in_schema=False)
+    def logo_drafts_home(actor: Annotated[ConsolePrincipal, Depends(principal)]) -> HTMLResponse:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        return HTMLResponse(
+            Path(__file__).with_name("logo_draft_ui.html").read_text(encoding="utf-8"),
+            headers={
+                "Cache-Control": "no-store",
+                "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; base-uri 'none'; frame-ancestors 'none'; form-action 'self'",
+                "Referrer-Policy": "no-referrer",
+                "X-Content-Type-Options": "nosniff",
+            },
+        )
+
+    @application.post("/v1/console/logo-drafts", status_code=status.HTTP_201_CREATED)
+    def create_logo_draft(
+        payload: LogoDraftRequest,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[LogoDraftStore, Depends(logo_drafts)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        return store.create(
+            tenant_id=str(actor.tenant_id),
+            owner_principal_id=str(actor.principal_id),
+            request=payload,
+        )
+
+    @application.get("/v1/console/logo-drafts")
+    def list_logo_drafts(
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[LogoDraftStore, Depends(logo_drafts)],
+    ) -> list[dict[str, object]]:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        return store.list_for_owner(
+            tenant_id=str(actor.tenant_id), owner_principal_id=str(actor.principal_id)
+        )
+
+    @application.get("/v1/console/logo-drafts/{draft_id}")
+    def get_logo_draft(
+        draft_id: str,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[LogoDraftStore, Depends(logo_drafts)],
+    ) -> dict[str, object]:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        try:
+            return store.get(
+                draft_id, tenant_id=str(actor.tenant_id), owner_principal_id=str(actor.principal_id)
+            )
+        except LogoDraftError as error:
+            raise logo_draft_error(error) from None
+
+    @application.post("/v1/console/logo-drafts/{draft_id}/revisions")
+    def revise_logo_draft(
+        draft_id: str,
+        payload: LogoRevisionRequest,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[LogoDraftStore, Depends(logo_drafts)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        try:
+            return store.revise(
+                draft_id,
+                tenant_id=str(actor.tenant_id),
+                owner_principal_id=str(actor.principal_id),
+                request=payload,
+            )
+        except LogoDraftError as error:
+            raise logo_draft_error(error) from None
+
+    @application.post("/v1/console/logo-drafts/{draft_id}/rollback/{number}")
+    def rollback_logo_draft(
+        draft_id: str,
+        number: int,
+        payload: LogoRollbackRequest,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[LogoDraftStore, Depends(logo_drafts)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        try:
+            return store.rollback(
+                draft_id,
+                number,
+                tenant_id=str(actor.tenant_id),
+                owner_principal_id=str(actor.principal_id),
+                based_on_revision_digest=payload.based_on_revision_digest,
+            )
+        except LogoDraftError as error:
+            raise logo_draft_error(error) from None
+
+    @application.get("/v1/console/logo-drafts/{draft_id}/download.svg")
+    def download_logo_draft(
+        draft_id: str,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[LogoDraftStore, Depends(logo_drafts)],
+    ) -> Response:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        try:
+            svg, filename = store.download(
+                draft_id, tenant_id=str(actor.tenant_id), owner_principal_id=str(actor.principal_id)
+            )
+        except LogoDraftError as error:
+            raise logo_draft_error(error) from None
+        return Response(
+            svg,
+            media_type="image/svg+xml",
+            headers={
+                "Content-Disposition": f'attachment; filename="{filename}"',
+                "Cache-Control": "no-store",
+                "Content-Security-Policy": "default-src 'none'; sandbox",
+                "X-Content-Type-Options": "nosniff",
+            },
+        )
+
     def visual_error(error: VisualDialogueError) -> HTTPException:
-        code = 409 if str(error) in {
-            "VISUAL_DIALOGUE_BUSY", "VISUAL_DIALOGUE_CONCURRENT_UPDATE",
-            "VISUAL_REVISION_STALE_BASE", "VISUAL_ARTIFACT_CONFLICT",
-        } else 422
+        code = (
+            409
+            if str(error)
+            in {
+                "VISUAL_DIALOGUE_BUSY",
+                "VISUAL_DIALOGUE_CONCURRENT_UPDATE",
+                "VISUAL_REVISION_STALE_BASE",
+                "VISUAL_ARTIFACT_CONFLICT",
+            }
+            else 422
+        )
         return HTTPException(status_code=code, detail=str(error))
 
     @application.post("/v1/console/platform-dialogues", status_code=status.HTTP_201_CREATED)
@@ -1724,7 +2087,9 @@ def install_console(
         if actor.role != "owner":
             raise HTTPException(status_code=403, detail="owner role required")
         return store.create(
-            tenant_id=str(actor.tenant_id), owner_principal_id=str(actor.principal_id), brief=payload
+            tenant_id=str(actor.tenant_id),
+            owner_principal_id=str(actor.principal_id),
+            brief=payload,
         )
 
     @application.get("/v1/console/platform-dialogues")
@@ -1783,7 +2148,8 @@ def install_console(
         except VisualDialogueError as error:
             raise visual_error(error) from None
         return Response(
-            content=data, media_type="image/svg+xml",
+            content=data,
+            media_type="image/svg+xml",
             headers={"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"},
         )
 
@@ -1800,8 +2166,10 @@ def install_console(
             raise HTTPException(status_code=403, detail="owner role required")
         try:
             return store.add_feedback(
-                dialogue_id, tenant_id=str(actor.tenant_id),
-                owner_principal_id=str(actor.principal_id), feedback=payload,
+                dialogue_id,
+                tenant_id=str(actor.tenant_id),
+                owner_principal_id=str(actor.principal_id),
+                feedback=payload,
             )
         except VisualDialogueError as error:
             raise visual_error(error) from None
@@ -1819,8 +2187,10 @@ def install_console(
             raise HTTPException(status_code=403, detail="owner role required")
         try:
             return store.confirm(
-                dialogue_id, tenant_id=str(actor.tenant_id),
-                owner_principal_id=str(actor.principal_id), confirmation=payload,
+                dialogue_id,
+                tenant_id=str(actor.tenant_id),
+                owner_principal_id=str(actor.principal_id),
+                confirmation=payload,
             )
         except VisualDialogueError as error:
             raise visual_error(error) from None
@@ -1837,7 +2207,8 @@ def install_console(
             raise HTTPException(status_code=403, detail="owner role required")
         try:
             return store.seal(
-                dialogue_id, tenant_id=str(actor.tenant_id),
+                dialogue_id,
+                tenant_id=str(actor.tenant_id),
                 owner_principal_id=str(actor.principal_id),
             )
         except VisualDialogueError as error:

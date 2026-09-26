@@ -1,0 +1,291 @@
+{
+  "analysis_run_id": "9a4c9a04-2c9e-4858-bb35-1fdddb2b2554",
+  "axes": {
+    "why": [
+      {
+        "canonical_text": "일반 사용자가 말로 요청한 내용을 검토 가능한 웹 초안으로 빠르게 확인한다.",
+        "evidence_refs": [
+          "b19b3c1c-efdd-4687-a171-bad2fa580059"
+        ],
+        "confidence": 0.95,
+        "stability": "CORE",
+        "disputed": false
+      }
+    ],
+    "who": [
+      {
+        "canonical_text": "tenant에 속한 owner가 초안을 만들고 수정하고 승인 요청한다.",
+        "evidence_refs": [
+          "b19b3c1c-efdd-4687-a171-bad2fa580059"
+        ],
+        "confidence": 0.95,
+        "stability": "CORE",
+        "disputed": false
+      }
+    ],
+    "outcome": [
+      {
+        "canonical_text": "한국어 요청에서 결정적 HTML/CSS 초안을 만들고 버전·롤백·승인 대기를 제공한다.",
+        "evidence_refs": [
+          "b19b3c1c-efdd-4687-a171-bad2fa580059"
+        ],
+        "confidence": 0.95,
+        "stability": "CORE",
+        "disputed": false
+      },
+      {
+        "canonical_text": "홈과 상세 화면은 준비 단계, 결과물 미리보기, 버전 편집, 승인 대기, 배포 준비를 순서대로 보여 준다.",
+        "evidence_refs": [
+          "b19b3c1c-efdd-4687-a171-bad2fa580059"
+        ],
+        "confidence": 0.94,
+        "stability": "CORE",
+        "disputed": false
+      },
+      {
+        "canonical_text": "사용자 이름·짧은 문구·색상·형태로 외부 호출 없이 결정적 SVG 로고 3개 시안을 만들고, 선택·수정·롤백 후 소유자 인증을 거쳐 다운로드한다.",
+        "evidence_refs": [
+          "b19b3c1c-efdd-4687-a171-bad2fa580059"
+        ],
+        "confidence": 0.94,
+        "stability": "CORE",
+        "disputed": false
+      }
+    ],
+    "journey": [
+      {
+        "canonical_text": "홈→요청→미리보기→수정 또는 롤백→승인 대기",
+        "evidence_refs": [
+          "b19b3c1c-efdd-4687-a171-bad2fa580059"
+        ],
+        "confidence": 0.95,
+        "stability": "CORE",
+        "disputed": false
+      },
+      {
+        "canonical_text": "초보자는 GitHub 가입·GitHub Apps 참고와 Meshy 가입·API 문서 안내를 확인하고, 초안을 제작·검토한 뒤 Netlify 가입·저장소 배포 안내 참고로 이어진다.",
+        "evidence_refs": [
+          "b19b3c1c-efdd-4687-a171-bad2fa580059"
+        ],
+        "confidence": 0.96,
+        "stability": "CORE",
+        "disputed": false
+      },
+      {
+        "canonical_text": "로고 홈은 내 로고 목록과 draft_id URL로 저장된 상세로 다시 들어가며, 불러온 최신 revision의 입력값·저장 선택을 보여 준 뒤 새 선택을 별도 revision으로 저장한다.",
+        "evidence_refs": [
+          "b19b3c1c-efdd-4687-a171-bad2fa580059"
+        ],
+        "confidence": 0.95,
+        "stability": "CORE",
+        "disputed": false
+      },
+      {
+        "canonical_text": "로고 제작 화면은 입력→세 시안 비교→선택 저장→버전 복원 또는 SVG 다운로드의 상태를 같은 상세 화면에서 보여 주고, 초안·승인 화면을 오갈 수 있다.",
+        "evidence_refs": [
+          "b19b3c1c-efdd-4687-a171-bad2fa580059"
+        ],
+        "confidence": 0.96,
+        "stability": "CORE",
+        "disputed": false
+      }
+    ],
+    "object": [
+      {
+        "canonical_text": "artifact_type이 static_landing_page인 tenant-bound draft와 revision",
+        "evidence_refs": [
+          "b19b3c1c-efdd-4687-a171-bad2fa580059"
+        ],
+        "confidence": 0.9,
+        "stability": "CONFIGURABLE",
+        "disputed": false
+      },
+      {
+        "canonical_text": "artifact_type이 logo_svg인 tenant-bound deterministic vector draft와 revision",
+        "evidence_refs": [
+          "b19b3c1c-efdd-4687-a171-bad2fa580059"
+        ],
+        "confidence": 0.92,
+        "stability": "CONFIGURABLE",
+        "disputed": false
+      }
+    ],
+    "owner": [
+      {
+        "canonical_text": "owner만 자신의 tenant draft를 생성·수정·롤백·승인 요청한다.",
+        "evidence_refs": [
+          "b19b3c1c-efdd-4687-a171-bad2fa580059"
+        ],
+        "confidence": 0.98,
+        "stability": "CORE",
+        "disputed": false
+      }
+    ],
+    "invariant": [
+      {
+        "canonical_text": "자동 구현과 배포는 항상 false이며 임의 코드 실행은 없다.",
+        "evidence_refs": [
+          "b19b3c1c-efdd-4687-a171-bad2fa580059"
+        ],
+        "confidence": 0.99,
+        "stability": "CORE",
+        "disputed": false
+      },
+      {
+        "canonical_text": "external_connection_readiness는 GUIDANCE_ONLY이며 모든 external action control은 false다. 안내는 연결 완료의 증거가 아니다.",
+        "evidence_refs": [
+          "b19b3c1c-efdd-4687-a171-bad2fa580059"
+        ],
+        "confidence": 0.99,
+        "stability": "CORE",
+        "disputed": false
+      },
+      {
+        "canonical_text": "로고 rollback은 최신 revision digest를 요구해 stale 요청을 거부하며 SVG 텍스트는 XML 1.0 허용 code point만 escape하여 포함한다.",
+        "evidence_refs": [
+          "b19b3c1c-efdd-4687-a171-bad2fa580059"
+        ],
+        "confidence": 0.99,
+        "stability": "CORE",
+        "disputed": false
+      }
+    ],
+    "constraint": [
+      {
+        "canonical_text": "로고·명함·SNS 랜딩·숏폼은 준비 중으로만 표시한다.",
+        "evidence_refs": [
+          "b19b3c1c-efdd-4687-a171-bad2fa580059"
+        ],
+        "confidence": 0.95,
+        "stability": "CORE",
+        "disputed": false
+      },
+      {
+        "canonical_text": "3D 캐릭터 Addon은 준비 중으로만 표시하며 이미지 업로드·Meshy 호출·다운로드를 실행하지 않는다.",
+        "evidence_refs": [
+          "b19b3c1c-efdd-4687-a171-bad2fa580059"
+        ],
+        "confidence": 0.99,
+        "stability": "CORE",
+        "disputed": false
+      },
+      {
+        "canonical_text": "GitHub·Meshy·Netlify는 공식 가입·문서 링크로만 안내하며 ARKAON GitHub·Netlify 연결 기능은 미제공이고, 이 UI는 로그인·비밀번호/API 키 수집·저장, Meshy 호출, GitHub 쓰기, Netlify 배포를 실행하지 않는다.",
+        "evidence_refs": [
+          "b19b3c1c-efdd-4687-a171-bad2fa580059"
+        ],
+        "confidence": 0.99,
+        "stability": "CORE",
+        "disputed": false
+      },
+      {
+        "canonical_text": "새 draft는 readiness를 저장하지 않고 응답 projection으로만 계산한다. 이전 readiness 변형 또는 필드 없는 schema 1.0 draft는 원래 digest 검증 뒤 읽되, persisted readiness를 연결 증거나 권한으로 신뢰하지 않는다.",
+        "evidence_refs": [
+          "b19b3c1c-efdd-4687-a171-bad2fa580059"
+        ],
+        "confidence": 0.99,
+        "stability": "CORE",
+        "disputed": false
+      },
+      {
+        "canonical_text": "홈·상세의 시각 탐색은 HOLD이며, 현재 정보 구조를 완성된 차별적 디자인 언어로 주장하지 않는다.",
+        "evidence_refs": [
+          "b19b3c1c-efdd-4687-a171-bad2fa580059"
+        ],
+        "confidence": 0.98,
+        "stability": "CORE",
+        "disputed": false
+      },
+      {
+        "canonical_text": "로고는 도형·텍스트 기반 SVG 시안만 만든다. 이미지 생성, 외부 이미지 API 호출, 외부 쓰기·배포는 하지 않으며 500 크레딧 상한은 기록하지만 실측 meter는 제공되지 않는다.",
+        "evidence_refs": [
+          "b19b3c1c-efdd-4687-a171-bad2fa580059"
+        ],
+        "confidence": 0.99,
+        "stability": "CORE",
+        "disputed": false
+      }
+    ],
+    "risk": [
+      {
+        "canonical_text": "사용자 입력이 HTML로 해석되거나 tenant 경계를 넘는 접근을 차단한다.",
+        "evidence_refs": [
+          "b19b3c1c-efdd-4687-a171-bad2fa580059"
+        ],
+        "confidence": 0.98,
+        "stability": "CORE",
+        "disputed": false
+      },
+      {
+        "canonical_text": "기존 schema 1.0 draft의 유효한 digest를 readiness 필드 추가 때문에 거부하지 않으며, 응답에만 guidance 계약을 주입한다.",
+        "evidence_refs": [
+          "b19b3c1c-efdd-4687-a171-bad2fa580059"
+        ],
+        "confidence": 0.98,
+        "stability": "CORE",
+        "disputed": false
+      },
+      {
+        "canonical_text": "SVG 텍스트는 escape하여 markup·script 주입을 막고, 다운로드도 tenant owner 권한을 확인한다.",
+        "evidence_refs": [
+          "b19b3c1c-efdd-4687-a171-bad2fa580059"
+        ],
+        "confidence": 0.99,
+        "stability": "CORE",
+        "disputed": false
+      }
+    ],
+    "signal": [
+      {
+        "canonical_text": "저장소·API 테스트와 정적 검사를 통과한다.",
+        "evidence_refs": [
+          "b19b3c1c-efdd-4687-a171-bad2fa580059"
+        ],
+        "confidence": 0.9,
+        "stability": "CONFIGURABLE",
+        "disputed": false
+      }
+    ],
+    "evolution": [
+      {
+        "canonical_text": "공통 draft/revision 계약의 artifact_type을 통해 후속 제작물을 추가한다.",
+        "evidence_refs": [
+          "b19b3c1c-efdd-4687-a171-bad2fa580059"
+        ],
+        "confidence": 0.8,
+        "stability": "EXPERIMENTAL",
+        "disputed": false
+      },
+      {
+        "canonical_text": "3D Addon은 동의·권리, versioned asset/job state, 배치 미리보기, 명시 승인 계약을 갖춘 뒤 연결한다.",
+        "evidence_refs": [
+          "b19b3c1c-efdd-4687-a171-bad2fa580059"
+        ],
+        "confidence": 0.9,
+        "stability": "EXPERIMENTAL",
+        "disputed": false
+      },
+      {
+        "canonical_text": "홈·상세 UI는 단계 상태, 공식 다음 행동, sandbox 미리보기, revision, 접근성 있는 반응형 레이아웃을 재사용 가능한 제작 여정 컴포넌트로 유지한다.",
+        "evidence_refs": [
+          "b19b3c1c-efdd-4687-a171-bad2fa580059"
+        ],
+        "confidence": 0.92,
+        "stability": "CONFIGURABLE",
+        "disputed": false
+      },
+      {
+        "canonical_text": "첫 결과물 UI는 현재 저장 선택과 미리보기 선택을 구분하고, aria live 상태·키보드 초점·반응형 레이아웃으로 초보자가 실행 상태를 이해하게 한다.",
+        "evidence_refs": [
+          "b19b3c1c-efdd-4687-a171-bad2fa580059"
+        ],
+        "confidence": 0.94,
+        "stability": "CONFIGURABLE",
+        "disputed": false
+      }
+    ]
+  },
+  "completeness": 0.96,
+  "fingerprint": null,
+  "locked": false
+}
