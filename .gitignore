@@ -30,3 +30,7 @@ state/orchestrator-state.json
 state/orchestrator.run.lock
 quarantine/*.json
 knowledge/reflective-lessons/*.json
+
+# owner-authored runtime artifacts; may contain personal contact details
+state/business-cards/
+state/logo-drafts/

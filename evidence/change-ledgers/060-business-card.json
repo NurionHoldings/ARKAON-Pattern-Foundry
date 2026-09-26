@@ -1,0 +1,22 @@
+{
+  "schema_version": "apf.change-ledger/1.0",
+  "change_id": "060-business-card",
+  "intent_dna_ref": "knowledge/intent-dna/060-business-card.json",
+  "source_base": "cfb760b713210fc3b73589f9b9798c46a3b27830",
+  "scope_decision": "Independent local branch adds owner-bound business_card_svg drafts dependent on saved logo_svg drafts. It creates deterministic front/back SVG, revision, rollback, and SVG downloads. It does not alter the frozen 059 branch. Review delta: SVG mark extraction uses XML parsing and preserves nested groups; rollback copies the historical front/back SVG snapshot without reading the current logo; mutable owner state defaults outside the checkout and the repository ignores logo/card runtime paths. Audit correction: existing approval, dialogue, site-draft, and reference-consent stores retain APF_FOUNDRY_ROOT defaults; only logo and business-card runtime state uses APF_RUNTIME_ROOT.",
+  "external_effects": "none",
+  "credit": {
+    "cap": 500,
+    "meter": "UNAVAILABLE",
+    "consumption_claim": "none"
+  },
+  "verification": [
+    "2026-09-23 targeted: pytest tests/test_business_card.py tests/test_business_card_ui.py tests/test_logo_draft.py tests/test_logo_draft_ui.py tests/test_console.py = 23 passed",
+    "2026-09-23 final local regression: pytest = 686 passed, 5 skipped; ruff check src tests passed; git diff --check clean",
+    "2026-09-23 re-baseline: refreshed only existing evidence hashes and package_hash in the non-promoted operations-console-boundary candidate after console.py and test_console.py changed.",
+    "2026-09-23 review delta targeted: pytest tests/test_business_card.py tests/test_runtime_privacy.py tests/test_console.py = 19 passed; nested logo variants, exact SVG rollback snapshot, malformed JSON failure, and git ignore coverage included.",
+    "2026-09-23 review delta final local regression: pytest = 689 passed, 5 skipped; ruff check src tests passed; git diff --check clean.",
+    "2026-09-23 audit correction targeted: existing-store default root restored; pytest targeted runtime/business-card/console checks passed."
+  ],
+  "ci": "not started; reserved for post-audit execution"
+}

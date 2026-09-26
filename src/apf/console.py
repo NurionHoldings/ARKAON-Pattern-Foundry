@@ -17,6 +17,13 @@ from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
 from .admin_change_control import AdminChangeController, ChangeControlRejected
+from .business_card import (
+    BusinessCardError,
+    BusinessCardRequest,
+    BusinessCardRevisionRequest,
+    BusinessCardRollbackRequest,
+    BusinessCardStore,
+)
 from .conversational_site_draft import (
     ConversationalSiteDraftStore,
     SiteDraftError,
@@ -294,6 +301,7 @@ def install_console(
     visual_dialogue_store: VisualPlatformDialogueStore | None = None,
     conversational_site_draft_store: ConversationalSiteDraftStore | None = None,
     logo_draft_store: LogoDraftStore | None = None,
+    business_card_store: BusinessCardStore | None = None,
     reference_consent_store: ReferenceConsentStore | None = None,
 ) -> None:
     application.state.console_security = security
@@ -302,6 +310,7 @@ def install_console(
     application.state.visual_dialogue_store = visual_dialogue_store
     application.state.conversational_site_draft_store = conversational_site_draft_store
     application.state.logo_draft_store = logo_draft_store
+    application.state.business_card_store = business_card_store
     application.state.reference_consent_store = reference_consent_store
 
     def principal(
@@ -358,6 +367,12 @@ def install_console(
         store = request.app.state.logo_draft_store
         if store is None:
             raise HTTPException(status_code=503, detail="logo draft store unavailable")
+        return store
+
+    def business_cards(request: Request) -> BusinessCardStore:
+        store = request.app.state.business_card_store
+        if store is None:
+            raise HTTPException(status_code=503, detail="business card store unavailable")
         return store
 
     def reference_consents(request: Request) -> ReferenceConsentStore:
@@ -2051,6 +2066,151 @@ def install_console(
             )
         except LogoDraftError as error:
             raise logo_draft_error(error) from None
+        return Response(
+            svg,
+            media_type="image/svg+xml",
+            headers={
+                "Content-Disposition": f'attachment; filename="{filename}"',
+                "Cache-Control": "no-store",
+                "Content-Security-Policy": "default-src 'none'; sandbox",
+                "X-Content-Type-Options": "nosniff",
+            },
+        )
+
+    def business_card_error(error: BusinessCardError) -> HTTPException:
+        return HTTPException(
+            status_code=409
+            if str(error)
+            in {
+                "BUSINESS_CARD_BUSY",
+                "BUSINESS_CARD_CONCURRENT_UPDATE",
+                "BUSINESS_CARD_STALE_REVISION",
+            }
+            else 422,
+            detail=str(error),
+        )
+
+    @application.get("/business-cards", response_class=HTMLResponse, include_in_schema=False)
+    def business_cards_home(actor: Annotated[ConsolePrincipal, Depends(principal)]) -> HTMLResponse:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        return HTMLResponse(
+            Path(__file__).with_name("business_card_ui.html").read_text(encoding="utf-8"),
+            headers={
+                "Cache-Control": "no-store",
+                "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; base-uri 'none'; frame-ancestors 'none'; form-action 'self'",
+                "Referrer-Policy": "no-referrer",
+                "X-Content-Type-Options": "nosniff",
+            },
+        )
+
+    @application.post("/v1/console/business-cards", status_code=status.HTTP_201_CREATED)
+    def create_business_card(
+        payload: BusinessCardRequest,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[BusinessCardStore, Depends(business_cards)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        try:
+            return store.create(
+                tenant_id=str(actor.tenant_id),
+                owner_principal_id=str(actor.principal_id),
+                request=payload,
+            )
+        except BusinessCardError as error:
+            raise business_card_error(error) from None
+
+    @application.get("/v1/console/business-cards")
+    def list_business_cards(
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[BusinessCardStore, Depends(business_cards)],
+    ) -> list[dict[str, object]]:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        return store.list_for_owner(
+            tenant_id=str(actor.tenant_id), owner_principal_id=str(actor.principal_id)
+        )
+
+    @application.get("/v1/console/business-cards/{card_id}")
+    def get_business_card(
+        card_id: str,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[BusinessCardStore, Depends(business_cards)],
+    ) -> dict[str, object]:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        try:
+            return store.get(
+                card_id, tenant_id=str(actor.tenant_id), owner_principal_id=str(actor.principal_id)
+            )
+        except BusinessCardError as error:
+            raise business_card_error(error) from None
+
+    @application.post("/v1/console/business-cards/{card_id}/revisions")
+    def revise_business_card(
+        card_id: str,
+        payload: BusinessCardRevisionRequest,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[BusinessCardStore, Depends(business_cards)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        try:
+            return store.revise(
+                card_id,
+                tenant_id=str(actor.tenant_id),
+                owner_principal_id=str(actor.principal_id),
+                request=payload,
+            )
+        except BusinessCardError as error:
+            raise business_card_error(error) from None
+
+    @application.post("/v1/console/business-cards/{card_id}/rollback/{number}")
+    def rollback_business_card(
+        card_id: str,
+        number: int,
+        payload: BusinessCardRollbackRequest,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[BusinessCardStore, Depends(business_cards)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        try:
+            return store.rollback(
+                card_id,
+                number,
+                tenant_id=str(actor.tenant_id),
+                owner_principal_id=str(actor.principal_id),
+                based_on_revision_digest=payload.based_on_revision_digest,
+            )
+        except BusinessCardError as error:
+            raise business_card_error(error) from None
+
+    @application.get("/v1/console/business-cards/{card_id}/download/{side}.svg")
+    def download_business_card(
+        card_id: str,
+        side: str,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[BusinessCardStore, Depends(business_cards)],
+    ) -> Response:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        try:
+            svg, filename = store.download(
+                card_id,
+                side,
+                tenant_id=str(actor.tenant_id),
+                owner_principal_id=str(actor.principal_id),
+            )
+        except BusinessCardError as error:
+            raise business_card_error(error) from None
         return Response(
             svg,
             media_type="image/svg+xml",

@@ -28,6 +28,7 @@ packages = ["src/apf"]
 "src/apf/visual_dialogue_ui.html" = "apf/visual_dialogue_ui.html"
 "src/apf/conversational_site_draft_ui.html" = "apf/conversational_site_draft_ui.html"
 "src/apf/logo_draft_ui.html" = "apf/logo_draft_ui.html"
+"src/apf/business_card_ui.html" = "apf/business_card_ui.html"
 "src/apf/reference_material_consent_ui.html" = "apf/reference_material_consent_ui.html"
 
 [tool.pytest.ini_options]
