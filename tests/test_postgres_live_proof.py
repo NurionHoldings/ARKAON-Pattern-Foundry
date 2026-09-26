@@ -60,7 +60,8 @@ def test_live_proof_writes_report_when_not_dry_run(tmp_path, monkeypatch):
 
 def test_live_proof_raises_on_failure(monkeypatch, tmp_path):
     monkeypatch.setenv("TEST_DATABASE_URL", "postgresql+psycopg://invalid:invalid@127.0.0.1:1/none")
-    with pytest.raises(PostgresLiveProofRejected, match="POSTGRES_LIVE_PROOF_FAILED"):
+    with pytest.raises(PostgresLiveProofRejected) as error:
         PostgresLiveProofHarness(foundry_root=tmp_path).run(
             now=datetime(2031, 1, 1, tzinfo=UTC), dry_run=True
         )
+    assert error.value.code == "POSTGRES_LIVE_PROOF_FAILED"
