@@ -1,0 +1,70 @@
+{
+  "authorization": {
+    "basis": "SELF_DIAGNOSIS_SELF_GENERATION",
+    "mutate_locked_intent_dna": false,
+    "scope": "MISSING_INTENT_DNA_ONLY"
+  },
+  "completeness": 1.0,
+  "contributor": "ETERNIAN",
+  "evidence_refs": [
+    "config/arkaon-admin-change-control.json",
+    "src/apf/admin_change_control.py"
+  ],
+  "feature_id": "admin-change-control",
+  "feature_intent": {
+    "constraint": [
+      "partial-apply records approved scope intent only; live platform mutation stays outside Foundry; operator-decision inbox promotion requires eternian review digest first; preview-only mode never mutates platform repositories"
+    ],
+    "evolution": [
+      "Pass 1 evidence routing",
+      "Pass 3 human lock"
+    ],
+    "invariant": [
+      "locked Intent_DNA mutation 금지",
+      "propose-only inbox 유지"
+    ],
+    "journey": [
+      "기능 추가 → intent 누락 감지 → Pass-0 seed 자가생성 → inbox 검토"
+    ],
+    "object": [
+      "admin change control"
+    ],
+    "outcome": [
+      "Pass-0 Intent_DNA seed 생성",
+      "에테르니언 검토 후 CORE lock 가능"
+    ],
+    "owner": [
+      "누리온 Foundry 거버넌스",
+      "에테르니언 최종 lock 권한"
+    ],
+    "risk": [
+      "의도 누락 시 학습·승격 경로 단절",
+      "잘못된 seed는 eternian review에서 차단"
+    ],
+    "signal": [
+      "missing_intent_count",
+      "generated_seed_count",
+      "completeness"
+    ],
+    "value": [
+      "admin-change-control 기능의 의도·경계를 기계 판독 가능하게 고정"
+    ],
+    "who": [
+      "범(운영자)",
+      "에테르니언 검토자",
+      "아르카온 자가진단"
+    ],
+    "why": [
+      "ARKAON 관리자 변경 통제·Reflection Bridge (Pattern Foundry #050): Governed admin change control: preview, partial-apply intent, rollback — never auto deploy."
+    ]
+  },
+  "fingerprint": "766b4502b806b28e91bf332f0f8901a91cdfdc39f756900af6c17f9866a279f9",
+  "gates": {
+    "intent_dna_mutation": false,
+    "locked": false,
+    "review_status": "ETERNIAN_REVIEW_REQUIRED"
+  },
+  "pass_stage": 0,
+  "phase": "PASS0_SELF_GENERATED",
+  "schema_version": "apf.feature-intent-seed/v1"
+}

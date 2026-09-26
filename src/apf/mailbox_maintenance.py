@@ -183,15 +183,96 @@ def _plan_document(
     return document
 
 
+def reconcile_mailbox_index(*, foundry_root: Path, now: datetime | None = None) -> dict[str, Any]:
+    """Close ghost PENDING items whose inbox payloads were archived or already fulfilled."""
+    root = foundry_root.resolve()
+    stamp = now or datetime.now(UTC)
+    items_root = root / "state" / "mailbox" / "items"
+    archive_root = root / "archive" / "mailbox"
+    fulfillment_root = root / "state" / "mailbox" / "fulfillment-queue"
+
+    fulfilled_item_ids: set[str] = set()
+    for path in fulfillment_root.glob("*.json") if fulfillment_root.is_dir() else ():
+        document = _load(path)
+        if document is None:
+            continue
+        if str(document.get("status", "")).upper() == "COMPLETED":
+            fulfilled_item_ids.add(str(document.get("item_id", "")))
+
+    counts = {
+        "fulfillment_completed": 0,
+        "payload_archived": 0,
+        "payload_missing": 0,
+        "still_pending": 0,
+        "active_inbox_pending": 0,
+    }
+    for path in sorted(items_root.glob("*.json")) if items_root.is_dir() else ():
+        document = _load(path)
+        if document is None:
+            continue
+        if _status(document) != "PENDING":
+            continue
+        item_id = str(document.get("item_id", path.stem))
+        payload_rel = str(document.get("payload_path", ""))
+        payload_path = root.joinpath(*payload_rel.split("/")) if payload_rel else None
+
+        if item_id in fulfilled_item_ids:
+            document["status"] = "FULFILLED"
+            document["reconciled_at"] = stamp.isoformat()
+            document["reconcile_reason"] = "fulfillment_completed"
+            path.write_text(json.dumps(document, ensure_ascii=False, indent=2), encoding="utf-8")
+            counts["fulfillment_completed"] += 1
+            continue
+
+        if payload_path is not None and payload_path.is_file():
+            counts["still_pending"] += 1
+            try:
+                payload_path.relative_to(root / "inbox")
+                counts["active_inbox_pending"] += 1
+            except ValueError:
+                pass
+            continue
+
+        payload_name = Path(payload_rel).name if payload_rel else ""
+        archived = (
+            list(archive_root.rglob(payload_name))
+            if payload_name and archive_root.is_dir()
+            else []
+        )
+        document["status"] = "FULFILLED"
+        document["reconciled_at"] = stamp.isoformat()
+        if archived:
+            document["reconcile_reason"] = "payload_archived"
+            document["archived_payload_path"] = archived[0].relative_to(root).as_posix()
+            counts["payload_archived"] += 1
+        else:
+            document["reconcile_reason"] = "payload_missing"
+            counts["payload_missing"] += 1
+        path.write_text(json.dumps(document, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    return {
+        "schema_version": "apf.mailbox-reconcile-report/v1",
+        "reconciled_at": stamp.isoformat(),
+        "counts": counts,
+    }
+
+
 def run_maintenance(
     *,
     foundry_root: Path,
     batch_size: int = 30,
     apply_archive_changes: bool = False,
+    reconcile_index: bool = False,
     summary_only: bool = False,
     report_path: Path | None = None,
 ) -> dict[str, Any]:
     root = foundry_root.resolve()
+    reconcile_report: dict[str, Any] | None = None
+    if reconcile_index:
+        reconcile_report = reconcile_mailbox_index(foundry_root=root)
+        from .arkaon_mailbox import ArkaonMailbox
+
+        ArkaonMailbox(foundry_root=root).sync_from_inbox(now=datetime.now(UTC))
     plan = build_plan(
         root / "inbox",
         batch_size=batch_size,
@@ -216,14 +297,23 @@ def run_maintenance(
         json.dumps(full_document, ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
-    if summary_only:
-        return _plan_document(
-            plan,
-            batch_size=batch_size,
-            moved=moved,
-            summary_only=True,
+    if reconcile_report is not None:
+        reconcile_path = root / "state" / "mailbox-reconcile-latest.json"
+        reconcile_path.write_text(
+            json.dumps(reconcile_report, ensure_ascii=False, indent=2),
+            encoding="utf-8",
         )
-    return full_document
+    output = full_document if not summary_only else _plan_document(
+        plan,
+        batch_size=batch_size,
+        moved=moved,
+        summary_only=True,
+    )
+    if reconcile_report is not None and not summary_only:
+        output = {**output, "reconcile": reconcile_report}
+    elif reconcile_report is not None:
+        output = {**output, "reconcile": reconcile_report["counts"]}
+    return output
 
 
 def main() -> int:
@@ -231,6 +321,7 @@ def main() -> int:
     parser.add_argument("--foundry-root", type=Path, default=Path.cwd())
     parser.add_argument("--batch-size", type=int, default=30)
     parser.add_argument("--apply-archive", action="store_true")
+    parser.add_argument("--reconcile-index", action="store_true")
     parser.add_argument("--summary", action="store_true")
     parser.add_argument("--report-path", type=Path)
     arguments = parser.parse_args()
@@ -238,6 +329,7 @@ def main() -> int:
         foundry_root=arguments.foundry_root,
         batch_size=arguments.batch_size,
         apply_archive_changes=arguments.apply_archive,
+        reconcile_index=arguments.reconcile_index,
         summary_only=arguments.summary,
         report_path=arguments.report_path,
     )

@@ -1,0 +1,102 @@
+{
+  "schema_version": "apf.landing-intent-seed/v1",
+  "seed_id": "APF-LANDING-INTENT-AI-ABA-001",
+  "platform": {
+    "id": "AI_ABA",
+    "name": "AI-ABA",
+    "ownership": "FIRST_PARTY_USER_DECLARED",
+    "platform_type": "AI_CLINICAL_EDUCATION_SUPPORT"
+  },
+  "phase": "EXTERNAL_LEARNING_ONLY",
+  "authorization": {
+    "basis": "OWNER_AUTHORIZED_LANDING_LEARNING",
+    "scope": "STRUCTURAL_AND_ANGLE_OBSERVATION_NO_VERBATIM_COPY",
+    "evidence_ref": "sha256:0000000000000000000000000000000000000000000000000000000000000006"
+  },
+  "conversion": {
+    "primary_goal": "BCBA_OR_CLINIC_INQUIRY",
+    "secondary_goals": ["WEBINAR_REGISTER", "RESOURCE_LIBRARY_ACCESS"],
+    "success_signals": ["professional_inquiry_submit", "credential_verified_signup", "evidence_library_view"]
+  },
+  "landing_intent": {
+    "why": [
+      "ABA·행동중재 workflow를 evidence-based assist로 보조한다",
+      "clinical decision·diagnosis는 licensed professional only임을 landing에서 고정한다"
+    ],
+    "who": [
+      "BCBA·임상가·센터 운영 staff",
+      "caregiver education resource를 찾는 보호자(secondary)",
+      "institution procurement researcher"
+    ],
+    "value": [
+      "data collection·session note·program tracking assist(claim 범위)",
+      "evidence citation structure·outcome measurement framing",
+      "institutional compliance·audit-friendly workflow hints"
+    ],
+    "outcome": [
+      "qualified professional inquiry or verified signup",
+      " cure·diagnosis guarantee claim 0",
+      "학습: evidence-block vs professional inquiry rate digest"
+    ],
+    "journey": [
+      "Hero(problem in clinic workflow) → Professional scope → Evidence approach → Compliance → Inquiry CTA",
+      "consumer direct purchase path는 policy confirm 전 landing에 노출하지 않음"
+    ],
+    "object": [
+      "AI-ABA clinical/education support tooling",
+      "training·resource library(abstract)"
+    ],
+    "owner": [
+      "AI-ABA 운영·clinical advisory 주체",
+      "Foundry는 patient record·session raw 미수집"
+    ],
+    "invariant": [
+      "HIPAA·medical device·clinical claim boundary 유지",
+      "patient identifiable landing form 금지",
+      "peer-reviewed cite는 structure+digest; 논문 full text 미저장"
+    ],
+    "constraint": [
+      "outcome guarantee·single-case miracle claim 금지",
+      "ABA trademark·certification misuse 금지",
+      "competitor clinical AI copy verbatim 금지"
+    ],
+    "risk": [
+      "unlicensed clinical advice perception",
+      "weak BCBA review loop messaging",
+      "caregiver vs clinician audience confusion"
+    ],
+    "signal": [
+      "professional_scope_block",
+      "evidence_citation_structure",
+      "compliance_faq_present",
+      "credential_gated_cta"
+    ],
+    "evolution": [
+      "1단계: clinical/education AI landing evidence-first pattern 학습",
+      "2단계: clinic vs caregiver 분야 요청 시 proposal split"
+    ]
+  },
+  "learning_focus": {
+    "external_budget_share": 0.65,
+    "priority_patterns": [
+      "evidence-before-cta",
+      "professional-scope-boundary",
+      "compliance-faq-block",
+      "credential-gated-signup"
+    ],
+    "copy_angle_tags": [
+      "workflow-efficiency",
+      "measurement-transparency",
+      "bcba-collaboration",
+      "audit-ready-documentation"
+    ],
+    "observation_surfaces": ["PUBLIC_LANDING", "EVIDENCE_SECTION_LAYOUT", "PROFESSIONAL_INQUIRY_FORM"]
+  },
+  "gates": {
+    "intent_dna_mutation": false,
+    "owned_asset_promotion": false,
+    "automatic_publish": false,
+    "verbatim_competitor_storage": false,
+    "review_status": "ETHERNIAN_REVIEW_REQUIRED"
+  }
+}

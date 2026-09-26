@@ -1,0 +1,12 @@
+{
+  "schema_version": "apf.arkaon-pattern-promotion/v1",
+  "production_promotion_allowed": false,
+  "minimum_reuse_patterns": 3,
+  "ethernian_public_key_b64": null,
+  "accept_test_vector_decisions": false,
+  "notes": [
+    "runtime exposes verification only; eternian private key stays outside Foundry",
+    "populate config/pattern-promotion-manifest.json with externally signed decisions",
+    "TEST_VECTOR decisions are accepted only when accept_test_vector_decisions is true"
+  ]
+}

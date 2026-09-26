@@ -1,0 +1,11 @@
+{
+  "schema_version": "apf.user-feature-proposal/v1",
+  "enabled": true,
+  "require_payment_entitlement": true,
+  "maximum_features_per_proposal": 5,
+  "emit_operator_notice": true,
+  "notes": [
+    "Propose newly evolved ARKAON capabilities to paid users based on improvement analysis",
+    "Users can start Co-Creation via feature_offers[].suggested_prompt"
+  ]
+}

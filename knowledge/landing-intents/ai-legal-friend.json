@@ -1,0 +1,102 @@
+{
+  "schema_version": "apf.landing-intent-seed/v1",
+  "seed_id": "APF-LANDING-INTENT-AI-LEGAL-FRIEND-001",
+  "platform": {
+    "id": "AI_LEGAL_FRIEND",
+    "name": "AI법친",
+    "ownership": "FIRST_PARTY_USER_DECLARED",
+    "platform_type": "AI_PROFESSIONAL_SUPPORT"
+  },
+  "phase": "EXTERNAL_LEARNING_ONLY",
+  "authorization": {
+    "basis": "OWNER_AUTHORIZED_LANDING_LEARNING",
+    "scope": "STRUCTURAL_AND_ANGLE_OBSERVATION_NO_VERBATIM_COPY",
+    "evidence_ref": "sha256:0000000000000000000000000000000000000000000000000000000000000004"
+  },
+  "conversion": {
+    "primary_goal": "QUALIFIED_CONSULTATION_LEAD",
+    "secondary_goals": ["FREE_TRIAL", "DOCUMENT_TEMPLATE_DOWNLOAD"],
+    "success_signals": ["consultation_request", "trial_start_with_disclaimer_ack", "faq_engagement"]
+  },
+  "landing_intent": {
+    "why": [
+      "법률·행정 정보 접근 장벽을 낮추되 변호사·전문가 대체 아님을 명확히 한다",
+      "trust-first landing으로 qualified lead만 전환한다"
+    ],
+    "who": [
+      "개인·소상공인·스타트업의 초기 법률 정보 탐색자",
+      "AI assist를 원하지만 professional escalation path가 필요한 사용자",
+      "공식 FAQ·가이드에서 랜딩으로 referral된 traffic"
+    ],
+    "value": [
+      "24h 정보 탐색·초안·체크리스트(claim 범위 내)",
+      "명확한 disclaimer·human expert handoff",
+      "영역별 use case (근로·계약·지식재산 등 abstract tag)"
+    ],
+    "outcome": [
+      "disclaimer 확인 후 consultation/trial conversion",
+      "‘100% 승소’ 등 금지 claim 0",
+      "학습: disclaimer-above-fold vs qualified lead rate"
+    ],
+    "journey": [
+      "Hero(문제 awareness) → Scope/Not-a-lawyer → Use cases → Trust(credentials digest) → CTA(상담/체험)",
+      "결제·개인 사건 detail form은 post-qualification"
+    ],
+    "object": [
+      "AI법친 정보·assist 서비스",
+      "상담·전문가 연결 채널"
+    ],
+    "owner": [
+      "AI법친 운영·법무 검토 주체",
+      "Foundry는 판례·client matter raw 미수집"
+    ],
+    "invariant": [
+      "법률 advice claim은 licensed professional boundary 유지",
+      "disclaimer omit 0 on primary CTA path",
+      "경쟁 legal tech 카피 verbatim 금지"
+    ],
+    "constraint": [
+      "승소율·결과 보장 표현 금지",
+      "사건 fact·PII landing field 금지",
+      "학술·공식 법령은 cite structure only"
+    ],
+    "risk": [
+      "unauthorized practice of law perception",
+      "과도한 AI automation promise",
+      "weak escalation path"
+    ],
+    "signal": [
+      "disclaimer_above_primary_cta",
+      "human_escalation_visible",
+      "use_case_segmentation",
+      "credential_digest_present"
+    ],
+    "evolution": [
+      "1단계: professional AI support landing trust pattern 학습",
+      "2단계: 분야(근로/계약 등) 요청 시 angle·section proposal"
+    ]
+  },
+  "learning_focus": {
+    "external_budget_share": 0.65,
+    "priority_patterns": [
+      "disclaimer-before-cta",
+      "trust-credentials-block",
+      "use-case-segmentation",
+      "qualified-lead-form-minimal"
+    ],
+    "copy_angle_tags": [
+      "problem-awareness",
+      "not-a-lawyer-boundary",
+      "checklist-lead-magnet",
+      "expert-handoff"
+    ],
+    "observation_surfaces": ["PUBLIC_LANDING", "DISCLAIMER_PLACEMENT", "APPROVED_CAMPAIGN_METRICS"]
+  },
+  "gates": {
+    "intent_dna_mutation": false,
+    "owned_asset_promotion": false,
+    "automatic_publish": false,
+    "verbatim_competitor_storage": false,
+    "review_status": "ETHERNIAN_REVIEW_REQUIRED"
+  }
+}
