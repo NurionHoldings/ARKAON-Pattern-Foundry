@@ -1,0 +1,19 @@
+{
+  "schema_version": "apf.research-watch-sources/v1",
+  "sources": [
+    {
+      "watch_id": "foundry-readiness",
+      "kind": "LOCAL_MANIFEST",
+      "path": "knowledge/readiness/v0.1-readiness.json",
+      "platform_id": "ARKAON_FOUNDRY",
+      "enabled": true
+    },
+    {
+      "watch_id": "shared-policy",
+      "kind": "LOCAL_MANIFEST",
+      "path": "config/shared-policy.json",
+      "platform_id": "ARKAON_FOUNDRY",
+      "enabled": true
+    }
+  ]
+}

@@ -4,6 +4,7 @@
   "startup_trigger": "OS_BOOT",
   "collect_immediately": true,
   "interval_seconds": 900,
+  "hourly_learning_schedule": "config/arkaon-hourly-learning-schedule.json",
   "external_target_ratio": 0.65,
   "internal_target_ratio": 0.35,
   "minimum_intent_relevance": 0.30,
@@ -41,5 +42,127 @@
     "INDEPENDENTLY_VERIFIED",
     "OWNED_ASSET"
   ],
-  "audit_every_decision": true
+  "audit_every_decision": true,
+  "sources": [
+    {
+      "source_id": "mdn-css-animations",
+      "kind": "OFFICIAL_STANDARD",
+      "locator": "https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_animations",
+      "intent_relevance": 0.88,
+      "license_clarity": 0.92,
+      "domain_ids": ["TYPOGRAPHY_MOTION", "SIGNATURE_MOTION"],
+      "robots_allowed": true,
+      "terms_allowed": true
+    },
+    {
+      "source_id": "mdn-color-contrast",
+      "kind": "OFFICIAL_STANDARD",
+      "locator": "https://developer.mozilla.org/en-US/docs/Web/Accessibility/Understanding_WCAG/Perceivable/Color_contrast",
+      "intent_relevance": 0.86,
+      "license_clarity": 0.92,
+      "domain_ids": ["TYPOGRAPHY_MOTION", "HOME_SURFACE_OPTIMIZATION"],
+      "robots_allowed": true,
+      "terms_allowed": true
+    },
+    {
+      "source_id": "mdn-html-structure",
+      "kind": "OFFICIAL_STANDARD",
+      "locator": "https://developer.mozilla.org/en-US/docs/Web/HTML",
+      "intent_relevance": 0.82,
+      "license_clarity": 0.92,
+      "domain_ids": ["TEMPLATE_COMPOSITION", "HOME_SURFACE_OPTIMIZATION"],
+      "robots_allowed": true,
+      "terms_allowed": true
+    },
+    {
+      "source_id": "mdn-forms-auth",
+      "kind": "OFFICIAL_STANDARD",
+      "locator": "https://developer.mozilla.org/en-US/docs/Learn/Forms",
+      "intent_relevance": 0.84,
+      "license_clarity": 0.92,
+      "domain_ids": ["AUTH_ONBOARDING_UX"],
+      "robots_allowed": true,
+      "terms_allowed": true
+    },
+    {
+      "source_id": "mdn-payment-request",
+      "kind": "OFFICIAL_STANDARD",
+      "locator": "https://developer.mozilla.org/en-US/docs/Web/API/Payment_Request_API",
+      "intent_relevance": 0.83,
+      "license_clarity": 0.90,
+      "domain_ids": ["PAYMENT_CHECKOUT_FLOW"],
+      "robots_allowed": true,
+      "terms_allowed": true
+    },
+    {
+      "source_id": "mdn-view-transitions",
+      "kind": "OFFICIAL_STANDARD",
+      "locator": "https://developer.mozilla.org/en-US/docs/Web/API/View_Transitions_API",
+      "intent_relevance": 0.80,
+      "license_clarity": 0.90,
+      "domain_ids": ["SIGNATURE_MOTION", "VIDEO_TEMPLATE_EFFECTS"],
+      "robots_allowed": true,
+      "terms_allowed": true
+    },
+    {
+      "source_id": "web-dev-animation-performance",
+      "kind": "OFFICIAL_STANDARD",
+      "locator": "https://web.dev/articles/animations-guide",
+      "intent_relevance": 0.85,
+      "license_clarity": 0.88,
+      "domain_ids": ["SIGNATURE_MOTION", "VIDEO_TEMPLATE_EFFECTS"],
+      "robots_allowed": true,
+      "terms_allowed": true
+    },
+    {
+      "source_id": "w3c-wcag-contrast",
+      "kind": "OFFICIAL_STANDARD",
+      "locator": "https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum.html",
+      "intent_relevance": 0.80,
+      "license_clarity": 0.95,
+      "domain_ids": ["TYPOGRAPHY_MOTION", "HOME_SURFACE_OPTIMIZATION"],
+      "robots_allowed": true,
+      "terms_allowed": true
+    },
+    {
+      "source_id": "python-packaging-version",
+      "kind": "OFFICIAL_STANDARD",
+      "locator": "https://packaging.python.org/en/latest/discussions/versioning/",
+      "intent_relevance": 0.72,
+      "license_clarity": 0.95,
+      "domain_ids": ["LIFECYCLE_STEWARDSHIP", "CROSS_FEATURE_COHERENCE"],
+      "robots_allowed": true,
+      "terms_allowed": true
+    },
+    {
+      "source_id": "openapi-spec",
+      "kind": "OFFICIAL_STANDARD",
+      "locator": "https://spec.openapis.org/oas/latest.html",
+      "intent_relevance": 0.78,
+      "license_clarity": 0.95,
+      "domain_ids": ["CROSS_FEATURE_COHERENCE", "LIFECYCLE_STEWARDSHIP", "EMERGING_MARKET_SIGNALS"],
+      "robots_allowed": true,
+      "terms_allowed": true
+    },
+    {
+      "source_id": "w3c-standards-tr-index",
+      "kind": "OFFICIAL_STANDARD",
+      "locator": "https://www.w3.org/TR/",
+      "intent_relevance": 0.76,
+      "license_clarity": 0.95,
+      "domain_ids": ["EMERGING_MARKET_SIGNALS", "CROSS_FEATURE_COHERENCE"],
+      "robots_allowed": true,
+      "terms_allowed": true
+    },
+    {
+      "source_id": "spdx-license-list",
+      "kind": "OFFICIAL_STANDARD",
+      "locator": "https://spdx.org/licenses/",
+      "intent_relevance": 0.70,
+      "license_clarity": 0.98,
+      "domain_ids": ["EMERGING_MARKET_SIGNALS", "LIFECYCLE_STEWARDSHIP"],
+      "robots_allowed": true,
+      "terms_allowed": true
+    }
+  ]
 }

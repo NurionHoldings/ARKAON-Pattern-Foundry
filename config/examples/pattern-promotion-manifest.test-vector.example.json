@@ -1,0 +1,60 @@
+{
+  "schema_version": "apf.pattern-promotion-manifest/v1",
+  "catalog_revision": "3037b8a4d4cb1e65057e027aa2b8ee22c0a7b5b77c4fb21f820e4d4996b50be2",
+  "decisions": [
+    {
+      "pattern_id": "apf.public.authorized-origin-allowlist",
+      "source": "TEST_VECTOR",
+      "decision": {
+        "pattern_id": "apf.public.authorized-origin-allowlist",
+        "catalog_revision": "3037b8a4d4cb1e65057e027aa2b8ee22c0a7b5b77c4fb21f820e4d4996b50be2",
+        "package_hash": "11992dffc1bb609f250616645941b64f0b1ffd040e6b8e67b585833a0b0d610e",
+        "evidence_digest": "f184e2ece5e9e3f17fe65acd4d2534019896667ed7c6108f902eb32541566bfd",
+        "test_digest": "7e4e2b598b8f6435a57b052974495cf289edbbac62cc0b8b0e786de5a6263e23",
+        "policy": "apf.public-pattern-promotion/1.0",
+        "expires_at": "2030-01-01T00:00:00Z",
+        "nonce": "demo-test-vector-0",
+        "decision": "PUBLIC_PATTERN_APPROVED",
+        "owned_asset": false
+      },
+      "signature": "ygUcogmi_ZwGu0mptX2FGgHcWoKLHCxQfuzgnBvG5oR9DqA1dMt-oNOYLXmoBJU-ybJLvs102Kbl0NvQRGxKAg"
+    },
+    {
+      "pattern_id": "apf.public.bounded-collection-budget",
+      "source": "TEST_VECTOR",
+      "decision": {
+        "pattern_id": "apf.public.bounded-collection-budget",
+        "catalog_revision": "3037b8a4d4cb1e65057e027aa2b8ee22c0a7b5b77c4fb21f820e4d4996b50be2",
+        "package_hash": "5a7534d184be3f005fb9ef01f20b4c5879470a2c3f5b0ae0c9d65f26dd90c1b2",
+        "evidence_digest": "e6b4c6ff82a75e734b443f9d4bebc975d54879f5451a5772e2f1e0b7b542954d",
+        "test_digest": "9d4446509e55abfc1187e8cabbbe822d53b8966f5b24e068a3b966c82f4da9f2",
+        "policy": "apf.public-pattern-promotion/1.0",
+        "expires_at": "2030-01-01T00:00:00Z",
+        "nonce": "demo-test-vector-1",
+        "decision": "PUBLIC_PATTERN_APPROVED",
+        "owned_asset": false
+      },
+      "signature": "TJDUYVAP1jx-kzsiujJqMOCHqRGdIT21iEQ6CmixUc3S5YZyKXQ9H_r7I81aqML-e2k7e3eqmD3g6gyPopsPDA"
+    },
+    {
+      "pattern_id": "apf.public.candidate-not-asset",
+      "source": "TEST_VECTOR",
+      "decision": {
+        "pattern_id": "apf.public.candidate-not-asset",
+        "catalog_revision": "3037b8a4d4cb1e65057e027aa2b8ee22c0a7b5b77c4fb21f820e4d4996b50be2",
+        "package_hash": "b0350acb3e1cdde8829845b202cd08f62809269bd9d001ce5cefe699ae86d413",
+        "evidence_digest": "aaa2639e8d0ac6b5920fdc9bff93a48508542c13732a15f36ceb311fef8ebb33",
+        "test_digest": "a04a7bfda50a14d9e738e96e7e6c21f883842fc8617847407a3ff04f68e53393",
+        "policy": "apf.public-pattern-promotion/1.0",
+        "expires_at": "2030-01-01T00:00:00Z",
+        "nonce": "demo-test-vector-2",
+        "decision": "PUBLIC_PATTERN_APPROVED",
+        "owned_asset": false
+      },
+      "signature": "zEw6Ish8SaXnKRFU1jtgk-ltkhAaLrV2dI0zVWc__uArOMi7wUhg4FWG6I4ZxykMh976oTd7tYqvlyGIGYFlBg"
+    }
+  ],
+  "notes": [
+    "TEST_VECTOR demo only; not a production eternian approval"
+  ]
+}

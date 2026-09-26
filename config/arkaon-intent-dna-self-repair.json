@@ -1,0 +1,18 @@
+{
+  "schema_version": "apf.intent-dna-self-repair/v1",
+  "enabled": true,
+  "self_generation_allowed": true,
+  "mutate_locked_intent_dna": false,
+  "scan_feature_configs": true,
+  "scan_inbox_packets": true,
+  "minimum_completeness": 0.85,
+  "emit_research_packet": true,
+  "emit_eternian_packet": true,
+  "automatic_implement_allowed": false,
+  "production_change_allowed": false,
+  "notes": [
+    "Beom/Eternian-added features without Intent_DNA are detected and Pass-0 seeds may be self-generated.",
+    "Self-generation is authorized only for missing DNA; locked CORE DNA mutation remains forbidden.",
+    "Generated seeds stay PROPOSED until eternian review."
+  ]
+}

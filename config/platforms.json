@@ -1,6 +1,6 @@
 {
   "schema_version": "apf.central-platforms/v1",
-  "foundry_root": "D:\\ARKAON_Pattern Foundry",
+  "foundry_root": "${FOUNDRY_ROOT}",
   "platforms": [
     {
       "id": "NARANG_RIDER",
