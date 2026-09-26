@@ -26,7 +26,14 @@
   ],
   "assetization_exception_requires": [
     "provenance_recorded",
-    "no_source_code_copy"
+    "no_source_code_copy",
+    "rights_review_passed",
+    "owner_approval_digest",
+    "independent_implementation",
+    "original_expression_excluded",
+    "distinctive_category_count_gte_2",
+    "functional_distinction",
+    "similarity_review_passed"
   ],
   "assetization_route": [
     "REFERENCE_COLLECTED",

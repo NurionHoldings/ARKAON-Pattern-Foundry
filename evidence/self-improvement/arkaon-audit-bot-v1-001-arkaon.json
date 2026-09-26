@@ -1,0 +1,29 @@
+{
+  "schema_version": "apf.arkaon-verification-evidence/1.0",
+  "request_id": "arkaon-audit-bot-v1-001",
+  "scope_digest": "b6faa3133c7b8f7bee4ff08d58b198c32ebbca6b1df416b8bb074b7c440ede35",
+  "state": "ARKAON_VERIFIED",
+  "verified_at": "2026-09-19T11:28:53+09:00",
+  "base_sha": "f0d17807f4089362a9b260dd1e0f3fcd9f1170c4",
+  "candidate_sha": "3db0a553accac40ddc38c8c28e7422d7ac8aaaa1",
+  "checks": [
+    "focused audit and learning tests: 9 PASS",
+    "full regression: 603 PASS / 5 SKIP",
+    "ruff src tests tools: PASS",
+    "self-audit decision: PASS with merge_allowed=false and deployment_allowed=false"
+  ],
+  "test_result_digest": "sha256:765b6919c22962c58b8d865976cdb22c042bbd78b1710745aa83c3686da05688",
+  "self_audit_manifest_digest": "sha256:15681524748f65bf9aa12985486a122533c8485bbdabfd77262a32d8b7ff33c4",
+  "self_audit_evidence_digest": "sha256:e055474466cfb5e7bab175eab35e559dd8310b66bfc757e14bb6a4ee5ee7bc0f",
+  "artifact_sha256": {
+    "config/arkaon-audit-bot.json": "sha256:48802baa1546668d83806d7d2ee01d517331969634b3c76c910c9e96b205ac0c",
+    "docs/63-arkaon-audit-bot.md": "sha256:bba2ee1a5334cfc755ef20a5ed0fdb582f6921977912709732e14120a44186c0",
+    "src/apf/arkaon_audit_bot.py": "sha256:4fbc6b65a70b8c9d11eb0fc879b6dc09c149c9652a945b0a294cf4e90e129b3e",
+    "src/apf/audit_bot_learning.py": "sha256:e42ed25f7334400c838a94f4843951fff749ebca3616a187ff0c3479eee81cb3",
+    "tests/test_arkaon_audit_bot.py": "sha256:9efc0765ea679d09ad9f954d31fbe634d77012e534b426bfbd25e266c5a86051",
+    "tests/test_audit_bot_learning.py": "sha256:842389d1ac252eb32b25f062a7d4f8bb240a59539bac0e6cfba480e4050e7864",
+    "tools/run_arkaon_audit_bot.py": "sha256:b0140107e39645b55f6001f6e1f4bb2f95be2be0e8626916912e1d71b50b6546"
+  },
+  "automatic_merge_allowed": false,
+  "deployment_allowed": false
+}

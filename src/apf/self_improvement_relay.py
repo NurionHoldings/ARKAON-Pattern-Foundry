@@ -13,7 +13,16 @@ from hashlib import sha256
 from pathlib import Path
 from typing import Protocol
 
+from .arkaon_audit_bot import AuditBotError, AuditDecision
+from .audit_bot_internal import InternalAuditResult, run_internal_integrity_audit
+from .audit_bot_runtime import AuditQueueResult, process_audit_queue
 from .mailbox_maintenance import run_maintenance
+from .self_improvement_execution import (
+    ApprovalSource,
+    ApprovalSyncResult,
+    GhApprovalSource,
+    sync_approval_receipts,
+)
 
 
 class RelayError(RuntimeError):
@@ -43,6 +52,9 @@ class BlockedPacket:
 class RelayCycle:
     delivered: tuple[RelayReceipt, ...]
     blocked: tuple[BlockedPacket, ...]
+    approvals: ApprovalSyncResult | None
+    audits: AuditQueueResult | None
+    internal_audit: InternalAuditResult | None
     mailbox: dict[str, object]
 
 
@@ -211,15 +223,75 @@ def relay_once(
         lock_path.unlink(missing_ok=True)
 
 
-def relay_cycle(*, foundry_root: Path, publisher: Publisher, batch_size: int = 30) -> RelayCycle:
+def relay_cycle(
+    *,
+    foundry_root: Path,
+    publisher: Publisher,
+    batch_size: int = 30,
+    approval_source: ApprovalSource | None = None,
+    audit_repository_root: Path | None = None,
+    audit_policy_path: Path | None = None,
+    deployment_baseline_path: Path | None = None,
+) -> RelayCycle:
     delivered, blocked = relay_once(foundry_root=foundry_root, publisher=publisher)
+    approvals = None
+    if approval_source is not None:
+        receipts = _load_receipts(foundry_root / "state" / "self-improvement-relay.json")
+        approvals = sync_approval_receipts(
+            foundry_root=foundry_root,
+            source=approval_source,
+            requests={
+                request_id: receipt["scope_digest"]
+                for request_id, receipt in receipts.items()
+                if isinstance(receipt.get("scope_digest"), str)
+            },
+        )
+    audits = None
+    if audit_repository_root is not None or audit_policy_path is not None:
+        if audit_repository_root is None or audit_policy_path is None:
+            raise RelayError("AUDIT_RUNTIME_CONFIGURATION_INCOMPLETE")
+        try:
+            audits = process_audit_queue(
+                foundry_root=foundry_root,
+                repository_root=audit_repository_root,
+                policy_path=audit_policy_path,
+                max_jobs=min(batch_size, 30),
+            )
+        except (AuditBotError, OSError, json.JSONDecodeError) as exc:
+            audits = AuditQueueResult((), (), (f"RUNTIME:{exc!s}",))
+    internal_audit = None
+    if deployment_baseline_path is not None:
+        if audit_repository_root is None or audit_policy_path is None:
+            raise RelayError("INTERNAL_AUDIT_CONFIGURATION_INCOMPLETE")
+        try:
+            internal_audit = run_internal_integrity_audit(
+                foundry_root=foundry_root,
+                repository_root=audit_repository_root,
+                policy_path=audit_policy_path,
+                baseline_path=deployment_baseline_path,
+            )
+        except (AuditBotError, OSError, json.JSONDecodeError) as exc:
+            reason = f"BLOCKED:INTERNAL_AUDIT_RUNTIME:{exc!s}"
+            digest = "sha256:" + sha256(reason.encode()).hexdigest()
+            internal_audit = InternalAuditResult(
+                AuditDecision.BLOCKED,
+                (reason,),
+                digest,
+            )
     mailbox = run_maintenance(
         foundry_root=foundry_root,
         batch_size=batch_size,
         apply_archive_changes=True,
         summary_only=True,
     )
-    return RelayCycle(delivered=delivered, blocked=blocked, mailbox=mailbox)
+    return RelayCycle(
+        delivered=delivered,
+        blocked=blocked,
+        approvals=approvals,
+        audits=audits,
+        internal_audit=internal_audit,
+        mailbox=mailbox,
+    )
 
 
 class GhPublisher:
@@ -327,13 +399,26 @@ def main() -> int:
     )
     parser.add_argument("--watch-seconds", type=int, default=0)
     parser.add_argument("--mailbox-batch-size", type=int, default=30)
+    parser.add_argument("--audit-policy", type=Path)
+    parser.add_argument("--deployment-baseline", type=Path)
     arguments = parser.parse_args()
     publisher = GhPublisher(arguments.repository)
+    approval_source = GhApprovalSource(arguments.repository)
+    audit_policy = arguments.audit_policy or (
+        arguments.foundry_root / "config" / "arkaon-audit-bot.json"
+    )
+    deployment_baseline = arguments.deployment_baseline or (
+        arguments.foundry_root / "state" / "audit-bot-deployment-baseline.json"
+    )
     while True:
         relay_cycle(
             foundry_root=arguments.foundry_root.resolve(),
             publisher=publisher,
             batch_size=arguments.mailbox_batch_size,
+            approval_source=approval_source,
+            audit_repository_root=arguments.foundry_root.resolve(),
+            audit_policy_path=audit_policy.resolve(),
+            deployment_baseline_path=deployment_baseline.resolve(),
         )
         if arguments.watch_seconds <= 0:
             return 0

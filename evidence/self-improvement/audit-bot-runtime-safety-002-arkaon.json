@@ -1,0 +1,30 @@
+{
+  "schema_version": "apf.arkaon-verification-evidence/1.0",
+  "request_id": "audit-bot-runtime-safety-002",
+  "scope_digest": "5b93a54db6d09cdfaf5d8675b07c4a8548de4f6358e6e322481978a7c942eb08",
+  "state": "ARKAON_VERIFIED",
+  "candidate_sha": "dca637ee0e699e58c7858e80be19df646aecfbb0",
+  "checks": [
+    "focused runtime, learning, internal audit, approval and relay tests: 36 PASS on Windows CI",
+    "local full regression: 619 PASS / 5 SKIP",
+    "Linux GitHub test job: GREEN",
+    "PostgreSQL integration: GREEN",
+    "Windows audit-controls: GREEN after UTF-8 remediation",
+    "Ruff: PASS"
+  ],
+  "test_result_digest": "sha256:edd8aad41e6c9aa006c4592c18658be9b247ce9e7306447dae7bbaaa0c3ec2f3",
+  "self_audit_manifest_file_digest": "sha256:69267d17da35f0a7c9842362dd7665096a0eecadac4f587e8e89e7f459c2006a",
+  "self_audit_evidence_digest": "sha256:81898973b90ad915c75d25a21e8c1fa51939741ebf804deef91f7a3ddefdb0f6",
+  "self_audit_decision": "HOLD_PROTECTED_CONTROLS_REQUIRE_INDEPENDENT_REVIEW",
+  "artifact_sha256": {
+    ".github/workflows/ci.yml": "sha256:08d5921c6defbffef034e130c70bd8c911f362709f9f42e850faa22f9bf871a6",
+    "config/arkaon-audit-bot.json": "sha256:0b9500079aa086d427960ac5c0048c7972b9580d96b3110773fc5a7d8c162af4",
+    "src/apf/audit_bot_internal.py": "sha256:3d7fc53901e35cf902527d80dbc9efcf9dea885d5ae70d8f2ad939a2d499fa46",
+    "src/apf/audit_bot_learning.py": "sha256:5f8803bfb86647812e0526d9e94156fd44109136ffa5cc7116928bbfba59e1a4",
+    "src/apf/audit_bot_runtime.py": "sha256:6870518c7ee9383e85899961b2ae499613c34b4cd36fb51b520df2830ef8d7ac",
+    "src/apf/self_improvement_execution.py": "sha256:2f9d508ef59ce0d55f130616d1d731162fb7d8509d9cc40132785c9a9efdc49b",
+    "src/apf/self_improvement_relay.py": "sha256:bb58328662deeeee7e0650fd5657c9874b5d44959ef421f34db3e23782b3b8ba"
+  },
+  "automatic_merge_allowed": false,
+  "deployment_allowed": false
+}

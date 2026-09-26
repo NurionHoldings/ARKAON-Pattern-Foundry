@@ -61,6 +61,22 @@ class WorktreeRunResult:
     stderr_digest: str
 
 
+@dataclass(frozen=True)
+class ApprovalQueueEntry:
+    request_id: str
+    scope_digest: str
+    receipt_digest: str
+    source_commit_sha: str
+    state: str = "OWNER_APPROVED"
+
+
+@dataclass(frozen=True)
+class ApprovalSyncResult:
+    accepted: tuple[ApprovalQueueEntry, ...]
+    pending: tuple[str, ...]
+    blocked: tuple[tuple[str, str], ...]
+
+
 class ApprovalSource(Protocol):
     def fetch(self, request_id: str) -> tuple[dict[str, object], str]: ...
 
@@ -123,6 +139,92 @@ class GhApprovalSource:
         return document, source_commit_sha
 
 
+def sync_approval_receipts(
+    *,
+    foundry_root: Path,
+    source: ApprovalSource,
+    requests: dict[str, str],
+) -> ApprovalSyncResult:
+    """Fetch approved scopes and create durable, non-executing sandbox queue entries."""
+    accepted: list[ApprovalQueueEntry] = []
+    pending: list[str] = []
+    blocked: list[tuple[str, str]] = []
+    queue_root = foundry_root / "state" / "self-improvement-execution-queue"
+    ledger_path = foundry_root / "state" / "owner-approvals.json"
+    for request_id, expected_scope_digest in sorted(requests.items()):
+        if _REQUEST_ID.fullmatch(request_id) is None:
+            blocked.append((request_id, "INVALID_REQUEST_ID"))
+            continue
+        queue_path = queue_root / f"{request_id}.json"
+        if queue_path.is_file():
+            try:
+                existing = json.loads(queue_path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError) as exc:
+                blocked.append((request_id, type(exc).__name__.upper()))
+                continue
+            if (
+                existing.get("request_id") != request_id
+                or existing.get("scope_digest") != expected_scope_digest
+                or existing.get("state") != "OWNER_APPROVED"
+                or existing.get("schema_version") != "apf.approved-execution-job/1.0"
+                or not _queue_is_ledger_bound(existing, ledger_path)
+            ):
+                blocked.append((request_id, "APPROVAL_QUEUE_CONFLICT"))
+            continue
+        try:
+            document, source_commit_sha = source.fetch(request_id)
+        except ApprovalExecutionError as exc:
+            if str(exc) in {
+                "GITHUB_APPROVAL_COMMIT_UNRESOLVED",
+                "GITHUB_APPROVAL_FETCH_FAILED",
+            }:
+                pending.append(request_id)
+            else:
+                blocked.append((request_id, str(exc)))
+            continue
+        try:
+            receipt = parse_approval_receipt(
+                document,
+                source_commit_sha=source_commit_sha,
+            )
+            receipt_digest = record_approval(
+                ledger_path=ledger_path,
+                receipt=receipt,
+                expected_request_id=request_id,
+                expected_scope_digest=expected_scope_digest,
+            )
+            entry = ApprovalQueueEntry(
+                request_id=request_id,
+                scope_digest=expected_scope_digest,
+                receipt_digest=receipt_digest,
+                source_commit_sha=source_commit_sha,
+            )
+            queue_root.mkdir(parents=True, exist_ok=True)
+            _atomic_json(
+                queue_path, {"schema_version": "apf.approved-execution-job/1.0", **asdict(entry)}
+            )
+            accepted.append(entry)
+        except (ApprovalExecutionError, OSError, json.JSONDecodeError) as exc:
+            blocked.append((request_id, str(exc) or type(exc).__name__.upper()))
+    result = ApprovalSyncResult(tuple(accepted), tuple(pending), tuple(blocked))
+    _atomic_json(
+        foundry_root / "state" / "self-improvement-approval-sync-latest.json",
+        {
+            "schema_version": "apf.approval-sync-result/1.0",
+            "accepted": [asdict(item) for item in result.accepted],
+            "pending": list(result.pending),
+            "blocked": [
+                {"request_id": request_id, "reason": reason}
+                for request_id, reason in result.blocked
+            ],
+            "execution_automatic": False,
+            "merge_automatic": False,
+            "deployment_automatic": False,
+        },
+    )
+    return result
+
+
 def parse_approval_receipt(
     document: dict[str, object], *, source_commit_sha: str
 ) -> OwnerApprovalReceipt:
@@ -174,31 +276,34 @@ def record_approval(
 ) -> str:
     if receipt.request_id != expected_request_id or receipt.scope_digest != expected_scope_digest:
         raise ApprovalExecutionError("APPROVAL_SCOPE_BINDING_MISMATCH")
-    entries: list[dict[str, object]] = []
-    if ledger_path.exists():
-        document = json.loads(ledger_path.read_text(encoding="utf-8"))
-        if document.get("schema_version") != "apf.owner-approval-ledger/1.0":
-            raise ApprovalExecutionError("APPROVAL_LEDGER_SCHEMA_INVALID")
-        entries = list(document.get("entries") or [])
-    entry = {**receipt.canonical_document(), "receipt_digest": receipt.digest()}
-    for existing in entries:
-        if existing.get("request_id") == receipt.request_id:
-            if existing != entry:
-                raise ApprovalExecutionError("APPROVAL_LEDGER_CONFLICT")
-            return receipt.digest()
-    entries.append(entry)
     ledger_path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = ledger_path.with_suffix(".tmp")
-    temporary.write_text(
-        json.dumps(
+    lock_path = ledger_path.with_suffix(ledger_path.suffix + ".lock")
+    descriptor = _exclusive_lock(lock_path, "APPROVAL_LEDGER_BUSY")
+    try:
+        entries: list[dict[str, object]] = []
+        if ledger_path.exists():
+            document = json.loads(ledger_path.read_text(encoding="utf-8"))
+            if document.get("schema_version") != "apf.owner-approval-ledger/1.0":
+                raise ApprovalExecutionError("APPROVAL_LEDGER_SCHEMA_INVALID")
+            raw_entries = document.get("entries")
+            if not isinstance(raw_entries, list):
+                raise ApprovalExecutionError("APPROVAL_LEDGER_SCHEMA_INVALID")
+            entries = list(raw_entries)
+        entry = {**receipt.canonical_document(), "receipt_digest": receipt.digest()}
+        for existing in entries:
+            if existing.get("request_id") == receipt.request_id:
+                if existing != entry:
+                    raise ApprovalExecutionError("APPROVAL_LEDGER_CONFLICT")
+                return receipt.digest()
+        entries.append(entry)
+        _atomic_json(
+            ledger_path,
             {"schema_version": "apf.owner-approval-ledger/1.0", "entries": entries},
-            indent=2,
-            sort_keys=True,
-        ),
-        encoding="utf-8",
-    )
-    temporary.replace(ledger_path)
-    return receipt.digest()
+        )
+        return receipt.digest()
+    finally:
+        os.close(descriptor)
+        lock_path.unlink(missing_ok=True)
 
 
 def run_in_approved_worktree(
@@ -259,6 +364,45 @@ def _git(root: Path, *arguments: str) -> None:
     )
     if completed.returncode != 0:
         raise ApprovalExecutionError("GIT_WORKTREE_OPERATION_FAILED")
+
+
+def _atomic_json(path: Path, document: dict[str, object]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    with temporary.open("w", encoding="utf-8", newline="\n") as handle:
+        handle.write(json.dumps(document, ensure_ascii=False, indent=2, sort_keys=True))
+        handle.flush()
+        os.fsync(handle.fileno())
+    temporary.replace(path)
+
+
+def _exclusive_lock(path: Path, code: str) -> int:
+    try:
+        descriptor = os.open(str(path), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+    except FileExistsError as exc:
+        raise ApprovalExecutionError(code) from exc
+    os.write(descriptor, str(os.getpid()).encode())
+    return descriptor
+
+
+def _queue_is_ledger_bound(queue: dict[str, object], ledger_path: Path) -> bool:
+    try:
+        ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return False
+    if ledger.get("schema_version") != "apf.owner-approval-ledger/1.0":
+        return False
+    entries = ledger.get("entries")
+    if not isinstance(entries, list):
+        return False
+    return any(
+        isinstance(entry, dict)
+        and entry.get("request_id") == queue.get("request_id")
+        and entry.get("scope_digest") == queue.get("scope_digest")
+        and entry.get("receipt_digest") == queue.get("receipt_digest")
+        and entry.get("source_commit_sha") == queue.get("source_commit_sha")
+        for entry in entries
+    )
 
 
 def _validated_strings(value: object, code: str) -> tuple[str, ...]:

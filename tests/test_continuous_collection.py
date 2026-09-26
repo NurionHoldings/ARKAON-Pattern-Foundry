@@ -72,6 +72,13 @@ def test_unclear_license_can_be_assetized_by_clean_room_exception():
             assetization_basis=AssetizationBasis.CLEAN_ROOM_ABSTRACTION,
             provenance_recorded=True,
             copied_source_code=False,
+            rights_review_passed=True,
+            owner_approval_digest="sha256:" + "a" * 64,
+            independent_implementation=True,
+            original_expression_excluded=True,
+            distinctive_category_count=2,
+            functional_distinction=True,
+            similarity_review_passed=True,
         ),
         ContinuousCollectionPolicy(),
     )
@@ -100,6 +107,39 @@ def test_assetization_exception_requires_provenance_and_no_code_copy():
     )
     assert not no_provenance.reusable
     assert not copied.reusable
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("rights_review_passed", False),
+        ("owner_approval_digest", None),
+        ("independent_implementation", False),
+        ("original_expression_excluded", False),
+        ("distinctive_category_count", 1),
+        ("functional_distinction", False),
+        ("similarity_review_passed", False),
+    ],
+)
+def test_clean_room_exception_fails_closed_when_a_concrete_gate_is_missing(field, value):
+    controls = {
+        "license_clarity": 0.4,
+        "assetization_basis": AssetizationBasis.CLEAN_ROOM_ABSTRACTION,
+        "provenance_recorded": True,
+        "copied_source_code": False,
+        "rights_review_passed": True,
+        "owner_approval_digest": "sha256:" + "a" * 64,
+        "independent_implementation": True,
+        "original_expression_excluded": True,
+        "distinctive_category_count": 2,
+        "functional_distinction": True,
+        "similarity_review_passed": True,
+    }
+    controls[field] = value
+    decision = decide_collection(candidate(**controls), ContinuousCollectionPolicy())
+    assert decision.collect
+    assert not decision.reusable
+    assert decision.reason == "COLLECT_REFERENCE_FOR_INDEPENDENT_DEVELOPMENT"
 
 
 def test_collection_ratios_must_be_complete():

@@ -1,0 +1,40 @@
+{
+  "schema_version": "apf.owner-approval-receipt/1.0",
+  "state": "OWNER_APPROVED",
+  "request_id": "audit-bot-runtime-safety-002",
+  "scope_digest": "5b93a54db6d09cdfaf5d8675b07c4a8548de4f6358e6e322481978a7c942eb08",
+  "approver": "최인석",
+  "approved_at": "2026-09-19T11:51:42+09:00",
+  "allowed_paths": [
+    ".github/workflows/ci.yml",
+    "config/arkaon-audit-bot.json",
+    "docs/42-self-improvement-execution.md",
+    "docs/64-audit-bot-runtime-safety.md",
+    "src/apf/audit_bot_internal.py",
+    "src/apf/audit_bot_learning.py",
+    "src/apf/audit_bot_runtime.py",
+    "src/apf/self_improvement_execution.py",
+    "src/apf/self_improvement_relay.py",
+    "tests/test_audit_bot_internal.py",
+    "tests/test_audit_bot_learning.py",
+    "tests/test_audit_bot_runtime.py",
+    "tests/test_self_improvement_execution.py",
+    "tests/test_self_improvement_relay.py",
+    "requests/self-improvement/audit-bot-runtime-safety-002.json",
+    "approvals/self-improvement/audit-bot-runtime-safety-002.json",
+    "evidence/self-improvement/audit-bot-runtime-safety-002-arkaon.json",
+    "evidence/self-improvement/audit-bot-runtime-safety-002-eternian.json",
+    "evidence/self-improvement/audit-bot-runtime-safety-002-result.json"
+  ],
+  "allowed_operations": [
+    "READ_WORKTREE",
+    "WRITE_WORKTREE",
+    "RUN_TESTS",
+    "RUN_LINTER",
+    "GENERATE_ARTIFACT",
+    "UPDATE_OPEN_UNMERGED_PR"
+  ],
+  "production_change_allowed": false,
+  "automatic_merge_allowed": false,
+  "deployment_allowed": false
+}

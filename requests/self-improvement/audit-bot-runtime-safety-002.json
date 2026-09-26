@@ -1,0 +1,31 @@
+{
+  "schema_version": "apf.self-improvement-request/1.0",
+  "request_id": "audit-bot-runtime-safety-002",
+  "state": "OWNER_APPROVED",
+  "revision": 1,
+  "intent_dna": "Apply Audit Bot in realtime, at every approved modification gate, and during internal integrity audits without granting automatic merge, deployment, or self-approval.",
+  "capability_gap": "Audit Bot v1 was a manual CLI and its approval and learning ledgers lacked complete concurrency, receipt-binding, backpressure, recovery, and Windows CI coverage.",
+  "evidence_refs": [
+    "sha256:e22433617b8e6c7a6ea9dc23870f31fce5279350"
+  ],
+  "proposed_change": "Connect approval synchronization and mandatory audit queues to the 15-second relay, add deployment-baseline internal audits, harden approval and learning ledgers, quarantine corrupt jobs, and add Windows control CI.",
+  "expected_benefit": "Every verified change and deployed control is continuously checked against owner-approved scope and tamper-evident bounded ledgers.",
+  "risks": [
+    "A strict gate may hold a legitimate change until evidence or baseline is corrected.",
+    "A stale or missing deployment baseline causes HOLD.",
+    "Backpressure stops new learning records after the configured retention ceiling."
+  ],
+  "validation_plan": [
+    "Prove approval-ledger and learning-ledger concurrent writers are rejected.",
+    "Prove duplicate feedback and receipt reuse are rejected.",
+    "Prove segment rotation preserves the global hash chain and applies backpressure.",
+    "Prove malformed audit jobs are quarantined while later valid jobs continue.",
+    "Prove protected-file drift and ledger tampering are BLOCKED.",
+    "Run Linux full regression, PostgreSQL CI, and Windows audit-control CI."
+  ],
+  "source_tier": "OWNER_APPROVED",
+  "scope_digest": "5b93a54db6d09cdfaf5d8675b07c4a8548de4f6358e6e322481978a7c942eb08",
+  "production_change_allowed": false,
+  "automatic_merge_allowed": false,
+  "deployment_allowed": false
+}

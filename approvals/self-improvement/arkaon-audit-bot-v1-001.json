@@ -1,0 +1,33 @@
+{
+  "schema_version": "apf.owner-approval-receipt/1.0",
+  "state": "OWNER_APPROVED",
+  "request_id": "arkaon-audit-bot-v1-001",
+  "scope_digest": "b6faa3133c7b8f7bee4ff08d58b198c32ebbca6b1df416b8bb074b7c440ede35",
+  "approver": "최인석",
+  "approved_at": "2026-09-19T11:28:53+09:00",
+  "allowed_paths": [
+    "config/arkaon-audit-bot.json",
+    "docs/63-arkaon-audit-bot.md",
+    "src/apf/arkaon_audit_bot.py",
+    "src/apf/audit_bot_learning.py",
+    "tests/test_arkaon_audit_bot.py",
+    "tests/test_audit_bot_learning.py",
+    "tools/run_arkaon_audit_bot.py",
+    "requests/self-improvement/arkaon-audit-bot-v1-001.json",
+    "approvals/self-improvement/arkaon-audit-bot-v1-001.json",
+    "evidence/self-improvement/arkaon-audit-bot-v1-001-arkaon.json",
+    "evidence/self-improvement/arkaon-audit-bot-v1-001-eternian.json",
+    "evidence/self-improvement/arkaon-audit-bot-v1-001-result.json"
+  ],
+  "allowed_operations": [
+    "READ_WORKTREE",
+    "WRITE_WORKTREE",
+    "RUN_TESTS",
+    "RUN_LINTER",
+    "GENERATE_ARTIFACT",
+    "CREATE_OPEN_UNMERGED_PR"
+  ],
+  "production_change_allowed": false,
+  "automatic_merge_allowed": false,
+  "deployment_allowed": false
+}

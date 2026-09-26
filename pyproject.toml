@@ -25,6 +25,8 @@ packages = ["src/apf"]
 [tool.hatch.build.targets.wheel.force-include]
 "db/migrations" = "apf/sql_migrations"
 "src/apf/console_ui.html" = "apf/console_ui.html"
+"src/apf/visual_dialogue_ui.html" = "apf/visual_dialogue_ui.html"
+"src/apf/reference_material_consent_ui.html" = "apf/reference_material_consent_ui.html"
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]

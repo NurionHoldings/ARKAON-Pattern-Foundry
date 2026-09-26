@@ -7,7 +7,7 @@ import secrets
 import sqlite3
 import time
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Annotated, Literal, Protocol
 from uuid import UUID
@@ -23,7 +23,32 @@ from .durable_review import (
     ReviewDecision,
     ReviewStage,
 )
+from .plain_language_approval import (
+    ApprovalDecision,
+    PlainApprovalError,
+    PlainLanguageApprovalStore,
+)
+from .reference_material_consent import (
+    NOTICE_TEXT,
+    NOTICE_VERSION,
+    REQUIRED_ACKNOWLEDGEMENTS,
+    ReferenceConsentError,
+    ReferenceConsentStore,
+    ReferenceUseConsent,
+    ReferenceUseRequest,
+)
+from .reference_material_consent import (
+    digest as reference_digest,
+)
 from .repository import TargetRepository
+from .visual_platform_dialogue import (
+    PlatformBrief,
+    RevisionFeedback,
+    RevisionSubmission,
+    UnderstandingConfirmation,
+    VisualDialogueError,
+    VisualPlatformDialogueStore,
+)
 
 SESSION_COOKIE = "apf_console_session"
 CSRF_COOKIE = "apf_console_csrf"
@@ -34,13 +59,13 @@ SAFE_METHODS = frozenset({"GET", "HEAD", "OPTIONS"})
 class ConsolePrincipal:
     tenant_id: UUID
     principal_id: UUID
-    role: Literal["operator", "reviewer", "auditor"]
+    role: Literal["owner", "operator", "reviewer", "auditor"]
 
 
 class DevSessionRequest(BaseModel):
     tenant_id: UUID
     principal_id: UUID
-    role: Literal["operator", "reviewer", "auditor"] = "operator"
+    role: Literal["owner", "operator", "reviewer", "auditor"] = "operator"
 
 
 class OperatorApprovalRequest(BaseModel):
@@ -158,6 +183,12 @@ class ReviewSubmission(BaseModel):
         return ReviewAttestation(**values)
 
 
+class ReferenceConsentSubmission(BaseModel):
+    request: ReferenceUseRequest
+    acknowledged_items: set[str]
+    nonce: UUID
+
+
 class ConsoleReviewStore(Protocol):
     def list_reviews_for_principal(
         self, tenant_id: str, principal_id: str, *, limit: int, offset: int,
@@ -227,9 +258,15 @@ class ConsoleSecurity:
 
 def install_console(
     application, *, security: ConsoleSecurity, review_store: ConsoleReviewStore | None = None,
+    approval_store: PlainLanguageApprovalStore | None = None,
+    visual_dialogue_store: VisualPlatformDialogueStore | None = None,
+    reference_consent_store: ReferenceConsentStore | None = None,
 ) -> None:
     application.state.console_security = security
     application.state.console_review_store = review_store
+    application.state.plain_approval_store = approval_store
+    application.state.visual_dialogue_store = visual_dialogue_store
+    application.state.reference_consent_store = reference_consent_store
 
     def principal(
         request: Request,
@@ -261,6 +298,23 @@ def install_console(
 
     def change_controller() -> AdminChangeController:
         return AdminChangeController(foundry_root=foundry_root())
+    def approvals(request: Request) -> PlainLanguageApprovalStore:
+        store = request.app.state.plain_approval_store
+        if store is None:
+            raise HTTPException(status_code=503, detail="plain-language approval store unavailable")
+        return store
+
+    def visual_dialogues(request: Request) -> VisualPlatformDialogueStore:
+        store = request.app.state.visual_dialogue_store
+        if store is None:
+            raise HTTPException(status_code=503, detail="visual dialogue store unavailable")
+        return store
+
+    def reference_consents(request: Request) -> ReferenceConsentStore:
+        store = request.app.state.reference_consent_store
+        if store is None:
+            raise HTTPException(status_code=503, detail="reference consent store unavailable")
+        return store
 
     def store_error(error: Exception) -> HTTPException:
         if isinstance(error, DurableStoreError):
@@ -1330,6 +1384,89 @@ def install_console(
             "rollback_token": record.rollback_token,
             "intent_only": record.intent_only,
         }
+    @application.get("/platform-dialogue", response_class=HTMLResponse, include_in_schema=False)
+    def platform_dialogue_home(
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+    ) -> HTMLResponse:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        html_path = Path(__file__).with_name("visual_dialogue_ui.html")
+        return HTMLResponse(
+            html_path.read_text(encoding="utf-8"),
+            headers={
+                "Cache-Control": "no-store",
+                "Content-Security-Policy": (
+                    "default-src 'none'; img-src 'self'; style-src 'unsafe-inline'; "
+                    "script-src 'unsafe-inline'; connect-src 'self'; base-uri 'none'; "
+                    "frame-ancestors 'none'; form-action 'self'"
+                ),
+                "Referrer-Policy": "no-referrer",
+                "X-Content-Type-Options": "nosniff",
+            },
+        )
+
+    @application.get(
+        "/reference-material-consent", response_class=HTMLResponse, include_in_schema=False
+    )
+    def reference_material_consent_home(
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+    ) -> HTMLResponse:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        html_path = Path(__file__).with_name("reference_material_consent_ui.html")
+        return HTMLResponse(
+            html_path.read_text(encoding="utf-8"),
+            headers={
+                "Cache-Control": "no-store",
+                "Content-Security-Policy": (
+                    "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; "
+                    "connect-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'"
+                ),
+                "Referrer-Policy": "no-referrer",
+                "X-Content-Type-Options": "nosniff",
+            },
+        )
+
+    @application.get("/v1/console/reference-material-notice")
+    def reference_material_notice(
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+    ) -> dict[str, object]:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        return {
+            "notice_version": NOTICE_VERSION,
+            "notice_text": NOTICE_TEXT,
+            "notice_digest": reference_digest(NOTICE_TEXT),
+            "required_acknowledgements": sorted(REQUIRED_ACKNOWLEDGEMENTS),
+            "automatic_merge_allowed": False,
+            "deployment_allowed": False,
+        }
+
+    @application.post(
+        "/v1/console/reference-material-consents", status_code=status.HTTP_201_CREATED
+    )
+    def record_reference_material_consent(
+        payload: ReferenceConsentSubmission,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[ReferenceConsentStore, Depends(reference_consents)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        consent = ReferenceUseConsent(
+            request_digest=reference_digest(payload.request.model_dump(mode="json")),
+            notice_version=NOTICE_VERSION,
+            acknowledged_items=payload.acknowledged_items,
+            principal_id=actor.principal_id,
+            nonce=payload.nonce,
+            confirmed_at=datetime.now(UTC),
+        )
+        try:
+            return store.record(payload.request, consent)
+        except ReferenceConsentError as error:
+            code = 409 if str(error) == "REFERENCE_CONSENT_ALREADY_RECORDED" else 422
+            raise HTTPException(status_code=code, detail=str(error)) from None
 
     @application.get("/v1/console/summary")
     def summary(
@@ -1527,6 +1664,184 @@ def install_console(
             raise store_error(error) from None
         return {"task_id": decided.task_id, "decision": payload.decision.value,
                 "status": decided.status.value}
+
+    @application.get("/v1/console/self-improvement-reports")
+    def plain_reports(
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[PlainLanguageApprovalStore, Depends(approvals)],
+    ) -> list[dict[str, object]]:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        return store.list_reports()
+
+    @application.get("/v1/console/self-improvement-reports/{request_id}")
+    def plain_report(
+        request_id: str,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[PlainLanguageApprovalStore, Depends(approvals)],
+    ) -> dict[str, object]:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        try:
+            return store.get_report(request_id)
+        except PlainApprovalError as error:
+            raise HTTPException(status_code=404, detail=str(error)) from None
+
+    @application.post("/v1/console/self-improvement-reports/{request_id}/decision")
+    def decide_plain_report(
+        request_id: str,
+        payload: ApprovalDecision,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[PlainLanguageApprovalStore, Depends(approvals)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        try:
+            return store.decide(
+                request_id=request_id, decision=payload, principal_id=str(actor.principal_id)
+            )
+        except PlainApprovalError as error:
+            code = 409 if str(error) == "PLAIN_APPROVAL_ALREADY_DECIDED" else 422
+            raise HTTPException(status_code=code, detail=str(error)) from None
+
+    def visual_error(error: VisualDialogueError) -> HTTPException:
+        code = 409 if str(error) in {
+            "VISUAL_DIALOGUE_BUSY", "VISUAL_DIALOGUE_CONCURRENT_UPDATE",
+            "VISUAL_REVISION_STALE_BASE", "VISUAL_ARTIFACT_CONFLICT",
+        } else 422
+        return HTTPException(status_code=code, detail=str(error))
+
+    @application.post("/v1/console/platform-dialogues", status_code=status.HTTP_201_CREATED)
+    def create_platform_dialogue(
+        payload: PlatformBrief,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[VisualPlatformDialogueStore, Depends(visual_dialogues)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        return store.create(
+            tenant_id=str(actor.tenant_id), owner_principal_id=str(actor.principal_id), brief=payload
+        )
+
+    @application.get("/v1/console/platform-dialogues")
+    def list_platform_dialogues(
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[VisualPlatformDialogueStore, Depends(visual_dialogues)],
+    ) -> list[dict[str, object]]:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        return store.list_for_owner(
+            tenant_id=str(actor.tenant_id), owner_principal_id=str(actor.principal_id)
+        )
+
+    @application.get("/v1/console/platform-dialogues/{dialogue_id}")
+    def get_platform_dialogue(
+        dialogue_id: str,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[VisualPlatformDialogueStore, Depends(visual_dialogues)],
+    ) -> dict[str, object]:
+        if actor.role not in {"owner", "operator"}:
+            raise HTTPException(status_code=403, detail="platform dialogue role required")
+        try:
+            return store.get(dialogue_id, tenant_id=str(actor.tenant_id))
+        except VisualDialogueError as error:
+            raise visual_error(error) from None
+
+    @application.post("/v1/console/platform-dialogues/{dialogue_id}/revisions")
+    def submit_platform_revision(
+        dialogue_id: str,
+        payload: RevisionSubmission,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[VisualPlatformDialogueStore, Depends(visual_dialogues)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        if actor.role != "operator":
+            raise HTTPException(status_code=403, detail="ARKAON operator role required")
+        try:
+            return store.submit_revision(
+                dialogue_id, tenant_id=str(actor.tenant_id), submission=payload
+            )
+        except VisualDialogueError as error:
+            raise visual_error(error) from None
+
+    @application.get("/v1/console/platform-dialogues/{dialogue_id}/revisions/{number}/preview.svg")
+    def platform_revision_image(
+        dialogue_id: str,
+        number: int,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[VisualPlatformDialogueStore, Depends(visual_dialogues)],
+    ) -> Response:
+        if actor.role not in {"owner", "operator"}:
+            raise HTTPException(status_code=403, detail="platform dialogue role required")
+        try:
+            data = store.image(dialogue_id, number, tenant_id=str(actor.tenant_id))
+        except VisualDialogueError as error:
+            raise visual_error(error) from None
+        return Response(
+            content=data, media_type="image/svg+xml",
+            headers={"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"},
+        )
+
+    @application.post("/v1/console/platform-dialogues/{dialogue_id}/feedback")
+    def request_platform_revision(
+        dialogue_id: str,
+        payload: RevisionFeedback,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[VisualPlatformDialogueStore, Depends(visual_dialogues)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        try:
+            return store.add_feedback(
+                dialogue_id, tenant_id=str(actor.tenant_id),
+                owner_principal_id=str(actor.principal_id), feedback=payload,
+            )
+        except VisualDialogueError as error:
+            raise visual_error(error) from None
+
+    @application.post("/v1/console/platform-dialogues/{dialogue_id}/understanding")
+    def confirm_platform_understanding(
+        dialogue_id: str,
+        payload: UnderstandingConfirmation,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[VisualPlatformDialogueStore, Depends(visual_dialogues)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        try:
+            return store.confirm(
+                dialogue_id, tenant_id=str(actor.tenant_id),
+                owner_principal_id=str(actor.principal_id), confirmation=payload,
+            )
+        except VisualDialogueError as error:
+            raise visual_error(error) from None
+
+    @application.post("/v1/console/platform-dialogues/{dialogue_id}/seal")
+    def seal_platform_specification(
+        dialogue_id: str,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[VisualPlatformDialogueStore, Depends(visual_dialogues)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        try:
+            return store.seal(
+                dialogue_id, tenant_id=str(actor.tenant_id),
+                owner_principal_id=str(actor.principal_id),
+            )
+        except VisualDialogueError as error:
+            raise visual_error(error) from None
 
 
 def console_security_from_config(

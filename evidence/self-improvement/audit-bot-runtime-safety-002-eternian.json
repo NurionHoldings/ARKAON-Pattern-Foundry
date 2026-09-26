@@ -1,0 +1,33 @@
+{
+  "schema_version": "apf.eternian-audit-evidence/1.0",
+  "request_id": "audit-bot-runtime-safety-002",
+  "scope_digest": "5b93a54db6d09cdfaf5d8675b07c4a8548de4f6358e6e322481978a7c942eb08",
+  "state": "ETERNIAN_VERIFIED",
+  "protected_control_hold_review": {
+    ".github/workflows/ci.yml": "APPROVED_SCOPE: adds independent Windows audit-control CI",
+    "src/apf/self_improvement_execution.py": "APPROVED_SCOPE: adds exclusive approval-ledger lock, schema validation, fsync and atomic replacement",
+    "src/apf/self_improvement_relay.py": "APPROVED_SCOPE: connects approval, change audit and internal audit while isolating runtime failures",
+    "tests/test_self_improvement_execution.py": "APPROVED_SCOPE: proves idempotency, busy-lock rejection and Windows UTF-8 behavior",
+    "tests/test_self_improvement_relay.py": "APPROVED_SCOPE: proves runtime failure isolation and normal-delivery continuation"
+  },
+  "independent_findings_and_remediation": [
+    "Audit-policy failure could stop the relay cycle; remediated to BLOCKED runtime results while mailbox delivery continues.",
+    "Windows default text decoding broke a ledger assertion; remediated with explicit UTF-8 and re-run on Windows.",
+    "Deployment baseline candidate lacked explicit owner activation; split candidate creation from approval-bound ACTIVE activation.",
+    "Current audit policy drift was not compared to the deployment baseline; added policy digest binding."
+  ],
+  "post_remediation_checks": [
+    "Local full regression: 619 PASS / 5 SKIP",
+    "Linux general CI: GREEN",
+    "PostgreSQL integration CI: GREEN",
+    "Windows audit-controls CI: GREEN",
+    "Audit Bot HOLD contains only five expected protected-control review findings",
+    "No unreported or out-of-approved-scope changes"
+  ],
+  "remaining_operational_checks": [
+    "After merge, run one live cycle of the Windows Scheduled Task with the owner's existing gh authentication.",
+    "Activate the deployment baseline only with the separate owner deployment approval digest."
+  ],
+  "automatic_merge_allowed": false,
+  "deployment_allowed": false
+}

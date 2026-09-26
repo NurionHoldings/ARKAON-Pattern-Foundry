@@ -1,0 +1,31 @@
+{
+  "schema_version": "apf.eternian-audit-evidence/1.0",
+  "request_id": "arkaon-audit-bot-v1-001",
+  "scope_digest": "b6faa3133c7b8f7bee4ff08d58b198c32ebbca6b1df416b8bb074b7c440ede35",
+  "state": "ETERNIAN_VERIFIED",
+  "audited_at": "2026-09-19T11:28:53+09:00",
+  "independent_findings": [
+    "Initial audit did not compare the report scope digest with an owner-approved digest.",
+    "Initial learning feedback trusted a free-form reviewer name and could not prove ARKAON/ETERNIAN separation."
+  ],
+  "remediation": [
+    "Added CRITICAL SCOPE_DIGEST_MISMATCH and CHANGE_OUTSIDE_APPROVED_SCOPE findings.",
+    "Bound learning feedback to ARKAON or ETERNIAN role plus a SHA-256 review receipt.",
+    "Required both roles before a propose-only upgrade can be emitted."
+  ],
+  "independent_checks": [
+    "scope mismatch and path escape: BLOCKED",
+    "single-role repeated feedback: no proposal",
+    "learning ledger mutation: tamper detected",
+    "full regression after remediation: 603 PASS / 5 SKIP",
+    "ruff after remediation: PASS"
+  ],
+  "test_result_digest": "sha256:765b6919c22962c58b8d865976cdb22c042bbd78b1710745aa83c3686da05688",
+  "remaining_risks": [
+    "Static rules require future governed upgrades for novel regression classes.",
+    "Reviewer receipts are SHA-bound but identity authentication depends on the surrounding approval and evidence system.",
+    "The Windows scheduled relay integration has not been exercised in this Linux sandbox."
+  ],
+  "automatic_merge_allowed": false,
+  "deployment_allowed": false
+}

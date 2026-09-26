@@ -8,16 +8,23 @@ import apf.console as console_module
 from apf.api import create_app
 from apf.console import SESSION_COOKIE, ConsoleSecurity
 from apf.domain import AnalysisTargetCreate
+from apf.plain_language_approval import PlainLanguageApprovalStore
+from apf.reference_material_consent import (
+    REQUIRED_ACKNOWLEDGEMENTS,
+    ReferenceConsentStore,
+)
 from apf.repository import MemoryRepository
+from apf.visual_platform_dialogue import VisualPlatformDialogueStore
 
 
-def make_client(*, role: str = "operator"):
+def make_client(*, role: str = "operator", approval_store=None):
     repository = MemoryRepository()
     app = create_app(
         repository=repository,
         console_security=ConsoleSecurity(
             environment="test", secret="s" * 32, allow_dev_sessions=True
         ),
+        plain_approval_store=approval_store,
     )
     client = TestClient(app, base_url="https://testserver")
     tenant_id, principal_id = uuid4(), uuid4()
@@ -40,6 +47,73 @@ def target_payload(tenant_id, name="MJN"):
             "source_evidence_ids": [str(uuid4())],
         }
     )
+
+
+def test_reference_material_notice_checkboxes_and_receipt_are_owner_bound(tmp_path):
+    tenant_id, owner_id = uuid4(), uuid4()
+    app = create_app(
+        repository=MemoryRepository(),
+        console_security=ConsoleSecurity(
+            environment="test", secret="s" * 32, allow_dev_sessions=True
+        ),
+        reference_consent_store=ReferenceConsentStore(tmp_path),
+    )
+    client = TestClient(app, base_url="https://testserver")
+    session = client.post(
+        "/console/dev/session",
+        json={"tenant_id": str(tenant_id), "principal_id": str(owner_id), "role": "owner"},
+    )
+    csrf = session.json()["csrf_token"]
+    page = client.get("/reference-material-consent")
+    assert page.status_code == 200
+    assert "참고자료 사용 확인" in page.text
+    notice = client.get("/v1/console/reference-material-notice")
+    assert notice.status_code == 200
+    assert set(notice.json()["required_acknowledgements"]) == REQUIRED_ACKNOWLEDGEMENTS
+    payload = {
+        "request": {
+            "request_id": "reference-ui-001",
+            "source_id": "official-page",
+            "source_locator": "https://example.org/product",
+            "intended_use": "기능 원리만 참고하여 독립적인 이용 흐름을 구현한다.",
+            "mode": "CLEAN_ROOM_IMPLEMENTATION",
+            "rights_basis": "UNKNOWN",
+            "rights_evidence_digest": None,
+            "requested_paths": ["src/apf/example.py"],
+            "scope_digest": "sha256:" + "a" * 64,
+        },
+        "acknowledged_items": sorted(REQUIRED_ACKNOWLEDGEMENTS),
+        "nonce": str(uuid4()),
+    }
+    assert client.post(
+        "/v1/console/reference-material-consents", json=payload
+    ).status_code == 403
+    recorded = client.post(
+        "/v1/console/reference-material-consents",
+        headers={"X-CSRF-Token": csrf},
+        json=payload,
+    )
+    assert recorded.status_code == 201
+    assert recorded.json()["decision"]["decision"] == "SANDBOX_IMPLEMENTATION_ALLOWED"
+    assert recorded.json()["decision"]["merge_allowed"] is False
+    assert recorded.json()["decision"]["deployment_allowed"] is False
+
+
+def test_reference_material_ui_is_owner_only(tmp_path):
+    app = create_app(
+        repository=MemoryRepository(),
+        console_security=ConsoleSecurity(
+            environment="test", secret="s" * 32, allow_dev_sessions=True
+        ),
+        reference_consent_store=ReferenceConsentStore(tmp_path),
+    )
+    client = TestClient(app, base_url="https://testserver")
+    client.post(
+        "/console/dev/session",
+        json={"tenant_id": str(uuid4()), "principal_id": str(uuid4()), "role": "operator"},
+    )
+    assert client.get("/reference-material-consent").status_code == 403
+    assert client.get("/v1/console/reference-material-notice").status_code == 403
 
 
 def test_console_requires_session_and_has_security_headers():
@@ -157,3 +231,88 @@ def test_co_creation_session_requires_exact_owner_and_safe_id(tmp_path, monkeypa
         "tenant_id": str(tenant_id), "principal_id": str(principal_id), "role": "operator"
     })
     assert client.get(endpoint).json()["secret"] == "private"
+def test_plain_approval_routes_require_owner_csrf_and_store(tmp_path):
+    operator, _, _, _ = make_client(
+        role="operator", approval_store=PlainLanguageApprovalStore(tmp_path)
+    )
+    assert operator.get("/v1/console/self-improvement-reports").status_code == 403
+
+    owner, _, _, csrf = make_client(
+        role="owner", approval_store=PlainLanguageApprovalStore(tmp_path)
+    )
+    assert owner.get("/v1/console/self-improvement-reports").status_code == 200
+    payload = {
+        "decision": "APPROVE", "scope_digest": "a" * 64,
+        "nonce": str(uuid4()), "expires_at": "2031-01-01T01:00:00+00:00",
+    }
+    request_id = "missing"
+    assert owner.post(
+        f"/v1/console/self-improvement-reports/{request_id}/decision", json=payload
+    ).status_code == 403
+    response = owner.post(
+        f"/v1/console/self-improvement-reports/{request_id}/decision", json=payload,
+        headers={"X-CSRF-Token": csrf},
+    )
+    assert response.status_code == 422
+
+
+def test_visual_platform_dialogue_api_separates_owner_and_arkaon_operator(tmp_path):
+    tenant_id, owner_id, operator_id = uuid4(), uuid4(), uuid4()
+    app = create_app(
+        repository=MemoryRepository(),
+        console_security=ConsoleSecurity(
+            environment="test", secret="s" * 32, allow_dev_sessions=True
+        ),
+        visual_dialogue_store=VisualPlatformDialogueStore(tmp_path),
+    )
+    client = TestClient(app, base_url="https://testserver")
+
+    owner_session = client.post(
+        "/console/dev/session",
+        json={"tenant_id": str(tenant_id), "principal_id": str(owner_id), "role": "owner"},
+    )
+    owner_csrf = owner_session.json()["csrf_token"]
+    created = client.post(
+        "/v1/console/platform-dialogues",
+        headers={"X-CSRF-Token": owner_csrf},
+        json={
+            "name": "부업장터", "purpose": "벌거리 연결", "audience": ["참여자"],
+            "required_capabilities": ["탐색", "정산"], "constraints": ["모바일 우선"],
+        },
+    )
+    assert created.status_code == 201
+    dialogue_id = created.json()["dialogue_id"]
+    assert client.post(
+        f"/v1/console/platform-dialogues/{dialogue_id}/revisions",
+        headers={"X-CSRF-Token": owner_csrf},
+        json={
+            "based_on_revision_digest": None, "change_summary": "첫 화면",
+            "screens": [{
+                "screen_id": "home", "title": "홈", "purpose": "탐색",
+                "components": ["검색", "추천"],
+            }],
+        },
+    ).status_code == 403
+
+    operator_session = client.post(
+        "/console/dev/session",
+        json={"tenant_id": str(tenant_id), "principal_id": str(operator_id), "role": "operator"},
+    )
+    operator_csrf = operator_session.json()["csrf_token"]
+    revised = client.post(
+        f"/v1/console/platform-dialogues/{dialogue_id}/revisions",
+        headers={"X-CSRF-Token": operator_csrf},
+        json={
+            "based_on_revision_digest": None, "change_summary": "첫 화면",
+            "screens": [{
+                "screen_id": "home", "title": "홈", "purpose": "탐색",
+                "components": ["검색", "추천"],
+            }],
+        },
+    )
+    assert revised.status_code == 200
+    image = client.get(
+        f"/v1/console/platform-dialogues/{dialogue_id}/revisions/1/preview.svg"
+    )
+    assert image.status_code == 200
+    assert image.headers["content-type"].startswith("image/svg+xml")

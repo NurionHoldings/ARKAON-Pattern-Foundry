@@ -67,6 +67,13 @@ class CollectionCandidate:
     assetization_basis: AssetizationBasis = AssetizationBasis.NONE
     provenance_recorded: bool = False
     copied_source_code: bool = False
+    rights_review_passed: bool = False
+    owner_approval_digest: str | None = None
+    independent_implementation: bool = False
+    original_expression_excluded: bool = False
+    distinctive_category_count: int = 0
+    functional_distinction: bool = False
+    similarity_review_passed: bool = False
 
 
 @dataclass(frozen=True)
@@ -119,17 +126,31 @@ def decide_collection(
     if candidate.kind in {SourceKind.OWNED, SourceKind.CLIENT_DELEGATED} and not candidate.explicitly_authorized:
         return CollectionDecision(False, False, "EXPLICIT_AUTHORIZATION_REQUIRED")
     licensed_reuse = candidate.license_clarity >= 0.80
-    independent_assetization = (
+    base_assetization = (
         candidate.assetization_basis
         in {
             AssetizationBasis.OWNED,
             AssetizationBasis.EXPLICIT_PERMISSION,
             AssetizationBasis.PUBLIC_DOMAIN,
-            AssetizationBasis.CLEAN_ROOM_ABSTRACTION,
         }
         and candidate.provenance_recorded
         and not candidate.copied_source_code
     )
+    clean_room_exception = (
+        candidate.assetization_basis == AssetizationBasis.CLEAN_ROOM_ABSTRACTION
+        and candidate.provenance_recorded
+        and not candidate.copied_source_code
+        and candidate.rights_review_passed
+        and isinstance(candidate.owner_approval_digest, str)
+        and len(candidate.owner_approval_digest) == 71
+        and candidate.owner_approval_digest.startswith("sha256:")
+        and candidate.independent_implementation
+        and candidate.original_expression_excluded
+        and candidate.distinctive_category_count >= 2
+        and candidate.functional_distinction
+        and candidate.similarity_review_passed
+    )
+    independent_assetization = base_assetization or clean_room_exception
     reusable = licensed_reuse or independent_assetization
     if independent_assetization and not licensed_reuse:
         return CollectionDecision(True, True, "COLLECT_INDEPENDENT_ASSET")
