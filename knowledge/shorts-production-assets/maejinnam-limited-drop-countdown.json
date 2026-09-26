@@ -1,0 +1,36 @@
+{
+  "asset_id": "8f471008d7ca3562",
+  "attention_factors": {
+    "audio_cue_tag": "tick-or-beat",
+    "caption_role": "headline-overlay",
+    "cta_timing_bin": "open",
+    "curiosity_mechanism": "open-loop",
+    "hook_window_bin": "0-1s",
+    "pacing_bin": "fast-cut",
+    "pattern_interrupt": "sudden-zoom",
+    "primary_driver": "scarcity-framing",
+    "secondary_drivers": [
+      "countdown-visual",
+      "motion-contrast-open"
+    ],
+    "social_proof_frame": "sold-out-digest",
+    "trust_mechanism": "limited-stock-badge",
+    "visual_contrast_bin": "high-motion-open"
+  },
+  "automatic_learning": false,
+  "category_tag": "commerce-hype",
+  "click_velocity_bin": "surge",
+  "content_angle_tag": "scarcity-countdown",
+  "factor_source": "manifest",
+  "item_id": "limited-drop-countdown",
+  "platform_id": "MAEJINNAM",
+  "production_change_allowed": false,
+  "production_guidance": "Lead with 'scarcity-framing' inside hook window 0-1s. Pacing: fast-cut; secondary drivers: countdown-visual, motion-contrast-open. Curiosity mechanism: open-loop. Place CTA emphasis at open.",
+  "reuse_domains": [
+    "VIDEO_TEMPLATE_EFFECTS",
+    "SIGNATURE_MOTION"
+  ],
+  "schema_version": "apf.shorts-production-asset/v1",
+  "verbatim_post_storage": false,
+  "watch_id": "maejinnam-sns-digest"
+}

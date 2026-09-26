@@ -1,0 +1,13 @@
+{
+  "schema_version": "apf.arkaon-asset-investigation/v1",
+  "automatic_promotion_allowed": false,
+  "automatic_learning_allowed": false,
+  "production_change_allowed": false,
+  "max_report_items": 10,
+  "emit_research_packet": true,
+  "minimum_score_for_packet": 50,
+  "notes": [
+    "investigation ranks asset and pattern signals; it never auto-promotes or mutates platforms",
+    "best-asset selection is evidence-bound ranking for eternian and operator review only"
+  ]
+}

@@ -55,6 +55,7 @@ class CollectionCandidate:
     kind: SourceKind
     locator: str
     intent_relevance: float
+    learning_domain_ids: tuple[str, ...] = ()
     content_hash_seen: bool = False
     explicitly_authorized: bool = False
     contains_personal_data: bool = False

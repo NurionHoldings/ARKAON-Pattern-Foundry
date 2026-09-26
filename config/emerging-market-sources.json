@@ -1,0 +1,37 @@
+{
+  "schema_version": "apf.emerging-market-sources/v1",
+  "sources": [
+    {
+      "watch_id": "wave1-creator-commerce",
+      "kind": "LOCAL_MANIFEST",
+      "path": "knowledge/market-digests/wave1-creator-commerce.json",
+      "platform_id": "ARKAON_FOUNDRY",
+      "market_scope": "DOMESTIC_CREATOR_COMMERCE",
+      "enabled": true
+    },
+    {
+      "watch_id": "wave1-ai-landing-tools",
+      "kind": "LOCAL_MANIFEST",
+      "path": "knowledge/market-digests/wave1-ai-landing-tools.json",
+      "platform_id": "ARKAON_FOUNDRY",
+      "market_scope": "AI_LANDING_COPY_TOOLS",
+      "enabled": true
+    },
+    {
+      "watch_id": "w3c-standards-index",
+      "kind": "PUBLIC_HTTPS_INDEX",
+      "locator": "https://www.w3.org/TR/",
+      "platform_id": "ARKAON_FOUNDRY",
+      "market_scope": "WEB_STANDARDS_EMERGENCE",
+      "enabled": true
+    },
+    {
+      "watch_id": "openapi-spec-index",
+      "kind": "PUBLIC_HTTPS_INDEX",
+      "locator": "https://spec.openapis.org/oas/latest.html",
+      "platform_id": "ARKAON_FOUNDRY",
+      "market_scope": "API_PLATFORM_EMERGENCE",
+      "enabled": true
+    }
+  ]
+}
