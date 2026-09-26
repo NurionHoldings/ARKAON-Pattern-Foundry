@@ -19,8 +19,11 @@ from .conversational_site_draft import ConversationalSiteDraftStore
 from .design_reference_urls import DesignReferenceStore
 from .design_style_proposal import StyleProposalStore
 from .domain import AnalysisTarget, AnalysisTargetCreate, TargetState
+from .github_owner_auth import GitHubOwnerAuth
 from .logo_draft import LogoDraftStore
 from .plain_language_approval import PlainLanguageApprovalStore
+from .popular_format import ProposalStore
+from .production_readiness import production_ready
 from .public_page_observer import PublicPageObserver
 from .reference_material_consent import ReferenceConsentStore
 from .repository import (
@@ -52,6 +55,8 @@ def repository_from_config(
     environment = (environment or os.getenv("APF_ENV", "development")).lower()
     database_url = database_url or os.getenv("DATABASE_URL")
     if database_url:
+        if database_url.startswith("postgres://"):
+            database_url = "postgresql://" + database_url[len("postgres://"):]
         if not database_url.startswith(("postgresql://", "postgresql+psycopg://")):
             raise RuntimeError("DATABASE_URL must use PostgreSQL")
         return PostgresRepository(database_url)
@@ -72,6 +77,7 @@ def create_app(
     *,
     repository: TargetRepository | None = None,
     console_security: ConsoleSecurity | None = None,
+    owner_auth: GitHubOwnerAuth | None = None,
     console_review_store: ConsoleReviewStore | None = None,
     plain_approval_store: PlainLanguageApprovalStore | None = None,
     visual_dialogue_store: VisualPlatformDialogueStore | None = None,
@@ -82,6 +88,7 @@ def create_app(
     design_reference_store: DesignReferenceStore | None = None,
     style_proposal_store: StyleProposalStore | None = None,
     public_page_observer: PublicPageObserver | None = None,
+    format_proposal_store: ProposalStore | None = None,
 ) -> FastAPI:
     application = FastAPI(title="ARKAON Pattern Foundry", version="0.1.0")
     application.state.repository = repository or repository_from_config()
@@ -89,6 +96,7 @@ def create_app(
     install_console(
         application,
         security=console_security or console_security_from_config(),
+        owner_auth=owner_auth or GitHubOwnerAuth.from_environment(),
         review_store=console_review_store,
         approval_store=plain_approval_store
         or PlainLanguageApprovalStore(
@@ -107,6 +115,7 @@ def create_app(
         design_reference_store=design_reference_store or DesignReferenceStore(runtime_root()),
         style_proposal_store=style_proposal_store or StyleProposalStore(runtime_root()),
         public_page_observer=public_page_observer or PublicPageObserver(),
+        format_proposal_store=format_proposal_store or ProposalStore(runtime_root()),
         reference_consent_store=reference_consent_store
         or ReferenceConsentStore(Path(os.getenv("APF_FOUNDRY_ROOT", Path(__file__).parents[2]))),
     )
@@ -114,6 +123,12 @@ def create_app(
     @application.get("/health")
     def health() -> dict[str, str]:
         return {"status": "ok"}
+
+    @application.get("/ready")
+    def ready() -> dict[str, str]:
+        if not production_ready(application.state.repository):
+            raise HTTPException(status_code=503, detail="deployment not ready")
+        return {"status": "ready"}
 
     @application.post(
         "/v1/targets", response_model=AnalysisTarget, status_code=status.HTTP_201_CREATED

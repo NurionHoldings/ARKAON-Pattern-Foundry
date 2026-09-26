@@ -10,6 +10,7 @@ requires-python = ">=3.11"
 dependencies = [
   "cryptography>=43,<47",
   "fastapi>=0.115,<1",
+  "httpx>=0.27,<1",
   "Pillow>=11,<13",
   "pydantic>=2.9,<3",
   "psycopg[binary]>=3.2,<4",
@@ -18,7 +19,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8,<9", "httpx>=0.27,<1", "ruff>=0.8,<1"]
+dev = ["pytest>=8,<9", "ruff>=0.8,<1"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/apf"]
@@ -32,6 +33,7 @@ packages = ["src/apf"]
 "src/apf/business_card_ui.html" = "apf/business_card_ui.html"
 "src/apf/reference_material_consent_ui.html" = "apf/reference_material_consent_ui.html"
 "src/apf/design_reference_ui.html" = "apf/design_reference_ui.html"
+"src/apf/railway_setup_ui.html" = "apf/railway_setup_ui.html"
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]

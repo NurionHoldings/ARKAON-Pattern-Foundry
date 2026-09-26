@@ -13,7 +13,7 @@ from typing import Annotated, Literal, Protocol
 from uuid import UUID
 
 from fastapi import Cookie, Depends, Header, HTTPException, Query, Request, Response, status
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import BaseModel, Field
 
 from .admin_change_control import AdminChangeController, ChangeControlRejected
@@ -50,6 +50,7 @@ from .durable_review import (
     ReviewDecision,
     ReviewStage,
 )
+from .github_owner_auth import GitHubOwnerAuth, OwnerAuthError
 from .logo_draft import (
     LogoDraftError,
     LogoDraftRequest,
@@ -65,7 +66,14 @@ from .plain_language_approval import (
     PlainLanguageApprovalStore,
 )
 from .platform_page_preview import PageKind
+from .popular_format import Decision as FormatDecision
+from .popular_format import ProposalRequest, ProposalStore
+from .popular_format import build as build_format
 from .public_page_observer import ObservationError, PublicPageObserver
+from .railway_actions import execute as execute_railway_action
+from .railway_actions import preview as preview_railway_action
+from .railway_advisor import guidance as railway_guidance
+from .railway_provider import RailwayClient, RailwayProviderError
 from .reference_material_consent import (
     NOTICE_TEXT,
     NOTICE_VERSION,
@@ -90,7 +98,16 @@ from .visual_platform_dialogue import (
 
 SESSION_COOKIE = "apf_console_session"
 CSRF_COOKIE = "apf_console_csrf"
+OAUTH_STATE_COOKIE = "apf_console_oauth_state"
 SAFE_METHODS = frozenset({"GET", "HEAD", "OPTIONS"})
+
+
+class RailwayServicePreviewRequest(BaseModel):
+    name: str = Field(min_length=3, max_length=40)
+
+
+class RailwayServiceCreateRequest(BaseModel):
+    approval_token: str = Field(min_length=40, max_length=2048)
 
 
 @dataclass(frozen=True)
@@ -320,6 +337,7 @@ def install_console(
     application,
     *,
     security: ConsoleSecurity,
+    owner_auth: GitHubOwnerAuth | None = None,
     review_store: ConsoleReviewStore | None = None,
     approval_store: PlainLanguageApprovalStore | None = None,
     visual_dialogue_store: VisualPlatformDialogueStore | None = None,
@@ -330,6 +348,7 @@ def install_console(
     design_reference_store: DesignReferenceStore | None = None,
     style_proposal_store: StyleProposalStore | None = None,
     public_page_observer: PublicPageObserver | None = None,
+    format_proposal_store: ProposalStore | None = None,
 ) -> None:
     application.state.console_security = security
     application.state.console_review_store = review_store
@@ -342,6 +361,7 @@ def install_console(
     application.state.design_reference_store = design_reference_store
     application.state.style_proposal_store = style_proposal_store
     application.state.public_page_observer = public_page_observer
+    application.state.format_proposal_store = format_proposal_store
 
     def principal(
         request: Request,
@@ -451,6 +471,143 @@ def install_console(
         response.set_cookie(SESSION_COOKIE, token, httponly=True, secure=True, samesite="strict")
         response.set_cookie(CSRF_COOKIE, csrf, httponly=False, secure=True, samesite="strict")
         return {"csrf_token": csrf}
+
+    @application.get("/console/auth/github", include_in_schema=False)
+    def start_owner_sign_in() -> RedirectResponse:
+        if owner_auth is None:
+            raise HTTPException(status_code=503, detail="owner sign-in unavailable")
+        destination, state_cookie = owner_auth.start()
+        response = RedirectResponse(destination, status_code=302)
+        response.set_cookie(
+            OAUTH_STATE_COOKIE, state_cookie, max_age=300, httponly=True,
+            secure=True, samesite="lax", path="/console/auth",
+        )
+        response.headers["Cache-Control"] = "no-store"
+        return response
+
+    @application.get("/console/auth/callback", include_in_schema=False)
+    def finish_owner_sign_in(
+        code: str, state: str,
+        state_cookie: Annotated[str | None, Cookie(alias=OAUTH_STATE_COOKIE)] = None,
+    ) -> RedirectResponse:
+        if owner_auth is None:
+            raise HTTPException(status_code=503, detail="owner sign-in unavailable")
+        try:
+            identity = owner_auth.verify_callback(code=code, state=state, cookie=state_cookie)
+        except OwnerAuthError as error:
+            raise HTTPException(status_code=403, detail=str(error)) from None
+        token = security.issue(ConsolePrincipal(
+            tenant_id=identity.tenant_id, principal_id=identity.principal_id, role="owner",
+        ))
+        response = RedirectResponse("/console", status_code=303)
+        response.set_cookie(
+            SESSION_COOKIE, token, max_age=3600, httponly=True,
+            secure=True, samesite="strict", path="/",
+        )
+        response.set_cookie(
+            CSRF_COOKIE, secrets.token_urlsafe(32), max_age=3600,
+            httponly=False, secure=True, samesite="strict", path="/",
+        )
+        response.delete_cookie(OAUTH_STATE_COOKIE, path="/console/auth", secure=True, httponly=True, samesite="lax")
+        response.headers["Cache-Control"] = "no-store"
+        return response
+
+    @application.get("/v1/console/railway-readiness")
+    def railway_readiness(
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+    ) -> dict[str, object]:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        path = Path(__file__).resolve().parents[2] / "knowledge/readiness/v0.1-readiness.json"
+        try:
+            readiness = json.loads(path.read_text(encoding="utf-8"))
+            return {
+                "overall_status": readiness["overall_status"],
+                "deployment_allowed": readiness["locks"]["deployment"] is True,
+            }
+        except (OSError, ValueError, KeyError, TypeError):
+            raise HTTPException(status_code=503, detail="readiness evidence unavailable") from None
+
+    @application.get("/v1/console/railway-guidance")
+    def railway_guidance_view(
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        response: Response,
+    ) -> dict[str, object]:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        try:
+            response.headers["Cache-Control"] = "no-store"
+            return railway_guidance()
+        except (OSError, ValueError, KeyError, TypeError):
+            raise HTTPException(status_code=503, detail="Railway guidance unavailable") from None
+
+    @application.get("/v1/console/railway-live")
+    def railway_live(
+        actor: Annotated[ConsolePrincipal, Depends(principal)], response: Response,
+    ) -> dict:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        response.headers["Cache-Control"] = "no-store"
+        try:
+            return RailwayClient.from_environment().snapshot()
+        except RailwayProviderError as error:
+            raise HTTPException(status_code=503, detail=str(error)) from None
+
+    @application.post("/v1/console/railway-service-preview")
+    def railway_service_preview(
+        payload: RailwayServicePreviewRequest,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)], response: Response,
+    ) -> dict:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        response.headers["Cache-Control"] = "no-store"
+        try:
+            return preview_railway_action(
+                RailwayClient.from_environment(), payload.name, str(actor.principal_id),
+            )
+        except RailwayProviderError as error:
+            raise HTTPException(status_code=503, detail=str(error)) from None
+
+    @application.post("/v1/console/railway-service-create")
+    def railway_service_create(
+        payload: RailwayServiceCreateRequest,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)], response: Response,
+    ) -> dict:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        try:
+            if not railway_guidance()["deployment_allowed"]:
+                raise HTTPException(status_code=423, detail="deployment readiness lock is active")
+            response.headers["Cache-Control"] = "no-store"
+            return execute_railway_action(
+                RailwayClient.from_environment(), payload.approval_token,
+                str(actor.principal_id),
+            )
+        except RailwayProviderError as error:
+            raise HTTPException(status_code=503, detail=str(error)) from None
+        except (OSError, ValueError, KeyError, TypeError):
+            raise HTTPException(status_code=503, detail="readiness evidence unavailable") from None
+
+    @application.get("/console/railway-setup", response_class=HTMLResponse, include_in_schema=False)
+    def railway_setup(actor: Annotated[ConsolePrincipal, Depends(principal)]) -> HTMLResponse:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        return HTMLResponse(
+            Path(__file__).with_name("railway_setup_ui.html").read_text(encoding="utf-8"),
+            headers={
+                "Cache-Control": "no-store",
+                "Content-Security-Policy": (
+                    "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; "
+                    "connect-src 'self'; base-uri 'none'; frame-ancestors 'none'"
+                ),
+                "Referrer-Policy": "no-referrer",
+                "X-Content-Type-Options": "nosniff",
+            },
+        )
 
     @application.get("/console", response_class=HTMLResponse, include_in_schema=False)
     def console_home(actor: Annotated[ConsolePrincipal, Depends(principal)]) -> HTMLResponse:
@@ -1861,6 +2018,85 @@ def install_console(
                 "X-Content-Type-Options": "nosniff",
             },
         )
+
+    def format_asset(actor: ConsolePrincipal, kind: str, record_id: str) -> dict:
+        stores = {
+            "site_draft": application.state.conversational_site_draft_store,
+            "logo_draft": application.state.logo_draft_store,
+            "business_card": application.state.business_card_store,
+            "platform_dialogue": application.state.visual_dialogue_store,
+        }
+        store = stores.get(kind)
+        if store is None:
+            raise HTTPException(status_code=404, detail="asset not found")
+        try:
+            if kind == "platform_dialogue":
+                asset = store.get_for_owner(record_id, tenant_id=str(actor.tenant_id), owner_principal_id=str(actor.principal_id))
+            else:
+                asset = store.get(record_id, tenant_id=str(actor.tenant_id), owner_principal_id=str(actor.principal_id))
+        except (SiteDraftError, LogoDraftError, BusinessCardError, VisualDialogueError, ValueError, KeyError):
+            raise HTTPException(status_code=404, detail="asset not found") from None
+        if not asset.get("intent_dna") or not asset.get("revisions"):
+            raise HTTPException(status_code=422, detail="asset has no current intent/DNA revision")
+        return asset
+
+    def format_store(request: Request) -> ProposalStore:
+        store = request.app.state.format_proposal_store
+        if store is None:
+            raise HTTPException(status_code=503, detail="format proposal store unavailable")
+        return store
+
+    @application.get("/format-proposals", response_class=HTMLResponse, include_in_schema=False)
+    def format_proposals_page(actor: Annotated[ConsolePrincipal, Depends(principal)]) -> HTMLResponse:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        return HTMLResponse(Path(__file__).with_name("popular_format_ui.html").read_text(encoding="utf-8"),
+            headers={"Cache-Control": "no-store", "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'"})
+
+    @application.post("/v1/console/format-proposals", status_code=201)
+    def create_format_proposal(payload: ProposalRequest, request: Request,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)]) -> dict:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        asset = format_asset(actor, payload.artifact_type, payload.record_id)
+        latest = asset["revisions"][-1]["revision_digest"]
+        if payload.source_revision_digest != latest:
+            raise HTTPException(status_code=409, detail="SOURCE_REVISION_CHANGED")
+        try:
+            proposal = build_format(payload, asset["intent_dna"], str(actor.principal_id), str(actor.tenant_id))
+        except ValueError as error:
+            raise HTTPException(status_code=422, detail=str(error)) from None
+        return format_store(request).create(proposal)
+
+    @application.get("/v1/console/format-proposals/{proposal_id}")
+    def get_format_proposal(proposal_id: UUID, request: Request,
+        actor: Annotated[ConsolePrincipal, Depends(principal)]) -> dict:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        try:
+            return format_store(request).get(str(proposal_id), str(actor.tenant_id), str(actor.principal_id))
+        except KeyError:
+            raise HTTPException(status_code=404, detail="proposal not found") from None
+
+    @application.post("/v1/console/format-proposals/{proposal_id}/decision")
+    def decide_format_proposal(proposal_id: UUID, payload: FormatDecision, request: Request,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)]) -> dict:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        store = format_store(request)
+        try:
+            doc = store.get(str(proposal_id), str(actor.tenant_id), str(actor.principal_id))
+            asset = format_asset(actor, doc["artifact_type"], doc["record_id"])
+            return store.decide(str(proposal_id), str(actor.tenant_id), str(actor.principal_id), payload,
+                                asset["intent_dna"], asset["revisions"][-1]["revision_digest"])
+        except KeyError:
+            raise HTTPException(status_code=404, detail="proposal not found") from None
+        except ValueError as error:
+            raise HTTPException(status_code=409, detail=str(error)) from None
 
     @application.post("/v1/console/site-drafts", status_code=status.HTTP_201_CREATED)
     def create_site_draft(

@@ -13,6 +13,7 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
+from .asset_identity import make_asset_identity
 from .platform_page_preview import PageKind, render_page_mockup
 
 
@@ -87,6 +88,14 @@ class VisualPlatformDialogueStore:
             "confirmations": [],
             "automatic_implementation": False,
             "automatic_deployment": False,
+            "intent_dna": make_asset_identity(
+                tenant_id=tenant_id, owner_principal_id=owner_principal_id,
+                artifact_type="platform_specification", artifact_id=dialogue_id,
+                original_intent={"purpose": "platform_specification"},
+                dna={"screens": ["home", "detail"], "brief_revision": 1,
+                     "capability_count": len(brief.required_capabilities),
+                     "deployment": "NOT_CONNECTED"},
+            ),
         }
         document["dialogue_digest"] = _digest(document)
         _exclusive_json(self._path(dialogue_id), document)
@@ -354,6 +363,7 @@ def _public(document: dict[str, object], *, detail: bool = False) -> dict[str, o
         "dialogue_id": document["dialogue_id"], "name": brief["name"],
         "state": document["state"], "revision_count": len(document["revisions"]),
         "automatic_implementation": False, "automatic_deployment": False,
+        "intent_dna": document.get("intent_dna"),
     }
     if detail:
         value.update(

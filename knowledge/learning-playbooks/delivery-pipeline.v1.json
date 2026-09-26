@@ -1,0 +1,125 @@
+{
+  "schema_version": "apf.delivery-pipeline/1.0",
+  "state": "DESIGN_ONLY",
+  "scope": [
+    "landing",
+    "template",
+    "platform"
+  ],
+  "services": {
+    "github": {
+      "connection": "GITHUB_APP_SELECTED_REPOSITORY",
+      "default_permission": "CONTENTS_AND_PR_ON_SELECTED_REPOSITORY",
+      "write": "USER_CLICK_AND_READ_BACK"
+    },
+    "railway": {
+      "connection": "OAUTH_SELECTED_PROJECT",
+      "default_permission": "PROJECT_MEMBER_WHEN_NEEDED",
+      "write": "USER_CLICK_COST_PREVIEW_AND_READ_BACK"
+    },
+    "netlify": {
+      "connection": "OAUTH_SELECTED_TEAM_SITE",
+      "default_deploy": "DRAFT",
+      "production": "SEPARATE_USER_APPROVAL"
+    }
+  },
+  "states": [
+    "DRAFT_READY",
+    "OWNER_PREVIEW_CONFIRMED",
+    "GITHUB_CONNECTION_PENDING",
+    "REPOSITORY_BOUND",
+    "REVIEW_BRANCH_SAVED",
+    "SERVER_SCOPE_DECIDED",
+    "RAILWAY_CONNECTION_PENDING",
+    "BACKEND_CONFIGURED",
+    "AUTH_AND_DATA_VERIFIED",
+    "NETLIFY_CONNECTION_PENDING",
+    "DRAFT_DEPLOY_VERIFIED",
+    "PRODUCTION_APPROVAL_PENDING",
+    "PRODUCTION_DEPLOY_VERIFIED"
+  ],
+  "gates": {
+    "repository_write": [
+      "owner",
+      "tenant",
+      "repository_selection",
+      "scoped_app_installation",
+      "preview_digest",
+      "csrf",
+      "nonce",
+      "expected_head_sha"
+    ],
+    "railway_resource_write": [
+      "owner",
+      "tenant",
+      "selected_project",
+      "oauth_scope",
+      "cost_preview",
+      "explicit_single_action_click",
+      "idempotency",
+      "provider_read_back"
+    ],
+    "draft_deploy": [
+      "owner",
+      "site_binding",
+      "exact_artifact_digest",
+      "netlify_oauth",
+      "preview_only",
+      "provider_read_back"
+    ],
+    "production_deploy": [
+      "deployment_lock_true",
+      "owner_specific_approval",
+      "ci_exact_sha",
+      "authentication_proof",
+      "data_backup_restore_proof",
+      "domain_and_tls",
+      "rollback_target",
+      "provider_read_back"
+    ]
+  },
+  "invariants": [
+    "A user acknowledgement is not provider verification.",
+    "GitHub OAuth owner login is not customer account management.",
+    "Static artifacts skip Railway only when no API, login or database is required.",
+    "Never collect provider passwords or long-lived tokens in chat or browser storage.",
+    "No automatic merge or production deploy from a push unless reviewed policy explicitly allows it.",
+    "Partial failures preserve evidence and surface remaining resources and costs.",
+    "Present the currently implemented artifact and its preview before asking for operational setup.",
+    "Do not mark a result artifact incomplete solely because production deployment is held; show its exact capability boundary.",
+    "Operational completion requires Railway backend proof only for artifacts with account, API, or database needs."
+  ],
+  "current_capability": "GUIDANCE_ONLY",
+  "implementation_plan": [
+    "artifact_package",
+    "github_app_write",
+    "railway_oauth_resources",
+    "netlify_oauth_draft",
+    "verified_activation"
+  ],
+  "source": "docs/arkaon-delivery-pipeline.md",
+  "stages": {
+    "result_presentation": {
+      "label": "현재 구현 결과물 제시",
+      "status": "AVAILABLE_CAPABILITY_ONLY",
+      "required_evidence": [
+        "artifact_revision_or_preview",
+        "owner_visible_preview",
+        "implemented_vs_pending_capability_list"
+      ],
+      "user_message": "여기까지 만들 수 있습니다. 시안을 먼저 확인하세요.",
+      "requires_railway_backend_proof": false
+    },
+    "operational_readiness": {
+      "label": "실제 운영·배포를 위한 추가 개발",
+      "status": "HOLD_UNTIL_VERIFIED",
+      "required_evidence": [
+        "github_repository_write",
+        "railway_backend_auth_db_volume_proof_when_needed",
+        "netlify_preview_and_public_deploy_proof"
+      ],
+      "user_message": "공개 운영에는 연결 기능 개발과 서비스별 보안·복구 검증이 추가로 필요합니다.",
+      "requires_explicit_next_stage_selection": true
+    }
+  }
+}

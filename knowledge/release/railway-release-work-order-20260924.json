@@ -1,0 +1,238 @@
+{
+  "schema_version": "apf.arkaon-release-work-order/1.0",
+  "created_at": "2026-09-24",
+  "owner_instruction": "ARKAON prepares and executes the isolated release preparation work. ETERNIAN audits ARKAON evidence and presents an approval decision; production changes remain separately gated.",
+  "repository": "NurionHoldings/ARKAON-Pattern-Foundry",
+  "snapshot": {
+    "main_sha": "32af99aa9e7f2389977b1ad4bc6ff167a270df26",
+    "readiness": "PRODUCT_IMPLEMENT_HOLD",
+    "deployment_allowed": false,
+    "railway_environment": "production",
+    "railway_pending_changes": 4,
+    "railway_app": "staged, not deployed",
+    "candidate_kind": "PRE_HANDOFF_SNAPSHOT_SHA; MUST_REQUERY_LATEST_PR_71_HEAD",
+    "prs": [
+      {
+        "number": 58,
+        "base": "main",
+        "head": "feat/059-conversational-static-draft",
+        "head_sha": "2c6f69cc35da468076b5f4db92afb97e68ec15d4",
+        "ci_run": 144,
+        "ci_status": "success",
+        "observed_compare_status": "ahead",
+        "behind_parent_commits": 0,
+        "review_submissions": 0,
+        "draft": true
+      },
+      {
+        "number": 59,
+        "base": "feat/059-conversational-static-draft",
+        "head": "feat/060-business-card",
+        "head_sha": "75698f9c362bae0a5f6da6631650990b32188729",
+        "ci_run": 145,
+        "ci_status": "success",
+        "observed_compare_status": "ahead",
+        "behind_parent_commits": 0,
+        "review_submissions": 0,
+        "draft": true
+      },
+      {
+        "number": 60,
+        "base": "feat/060-business-card",
+        "head": "feat/061-logo-motion-foundation",
+        "head_sha": "5b9408fc54c6e04bdb7c11c9e70fd078d5f34e7e",
+        "ci_run": 150,
+        "ci_status": "success",
+        "observed_compare_status": "ahead",
+        "behind_parent_commits": 0,
+        "review_submissions": 0,
+        "draft": true
+      },
+      {
+        "number": 61,
+        "base": "feat/061-logo-motion-foundation",
+        "head": "feat/062-logo-image-reference",
+        "head_sha": "2f7b1a21aacb57f80fa583e564f7e7a4aa3ae34d",
+        "ci_run": 184,
+        "ci_status": "success",
+        "observed_compare_status": "ahead",
+        "behind_parent_commits": 0,
+        "review_submissions": 0,
+        "draft": true
+      },
+      {
+        "number": 62,
+        "base": "feat/062-logo-image-reference",
+        "head": "feat/063-preview-first-workflow",
+        "head_sha": "252518600af7efe8935d6d209cb76f448d98ee32",
+        "ci_run": 151,
+        "ci_status": "success",
+        "observed_compare_status": "diverged",
+        "behind_parent_commits": 2,
+        "review_submissions": 0,
+        "draft": true
+      },
+      {
+        "number": 63,
+        "base": "feat/063-preview-first-workflow",
+        "head": "feat/064-business-card-live-preview",
+        "head_sha": "ceb46a485f2f6d4266edc0d19991864c036dac1f",
+        "ci_run": 153,
+        "ci_status": "success",
+        "observed_compare_status": "ahead",
+        "behind_parent_commits": 0,
+        "review_submissions": 0,
+        "draft": true
+      },
+      {
+        "number": 64,
+        "base": "feat/064-business-card-live-preview",
+        "head": "feat/065-site-revision-preview",
+        "head_sha": "934658aebc0861af965d001bde7da64c9804acdb",
+        "ci_run": 155,
+        "ci_status": "success",
+        "observed_compare_status": "ahead",
+        "behind_parent_commits": 0,
+        "review_submissions": 0,
+        "draft": true
+      },
+      {
+        "number": 65,
+        "base": "feat/065-site-revision-preview",
+        "head": "feat/066-landing-device-preview",
+        "head_sha": "624394e7df69974e50844b61210e5c0ba477f906",
+        "ci_run": 156,
+        "ci_status": "success",
+        "observed_compare_status": "ahead",
+        "behind_parent_commits": 0,
+        "review_submissions": 0,
+        "draft": true
+      },
+      {
+        "number": 66,
+        "base": "feat/066-landing-device-preview",
+        "head": "feat/067-platform-page-previews",
+        "head_sha": "14bcfe5f9ca1541bbbf5b87cfd098a78bbfe3230",
+        "ci_run": 162,
+        "ci_status": "success",
+        "observed_compare_status": "ahead",
+        "behind_parent_commits": 0,
+        "review_submissions": 0,
+        "draft": true
+      },
+      {
+        "number": 67,
+        "base": "feat/067-platform-page-previews",
+        "head": "feat/068-visual-system-upgrade",
+        "head_sha": "1ac03428746b1e89d8c53d4af32f72cb29755e08",
+        "ci_run": 166,
+        "ci_status": "success",
+        "observed_compare_status": "ahead",
+        "behind_parent_commits": 0,
+        "review_submissions": 0,
+        "draft": true
+      },
+      {
+        "number": 68,
+        "base": "feat/068-visual-system-upgrade",
+        "head": "feat/069-design-reference-urls",
+        "head_sha": "a0adee96c1465706e52253d45aeb380dce587a67",
+        "ci_run": 168,
+        "ci_status": "success",
+        "observed_compare_status": "ahead",
+        "behind_parent_commits": 0,
+        "review_submissions": 0,
+        "draft": true
+      },
+      {
+        "number": 69,
+        "base": "feat/069-design-reference-urls",
+        "head": "feat/070-design-observation-preview",
+        "head_sha": "e7963ff7a295e7602b489456c82aff905b24b23b",
+        "ci_run": 174,
+        "ci_status": "success",
+        "observed_compare_status": "ahead",
+        "behind_parent_commits": 0,
+        "review_submissions": 0,
+        "draft": true
+      },
+      {
+        "number": 70,
+        "base": "feat/070-design-observation-preview",
+        "head": "feat/071-automatic-url-design-observation",
+        "head_sha": "6a3c5f1236e6ba320ae2a6adc1243f979028757d",
+        "ci_run": 181,
+        "ci_status": "success",
+        "observed_compare_status": "ahead",
+        "behind_parent_commits": 0,
+        "review_submissions": 0,
+        "draft": true
+      },
+      {
+        "number": 71,
+        "base": "feat/071-automatic-url-design-observation",
+        "head": "feat/072-railway-staging-readiness",
+        "head_sha": "452d4374190e45a80480fc24d424e885c9e7b618",
+        "ci_run": 226,
+        "ci_status": "success",
+        "observed_compare_status": "ahead",
+        "behind_parent_commits": 0,
+        "review_submissions": 0,
+        "draft": true
+      }
+    ],
+    "pre_handoff_sha": "452d4374190e45a80480fc24d424e885c9e7b618",
+    "pr_71_head_must_be_refetched": true
+  },
+  "arkaon_actions": [
+    {
+      "id": "A1",
+      "action": "Re-fetch all PR heads, bases, draft/review states, mergeability and exact SHA CI; reject any stale row.",
+      "output": "reports/release/railway-pr-chain-current.json"
+    },
+    {
+      "id": "A2",
+      "action": "Resolve PR #62 parent divergence in an isolated worktree without force push, preserving approved content and evidence hashes; rerun CI; check every descendant after parent movement.",
+      "output": "PR update plus tests and compare report"
+    },
+    {
+      "id": "A3",
+      "action": "Assemble exact application config and staging-only validation evidence: separate /data app volume, Postgres reference, owner OAuth, migration, tenant, persistence, backup restore, health and denied non-owner.",
+      "output": "reports/release/railway-staging-evidence.json"
+    },
+    {
+      "id": "A4",
+      "action": "Produce candidate manifest with per-PR SHA, CI run, review status, changed files, rollback, and staged costs; submit for ETERNIAN independent audit.",
+      "output": "reports/release/railway-candidate-manifest.json"
+    },
+    {
+      "id": "A5",
+      "action": "After scope-bound owner approval recorded following ETERNIAN audit, merge PRs in order, re-evaluate each next PR against its new base, rerun CI and record resulting main SHA. Do not deploy until separate deployment approval.",
+      "output": "reports/release/railway-final-main-sha.json"
+    }
+  ],
+  "eternian_audit": [
+    "Compare every claimed SHA and GitHub CI to provider read-back",
+    "Review #62 reconciliation and evidence-hash integrity",
+    "Verify staging proof and production lock independently",
+    "Record decision APPROVE/HOLD with exact scope digest; approval does not itself trigger deployment"
+  ],
+  "hold_conditions": [
+    "PR is draft or has no reviewed approval when merge is attempted",
+    "Current head differs from approved manifest",
+    "CI missing or failing for exact head",
+    "Parent merge changes downstream diff without renewed review",
+    "PRODUCT_IMPLEMENT_HOLD or deployment=false for production deployment",
+    "Railway production has staged changes connecting main with auto deployment",
+    "Railway app volume/variables/migrations/OAuth/backup proof missing"
+  ],
+  "permissions": {
+    "may_create_isolated_candidate": true,
+    "may_update_feature_branches_after_tests": true,
+    "may_merge_before_audit_and_owner_approval": false,
+    "may_apply_railway_production_changes": false,
+    "may_change_readiness_lock_without_review": false
+  },
+  "status": "ARKAON_EXECUTION_PENDING",
+  "final_deploy_sha": null
+}
