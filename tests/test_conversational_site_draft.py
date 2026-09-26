@@ -128,3 +128,24 @@ def test_previous_persisted_readiness_variant_is_compatible_but_not_trusted(tmp_
     ]
     assert readiness["github"]["connection_feature"] == "NOT_AVAILABLE"
     assert "app_installation" not in readiness["github"]
+
+
+def test_unsaved_site_revision_preview_is_escaped_owner_bound_and_does_not_write(tmp_path):
+    store, tenant, owner, draft_id = setup(tmp_path)
+    before = store.get(draft_id, tenant_id=tenant, owner_principal_id=owner)
+    request = SiteDraftRevisionRequest(
+        based_on_revision_digest=before["revisions"][-1]["revision_digest"],
+        change_note="임시 문구 확인",
+        title="새 제목 <script>alert(1)</script>",
+        description="저장 전 미리보기 내용",
+    )
+    page = store.preview_revision(
+        draft_id, tenant_id=tenant, owner_principal_id=owner, request=request
+    )
+    assert "&lt;script&gt;" in page and "<script>alert" not in page
+    assert "저장 전 미리보기 내용" in page
+    assert store.get(draft_id, tenant_id=tenant, owner_principal_id=owner) == before
+    with pytest.raises(SiteDraftError, match="NOT_FOUND"):
+        store.preview_revision(
+            draft_id, tenant_id=tenant, owner_principal_id=str(uuid4()), request=request
+        )
