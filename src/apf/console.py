@@ -2149,6 +2149,25 @@ def install_console(
             },
         )
 
+    @application.post("/v1/console/business-cards/preview")
+    def preview_business_card(
+        payload: BusinessCardRequest,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[BusinessCardStore, Depends(business_cards)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, str]:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        try:
+            return store.preview(
+                tenant_id=str(actor.tenant_id),
+                owner_principal_id=str(actor.principal_id),
+                request=payload,
+            )
+        except BusinessCardError as error:
+            raise business_card_error(error) from None
+
     @application.post("/v1/console/business-cards", status_code=status.HTTP_201_CREATED)
     def create_business_card(
         payload: BusinessCardRequest,
