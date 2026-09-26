@@ -15,6 +15,9 @@ def test_logo_ui_exposes_complete_owner_journey_and_accessible_states():
         "reportValidity()",
         "저장된 SVG 다운로드",
         "버전 기록",
+        "움직임 미리보기",
+        "motionImage.src=url",
+        "참고 이미지 미리보기",
         "도형·텍스트 기반 SVG 시안입니다",
     ):
         assert value in UI
