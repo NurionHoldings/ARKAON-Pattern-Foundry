@@ -112,6 +112,13 @@ class VisualPlatformDialogueStore:
         document = self._bound(dialogue_id, tenant_id)
         return _public(document, detail=True)
 
+    def get_for_owner(
+        self, dialogue_id: str, *, tenant_id: str, owner_principal_id: str
+    ) -> dict[str, object]:
+        return _public(
+            self._owner_bound(dialogue_id, tenant_id, owner_principal_id), detail=True
+        )
+
     def submit_revision(
         self, dialogue_id: str, *, tenant_id: str, submission: RevisionSubmission,
     ) -> dict[str, object]:

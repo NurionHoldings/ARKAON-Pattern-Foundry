@@ -16,6 +16,7 @@ from .console import (
     install_console,
 )
 from .conversational_site_draft import ConversationalSiteDraftStore
+from .design_reference_urls import DesignReferenceStore
 from .domain import AnalysisTarget, AnalysisTargetCreate, TargetState
 from .logo_draft import LogoDraftStore
 from .plain_language_approval import PlainLanguageApprovalStore
@@ -76,6 +77,7 @@ def create_app(
     logo_draft_store: LogoDraftStore | None = None,
     business_card_store: BusinessCardStore | None = None,
     reference_consent_store: ReferenceConsentStore | None = None,
+    design_reference_store: DesignReferenceStore | None = None,
 ) -> FastAPI:
     application = FastAPI(title="ARKAON Pattern Foundry", version="0.1.0")
     application.state.repository = repository or repository_from_config()
@@ -98,6 +100,7 @@ def create_app(
         ),
         logo_draft_store=logo_store,
         business_card_store=business_card_store or BusinessCardStore(runtime_root(), logo_store),
+        design_reference_store=design_reference_store or DesignReferenceStore(runtime_root()),
         reference_consent_store=reference_consent_store
         or ReferenceConsentStore(Path(os.getenv("APF_FOUNDRY_ROOT", Path(__file__).parents[2]))),
     )
