@@ -1,6 +1,9 @@
 import json
+from datetime import UTC, datetime
 
-from apf.mailbox_maintenance import apply_archive, build_plan
+from apf.mailbox_maintenance import apply_archive, build_plan, reconcile_mailbox_index
+
+NOW = datetime(2031, 1, 1, tzinfo=UTC)
 
 
 def write_packet(path, **values):
@@ -81,6 +84,38 @@ def test_relayed_self_improvement_is_archived_not_delivered(tmp_path):
     assert plan.deliver == ()
     assert plan.relayed == (request,)
     assert plan.archive == (request,)
+
+
+def test_reconcile_closes_pending_when_payload_archived(tmp_path):
+    inbox = tmp_path / "inbox" / "research"
+    inbox.mkdir(parents=True)
+    archived_name = "done-research.json"
+    archive_target = tmp_path / "archive" / "mailbox" / "2026-09-25" / "research" / archived_name
+    archive_target.parent.mkdir(parents=True)
+    write_packet(archive_target, status="PENDING", summary="archived packet")
+    items = tmp_path / "state" / "mailbox" / "items"
+    items.mkdir(parents=True)
+    (items / "ghost123456789abc.json").write_text(
+        json.dumps(
+            {
+                "item_id": "ghost123456789abc",
+                "status": "PENDING",
+                "payload_path": f"inbox/research/{archived_name}",
+                "platform_id": "DEMO",
+                "summary": "ghost",
+            }
+        ),
+        encoding="utf-8",
+    )
+    write_packet(inbox / "active.json", status="PENDING", summary="still active")
+
+    report = reconcile_mailbox_index(foundry_root=tmp_path, now=NOW)
+
+    ghost = json.loads((items / "ghost123456789abc.json").read_text(encoding="utf-8"))
+    assert ghost["status"] == "FULFILLED"
+    assert ghost["reconcile_reason"] == "payload_archived"
+    assert report["counts"]["payload_archived"] == 1
+    assert report["counts"]["still_pending"] == 0
 
 
 def test_plan_keeps_all_pending_while_selecting_batch(tmp_path):

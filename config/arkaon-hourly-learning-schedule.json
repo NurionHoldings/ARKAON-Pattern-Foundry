@@ -1,0 +1,38 @@
+{
+  "schema_version": "apf.hourly-learning-schedule/v1",
+  "enabled": true,
+  "timezone": "Asia/Seoul",
+  "automatic_implement_allowed": false,
+  "production_change_allowed": false,
+  "notes": [
+    "local hour 0-23 maps to one evolution domain topic per hour",
+    "hour 23 is INTEGRATION_REVIEW: collect all domain-tagged sources",
+    "15-minute collector cycles use the active hour topic until the hour changes"
+  ],
+  "hours": [
+    {"hour": 0, "domain_id": "LIFECYCLE_STEWARDSHIP", "topic_title": "템플릿·플랫폼 지속 유지"},
+    {"hour": 1, "domain_id": "LIFECYCLE_STEWARDSHIP", "topic_title": "버전 pin·migration·sunset"},
+    {"hour": 2, "domain_id": "AUTH_ONBOARDING_UX", "topic_title": "로그인·회원가입 편의"},
+    {"hour": 3, "domain_id": "AUTH_ONBOARDING_UX", "topic_title": "OAuth·세션 복구"},
+    {"hour": 4, "domain_id": "HOME_SURFACE_OPTIMIZATION", "topic_title": "홈 색상·목적 적합 구성"},
+    {"hour": 5, "domain_id": "HOME_SURFACE_OPTIMIZATION", "topic_title": "trust-before-offer·CTA"},
+    {"hour": 6, "domain_id": "TEMPLATE_COMPOSITION", "topic_title": "템플릿 구조·섹션 리듬"},
+    {"hour": 7, "domain_id": "TEMPLATE_COMPOSITION", "topic_title": "variant·preview sandbox"},
+    {"hour": 8, "domain_id": "TYPOGRAPHY_MOTION", "topic_title": "서체·색상·텍스트 모션"},
+    {"hour": 9, "domain_id": "TYPOGRAPHY_MOTION", "topic_title": "contrast·reduce-motion"},
+    {"hour": 10, "domain_id": "SIGNATURE_MOTION", "topic_title": "차별화 애니메이션"},
+    {"hour": 11, "domain_id": "SIGNATURE_MOTION", "topic_title": "브랜드 모션·성능 예산"},
+    {"hour": 12, "domain_id": "VIDEO_TEMPLATE_EFFECTS", "topic_title": "영상 템플릿 타이밍·레이어"},
+    {"hour": 13, "domain_id": "VIDEO_TEMPLATE_EFFECTS", "topic_title": "beat-sync·export contract"},
+    {"hour": 14, "domain_id": "CROSS_FEATURE_COHERENCE", "topic_title": "기능 간 연관·딥링크"},
+    {"hour": 15, "domain_id": "CROSS_FEATURE_COHERENCE", "topic_title": "nav·설정-미리보기 연동"},
+    {"hour": 16, "domain_id": "PAYMENT_CHECKOUT_FLOW", "topic_title": "결제 단계·가격 투명"},
+    {"hour": 17, "domain_id": "PAYMENT_CHECKOUT_FLOW", "topic_title": "checkout retry·receipt"},
+    {"hour": 18, "domain_id": "HOME_SURFACE_OPTIMIZATION", "topic_title": "홈 surface 복습"},
+    {"hour": 19, "domain_id": "TEMPLATE_COMPOSITION", "topic_title": "템플릿 composition 복습"},
+    {"hour": 20, "domain_id": "TYPOGRAPHY_MOTION", "topic_title": "타이포·모션 복습"},
+    {"hour": 21, "domain_id": "CROSS_FEATURE_COHERENCE", "topic_title": "cross-feature 복습"},
+    {"hour": 22, "domain_id": "EMERGING_MARKET_SIGNALS", "topic_title": "신규 시장·변화 감지"},
+    {"hour": 23, "domain_id": "INTEGRATION_REVIEW", "topic_title": "전주제 통합 관측", "collect_all_domains": true}
+  ]
+}

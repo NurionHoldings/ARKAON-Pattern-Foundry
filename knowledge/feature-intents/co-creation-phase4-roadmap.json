@@ -1,0 +1,8 @@
+{
+  "schema_version": "apf.feature-intent-seed/v1",
+  "feature_id": "co-creation-phase4-roadmap",
+  "contributor": "BEOM",
+  "pass_stage": 0,
+  "review_status": "PROPOSED",
+  "intent_summary": "Deliver user-requested works via staged codegen, tenant preview sandbox, and gated deploy after operator approval."
+}

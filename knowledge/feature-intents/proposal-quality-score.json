@@ -1,0 +1,8 @@
+{
+  "schema_version": "apf.feature-intent-seed/v1",
+  "feature_id": "proposal-quality-score",
+  "contributor": "BEOM",
+  "pass_stage": 0,
+  "review_status": "PROPOSED",
+  "intent_summary": "Weight learning assets into a proposal quality score gating co-creation and orchestrator runs."
+}

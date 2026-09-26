@@ -1,0 +1,19 @@
+{
+  "schema_version": "apf.cross-platform-learning/v1",
+  "enabled": true,
+  "execute_public_fetch": true,
+  "emit_landing_pattern_proposals": true,
+  "emit_eternian_lesson_packet": true,
+  "max_fetches_per_run": 3,
+  "minimum_platforms_for_pattern": 2,
+  "automatic_implement_allowed": false,
+  "production_change_allowed": false,
+  "platform_urls": {
+    "ZAKSIMSPACE": "https://zaksimspace.co.kr/"
+  },
+  "notes": [
+    "closes DISCOVER→COMPARE→ABSTRACT→LESSON after analysis target resolution",
+    "landing structure patterns are PROPOSED only — not promoted to 30-pattern catalog",
+    "immutable reflective lessons require eternian then operator decision"
+  ]
+}

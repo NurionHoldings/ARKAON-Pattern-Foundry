@@ -1,0 +1,232 @@
+{
+  "schema_version": "apf.evolution-domains/v1",
+  "phase": "EXTERNAL_LEARNING_ONLY",
+  "automatic_implement_allowed": false,
+  "production_change_allowed": false,
+  "external_budget_share": 0.65,
+  "notes": [
+    "abstract capability tokens only — no competitor verbatim, font files, or template asset copies",
+    "CapCut and third-party editors: observe effect categories and timing principles, not proprietary presets",
+    "phase 1 accumulates lessons; phase 2 proposes when operator requests a domain"
+  ],
+  "domains": [
+    {
+      "domain_id": "TYPOGRAPHY_MOTION",
+      "title": "텍스트·서체·색상·애니메이션",
+      "priority": 1,
+      "capability_tokens": [
+        "ux-type:scale-hierarchy",
+        "ux-type:readable-line-length",
+        "ux-color:contrast-aa-minimum",
+        "ux-color:semantic-accent-role",
+        "ux-motion:text-enter-stagger",
+        "ux-motion:reduce-motion-respect"
+      ],
+      "observation_signals": [
+        "heading_depth_count",
+        "font_role_count",
+        "motion_prefers_reduced_media_query"
+      ],
+      "abstract_patterns": [
+        "type-scale-with-purpose",
+        "color-role-not-random-accent",
+        "motion-with-reduced-motion-fallback"
+      ]
+    },
+    {
+      "domain_id": "TEMPLATE_COMPOSITION",
+      "title": "템플릿 구조·디자인·구현 효과",
+      "priority": 1,
+      "capability_tokens": [
+        "ux-template:section-rhythm",
+        "ux-template:reusable-block-boundary",
+        "ux-template:variant-slot-contract",
+        "ux-template:preview-safe-sandbox"
+      ],
+      "observation_signals": [
+        "section_count_above_fold",
+        "repeated_block_signature_hash",
+        "variant_parameter_count"
+      ],
+      "abstract_patterns": [
+        "composable-section-blocks",
+        "variant-without-layout-break",
+        "preview-before-publish"
+      ]
+    },
+    {
+      "domain_id": "HOME_SURFACE_OPTIMIZATION",
+      "title": "홈화면 색상·목적 적합 최적 구성",
+      "priority": 1,
+      "capability_tokens": [
+        "ux-home:purpose-color-palette",
+        "ux-home:single-primary-focus",
+        "ux-home:trust-before-offer",
+        "ux-home:mobile-first-touch-targets"
+      ],
+      "observation_signals": [
+        "primary_cta_count_above_fold",
+        "trust_block_before_checkout",
+        "dominant_hue_role"
+      ],
+      "abstract_patterns": [
+        "purpose-fit-palette",
+        "one-primary-action-home",
+        "trust-then-convert"
+      ]
+    },
+    {
+      "domain_id": "AUTH_ONBOARDING_UX",
+      "title": "로그인·회원가입 관리 및 편의성",
+      "priority": 1,
+      "capability_tokens": [
+        "ux-auth:progressive-signup",
+        "ux-auth:social-oauth-boundary",
+        "ux-auth:session-recovery-path",
+        "ux-auth:consent-granularity"
+      ],
+      "observation_signals": [
+        "signup_field_count",
+        "oauth_provider_count",
+        "password_recovery_link_present"
+      ],
+      "abstract_patterns": [
+        "minimal-fields-first",
+        "oauth-with-explicit-scope",
+        "recover-without-dead-end"
+      ]
+    },
+    {
+      "domain_id": "SIGNATURE_MOTION",
+      "title": "차별화·독특한 애니메이션",
+      "priority": 2,
+      "capability_tokens": [
+        "ux-motion:brand-signature-easing",
+        "ux-motion:loop-budget-cap",
+        "ux-motion:interaction-feedback-under-200ms",
+        "ux-motion:unique-not-generic-spinner"
+      ],
+      "observation_signals": [
+        "custom_easing_curve_detected",
+        "infinite_animation_count",
+        "first_input_delay_bucket"
+      ],
+      "abstract_patterns": [
+        "signature-motion-language",
+        "performance-budget-motion",
+        "distinct-feedback-not-stock"
+      ]
+    },
+    {
+      "domain_id": "VIDEO_TEMPLATE_EFFECTS",
+      "title": "영상 템플릿 효과 (CapCut류 추상 원리)",
+      "priority": 2,
+      "capability_tokens": [
+        "ux-video:transition-timing-curve",
+        "ux-video:text-track-layering",
+        "ux-video:beat-sync-marker",
+        "ux-video:export-preset-contract"
+      ],
+      "observation_signals": [
+        "transition_duration_ms_bin",
+        "text_overlay_layer_count",
+        "audio_beat_marker_present"
+      ],
+      "abstract_patterns": [
+        "timing-curve-not-preset-clone",
+        "layered-caption-structure",
+        "beat-aligned-cut-principle"
+      ],
+      "constraints": [
+        "no CapCut preset file import",
+        "no proprietary filter chain copy",
+        "abstract timing and layer roles only"
+      ]
+    },
+    {
+      "domain_id": "CROSS_FEATURE_COHERENCE",
+      "title": "플랫폼 내 타 기능과의 연관성",
+      "priority": 1,
+      "capability_tokens": [
+        "ux-coherence:shared-nav-model",
+        "ux-coherence:feature-to-checkout-bridge",
+        "ux-coherence:notification-to-action-deep-link",
+        "ux-coherence:settings-affect-preview"
+      ],
+      "observation_signals": [
+        "cross_route_link_count",
+        "deep_link_scheme_present",
+        "settings_preview_coupling"
+      ],
+      "abstract_patterns": [
+        "one-nav-language",
+        "every-feature-path-to-value",
+        "deep-link-closes-loop"
+      ]
+    },
+    {
+      "domain_id": "PAYMENT_CHECKOUT_FLOW",
+      "title": "결제 과정",
+      "priority": 1,
+      "capability_tokens": [
+        "ux-pay:price-transparency-before-submit",
+        "ux-pay:step-indicator",
+        "ux-pay:failure-recovery-retry",
+        "ux-pay:receipt-confirmation-surface"
+      ],
+      "observation_signals": [
+        "checkout_step_count",
+        "total_price_before_pay_click",
+        "error_retry_affordance"
+      ],
+      "abstract_patterns": [
+        "no-surprise-pricing",
+        "visible-progress-checkout",
+        "retry-without-restart"
+      ]
+    },
+    {
+      "domain_id": "EMERGING_MARKET_SIGNALS",
+      "title": "신규 시장 등장·변화 감지",
+      "priority": 1,
+      "capability_tokens": [
+        "market-watch:segment-novelty-bin",
+        "market-watch:demand-shift-signal",
+        "market-watch:regulatory-emergence",
+        "market-watch:category-entry-detection"
+      ],
+      "observation_signals": [
+        "segment_tag_delta",
+        "novelty_score_bin",
+        "change_velocity_bin",
+        "regulatory_tag_delta"
+      ],
+      "abstract_patterns": [
+        "segment-before-copy",
+        "demand-shift-not-hype-copy",
+        "regulatory-signal-early-watch"
+      ]
+    },
+    {
+      "domain_id": "LIFECYCLE_STEWARDSHIP",
+      "title": "템플릿·플랫폼 지속 유지 관계",
+      "priority": 1,
+      "capability_tokens": [
+        "ux-lifecycle:template-version-pin",
+        "ux-lifecycle:platform-migration-notice",
+        "ux-lifecycle:owner-continuity-contact",
+        "ux-lifecycle:deprecation-timeline"
+      ],
+      "observation_signals": [
+        "template_version_field_present",
+        "migration_banner_detected",
+        "support_contact_surface"
+      ],
+      "abstract_patterns": [
+        "pin-and-upgrade-path",
+        "relationship-survives-release",
+        "sunset-with-timeline"
+      ]
+    }
+  ]
+}

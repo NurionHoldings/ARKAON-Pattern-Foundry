@@ -1,0 +1,14 @@
+{
+  "schema_version": "apf.arkaon-owned-platform-connection/v1",
+  "read_only": true,
+  "copy_source_material": false,
+  "actual_code_analysis": false,
+  "mutate_intent_dna": false,
+  "promote_owned_asset": false,
+  "max_files_scanned": 5000,
+  "max_depth": 4,
+  "notes": [
+    "configure OWNED_PLATFORM_NOGADA_NEWS_REPO_PATH and OWNED_PLATFORM_SIDEJOB_MARKET_REPO_PATH for live structural proof",
+    "connection captures extension histogram and top-level layout only; no source material is copied"
+  ]
+}

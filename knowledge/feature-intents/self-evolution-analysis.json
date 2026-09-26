@@ -1,0 +1,8 @@
+{
+  "schema_version": "apf.feature-intent-seed/v1",
+  "feature_id": "self-evolution-analysis",
+  "contributor": "BEOM",
+  "pass_stage": 0,
+  "review_status": "PROPOSED",
+  "intent_summary": "Compare past vs present ARKAON capabilities, analyze improvement process and added features, propose them to users."
+}

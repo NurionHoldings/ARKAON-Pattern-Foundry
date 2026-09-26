@@ -1,0 +1,27 @@
+{
+  "schema_version": "apf.arkaon-admin-change-control/v1",
+  "maximum_outcome": "IMPROVEMENT_PROPOSAL",
+  "preview_required_before_apply": true,
+  "partial_apply_allowed": true,
+  "full_apply_requires_operator": true,
+  "automatic_merge_or_deploy": false,
+  "automatic_learning": false,
+  "production_change_allowed": false,
+  "rollback_token_required": true,
+  "forbidden_apply_categories": [
+    "member",
+    "order",
+    "location",
+    "payment",
+    "settlement",
+    "identity",
+    "pii",
+    "credential",
+    "secret"
+  ],
+  "notes": [
+    "partial-apply records approved scope intent only; live platform mutation stays outside Foundry",
+    "operator-decision inbox promotion requires eternian review digest first",
+    "preview-only mode never mutates platform repositories"
+  ]
+}

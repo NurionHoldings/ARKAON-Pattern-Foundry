@@ -1,0 +1,10 @@
+{
+  "schema_version": "apf.arkaon-reuse-proof-measurement/v1",
+  "production_claim_allowed": false,
+  "minimum_reduction_percent": 50,
+  "target_platform_id": "SIDEJOB_MARKET",
+  "notes": [
+    "M6 synthetic baseline only; production reuse proof remains external",
+    "baseline file: knowledge/reuse-proof/m6-synthetic-baseline.json"
+  ]
+}

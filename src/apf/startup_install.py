@@ -14,25 +14,26 @@ class StartupArtifact:
     content: str
 
 
-def collector_command(config_path: Path) -> tuple[str, ...]:
+def collector_command(config_path: Path, *, posix_paths: bool = False) -> tuple[str, ...]:
     data_dir = config_path.parent
+    path_for = _posix_path if posix_paths else str
     return (
         sys.executable,
         "-m",
         "apf.collector_service",
         "--config",
-        str(config_path),
+        path_for(config_path),
         "--audit",
-        str(data_dir / "arkaon-collection-audit.jsonl"),
+        path_for(data_dir / "arkaon-collection-audit.jsonl"),
         "--state",
-        str(data_dir / "arkaon-collection-state.sqlite3"),
+        path_for(data_dir / "arkaon-collection-state.sqlite3"),
     )
 
 
 def build_startup_artifact(system: str, config_path: Path) -> StartupArtifact:
-    command = collector_command(config_path)
     normalized = system.lower()
     if normalized == "linux":
+        command = collector_command(config_path, posix_paths=True)
         exec_start = " ".join(_systemd_quote(part) for part in command)
         return StartupArtifact(
             platform="linux",
@@ -40,11 +41,12 @@ def build_startup_artifact(system: str, config_path: Path) -> StartupArtifact:
             content=(
                 "[Unit]\nDescription=ARKAON continuous collector\nAfter=network-online.target\n\n"
                 "[Service]\nType=simple\nRestart=on-failure\nRestartSec=30\n"
-                f"WorkingDirectory={_systemd_quote(str(config_path.parent))}\n"
+                f"WorkingDirectory={_systemd_quote(_posix_path(config_path.parent))}\n"
                 f"ExecStart={exec_start}\n\n[Install]\nWantedBy=default.target\n"
             ),
         )
     if normalized == "darwin":
+        command = collector_command(config_path, posix_paths=True)
         arguments = "\n".join(f"      <string>{_xml_escape(part)}</string>" for part in command)
         return StartupArtifact(
             platform="darwin",
@@ -58,10 +60,11 @@ def build_startup_artifact(system: str, config_path: Path) -> StartupArtifact:
                 "  <key>ProgramArguments</key><array>\n"
                 f"{arguments}\n"
                 "  </array>\n  <key>RunAtLoad</key><true/>\n"
-                f"  <key>WorkingDirectory</key><string>{_xml_escape(str(config_path.parent))}</string>\n"
+                f"  <key>WorkingDirectory</key><string>{_xml_escape(_posix_path(config_path.parent))}</string>\n"
                 "  <key>KeepAlive</key><true/>\n</dict></plist>\n"
             ),
         )
+    command = collector_command(config_path)
     if normalized == "windows":
         executable, *arguments = command
         argument_text = " ".join(_windows_quote(part) for part in arguments)
@@ -101,6 +104,10 @@ def install_user_startup(
     if os.name != "nt":
         destination.chmod(0o600)
     return destination
+
+
+def _posix_path(path: Path) -> str:
+    return path.as_posix()
 
 
 def _systemd_quote(value: str) -> str:

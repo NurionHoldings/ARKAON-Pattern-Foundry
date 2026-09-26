@@ -1,7 +1,8 @@
 # 중앙 ARKAON 오케스트레이터 (Pattern Foundry 본거지)
 
 조회일: 2026-09-17
-상태: 로컬 설치형 중앙 실행기 구현. PC 로그인 자동등록은 **인석형 PC에서 1회 수동 실행** 필요.
+상태: 로컬 설치형 중앙 실행기 구현. PC 로그인 시 **자동 수집·분석**(`arkaon-startup.ps1`)이
+기본이며, 등록은 **인석형 PC에서 1회** `register-startup-task.ps1` 실행으로 완료합니다.
 
 ## 디렉터리
 
@@ -39,7 +40,8 @@ D:\ARKAON_Pattern Foundry\
 - 심볼릭 링크·Junction 경로 우회 차단
 - `.env`, 인증서, 토큰, 운영 DB, 개인정보 폴더 제외
 - `state/orchestrator.run.lock` 중복 시작 방지
-- 플랫폼별 실행시간·파일·메모리 한도(`config/resource-limits.json`)
+- 리소스 정책(`config/resource-limits.json` v2) — 기본 **무제한 축적·병렬 분석** (#060)
+- 학습 축적 정책(`config/arkaon-accumulation-policy.json`)
 - 플랫폼 분석 실패 격리(다른 플랫폼 계속 실행)
 - 보고서에 `platform_id`, `candidate_commit`, `created_at`, `report_sha256` 기록
 - `operator-decision`은 에테르니언 검토 전 이동 금지
@@ -53,10 +55,16 @@ python -m pytest
 python "orchestrator\arkaon-orchestrator.py" --dry-run
 ```
 
-시작 작업 등록(1회):
+시작 작업 등록(1회, **예약 작업 + 시작프로그램 + 5분 워치독**):
 
 ```powershell
 & "D:\ARKAON_Pattern Foundry\orchestrator\register-startup-task.ps1"
+```
+
+상태 진단:
+
+```powershell
+& "D:\ARKAON_Pattern Foundry\orchestrator\arkaon-autostart-diagnose.ps1"
 ```
 
 재부팅 없이 시험:
@@ -65,18 +73,20 @@ python "orchestrator\arkaon-orchestrator.py" --dry-run
 Start-ScheduledTask -TaskName "ARKAON_Pattern_Foundry"
 ```
 
-## PC 로그인 흐름
+## PC 로그인 흐름 (자동)
 
-1. 로그인 시 화면 **오른쪽 하단**에 ❤ 실행 버튼 표시
-2. 사용자가 버튼을 클릭하면 버튼이 사라지고 중앙 실행기 시작
-3. `config/platforms.json`에 등록·enabled된 폴더만 순차 확인
-4. 플랫폼별 구조 분석(공개 src/docs/tests/config 경로의 파일명 목록 digest)
-5. 화면·콘텐츠·운영 정합성 감사(`docs/39`) → `inbox/research`에 IMPROVEMENT_PROPOSAL 생성
-6. 사전보완 가이드 생성
-7. `inbox/research`와 `inbox/eternian-review`에 격리 저장
-8. 에테르니언·운영자 승인 전까지 코드·운영환경 미반영
+1. Windows 로그인 시 `arkaon-startup.ps1`이 **숨김 창**으로 자동 실행
+2. 연속 수집 데몬(`arkaon-collector-daemon.ps1`)과 15분 주기 분석 데몬
+   (`arkaon-analysis-daemon.ps1`)을 백그라운드로 기동
+3. 중앙 오케스트레이터를 **즉시 1회** 실행
+4. `config/platforms.json`에 등록·enabled된 폴더만 순차 확인
+5. 플랫폼별 구조 분석(공개 src/docs/tests/config 경로의 파일명 목록 digest)
+6. 화면·콘텐츠·운영 정합성 감사(`docs/39`) → `inbox/research`에 IMPROVEMENT_PROPOSAL 생성
+7. 사전보완 가이드 생성
+8. `inbox/research`와 `inbox/eternian-review`에 격리 저장
+9. 에테르니언·운영자 승인 전까지 코드·운영환경 미반영
 
-버튼 UI만 먼저 띄우려면:
+수동 ❤ 실행 버튼 UI가 필요할 때만:
 
 ```powershell
 powershell.exe -ExecutionPolicy Bypass -File "D:\ARKAON_Pattern Foundry\orchestrator\arkaon-launcher.ps1"

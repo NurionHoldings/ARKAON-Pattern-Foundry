@@ -1,0 +1,26 @@
+{
+  "schema_version": "apf.learning-impediment/v1",
+  "enabled": true,
+  "emit_research_packet": true,
+  "emit_eternian_packet": true,
+  "emit_beom_packet": true,
+  "minimum_impediments_for_packet": 1,
+  "audit_lookback_events": 200,
+  "learning_blocking_decisions": [
+    "RESPONSE_TOO_LARGE",
+    "FETCH_FAILED",
+    "SOURCE_POLICY_BLOCKED",
+    "COLLECTION_DISABLED",
+    "CREDENTIAL_ACCESS_BLOCKED"
+  ],
+  "scan_learning_storage": true,
+  "scan_business_improvement_program": true,
+  "mailbox_pending_backlog_threshold": 50,
+  "automatic_implement_allowed": false,
+  "production_change_allowed": false,
+  "notes": [
+    "detects ARKAON self-limits that hinder learning and requests modification from eternian/beom",
+    "includes learning storage capability and business improvement program (experience audit) gaps",
+    "no auto-fix; inbox → mailbox → user approval → fulfillment (#053)"
+  ]
+}

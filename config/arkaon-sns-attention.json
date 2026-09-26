@@ -1,0 +1,15 @@
+{
+  "schema_version": "apf.sns-attention/v1",
+  "enabled": true,
+  "require_attention_factors_for_surge": false,
+  "emit_production_assets": true,
+  "emit_inbox_packets": true,
+  "aggregate_driver_rank_limit": null,
+  "automatic_implement_allowed": false,
+  "production_change_allowed": false,
+  "notes": [
+    "attention_factors describe hook/pacing/caption/audio/CTA mechanics — not post verbatim or video files",
+    "assets land in knowledge/shorts-production-assets for reuse in shorts and long-form planning",
+    "inference from content_angle_tag is allowed when manifest omits attention_factors"
+  ]
+}

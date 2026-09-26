@@ -28,7 +28,7 @@
   },
   "evidence_hashes": {
     "src/apf/db.py": "5bca32a2aa84df171f807d2bdd6f20f4b1e12126d73439b5965bdaa3d835d790",
-    "tests/test_postgres_repository.py": "762e4b79bc9c21f242a40d82120cee8420e7daff9abfd8a6b55d555bf0c20aa5"
+    "tests/test_postgres_repository.py": "6e2bc0afb37777c4b4891cf93c72f713d8eca935e0b7772543472a9677cb2533"
   },
   "source_refs": [
     "src/apf/db.py"
@@ -53,5 +53,5 @@
   "status": "ETHERNIAN_REVIEW_REQUIRED",
   "owned_asset": false,
   "semantic_fingerprint": "ddaa331539d0f2ce9c881792c46a51d3733a58dd356fd54b6b4f7b538e5ed46d",
-  "package_hash": "e1757d7a82ed9844f04c4a49fedc9c95111dca17b7efcf247c3cd6ba5eb88fbc"
+  "package_hash": "01c0906559046e49ee0cff3a0092dc4dfeed7792b255c2f9a2a5615129739bbb"
 }
