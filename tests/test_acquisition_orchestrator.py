@@ -362,6 +362,19 @@ def test_raw_secret_rejected_from_identity_and_sanitized_envelope():
     assert job.state is JobState.QUARANTINED
 
 
+def test_opaque_uuid_with_phone_shaped_digits_is_valid_identity():
+    correlation = uuid4()
+    opaque = "00000000-0000-4000-8000-a01012345678"
+    request = AcquisitionJobRequest(
+        opaque, opaque, opaque, correlation, material(correlation)
+    )
+    assert request.tenant_id == opaque
+    with pytest.raises(JobError, match="RAW_SECRET_BLOCKED"):
+        AcquisitionJobRequest(
+            opaque, opaque, "password=supersecret", correlation, material(correlation)
+        )
+
+
 def test_invalid_inner_originality_signature_rolls_back_then_corrects():
     job, es, _, _, bs = setup()
     rights = advance_to_capture(job, es, bs)

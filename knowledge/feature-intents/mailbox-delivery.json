@@ -1,0 +1,69 @@
+{
+  "authorization": {
+    "basis": "SELF_DIAGNOSIS_SELF_GENERATION",
+    "mutate_locked_intent_dna": false,
+    "scope": "MISSING_INTENT_DNA_ONLY"
+  },
+  "completeness": 1.0,
+  "contributor": "ETERNIAN",
+  "evidence_refs": [
+    "config/arkaon-mailbox-delivery.json"
+  ],
+  "feature_id": "mailbox-delivery",
+  "feature_intent": {
+    "constraint": [
+      "ARKAON stores discovered needs in mailbox; eternian/beom visit triggers delivery messages to user; user approval enqueues fulfillment for eternian/beom; no auto-implement"
+    ],
+    "evolution": [
+      "Pass 1 evidence routing",
+      "Pass 3 human lock"
+    ],
+    "invariant": [
+      "locked Intent_DNA mutation 금지",
+      "propose-only inbox 유지"
+    ],
+    "journey": [
+      "기능 추가 → intent 누락 감지 → Pass-0 seed 자가생성 → inbox 검토"
+    ],
+    "object": [
+      "mailbox delivery"
+    ],
+    "outcome": [
+      "Pass-0 Intent_DNA seed 생성",
+      "에테르니언 검토 후 CORE lock 가능"
+    ],
+    "owner": [
+      "누리온 Foundry 거버넌스",
+      "에테르니언 최종 lock 권한"
+    ],
+    "risk": [
+      "의도 누락 시 학습·승격 경로 단절",
+      "잘못된 seed는 eternian review에서 차단"
+    ],
+    "signal": [
+      "missing_intent_count",
+      "generated_seed_count",
+      "completeness"
+    ],
+    "value": [
+      "mailbox-delivery 기능의 의도·경계를 기계 판독 가능하게 고정"
+    ],
+    "who": [
+      "범(운영자)",
+      "에테르니언 검토자",
+      "아르카온 자가진단"
+    ],
+    "why": [
+      "53. 우편함 · 방문 전달 · 사용자 승인 · 이행 흐름: ARKAON feature mailbox-delivery"
+    ]
+  },
+  "fingerprint": "ce89ee89eaad98709dd3f433e7b42522f17286194bc3acf4a2631e8664c5fcfc",
+  "gates": {
+    "intent_dna_mutation": false,
+    "locked": false,
+    "review_status": "ETERNIAN_REVIEW_REQUIRED"
+  },
+  "pass_stage": 0,
+  "phase": "PASS0_SELF_GENERATED",
+  "schema_version": "apf.feature-intent-seed/v1"
+}

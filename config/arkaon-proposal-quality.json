@@ -1,0 +1,24 @@
+{
+  "schema_version": "apf.proposal-quality/v1",
+  "enabled": true,
+  "minimum_proposal_quality_score": 0.2,
+  "weight_landing_patterns": 0.4,
+  "weight_cross_platform_learning": 0.3,
+  "weight_reflective_lessons": 0.2,
+  "weight_self_evolution_analyses": 0.1,
+  "full_score_landing_patterns": 3,
+  "full_score_cross_platform_learning": 3,
+  "full_score_reflective_lessons": 2,
+  "full_score_self_evolution_analyses": 1,
+  "replenish_enabled": true,
+  "max_replenish_attempts_per_request": 1,
+  "max_actions_per_replenish": 2,
+  "replenish_on_gate_fail": true,
+  "replenish_on_user_dissatisfaction": true,
+  "replenish_user_dissatisfaction_score_ceiling": 0.55,
+  "notes": [
+    "North star: all learning assets exist for better proposals (docs/70)",
+    "orchestrator persists score after each run; co-creation chat gates on score",
+    "replenish: gate fail or user dissatisfaction + thin assets → supplemental analysis → re-propose"
+  ]
+}

@@ -1,6 +1,6 @@
 param(
     [Parameter(Position = 0)]
-    [ValidateSet("status", "plan", "archive")]
+    [ValidateSet("status", "plan", "archive", "reconcile")]
     [string]$Action = "status",
     [int]$BatchSize = 30,
     [string]$FoundryRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
@@ -25,6 +25,9 @@ if ($Action -eq "status") {
 }
 elseif ($Action -eq "archive") {
     $Arguments += @("--apply-archive", "--summary")
+}
+elseif ($Action -eq "reconcile") {
+    $Arguments += @("--reconcile-index", "--summary")
 }
 
 & $Python @Arguments

@@ -18,7 +18,7 @@ pytestmark = pytest.mark.skipif(not DATABASE_URL, reason="TEST_DATABASE_URL is n
 def postgres_repository():
     engine = create_engine(DATABASE_URL, pool_pre_ping=True)
     downgrade(engine)
-    assert upgrade(engine) == ("0001_core", "0002_target_repository")
+    assert upgrade(engine) == ("0001_core", "0002_target_repository", "0003_durable_review")
     repository = PostgresRepository(engine=engine)
     yield repository
     downgrade(engine)

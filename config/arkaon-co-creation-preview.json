@@ -1,0 +1,14 @@
+{
+  "schema_version": "apf.co-creation-preview/v1",
+  "enabled": true,
+  "preview_ttl_minutes": 120,
+  "require_payment_entitlement": true,
+  "require_codegen_preview_ready": true,
+  "verify_entitlement_on_access": true,
+  "production_change_allowed": false,
+  "notes": [
+    "Wave W2 — tenant-scoped preview sandbox; HTTPS preview base URL only",
+    "codegen_status must be PREVIEW_READY before start",
+    "billing entitlement re-verified on start and access"
+  ]
+}

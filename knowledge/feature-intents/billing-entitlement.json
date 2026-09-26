@@ -1,0 +1,8 @@
+{
+  "schema_version": "apf.feature-intent-seed/v1",
+  "feature_id": "billing-entitlement",
+  "contributor": "BEOM",
+  "pass_stage": 0,
+  "review_status": "PROPOSED",
+  "intent_summary": "Verify paid co-creation access through billing SoT HTTPS API with digest dev fallback."
+}
