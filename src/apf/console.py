@@ -65,6 +65,7 @@ from .plain_language_approval import (
     PlainLanguageApprovalStore,
 )
 from .platform_page_preview import PageKind
+from .public_page_observer import ObservationError, PublicPageObserver
 from .reference_material_consent import (
     NOTICE_TEXT,
     NOTICE_VERSION,
@@ -220,6 +221,12 @@ class ReviewSubmission(BaseModel):
         return ReviewAttestation(**values)
 
 
+class DesignCaptureRequest(BaseModel):
+    based_on_set_digest: str = Field(pattern=r"^sha256:[0-9a-f]{64}$")
+    reference_id: UUID
+    consent_request_id: str = Field(pattern=r"^[a-zA-Z0-9][a-zA-Z0-9._-]{0,127}$")
+
+
 class ReferenceConsentSubmission(BaseModel):
     request: ReferenceUseRequest
     acknowledged_items: set[str]
@@ -322,6 +329,7 @@ def install_console(
     reference_consent_store: ReferenceConsentStore | None = None,
     design_reference_store: DesignReferenceStore | None = None,
     style_proposal_store: StyleProposalStore | None = None,
+    public_page_observer: PublicPageObserver | None = None,
 ) -> None:
     application.state.console_security = security
     application.state.console_review_store = review_store
@@ -333,6 +341,7 @@ def install_console(
     application.state.reference_consent_store = reference_consent_store
     application.state.design_reference_store = design_reference_store
     application.state.style_proposal_store = style_proposal_store
+    application.state.public_page_observer = public_page_observer
 
     def principal(
         request: Request,
@@ -407,6 +416,12 @@ def install_console(
         if store is None:
             raise HTTPException(status_code=503, detail="style proposal store unavailable")
         return store
+
+    def public_observer(request: Request) -> PublicPageObserver:
+        observer = request.app.state.public_page_observer
+        if observer is None:
+            raise HTTPException(status_code=503, detail="public page observer unavailable")
+        return observer
 
     def reference_consents(request: Request) -> ReferenceConsentStore:
         store = request.app.state.reference_consent_store
@@ -2517,6 +2532,43 @@ def install_console(
             )
         except DesignReferenceError as error:
             raise design_reference_error(error) from None
+
+    @application.post("/v1/console/design-references/{subject_type}/{subject_id}/capture")
+    def capture_design_reference(
+        subject_type: SubjectType, subject_id: UUID, payload: DesignCaptureRequest,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        references: Annotated[DesignReferenceStore, Depends(design_references)],
+        consents: Annotated[ReferenceConsentStore, Depends(reference_consents)],
+        observer: Annotated[PublicPageObserver, Depends(public_observer)],
+        site_store: Annotated[ConversationalSiteDraftStore, Depends(site_drafts)],
+        dialogue_store: Annotated[VisualPlatformDialogueStore, Depends(visual_dialogues)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        design_reference_subject(subject_type, str(subject_id), actor, site_store, dialogue_store)
+        selected = reference_set(subject_type, str(subject_id), actor, references)
+        if payload.based_on_set_digest != selected["set_digest"]:
+            raise HTTPException(status_code=409, detail="DESIGN_CAPTURE_REFERENCES_STALE")
+        reference = next(
+            (item for item in selected["references"]
+             if item["reference_id"] == str(payload.reference_id)), None
+        )
+        if reference is None:
+            raise HTTPException(status_code=404, detail="DESIGN_CAPTURE_REFERENCE_NOT_FOUND")
+        try:
+            consents.verify_analysis_receipt(
+                payload.consent_request_id, principal_id=str(actor.principal_id),
+                source_id=str(payload.reference_id), source_locator=str(reference["url"]),
+                scope_digest=payload.based_on_set_digest,
+            )
+        except ReferenceConsentError as error:
+            raise HTTPException(status_code=403, detail=str(error)) from None
+        try:
+            return observer.observe(str(reference["url"]), payload.reference_id)
+        except ObservationError as error:
+            raise HTTPException(status_code=422, detail=str(error)) from None
 
     def style_error(error: StyleProposalError) -> HTTPException:
         code = str(error)

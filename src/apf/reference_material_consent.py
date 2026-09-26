@@ -130,6 +130,40 @@ class ReferenceConsentStore:
     def __init__(self, root: Path) -> None:
         self.root = root.resolve()
 
+    def verify_analysis_receipt(
+        self, request_id: str, *, principal_id: str, source_id: str,
+        source_locator: str, scope_digest: str,
+    ) -> dict[str, object]:
+        if not re.fullmatch(r"[a-zA-Z0-9][a-zA-Z0-9._-]{0,127}", request_id):
+            raise ReferenceConsentError("REFERENCE_CONSENT_NOT_FOUND")
+        try:
+            receipt = json.loads(
+                (self.root / "state" / "reference-material-consents" / f"{request_id}.json")
+                .read_text(encoding="utf-8")
+            )
+        except (OSError, json.JSONDecodeError) as exc:
+            raise ReferenceConsentError("REFERENCE_CONSENT_NOT_FOUND") from exc
+        if not isinstance(receipt, dict):
+            raise ReferenceConsentError("REFERENCE_CONSENT_INVALID")
+        unsigned = {key: value for key, value in receipt.items() if key != "receipt_digest"}
+        if (
+            receipt.get("schema_version") != "apf.reference-material-consent-receipt/1.0"
+            or receipt.get("receipt_digest") != digest(unsigned)
+            or receipt.get("notice_version") != NOTICE_VERSION
+            or receipt.get("notice_digest") != digest(NOTICE_TEXT)
+            or receipt.get("mode") != ReferenceUseMode.PRINCIPLE_REFERENCE.value
+            or receipt.get("decision", {}).get("decision") != "REFERENCE_ANALYSIS_ALLOWED"
+        ):
+            raise ReferenceConsentError("REFERENCE_CONSENT_INVALID")
+        if (
+            receipt.get("principal_id") != principal_id
+            or receipt.get("source_id") != source_id
+            or receipt.get("source_locator") != source_locator
+            or receipt.get("scope_digest") != scope_digest
+        ):
+            raise ReferenceConsentError("REFERENCE_CONSENT_SCOPE_MISMATCH")
+        return receipt
+
     def record(
         self, request: ReferenceUseRequest, consent: ReferenceUseConsent,
     ) -> dict[str, object]:
@@ -138,6 +172,7 @@ class ReferenceConsentStore:
             "schema_version": "apf.reference-material-consent-receipt/1.0",
             "request_id": request.request_id,
             "source_id": request.source_id,
+            "source_locator": request.source_locator,
             "mode": request.mode.value,
             "rights_basis": request.rights_basis.value,
             "rights_evidence_digest": request.rights_evidence_digest,
