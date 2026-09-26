@@ -1,0 +1,108 @@
+{
+  "schema_version": "apf.landing-intent-seed/v1",
+  "seed_id": "APF-LANDING-INTENT-MAEJINNAM-001",
+  "platform": {
+    "id": "MAEJINNAM",
+    "name": "매진남",
+    "ownership": "FIRST_PARTY_USER_DECLARED",
+    "platform_type": "COMMERCE_HYPE_BRAND"
+  },
+  "phase": "EXTERNAL_LEARNING_ONLY",
+  "authorization": {
+    "basis": "OWNER_AUTHORIZED_LANDING_LEARNING",
+    "scope": "STRUCTURAL_AND_ANGLE_OBSERVATION_NO_VERBATIM_COPY",
+    "evidence_ref": "sha256:0000000000000000000000000000000000000000000000000000000000000001"
+  },
+  "conversion": {
+    "primary_goal": "PURCHASE_OR_WAITLIST",
+    "secondary_goals": ["BRAND_FOLLOW", "SHARE"],
+    "success_signals": ["cta_click_rate", "checkout_start", "waitlist_signup"]
+  },
+  "landing_intent": {
+    "why": [
+      "한정·매진 프레임으로 관심과 구매 urgency를 정당하게 형성한다",
+      "브랜드 서사(남성 타깃·희소성)와 상품 가치를 분리해 신뢰를 유지한다"
+    ],
+    "who": [
+      "희소성·트렌드에 반응하는 구매자",
+      "재입고·한정판 알림을 원하는 기존 관심층",
+      "SNS에서 발견해 랜딩으로 유입된 cold traffic"
+    ],
+    "value": [
+      "놓치면 다시 얻기 어려운 한정 혜택",
+      "브랜드 정체성과 맞는 큐레이션된 상품/콘텐츠",
+      "명확한 다음 행동(구매·대기 등록) 한 가지"
+    ],
+    "outcome": [
+      "방문 30초 내 primary CTA 클릭 또는 대기 등록",
+      "허위 재고·과장 매진 주장 없이 전환",
+      "외부 학습 축적: scarcity framing vs trust drop-off 상관 digest"
+    ],
+    "journey": [
+      "SNS/광고 클릭 → Hero(희소성+혜택) → Proof(실재 재고/리뷰 digest) → Offer → 단일 CTA",
+      "매진·재입고 알림은 opt-in consent 후에만"
+    ],
+    "object": [
+      "한정 상품·드롭·굿즈",
+      "브랜드 스토리·룩북(구조만 관측, 원문 미저장)"
+    ],
+    "owner": [
+      "매진남 운영 주체(1st party)",
+      "Foundry는 관측·학습·제안만; 게시·가격 변경 없음"
+    ],
+    "invariant": [
+      "매진·재고 주장은 검증 가능한 SoT와 bind",
+      "경쟁사·타 브랜드 문구·비주얼 복제 금지",
+      "Intent_DNA locked 전 자동 카피 생성·배포 금지"
+    ],
+    "constraint": [
+      "공정거래·표시광고: 과장·허위 scarcity 금지",
+      "PII·결제정보·내부 재고 raw는 학습 corpus 금지",
+      "홍보문은 discovery signal; Pattern 단독 근거 불가"
+    ],
+    "risk": [
+      "fake scarcity로 신뢰 붕괴",
+      "바이럴 문구 모방으로 contamination",
+      "과밀 CTA로 이탈"
+    ],
+    "signal": [
+      "hero_scarcity_tag_present",
+      "single_primary_cta",
+      "social_proof_above_fold",
+      "mobile_touch_target_44px"
+    ],
+    "evolution": [
+      "1단계: 외부 commerce/hype landing 구조·각도 학습",
+      "2단계: 축적 lesson 기반 매진남 분야 요청 시 section·angle 제안"
+    ]
+  },
+  "evolution_domain_refs": [
+    "HOME_SURFACE_OPTIMIZATION",
+    "TEMPLATE_COMPOSITION",
+    "PAYMENT_CHECKOUT_FLOW",
+    "LIFECYCLE_STEWARDSHIP"
+  ],
+  "learning_focus": {
+    "external_budget_share": 0.65,
+    "priority_patterns": [
+      "hero-single-cta",
+      "scarcity-with-verified-stock",
+      "social-proof-above-fold",
+      "countdown-with-timezone"
+    ],
+    "copy_angle_tags": [
+      "limited-drop",
+      "restock-alert",
+      "numeric-social-proof",
+      "identity-matching-male-audience"
+    ],
+    "observation_surfaces": ["PUBLIC_LANDING", "OFFICIAL_SOCIAL_LINK_IN", "APPROVED_CAMPAIGN_METRICS"]
+  },
+  "gates": {
+    "intent_dna_mutation": false,
+    "owned_asset_promotion": false,
+    "automatic_publish": false,
+    "verbatim_competitor_storage": false,
+    "review_status": "ETHERNIAN_REVIEW_REQUIRED"
+  }
+}

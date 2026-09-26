@@ -1,0 +1,14 @@
+{
+  "schema_version": "apf.co-creation-deploy/v1",
+  "enabled": true,
+  "production_promotion_allowed": false,
+  "require_predeployment_pass": true,
+  "require_distinct_approvers": true,
+  "require_eternian_for_pilot": true,
+  "require_eternian_for_production": true,
+  "automatic_deploy_allowed": false,
+  "notes": [
+    "W4 — staged deploy SHADOW → PILOT → PRODUCTION",
+    "production_promotion_allowed false until IMPLEMENT_HOLD release"
+  ]
+}

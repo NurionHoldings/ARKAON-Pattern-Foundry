@@ -1,0 +1,19 @@
+{
+  "schema_version": "apf.co-creation-codegen/v1",
+  "enabled": true,
+  "require_operator_approval_digest": true,
+  "require_scaffold_manifest": true,
+  "emit_operator_review_packet": true,
+  "max_codegen_files": 64,
+  "forbidden_relative_paths": [
+    ".env",
+    "secrets/",
+    ".git/",
+    "node_modules/"
+  ],
+  "automatic_deploy_allowed": false,
+  "notes": [
+    "Wave W1 — structural variant stubs only; no verbatim reference HTML/CSS",
+    "codegen_status: PENDING_REVIEW → GENERATED → OPERATOR_APPROVED → PREVIEW_READY"
+  ]
+}

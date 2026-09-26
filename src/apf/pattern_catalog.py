@@ -139,8 +139,8 @@ def validate_catalog(packages: list[dict[str, Any]], root: Path) -> str:
         anchors = package["evidence_anchors"]
         if set(anchors) != {"source_symbol", "test_name"}:
             raise PatternCatalogError("EVIDENCE_ANCHORS_INVALID")
-        source_text = (root / package["source_refs"][0]).read_text()
-        test_text = (root / package["test_refs"][0]).read_text()
+        source_text = (root / package["source_refs"][0]).read_text(encoding="utf-8")
+        test_text = (root / package["test_refs"][0]).read_text(encoding="utf-8")
         if not re.search(rf"\b{re.escape(anchors['source_symbol'])}\b", source_text):
             raise PatternCatalogError("SOURCE_SYMBOL_ANCHOR_MISSING")
         if not re.search(rf"def {re.escape(anchors['test_name'])}\(", test_text):

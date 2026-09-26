@@ -1,0 +1,109 @@
+{
+  "schema_version": "apf.landing-intent-seed/v1",
+  "seed_id": "APF-LANDING-INTENT-DOSIRAK-STORE-001",
+  "platform": {
+    "id": "DOSIRAK_STORE",
+    "name": "도시락.store",
+    "aliases": ["도식락.store"],
+    "ownership": "FIRST_PARTY_USER_DECLARED",
+    "platform_type": "FOOD_COMMERCE"
+  },
+  "phase": "EXTERNAL_LEARNING_ONLY",
+  "authorization": {
+    "basis": "OWNER_AUTHORIZED_LANDING_LEARNING",
+    "scope": "STRUCTURAL_AND_ANGLE_OBSERVATION_NO_VERBATIM_COPY",
+    "evidence_ref": "sha256:0000000000000000000000000000000000000000000000000000000000000002"
+  },
+  "conversion": {
+    "primary_goal": "FIRST_ORDER",
+    "secondary_goals": ["SUBSCRIPTION_TRIAL", "APP_INSTALL"],
+    "success_signals": ["menu_view_to_cart", "checkout_complete", "subscription_start"]
+  },
+  "landing_intent": {
+    "why": [
+      "바쁜 일상에서 신뢰할 수 있는 한 끼를 빠르게 결정하게 한다",
+      "식품 안전·출처·배송 조건을 구매 전에 투명하게 전달한다"
+    ],
+    "who": [
+      "직장인·1인 가구 등 간편식 구매자",
+      "반복 주문·구독을 고려하는 가격·시간 민감층",
+      "배달앱에서 비교 후 공식 스토어로 유입된 사용자"
+    ],
+    "value": [
+      "명확한 메뉴·가격·배송 SLA",
+      "위생·원산지·알레르기 등 food trust block",
+      "첫 구매·구독 혜택(과장 없는 numeric offer)"
+    ],
+    "outcome": [
+      "메뉴 탐색 후 장바구니 또는 첫 주문 완료",
+      "건강·효능 허위 표시 없이 trust block 노출",
+      "학습: proof-before-offer vs cart rate digest"
+    ],
+    "journey": [
+      "검색/광고 → Hero(한 끼 해결) → Menu/Offer grid → Trust(위생·리뷰 digest) → Delivery FAQ → CTA",
+      "구독은 선택 opt-in; 기본 journey는 단건 주문"
+    ],
+    "object": [
+      "도시락·간편식 SKU",
+      "배송 구역·시간대·보관 방법"
+    ],
+    "owner": [
+      "도시락.store 운영 주체",
+      "Foundry는 레시피·원가·공급망 raw 미수집"
+    ],
+    "invariant": [
+      "식품 표시·광고 관련 claim은 승인 evidence bind",
+      "알레르기·원산지 omission 0",
+      "경쟁 배달앱 UI·카피 복제 금지"
+    ],
+    "constraint": [
+      "의료·다이어트 efficacy claim 금지",
+      "고객 주문·주소 PII 학습 금지",
+      "실시간 재고는 SoT 없으면 landing에 표시하지 않음"
+    ],
+    "risk": [
+      "과장된 신선도·영양 claim",
+      "복잡한 menu grid로 decision fatigue",
+      "배송 예외 미고지로 CS spike"
+    ],
+    "signal": [
+      "food_trust_block_present",
+      "price_transparency_above_fold",
+      "delivery_sla_visible",
+      "review_digest_not_verbatim"
+    ],
+    "evolution": [
+      "1단계: food commerce landing 구조 벤치(Hero·Offer·Trust·CTA)",
+      "2단계: 구독 vs 단건 angle A/B lesson 축적 후 분야 제안"
+    ]
+  },
+  "evolution_domain_refs": [
+    "HOME_SURFACE_OPTIMIZATION",
+    "TEMPLATE_COMPOSITION",
+    "PAYMENT_CHECKOUT_FLOW",
+    "CROSS_FEATURE_COHERENCE"
+  ],
+  "learning_focus": {
+    "external_budget_share": 0.65,
+    "priority_patterns": [
+      "proof-before-offer",
+      "food-trust-block",
+      "delivery-sla-faq",
+      "first-order-incentive-with-expiry"
+    ],
+    "copy_angle_tags": [
+      "time-saving-meal",
+      "hygiene-certification",
+      "local-sourcing",
+      "subscription-save-percent"
+    ],
+    "observation_surfaces": ["PUBLIC_LANDING", "MENU_CATEGORY_LAYOUT", "APPROVED_CAMPAIGN_METRICS"]
+  },
+  "gates": {
+    "intent_dna_mutation": false,
+    "owned_asset_promotion": false,
+    "automatic_publish": false,
+    "verbatim_competitor_storage": false,
+    "review_status": "ETHERNIAN_REVIEW_REQUIRED"
+  }
+}

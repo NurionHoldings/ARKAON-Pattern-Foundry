@@ -1,0 +1,102 @@
+{
+  "schema_version": "apf.landing-intent-seed/v1",
+  "seed_id": "APF-LANDING-INTENT-AI-BABI-001",
+  "platform": {
+    "id": "AI_BABI",
+    "name": "AI배비",
+    "ownership": "FIRST_PARTY_USER_DECLARED",
+    "platform_type": "AI_CAREGIVER_ASSIST"
+  },
+  "phase": "EXTERNAL_LEARNING_ONLY",
+  "authorization": {
+    "basis": "OWNER_AUTHORIZED_LANDING_LEARNING",
+    "scope": "STRUCTURAL_AND_ANGLE_OBSERVATION_NO_VERBATIM_COPY",
+    "evidence_ref": "sha256:0000000000000000000000000000000000000000000000000000000000000005"
+  },
+  "conversion": {
+    "primary_goal": "PARENT_TRIAL_SIGNUP",
+    "secondary_goals": ["GUIDE_DOWNLOAD", "COMMUNITY_JOIN"],
+    "success_signals": ["trial_with_guardian_consent", "safety_policy_read_depth", "onboarding_complete"]
+  },
+  "landing_intent": {
+    "why": [
+      "부모·보호자의 육아·돌봄 부담을 줄이는 정보·routine assist를 제공한다",
+      "아동 safety·privacy를 landing에서 최우선 trust signal로 둔다"
+    ],
+    "who": [
+      "영·유아 자녀를 둔 보호자",
+      "돌봄 routine·발달 정보를 찾는 1차 caregiver",
+      "pediatric/medical claim에 민감한 cautious parent"
+    ],
+    "value": [
+      "age-appropriate routine·activity suggestion(assist scope 내)",
+      "명확한 non-medical·non-emergency boundary",
+      "guardian consent·child data minimization policy 요약"
+    ],
+    "outcome": [
+      "safety policy 확인 후 trial signup",
+      "medical diagnosis·치료 claim 0",
+      "학습: safety-block placement vs trial completion digest"
+    ],
+    "journey": [
+      "Hero(공감) → Safety & privacy → What it is / is not → Age use cases → Guardian consent CTA",
+      "child PII form field landing 금지"
+    ],
+    "object": [
+      "AI배비 assist app/service",
+      "육아 routine·콘텐츠 큐레이션(승인 범위)"
+    ],
+    "owner": [
+      "AI배비 운영·아동 privacy 책임 주체",
+      "Foundry는 child data·가정 raw story 미수집"
+    ],
+    "invariant": [
+      "아동 개인정보·사진·실명 landing 수집 금지",
+      "medical·emergency 대체 claim 금지",
+      "경쟁 parenting app 카피 verbatim 금지"
+    ],
+    "constraint": [
+      "COPPA·개인정보보호·아동 관련 regulation align",
+      "before/after development claim 금지",
+      "influencer testimonial은 승인 digest only"
+    ],
+    "risk": [
+      "overpromised supervision",
+      "weak emergency redirect",
+      "parental anxiety amplification"
+    ],
+    "signal": [
+      "safety_privacy_above_fold",
+      "not_medical_not_emergency_visible",
+      "guardian_consent_before_trial",
+      "age_band_segmentation"
+    ],
+    "evolution": [
+      "1단계: caregiver AI landing safety-first pattern 학습",
+      "2단계: 연령대별 분야 요청 시 angle proposal"
+    ]
+  },
+  "learning_focus": {
+    "external_budget_share": 0.65,
+    "priority_patterns": [
+      "safety-privacy-first",
+      "guardian-consent-gate",
+      "what-it-is-not-block",
+      "age-segmented-use-cases"
+    ],
+    "copy_angle_tags": [
+      "empathy-parent-fatigue",
+      "routine-assist-not-replacement",
+      "privacy-by-design",
+      "evidence-linked-tips"
+    ],
+    "observation_surfaces": ["PUBLIC_LANDING", "SAFETY_POLICY_STRUCTURE", "ONBOARDING_CONSENT_FLOW"]
+  },
+  "gates": {
+    "intent_dna_mutation": false,
+    "owned_asset_promotion": false,
+    "automatic_publish": false,
+    "verbatim_competitor_storage": false,
+    "review_status": "ETHERNIAN_REVIEW_REQUIRED"
+  }
+}

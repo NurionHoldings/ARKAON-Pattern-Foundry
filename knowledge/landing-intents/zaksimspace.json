@@ -1,0 +1,113 @@
+{
+  "schema_version": "apf.landing-intent-seed/v1",
+  "seed_id": "APF-LANDING-INTENT-ZAKSIMSPACE-001",
+  "platform": {
+    "id": "ZAKSIMSPACE",
+    "name": "작심스페이스",
+    "public_url": "https://zaksimspace.co.kr/",
+    "ownership": "THIRD_PARTY_PUBLIC_SURFACE",
+    "platform_type": "VIRTUAL_OFFICE_CONTRACT"
+  },
+  "phase": "EXTERNAL_LEARNING_ONLY",
+  "authorization": {
+    "basis": "OPERATOR_REQUESTED_STRUCTURAL_ANALYSIS",
+    "scope": "STRUCTURAL_AND_FLOW_OBSERVATION_NO_VERBATIM_COPY",
+    "evidence_ref": "operator-decision/zaksimspace-econtract-analysis"
+  },
+  "conversion": {
+    "primary_goal": "ELECTRONIC_CONTRACT_COMPLETION",
+    "secondary_goals": ["BRANCH_SELECTION", "PAYMENT", "MYPAGE_SELF_SERVICE"],
+    "success_signals": ["contract_completion_rate", "step_drop_off", "esign_completion"]
+  },
+  "landing_intent": {
+    "why": [
+      "비대면 전자계약으로 사업장 주소지 계약을 3분 내 완료하게 한다",
+      "4단계 프로세스와 마이페이지로 계약·우편·갱신 흐름을 투명하게 만든다"
+    ],
+    "who": [
+      "비상주 사무실·사업자등록 주소지가 필요한 창업자",
+      "전자계약·결제·갱신을 한 플랫폼에서 처리하려는 1인 사업자"
+    ],
+    "value": [
+      "24시간 즉시 계약·전자서명",
+      "단계별 진행 UI와 비교표로 신뢰 형성",
+      "마이페이지에서 계약서·우편·갱신 통합 관리"
+    ],
+    "outcome": [
+      "지점 선택 → 정보·결제 → 전자계약 → 계약서 발급 funnel 완료",
+      "경쟁사 대비 기능 비교표로 차별점 전달",
+      "외부 학습: e-contract step UX vs conversion digest"
+    ],
+    "journey": [
+      "랜딩 Hero CTA → 4-step process 설명 → trust block → 비교표 → FAQ → 계약 시작",
+      "계약 후 마이페이지: 계약 이력·우편·갱신·알림"
+    ],
+    "object": [
+      "전자계약·전자서명 흐름",
+      "랜딩·프로세스·비교표·대시보드 UI 구조"
+    ],
+    "owner": [
+      "작심스페이스 운영 주체(3rd party public surface)",
+      "Foundry는 structural 관측·cross-platform 학습만"
+    ],
+    "invariant": [
+      "계약·결제 UI 문구·디자인 원문 복제 금지",
+      "PII·계약자 정보·내부 API raw 금지",
+      "Intent_DNA locked 전 자동 구현·배포 금지"
+    ],
+    "constraint": [
+      "공개 HTTPS landing만 관측",
+      "전자문서 흐름은 abstract step token만 저장",
+      "경쟁사 verbatim 저장 금지"
+    ],
+    "risk": [
+      "계약 funnel 구조 모방으로 contamination",
+      "비교표 수치 verbatim 복제",
+      "로그인·결제 영역 과도 수집"
+    ],
+    "signal": [
+      "four_step_process_section",
+      "electronic_contract_step",
+      "comparison_matrix_present",
+      "mypage_dashboard_mock",
+      "single_primary_cta",
+      "faq_accordion"
+    ],
+    "evolution": [
+      "1단계: e-contract funnel·랜딩 design structural 학습",
+      "2단계: 축적 lesson 기반 유사 분야 cross-platform 제안"
+    ]
+  },
+  "evolution_domain_refs": [
+    "HOME_SURFACE_OPTIMIZATION",
+    "TEMPLATE_COMPOSITION",
+    "PAYMENT_CHECKOUT_FLOW",
+    "AUTH_ONBOARDING_UX",
+    "LIFECYCLE_STEWARDSHIP"
+  ],
+  "learning_focus": {
+    "external_budget_share": 0.70,
+    "priority_patterns": [
+      "hero-single-cta",
+      "four-step-process",
+      "comparison-table",
+      "mypage-dashboard",
+      "e-contract-flow",
+      "trust-refund-block"
+    ],
+    "copy_angle_tags": [
+      "instant-3min-contract",
+      "esign-step-clarity",
+      "competitor-diff-matrix",
+      "post-contract-lifecycle"
+    ],
+    "observation_surfaces": ["PUBLIC_LANDING", "PUBLIC_HTTPS_CONTRACT_FUNNEL"]
+  },
+  "gates": {
+    "intent_dna_mutation": false,
+    "owned_asset_promotion": false,
+    "automatic_publish": false,
+    "verbatim_competitor_storage": false,
+    "review_status": "ETHERNIAN_REVIEW_REQUIRED"
+  }
+}

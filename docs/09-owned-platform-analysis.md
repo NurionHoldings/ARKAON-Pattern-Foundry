@@ -10,6 +10,10 @@
 
 후속 대상: AI법친, AI배비, AI-ABA, 도식락.store, wither.
 
+랜딩·카피 Wave 1(매진남, 도시락.store, wither)은 **외부 분석·학습 축적을 우선**하고,
+축적된 경험자료가 있을 때만 사용자 분야 요청에 대해 정리·제안한다.  
+전략: [51-external-landing-learning-strategy.md](51-external-landing-learning-strategy.md).
+
 ## 한 플랫폼의 완료 정의
 
 ### Phase A — 권한과 Snapshot
