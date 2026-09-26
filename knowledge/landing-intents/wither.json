@@ -1,0 +1,108 @@
+{
+  "schema_version": "apf.landing-intent-seed/v1",
+  "seed_id": "APF-LANDING-INTENT-WITHER-001",
+  "platform": {
+    "id": "WITHER",
+    "name": "wither",
+    "ownership": "FIRST_PARTY_USER_DECLARED",
+    "platform_type": "EMERGING_BRAND_EXPLORATION"
+  },
+  "phase": "EXTERNAL_LEARNING_ONLY",
+  "authorization": {
+    "basis": "OWNER_AUTHORIZED_LANDING_LEARNING",
+    "scope": "STRUCTURAL_AND_ANGLE_OBSERVATION_NO_VERBATIM_COPY",
+    "evidence_ref": "sha256:0000000000000000000000000000000000000000000000000000000000000003"
+  },
+  "conversion": {
+    "primary_goal": "WAITLIST_OR_INQUIRY",
+    "secondary_goals": ["NEWSLETTER", "SOCIAL_FOLLOW"],
+    "success_signals": ["waitlist_submit", "inquiry_form_start", "scroll_depth_p75"]
+  },
+  "landing_intent": {
+    "why": [
+      "브랜드·서비스 정체가 공개 전 또는 확장 중일 때 curiosity를 안전하게 형성한다",
+      "미공개 detail 대신 가치 가설·문의 동기만 landing에서 다룬다"
+    ],
+    "who": [
+      "초기 관심·베타 대기 사용자",
+      "커뮤니티·SNS에서 이름만 보고 유입된 explorer",
+      "B2B/partnership 문의 잠재 채널"
+    ],
+    "value": [
+      "명확한 ‘다음에 무엇이 열리는지’ timeline 또는 waitlist benefit",
+      "브랜드 tone·미학의 structural signal(색·타이포 계층만)",
+      "과장 없는 teaser + contact path"
+    ],
+    "outcome": [
+      "waitlist 또는 qualified inquiry conversion",
+      "미확정 feature를 사실처럼 기재하지 않음",
+      "학습: mystery-hook vs bounce rate digest"
+    ],
+    "journey": [
+      "Teaser Hero → Problem hint → What to expect (abstract) → Waitlist/Inquiry CTA",
+      "feature list는 confirmed manifest bind 전 landing에 금지"
+    ],
+    "object": [
+      "wither 브랜드·서비스(세부 domain map은 Phase C 이후)",
+      "베타·출시 알림 프로그램"
+    ],
+    "owner": [
+      "wither 운영 주체",
+      "Foundry는 추측 feature를 Intent에 write하지 않음"
+    ],
+    "invariant": [
+      "미출시 기능·가격·일정 claim 금지",
+      "경쟁사 teaser 카피 복제 금지",
+      "locked Intent 전 landing auto-generate 금지"
+    ],
+    "constraint": [
+      "공개 surface 관측만; private repo code analysis는 path 설정 후 structural digest",
+      "이메일·전화 수집 시 consent·purpose 명시",
+      "블로그 rumor는 discovery signal only"
+    ],
+    "risk": [
+      "과도한 mystery로 trust deficit",
+      "waitlist spam without follow-up plan",
+      "domain 불명확 시 학습 noise"
+    ],
+    "signal": [
+      "single_waitlist_cta",
+      "expectation_section_present",
+      "no_unverified_feature_list",
+      "contact_consent_block"
+    ],
+    "evolution": [
+      "1단계: emerging brand / waitlist landing 구조·angle 학습",
+      "2단계: domain map 확정 후 wither-specific section proposal"
+    ]
+  },
+  "evolution_domain_refs": [
+    "TYPOGRAPHY_MOTION",
+    "SIGNATURE_MOTION",
+    "VIDEO_TEMPLATE_EFFECTS",
+    "LIFECYCLE_STEWARDSHIP"
+  ],
+  "learning_focus": {
+    "external_budget_share": 0.65,
+    "priority_patterns": [
+      "waitlist-single-cta",
+      "curiosity-hook-without-false-claim",
+      "timeline-expectation-block",
+      "minimal-form-fields"
+    ],
+    "copy_angle_tags": [
+      "early-access",
+      "founding-member",
+      "question-hook",
+      "aesthetic-minimal-hero"
+    ],
+    "observation_surfaces": ["PUBLIC_LANDING", "WAITLIST_FORM_STRUCTURE", "SOCIAL_LINK_OUT"]
+  },
+  "gates": {
+    "intent_dna_mutation": false,
+    "owned_asset_promotion": false,
+    "automatic_publish": false,
+    "verbatim_competitor_storage": false,
+    "review_status": "ETHERNIAN_REVIEW_REQUIRED"
+  }
+}

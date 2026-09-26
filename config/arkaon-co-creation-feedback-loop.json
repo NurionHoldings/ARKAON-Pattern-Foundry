@@ -1,0 +1,10 @@
+{
+  "schema_version": "apf.co-creation-feedback-loop/v1",
+  "enabled": true,
+  "emit_operator_revision_packet": true,
+  "record_evolution_snapshot": true,
+  "max_revisions_per_session": 12,
+  "notes": [
+    "W3 — preview feedback creates proposal v2 with lineage, diff, operator packet"
+  ]
+}

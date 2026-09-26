@@ -1,0 +1,43 @@
+{
+  "schema_version": "apf.sns-structural-digest/v1",
+  "platform_id": "MAEJINNAM",
+  "channel_kind": "OFFICIAL_SOCIAL_SURFACE",
+  "observation_signals": {
+    "link_count_bin": "3-5",
+    "format_tags": ["carousel", "story-highlight", "drop-countdown"],
+    "feature_tags": ["shop-link", "restock-badge"],
+    "environment_tags": ["mobile-first-layout", "dark-theme-option"],
+    "trend_items": [
+      {
+        "item_id": "limited-drop-countdown",
+        "category_tag": "commerce-hype",
+        "content_angle_tag": "scarcity-countdown",
+        "click_velocity_bin": "surge",
+        "engagement_bin": "high",
+        "attention_factors": {
+          "primary_driver": "scarcity-framing",
+          "secondary_drivers": ["countdown-visual", "motion-contrast-open"],
+          "hook_window_bin": "0-1s",
+          "curiosity_mechanism": "open-loop",
+          "trust_mechanism": "limited-stock-badge",
+          "pacing_bin": "fast-cut",
+          "caption_role": "headline-overlay",
+          "audio_cue_tag": "tick-or-beat",
+          "pattern_interrupt": "sudden-zoom",
+          "cta_timing_bin": "open",
+          "visual_contrast_bin": "high-motion-open",
+          "social_proof_frame": "sold-out-digest"
+        }
+      },
+      {
+        "item_id": "restock-alert-story",
+        "category_tag": "commerce-hype",
+        "content_angle_tag": "restock-alert",
+        "click_velocity_bin": "high",
+        "engagement_bin": "medium"
+      }
+    ]
+  },
+  "change_watch": ["feature_tags", "format_tags", "environment_tags", "trend_items"],
+  "verbatim_post_storage": false
+}

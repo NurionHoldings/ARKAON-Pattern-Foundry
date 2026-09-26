@@ -72,21 +72,41 @@ REGISTER → AUTHORIZE → SNAPSHOT → EXTRACT_INTENT_DNA → ANALYZE
 41. [우편함 유지관리](docs/41-mailbox-maintenance.md)
 42. [승인 기반 자기개선 실행](docs/42-self-improvement-execution.md)
 
+추가 설계 문서:
+
+- [ARKAON 관리자 변경 통제·Reflection Bridge](docs/41-admin-change-control.md)
+- [ARKAON 공개 Surface 관찰·구조 디코딩](docs/42-public-surface-observation.md)
+- [ARKAON 가동 전 준비 점검](docs/43-predeployment-readiness.md)
+- [ARKAON Research Watch](docs/44-research-watch.md)
+- [ARKAON 모빌리티 광장 거버넌스](docs/45-mobility-plaza-governance.md)
+- [ARKAON 지도 운영 게이트 (#071–#076)](docs/46-map-ops-gates.md)
+- [Pattern Promotion and Reuse Proof Runner](docs/47-pattern-promotion-reuse-proof.md)
+- [Pattern Promotion — 공개키·서명 주입 절차](docs/48-pattern-promotion-injection.md)
+- [ARKAON 자산 조사·우선순위 (R-011)](docs/49-asset-investigation.md)
+- [외부 랜딩·카피 학습 전략](docs/51-external-landing-learning-strategy.md)
+- [Capability Gap Engine](docs/52-capability-gap-engine.md)
+- [우편함·전달·승인·이행](docs/53-mailbox-delivery-flow.md)
+- [전분야 진화 학습 도메인](docs/54-evolution-learning-domains.md)
+- [시간별 주제 자율 학습·수집](docs/55-hourly-learning-schedule.md)
+- [SNS 정기 분석](docs/56-sns-periodic-analysis.md)
+- [신규 시장 등장·변화 감지](docs/57-emerging-market-watch.md)
+- [SNS 클릭 급등·트렌드·시장 개척 제안](docs/58-sns-trend-market-proposal.md)
+
 ## 중앙 오케스트레이터
 
-Pattern Foundry는 다중 플랫폼 ARKAON의 본거지입니다. PC 로그인 시 등록된 플랫폼만
-순차 분석하고, 결과는 `inbox/eternian-review`에 격리합니다. 승인 전 코드·운영 반영은
-하지 않습니다.
+Pattern Foundry는 다중 플랫폼 ARKAON의 본거지입니다. PC 로그인 시 **자동 수집·분석**이
+시작되고, 등록된 플랫폼만 순차 분석합니다. 결과는 `inbox/eternian-review`에 격리되며
+승인 전 코드·운영 반영은 하지 않습니다.
 
 ```powershell
-powershell.exe -ExecutionPolicy Bypass -File "D:\ARKAON_Pattern Foundry\orchestrator\arkaon-launcher.ps1"
-powershell.exe -File "D:\ARKAON_Pattern Foundry\orchestrator\arkaon-startup.ps1"
 powershell.exe -ExecutionPolicy Bypass -File "D:\ARKAON_Pattern Foundry\orchestrator\register-startup-task.ps1"
+powershell.exe -WindowStyle Hidden -File "D:\ARKAON_Pattern Foundry\orchestrator\arkaon-startup.ps1"
+powershell.exe -ExecutionPolicy Bypass -File "D:\ARKAON_Pattern Foundry\orchestrator\arkaon-launcher.ps1"
 ```
 
 ## 구현 게이트
 
-현재 상태는 **#047 CENTRAL ARKAON ORCHESTRATOR FOUNDATION / PRODUCT IMPLEMENTATION HOLD**입니다. 정확히 30개 후보와 검증·외부서명 승격·재사용 proof harness가 있지만, 모든 후보는 `ETHERNIAN_REVIEW_REQUIRED`이며 운영 승격은 0건입니다. 테스트 전용 서명은 `TEST_VECTOR`일 뿐 운영 승인이 아닙니다. PostgreSQL 대상 저장소와 CI 경로는 구현됐지만 live Green 증거 및 PostgreSQL 검토·후보 어댑터는 아직 없습니다. 노가다뉴스·부업장터는 제공된 구조 메타데이터 기반 읽기 전용 파일럿만 구현됐고 실제 저장소 연결·코드 분석은 `NOT_RUN_UNAVAILABLE`입니다. UI 상세 렌더링, 외부 서명에 의한 30개 개별 승격과 실제 재사용 증명도 미완료입니다. 상세 상태는 `knowledge/readiness/v0.1-readiness.json`이 기준입니다.
+현재 상태는 **#079 PLAZA GOVERNANCE + #071–#076 MAP OPS GATES / PRODUCT IMPLEMENTATION HOLD**입니다. 정확히 30개 후보와 검증·외부서명 승격·재사용 proof harness가 있지만, 모든 후보는 `ETHERNIAN_REVIEW_REQUIRED`이며 운영 승격은 0건입니다. 테스트 전용 서명은 `TEST_VECTOR`일 뿐 운영 승인이 아닙니다. PostgreSQL 대상 저장소와 CI 경로는 구현됐지만 live Green 증거 및 PostgreSQL 검토·후보 어댑터는 아직 없습니다. 노가다뉴스·부업장터는 제공된 구조 메타데이터 기반 읽기 전용 파일럿만 구현됐고 실제 저장소 연결·코드 분석은 `NOT_RUN_UNAVAILABLE`입니다. UI 상세 렌더링, 외부 서명에 의한 30개 개별 승격과 실제 재사용 증명도 미완료입니다. 상세 상태는 `knowledge/readiness/v0.1-readiness.json`이 기준입니다.
 
 ## 공개 저장소 정책
 

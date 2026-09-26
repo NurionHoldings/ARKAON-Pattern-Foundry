@@ -5,9 +5,11 @@ import json
 import unicodedata
 from dataclasses import dataclass
 from enum import StrEnum
+from pathlib import Path
 
 MIN_REUSABLE_CONFIDENCE = 0.8
 DEFAULT_FAILURE_FAMILY_LIMIT = 3
+UNBOUNDED_FAILURE_FAMILY_LIMIT: int | None = None
 
 
 def _normalize_semantic_text(value: str | None) -> str:
@@ -90,16 +92,24 @@ class LearningLesson:
 class LearningMemory:
     """Stores reusable, evidence-backed lessons for ARKAON workers."""
 
+    @classmethod
+    def from_foundry(cls, foundry_root: Path) -> LearningMemory:
+        from .accumulation_policy import AccumulationPolicy
+
+        policy = AccumulationPolicy.load(foundry_root / "config" / "arkaon-accumulation-policy.json")
+        failure_family_limit = None if policy.learning_memory_unbounded else policy.failure_family_limit
+        return cls(failure_family_limit=failure_family_limit)
+
     def __init__(
         self,
         *,
         minimum_confidence: float = MIN_REUSABLE_CONFIDENCE,
-        failure_family_limit: int = DEFAULT_FAILURE_FAMILY_LIMIT,
+        failure_family_limit: int | None = DEFAULT_FAILURE_FAMILY_LIMIT,
     ) -> None:
         if not 0 <= minimum_confidence <= 1:
             raise ValueError("minimum_confidence must be between 0 and 1")
-        if failure_family_limit < 1:
-            raise ValueError("failure_family_limit must be positive")
+        if failure_family_limit is not None and failure_family_limit < 1:
+            raise ValueError("failure_family_limit must be positive or None for unbounded")
         self.minimum_confidence = minimum_confidence
         self.failure_family_limit = failure_family_limit
         self._lessons: dict[str, LearningLesson] = {}
@@ -135,10 +145,10 @@ class LearningMemory:
         intent_fingerprint: str,
         domain: str,
         problem: str | None = None,
-        limit: int = 10,
+        limit: int | None = 10,
     ) -> tuple[LearningLesson, ...]:
-        if limit < 1:
-            raise ValueError("limit must be positive")
+        if limit is not None and limit < 1:
+            raise ValueError("limit must be positive or None for unbounded recall")
         normalized_intent = _normalize_semantic_text(intent_fingerprint)
         normalized_domain = _normalize_semantic_text(domain)
         normalized_problem = None if problem is None else _normalize_semantic_text(problem)
@@ -160,6 +170,8 @@ class LearningMemory:
                 lesson.content_hash,
             )
         )
+        if limit is None:
+            return tuple(matches)
         return tuple(matches[:limit])
 
     def __len__(self) -> int:
@@ -189,5 +201,5 @@ class LearningMemory:
             and existing.failure_family_hash == lesson.failure_family_hash
             for existing in self._lessons.values()
         )
-        if family_size >= self.failure_family_limit:
+        if self.failure_family_limit is not None and family_size >= self.failure_family_limit:
             raise ValueError("FAILURE_FAMILY_LIMIT")
