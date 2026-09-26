@@ -17,6 +17,8 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
+from .preview_design import FOUNDATION_CSS, LANDING_CSS
+
 
 class SiteDraftError(RuntimeError):
     pass
@@ -122,11 +124,30 @@ def _digest(value: object) -> str:
 def _static_page(
     title_text: str, description: str, revision: int, change_note: str | None = None
 ) -> str:
-    """Render a fixed template. User text is escaped and never interpreted as markup."""
+    """Render a fixed editorial landing template; input remains inert text."""
     title, summary = html.escape(title_text), html.escape(description)
     change = html.escape(change_note or "처음 요청을 바탕으로 만든 초안입니다.")
-    return f"""<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title><style>
-:root{{--ink:#162337;--muted:#627086;--paper:#f8fafc;--line:#dbe3ed;--accent:#2563eb;--navy:#10213c}}*{{box-sizing:border-box}}body{{margin:0;background:var(--paper);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif;line-height:1.55}}.wrap{{max-width:960px;margin:auto;padding:24px}}header{{background:var(--navy);color:white}}header .wrap{{display:flex;justify-content:space-between;gap:16px;align-items:center}}.tag{{font-size:13px;color:#b8cff7}}main{{padding:54px 24px}}.hero{{background:white;border:1px solid var(--line);border-radius:24px;padding:clamp(28px,6vw,66px);box-shadow:0 12px 30px #1e293b0c}}h1{{font-size:clamp(32px,6vw,56px);line-height:1.15;margin:10px 0 18px}}p{{max-width:680px;color:var(--muted);white-space:pre-wrap}}.actions{{display:flex;gap:10px;margin-top:28px;flex-wrap:wrap}}a{{display:inline-block;padding:12px 18px;border-radius:10px;background:var(--accent);color:white;text-decoration:none;font-weight:700}}a.secondary{{background:white;color:var(--accent);border:1px solid #bcd1fa}}section{{margin-top:24px;padding:24px;background:white;border:1px solid var(--line);border-radius:16px}}small{{color:var(--muted)}}@media(max-width:600px){{.wrap,main{{padding:16px}}header .wrap{{align-items:flex-start;flex-direction:column}}.hero{{border-radius:16px;padding:28px 22px}}a{{width:100%;text-align:center}}}}</style></head><body><header><div class="wrap"><strong>{title}</strong><span class="tag">웹사이트 초안 · v{revision}</span></div></header><main><div class="hero"><span class="tag">당신의 요청</span><h1>{title}</h1><p>{summary}</p><div class="actions"><a href="#contact">시작하기</a><a class="secondary" href="#about">자세히 보기</a></div></div><section id="about"><strong>이번 반영</strong><p>{change}</p></section><section id="contact"><strong>다음 단계</strong><p>이 화면은 검토용 정적 초안입니다. 명시 승인 전에는 공개·배포되지 않습니다.</p><small>생성된 코드 실행, 외부 전송, 결제 기능은 포함하지 않습니다.</small></section></main></body></html>"""
+    return f"""<!doctype html><html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{title}</title><style>{FOUNDATION_CSS}{LANDING_CSS}</style></head>
+<body><header class="site-header"><div class="wrap">
+<strong class="site-brand">{title}</strong><span class="site-tag">웹사이트 초안 · v{revision} · 검토 중</span>
+</div></header>
+<main class="wrap landing-main">
+<section class="landing-hero" aria-label="첫 화면">
+<div class="hero-copy"><span class="eyebrow">YOUR IDEA, MADE VISIBLE</span>
+<h1>{title}</h1><p>{summary}</p>
+<div class="actions"><a href="#contact">시작하기</a>
+<a class="secondary" href="#about">자세히 보기</a></div></div>
+<div class="hero-art" aria-hidden="true"><div class="art-orbit"></div>
+<div class="art-spark"></div></div></section>
+<div class="story-grid">
+<section class="story-panel" id="about"><span class="eyebrow">WHAT CHANGED</span>
+<h2>이번 반영</h2><p>{change}</p></section>
+<section class="story-panel" id="contact"><span class="eyebrow">NEXT STEP</span>
+<h2>다음 단계</h2><p>이 화면은 검토용 정적 초안입니다. 명시 승인 전에는 공개·배포되지 않습니다.</p>
+<small>생성된 코드 실행, 외부 전송, 결제 기능은 포함하지 않습니다.</small></section>
+</div></main></body></html>"""
 
 
 class ConversationalSiteDraftStore:
