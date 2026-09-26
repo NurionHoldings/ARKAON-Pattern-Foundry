@@ -513,10 +513,14 @@ def main() -> None:
         mechanism, invariant_a, invariant_b, failure_a, failure_b, applies, not_when = DETAILS[slug]
         hashes = {ref: digest((ROOT / ref).read_bytes()) for ref in (source, test)}
         source_names = re.findall(
-            r"^(?:class|def) ([a-zA-Z_][a-zA-Z0-9_]*)", (ROOT / source).read_text(), re.MULTILINE
+            r"^(?:class|def) ([a-zA-Z_][a-zA-Z0-9_]*)",
+            (ROOT / source).read_text(encoding="utf-8"),
+            re.MULTILINE,
         )
         test_names = re.findall(
-            r"^def (test_[a-zA-Z0-9_]+)\(", (ROOT / test).read_text(), re.MULTILINE
+            r"^def (test_[a-zA-Z0-9_]+)\(",
+            (ROOT / test).read_text(encoding="utf-8"),
+            re.MULTILINE,
         )
         if not source_names or not test_names:
             raise RuntimeError(f"evidence anchor not found for {slug}")
@@ -561,7 +565,10 @@ def main() -> None:
             ),
         }
         package["package_hash"] = digest(canonical(package))
-        (OUT / f"{slug}.json").write_text(json.dumps(package, indent=2, ensure_ascii=False) + "\n")
+        (OUT / f"{slug}.json").write_text(
+            json.dumps(package, indent=2, ensure_ascii=False) + "\n",
+            encoding="utf-8",
+        )
 
 
 if __name__ == "__main__":
