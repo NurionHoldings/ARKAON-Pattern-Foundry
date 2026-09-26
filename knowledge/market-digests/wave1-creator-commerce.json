@@ -1,0 +1,12 @@
+{
+  "schema_version": "apf.market-structural-digest/v1",
+  "market_scope": "DOMESTIC_CREATOR_COMMERCE",
+  "observation_signals": {
+    "segment_tags": ["live-commerce", "limited-drop-brands", "link-in-bio-storefront"],
+    "demand_tags": ["mobile-checkout", "scarcity-framing", "creator-led-trust"],
+    "regulatory_tags": ["fair-labeling", "ecommerce-disclosure"],
+    "novelty_score_bin": "rising",
+    "change_velocity_bin": "high"
+  },
+  "verbatim_storage": false
+}
