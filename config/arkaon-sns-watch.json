@@ -1,0 +1,18 @@
+{
+  "schema_version": "apf.sns-watch/v1",
+  "enabled": true,
+  "timezone": "Asia/Seoul",
+  "analysis_hours": [0, 6, 12, 18],
+  "maximum_outcome": "RESEARCH_PACKET",
+  "automatic_learning": false,
+  "production_change_allowed": false,
+  "competitor_copy_allowed": false,
+  "verbatim_post_storage_allowed": false,
+  "max_response_bytes": 500000,
+  "notes": [
+    "periodic SNS learning observes structural signals only — no post body verbatim",
+    "PUBLIC_HTTPS_PROFILE: authorized public link-in-bio or official landing pages only",
+    "LOCAL_MANIFEST: operator-sanitized structural digest exports",
+    "robots.txt and platform terms must allow observation; otherwise use LOCAL_MANIFEST"
+  ]
+}

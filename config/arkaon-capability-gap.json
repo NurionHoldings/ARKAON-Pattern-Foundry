@@ -1,0 +1,15 @@
+{
+  "schema_version": "apf.arkaon-capability-gap/v1",
+  "automatic_implement_allowed": false,
+  "production_change_allowed": false,
+  "emit_eternian_packet": true,
+  "emit_research_packet": true,
+  "minimum_external_references": 1,
+  "minimum_gaps_for_packet": 1,
+  "max_gaps_per_report": 20,
+  "notes": [
+    "compare owned registered platforms against external structural observations",
+    "never copy competitor text; capability tokens are abstract only",
+    "gaps produce action requests to inbox; no auto-implementation"
+  ]
+}

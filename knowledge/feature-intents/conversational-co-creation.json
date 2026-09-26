@@ -1,0 +1,8 @@
+{
+  "schema_version": "apf.feature-intent-seed/v1",
+  "feature_id": "conversational-co-creation",
+  "contributor": "BEOM",
+  "pass_stage": 0,
+  "review_status": "PROPOSED",
+  "intent_summary": "Paid tenant chat co-creation with reference URL structural styling and operator-gated build."
+}

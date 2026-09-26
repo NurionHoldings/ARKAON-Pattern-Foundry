@@ -1,0 +1,12 @@
+{
+  "schema_version": "apf.market-structural-digest/v1",
+  "market_scope": "AI_LANDING_COPY_TOOLS",
+  "observation_signals": {
+    "segment_tags": ["ai-copy-assist", "landing-builder", "template-marketplace"],
+    "demand_tags": ["conversion-copy", "multilingual-landing", "brand-voice-guardrails"],
+    "regulatory_tags": ["ai-disclosure", "advertising-claims"],
+    "novelty_score_bin": "rising",
+    "change_velocity_bin": "very-high"
+  },
+  "verbatim_storage": false
+}

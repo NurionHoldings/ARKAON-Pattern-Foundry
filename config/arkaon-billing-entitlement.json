@@ -1,0 +1,17 @@
+{
+  "schema_version": "apf.billing-entitlement/v1",
+  "enabled": true,
+  "mode": "DIGEST_THEN_API",
+  "billing_api_base_url": null,
+  "verify_path": "/v1/entitlements/verify",
+  "api_token_env": "ARKAON_BILLING_API_TOKEN",
+  "capability": "co_creation",
+  "allow_digest_fallback": true,
+  "request_timeout_seconds": 10,
+  "max_response_bytes": 8192,
+  "notes": [
+    "digest prototype: sha256 tenant|principal|platform|paid",
+    "set billing_api_base_url and ARKAON_BILLING_API_TOKEN for production SoT",
+    "BILLING_API mode uses API only; DIGEST_THEN_API accepts digest when API unavailable"
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "schema_version": "apf.reuse-proof-baseline/v1",
+  "platform_id": "SIDEJOB_MARKET",
+  "feature_id": "M6-SYNTHETIC-OPPORTUNITY-LIFECYCLE",
+  "baseline_metrics": {
+    "planning_hours": 24.0,
+    "revision_count": 6,
+    "omission_defects": 4,
+    "rework_hours": 10.0
+  },
+  "reuse_metrics": {
+    "planning_hours": 10.0,
+    "revision_count": 2,
+    "omission_defects": 1,
+    "rework_hours": 3.0,
+    "applied_pattern_ids": [
+      "apf.public.principal-ownership-recheck",
+      "apf.public.transactional-idempotent-transition",
+      "apf.public.financial-sot-audit-chain"
+    ]
+  },
+  "approved_patterns": [
+    {
+      "pattern_id": "apf.public.principal-ownership-recheck",
+      "status": "PUBLIC_PATTERN_APPROVED",
+      "package_hash": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+    },
+    {
+      "pattern_id": "apf.public.transactional-idempotent-transition",
+      "status": "PUBLIC_PATTERN_APPROVED",
+      "package_hash": "sha256:2222222222222222222222222222222222222222222222222222222222222222"
+    },
+    {
+      "pattern_id": "apf.public.financial-sot-audit-chain",
+      "status": "PUBLIC_PATTERN_APPROVED",
+      "package_hash": "sha256:3333333333333333333333333333333333333333333333333333333333333333"
+    }
+  ],
+  "notes": [
+    "Synthetic M6 baseline for harness validation only",
+    "Production planning-time measurement on 부업장터 remains external"
+  ]
+}
