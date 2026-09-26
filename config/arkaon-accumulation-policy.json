@@ -1,0 +1,14 @@
+{
+  "schema_version": "apf.accumulation-policy/v1",
+  "accumulation_mode": "bounded",
+  "engine_performance_mode": "bounded",
+  "learning_memory_unbounded": false,
+  "failure_family_limit": 100,
+  "curriculum_unbounded": false,
+  "recall_limit": 100,
+  "notes": [
+    "Learning assets remain durable while per-cycle processing stays bounded.",
+    "Mailbox backpressure and resource ceilings prevent one learning burst from exhausting the owner PC.",
+    "Raising limits requires an owner-reviewed policy change; PII, secret, auth, and symlink boundaries remain mandatory."
+  ]
+}

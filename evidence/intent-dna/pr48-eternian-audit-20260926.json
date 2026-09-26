@@ -1,0 +1,23 @@
+{
+  "schema_version": "apf.intent-dna-independent-audit/v1",
+  "auditor": "ETERNIAN",
+  "date": "2026-09-26",
+  "scope": "PR #48 integrated Pass-0 seeds against config/source/document evidence",
+  "total_seeds": 28,
+  "phase_counts": {
+    "PASS0_SELF_GENERATED": 22,
+    "LEGACY": 6
+  },
+  "missing_evidence_refs": [],
+  "fingerprint_drift": [],
+  "missing_intent_axes": [],
+  "pass0_decision": "PASS_PROPOSAL_ONLY",
+  "core_lock_decision": "HOLD_HUMAN_SEMANTIC_REVIEW_REQUIRED",
+  "automatic_implementation_allowed": false,
+  "deployment_approval": false,
+  "observations": [
+    "Completeness 1.0 measures populated axes and does not prove semantic correctness.",
+    "Pass-0 seeds remain ETERNIAN_REVIEW_REQUIRED; no CORE lock or production capability follows from this audit.",
+    "Production deployment requires separate readiness and runtime proof."
+  ]
+}

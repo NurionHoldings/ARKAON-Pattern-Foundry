@@ -1,0 +1,16 @@
+{
+  "schema_version": "apf.self-evolution-compare/v1",
+  "enabled": true,
+  "snapshot_on_feedback_revision": true,
+  "snapshot_on_deploy_stage": true,
+  "capability_sources": [
+    "knowledge/feature-intents",
+    "config",
+    "src/apf"
+  ],
+  "notes": [
+    "Records ARKAON capability snapshots when BEOM or ETERNIAN improve features",
+    "Compare past vs present; analyze process and added features (docs/69)",
+    "User feature proposals via arkaon-user-feature-proposal.json"
+  ]
+}

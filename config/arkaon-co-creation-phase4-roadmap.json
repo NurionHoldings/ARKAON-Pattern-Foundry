@@ -1,0 +1,28 @@
+{
+  "schema_version": "apf.co-creation-phase4-roadmap/v1",
+  "enabled": false,
+  "codegen_enabled": false,
+  "preview_enabled": false,
+  "deploy_enabled": false,
+  "preview_ttl_minutes": 120,
+  "require_billing_api_for_preview": true,
+  "require_eternian_for_pilot": true,
+  "require_eternian_for_production": true,
+  "max_codegen_files": 64,
+  "forbidden_codegen_paths": [
+    ".env",
+    "secrets/",
+    ".git/",
+    "node_modules/"
+  ],
+  "rollout_stages": [
+    "SHADOW",
+    "PILOT",
+    "PRODUCTION"
+  ],
+  "notes": [
+    "ROADMAP policy only — all sub-flags false until PRODUCT_IMPLEMENT_HOLD release",
+    "automatic_deploy_allowed in arkaon-co-creation-build.json must stay false until 4C PRODUCTION unlock",
+    "see docs/68-co-creation-phase4-roadmap.md"
+  ]
+}

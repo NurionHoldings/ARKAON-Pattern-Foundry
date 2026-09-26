@@ -1,0 +1,36 @@
+{
+  "asset_id": "8dbbb984b481ca13",
+  "attention_factors": {
+    "audio_cue_tag": "urgency-bed",
+    "caption_role": "offer-headline",
+    "cta_timing_bin": "open",
+    "curiosity_mechanism": "deadline-pressure",
+    "hook_window_bin": "0-1s",
+    "pacing_bin": "fast-cut",
+    "pattern_interrupt": "timer-snap",
+    "primary_driver": "time-scarcity",
+    "secondary_drivers": [
+      "clock-overlay",
+      "price-anchor-digest"
+    ],
+    "social_proof_frame": "order-volume-bin",
+    "trust_mechanism": "price-comparison-digest",
+    "visual_contrast_bin": "product-hero"
+  },
+  "automatic_learning": false,
+  "category_tag": "food-commerce",
+  "click_velocity_bin": "explosive",
+  "content_angle_tag": "time-boxed-offer",
+  "factor_source": "manifest",
+  "item_id": "lunch-deal-carousel",
+  "platform_id": "DOSIRAK_STORE",
+  "production_change_allowed": false,
+  "production_guidance": "Lead with 'time-scarcity' inside hook window 0-1s. Pacing: fast-cut; secondary drivers: clock-overlay, price-anchor-digest. Curiosity mechanism: deadline-pressure. Place CTA emphasis at open.",
+  "reuse_domains": [
+    "VIDEO_TEMPLATE_EFFECTS",
+    "SIGNATURE_MOTION"
+  ],
+  "schema_version": "apf.shorts-production-asset/v1",
+  "verbatim_post_storage": false,
+  "watch_id": "dosirak-sns-digest"
+}

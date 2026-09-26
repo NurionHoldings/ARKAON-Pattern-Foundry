@@ -1,0 +1,8 @@
+{
+  "schema_version": "apf.co-creation-build/v1",
+  "enabled": true,
+  "require_operator_approval_digest": true,
+  "emit_preview_sandbox": true,
+  "emit_template_scaffold": true,
+  "automatic_deploy_allowed": false
+}
