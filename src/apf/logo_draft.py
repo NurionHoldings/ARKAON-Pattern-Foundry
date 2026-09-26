@@ -12,6 +12,8 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
+from .logo_motion import Motion, animate_generated_logo
+
 
 class LogoDraftError(RuntimeError):
     pass
@@ -184,6 +186,14 @@ class LogoDraftStore:
         return revision["variants"][revision["selected_variant"] - 1][
             "svg"
         ], f"{doc['draft_id']}-logo.svg"
+
+    def animated_download(
+        self, draft_id: str, *, tenant_id: str, owner_principal_id: str, motion: Motion
+    ) -> tuple[str, str]:
+        svg, filename = self.download(
+            draft_id, tenant_id=tenant_id, owner_principal_id=owner_principal_id
+        )
+        return animate_generated_logo(svg, motion), filename.replace(".svg", f"-{motion}.svg")
 
     def _revision(
         self, number: int, base: str | None, request: LogoDraftRequest, selected: int, note: str

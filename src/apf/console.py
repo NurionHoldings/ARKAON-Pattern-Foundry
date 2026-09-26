@@ -43,6 +43,7 @@ from .logo_draft import (
     LogoRevisionRequest,
     LogoRollbackRequest,
 )
+from .logo_motion import Motion
 from .plain_language_approval import (
     ApprovalDecision,
     PlainApprovalError,
@@ -2051,6 +2052,35 @@ def install_console(
             )
         except LogoDraftError as error:
             raise logo_draft_error(error) from None
+
+    @application.get("/v1/console/logo-drafts/{draft_id}/animated.svg")
+    def download_animated_logo(
+        draft_id: str,
+        motion: Motion,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[LogoDraftStore, Depends(logo_drafts)],
+    ) -> Response:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        try:
+            svg, filename = store.animated_download(
+                draft_id,
+                tenant_id=str(actor.tenant_id),
+                owner_principal_id=str(actor.principal_id),
+                motion=motion,
+            )
+        except LogoDraftError as error:
+            raise logo_draft_error(error) from None
+        return Response(
+            svg,
+            media_type="image/svg+xml",
+            headers={
+                "Content-Disposition": f'attachment; filename="{filename}"',
+                "Cache-Control": "no-store",
+                "Content-Security-Policy": "default-src 'none'; sandbox",
+                "X-Content-Type-Options": "nosniff",
+            },
+        )
 
     @application.get("/v1/console/logo-drafts/{draft_id}/download.svg")
     def download_logo_draft(
