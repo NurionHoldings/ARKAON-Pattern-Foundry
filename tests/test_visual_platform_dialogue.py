@@ -135,3 +135,42 @@ def test_duplicate_screen_identity_is_rejected(tmp_path):
     )
     with pytest.raises(VisualDialogueError, match="SCREEN_ID_DUPLICATE"):
         store.submit_revision(dialogue_id, tenant_id=tenant, submission=duplicate)
+
+
+def test_home_and_detail_page_mockups_are_owner_bound_and_inert(tmp_path):
+    store, tenant, owner, dialogue_id = setup(tmp_path)
+    store.submit_revision(
+        dialogue_id, tenant_id=tenant,
+        submission=RevisionSubmission(
+            change_summary="홈과 상세 화면 시안",
+            screens=[
+                {"screen_id": "home", "title": "벌거리 홈", "purpose": "맞춤 탐색",
+                 "components": ["검색", "추천"]},
+                {"screen_id": "detail", "title": "상세 <script>alert(1)</script>",
+                 "purpose": "지원 여부 확인", "components": ["업무 조건", "보수"]},
+            ],
+        ),
+    )
+    home = store.page_preview(
+        dialogue_id, 1, "home", tenant_id=tenant, owner_principal_id=owner
+    )
+    detail = store.page_preview(
+        dialogue_id, 1, "detail", tenant_id=tenant, owner_principal_id=owner
+    )
+    assert "벌거리 홈" in home and "검색" in home
+    assert "&lt;script&gt;" in detail and "<script>alert" not in detail
+    assert "<script" not in home and "<script" not in detail
+    assert "@media(max-width:700px)" in detail
+    with pytest.raises(VisualDialogueError, match="OWNER_MISMATCH"):
+        store.page_preview(
+            dialogue_id, 1, "home", tenant_id=tenant, owner_principal_id=str(uuid4())
+        )
+
+
+def test_missing_detail_screen_is_labeled_as_unwritten(tmp_path):
+    store, tenant, owner, dialogue_id = setup(tmp_path)
+    store.submit_revision(dialogue_id, tenant_id=tenant, submission=revision())
+    detail = store.page_preview(
+        dialogue_id, 1, "detail", tenant_id=tenant, owner_principal_id=owner
+    )
+    assert "상세 화면 명세가 필요합니다" in detail

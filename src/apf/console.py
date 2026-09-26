@@ -50,6 +50,7 @@ from .plain_language_approval import (
     PlainApprovalError,
     PlainLanguageApprovalStore,
 )
+from .platform_page_preview import PageKind
 from .reference_material_consent import (
     NOTICE_TEXT,
     NOTICE_VERSION,
@@ -1464,7 +1465,7 @@ def install_console(
                 "Cache-Control": "no-store",
                 "Content-Security-Policy": (
                     "default-src 'none'; img-src 'self'; style-src 'unsafe-inline'; "
-                    "script-src 'unsafe-inline'; connect-src 'self'; base-uri 'none'; "
+                    "script-src 'unsafe-inline'; connect-src 'self'; frame-src 'self'; base-uri 'none'; "
                     "frame-ancestors 'none'; form-action 'self'"
                 ),
                 "Referrer-Policy": "no-referrer",
@@ -2398,6 +2399,36 @@ def install_console(
             content=data,
             media_type="image/svg+xml",
             headers={"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"},
+        )
+
+    @application.get(
+        "/v1/console/platform-dialogues/{dialogue_id}/revisions/{number}/page/{kind}.html",
+        response_class=HTMLResponse,
+    )
+    def platform_page_preview(
+        dialogue_id: str,
+        number: int,
+        kind: PageKind,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[VisualPlatformDialogueStore, Depends(visual_dialogues)],
+    ) -> HTMLResponse:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        try:
+            page = store.page_preview(
+                dialogue_id, number, kind,
+                tenant_id=str(actor.tenant_id),
+                owner_principal_id=str(actor.principal_id),
+            )
+        except VisualDialogueError as error:
+            raise visual_error(error) from None
+        return HTMLResponse(
+            page,
+            headers={
+                "Cache-Control": "no-store",
+                "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-ancestors 'self'",
+                "X-Content-Type-Options": "nosniff",
+            },
         )
 
     @application.post("/v1/console/platform-dialogues/{dialogue_id}/feedback")

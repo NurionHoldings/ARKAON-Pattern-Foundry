@@ -13,6 +13,8 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
+from .platform_page_preview import PageKind, render_page_mockup
+
 
 class VisualDialogueError(RuntimeError):
     pass
@@ -219,6 +221,17 @@ class VisualPlatformDialogueStore:
             manifest_path.unlink(missing_ok=True)
             raise
         return manifest
+
+    def page_preview(
+        self, dialogue_id: str, revision_number: int, kind: PageKind, *,
+        tenant_id: str, owner_principal_id: str,
+    ) -> str:
+        document = self._owner_bound(dialogue_id, tenant_id, owner_principal_id)
+        revisions = document["revisions"]
+        if not 1 <= revision_number <= len(revisions):
+            raise VisualDialogueError("VISUAL_IMAGE_NOT_FOUND")
+        revision = revisions[revision_number - 1]
+        return render_page_mockup(document["brief"], revision["screens"], kind)
 
     def image(self, dialogue_id: str, revision_number: int, *, tenant_id: str) -> bytes:
         document = self._bound(dialogue_id, tenant_id)
