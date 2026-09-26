@@ -27,7 +27,7 @@
     "external_material_included": false
   },
   "evidence_hashes": {
-    "src/apf/console.py": "f1cf73481645bbbbdf6b3612e74c629362b93cc9a1998a5bd10def190ffd2bc8",
+    "src/apf/console.py": "920077d20ee401f29d11b0bbb253026237e5e704a7c6def1f8e90a2c4f686f67",
     "tests/test_console.py": "0f5ef4d994a358af12d4a6817651f26268b10cf9e6de34d7284e726363ed03da"
   },
   "source_refs": [
@@ -53,5 +53,5 @@
   "status": "ETHERNIAN_REVIEW_REQUIRED",
   "owned_asset": false,
   "semantic_fingerprint": "0f46a7ac8be519640ccd6520b0aec29b43fcd55fe79ba84f2cf0a66d0d201c25",
-  "package_hash": "546ecfd4b423d9033c2b2f687ed9c07e399406b8f7b77f16b34f75f4e9e07170"
+  "package_hash": "7e799a88773f7be48123c3aaa13f4948792f1379f7370e9ffdc358f2f0e15ce9"
 }
