@@ -1,0 +1,35 @@
+{
+  "schema_version": "apf.arkaon-public-surface-observation/v1",
+  "maximum_outcome": "STRUCTURAL_OBSERVATION",
+  "copy_prohibited": true,
+  "verbatim_storage_allowed": false,
+  "dynamic_execution_allowed": false,
+  "network_access_allowed": false,
+  "credential_extraction_allowed": false,
+  "competitor_copy_allowed": false,
+  "allowed_surface_kinds": [
+    "PUBLIC_ROUTE",
+    "OPENAPI_PATH",
+    "POLICY_ROUTE_REF",
+    "STATIC_JS_STRUCTURE",
+    "VISIBLE_TEXT_SAMPLE"
+  ],
+  "forbidden_observation_categories": [
+    "member",
+    "order",
+    "location",
+    "payment",
+    "settlement",
+    "identity",
+    "pii",
+    "credential",
+    "secret"
+  ],
+  "max_js_file_bytes": 524288,
+  "max_js_files_per_platform": 32,
+  "notes": [
+    "observe structure and improvement signals only; never store competitor verbatim code or brand assets",
+    "minified JS is parser-normalized and de-escaped for structure digest; eval and dynamic execution remain forbidden",
+    "PUBLIC_OBSERVATION rights posture applies; bypass means indirect lawful observation not access-control circumvention"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "schema_version": "apf.arkaon-mailbox-delivery/v1",
+  "automatic_fulfill_allowed": false,
+  "production_change_allowed": false,
+  "visitor_roles": {
+    "eternian": "reviewer",
+    "beom": "operator"
+  },
+  "user_recipient_role": "operator",
+  "notes": [
+    "ARKAON stores discovered needs in mailbox; eternian/beom visit triggers delivery messages to user",
+    "user approval enqueues fulfillment for eternian/beom; no auto-implement"
+  ]
+}

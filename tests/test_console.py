@@ -1,8 +1,10 @@
+import json
 from uuid import uuid4
 
 import pytest
 from fastapi.testclient import TestClient
 
+import apf.console as console_module
 from apf.api import create_app
 from apf.console import SESSION_COOKIE, ConsoleSecurity
 from apf.domain import AnalysisTargetCreate
@@ -217,6 +219,32 @@ def test_summary_exposes_no_secret_or_raw_material():
         assert forbidden not in body
 
 
+def test_inbox_stage_cannot_traverse_outside_mailbox():
+    client, _, _, _ = make_client()
+    response = client.get("/v1/console/inbox", params={"stage": "../state"})
+    assert response.status_code == 422
+
+
+def test_co_creation_session_requires_exact_owner_and_safe_id(tmp_path, monkeypatch):
+    monkeypatch.setattr(console_module, "__file__", str(tmp_path / "src/apf/console.py"))
+    client, _, tenant_id, _ = make_client()
+    principal_id = uuid4()
+    session_id = uuid4()
+    sessions = tmp_path / "state/co-creation/sessions"
+    sessions.mkdir(parents=True)
+    path = sessions / f"{session_id}.json"
+    path.write_text(
+        json.dumps({
+            "tenant_id": str(tenant_id), "principal_id": str(principal_id), "secret": "private"
+        }), encoding="utf-8"
+    )
+    endpoint = f"/v1/console/co-creation/sessions/{session_id}"
+    assert client.get(endpoint).status_code == 404
+    assert client.get("/v1/console/co-creation/sessions/not-a-uuid").status_code == 404
+    client.post("/console/dev/session", json={
+        "tenant_id": str(tenant_id), "principal_id": str(principal_id), "role": "operator"
+    })
+    assert client.get(endpoint).json()["secret"] == "private"
 def test_plain_approval_routes_require_owner_csrf_and_store(tmp_path):
     operator, _, _, _ = make_client(
         role="operator", approval_store=PlainLanguageApprovalStore(tmp_path)

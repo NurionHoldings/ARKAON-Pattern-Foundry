@@ -1,0 +1,36 @@
+{
+  "schema_version": "apf.sns-structural-digest/v1",
+  "platform_id": "DOSIRAK_STORE",
+  "channel_kind": "OFFICIAL_SOCIAL_SURFACE",
+  "observation_signals": {
+    "link_count_bin": "2-4",
+    "format_tags": ["product-card", "review-quote-digest"],
+    "feature_tags": ["order-link", "delivery-badge"],
+    "environment_tags": ["commerce-landing-bridge"],
+    "trend_items": [
+      {
+        "item_id": "lunch-deal-carousel",
+        "category_tag": "food-commerce",
+        "content_angle_tag": "time-boxed-offer",
+        "click_velocity_bin": "explosive",
+        "engagement_bin": "very-high",
+        "attention_factors": {
+          "primary_driver": "time-scarcity",
+          "secondary_drivers": ["clock-overlay", "price-anchor-digest"],
+          "hook_window_bin": "0-1s",
+          "curiosity_mechanism": "deadline-pressure",
+          "trust_mechanism": "price-comparison-digest",
+          "pacing_bin": "fast-cut",
+          "caption_role": "offer-headline",
+          "audio_cue_tag": "urgency-bed",
+          "pattern_interrupt": "timer-snap",
+          "cta_timing_bin": "open",
+          "visual_contrast_bin": "product-hero",
+          "social_proof_frame": "order-volume-bin"
+        }
+      }
+    ]
+  },
+  "change_watch": ["feature_tags", "format_tags", "trend_items"],
+  "verbatim_post_storage": false
+}

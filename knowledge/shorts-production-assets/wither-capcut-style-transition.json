@@ -1,0 +1,37 @@
+{
+  "asset_id": "528591a2ec20567f",
+  "attention_factors": {
+    "audio_cue_tag": "beat-drop",
+    "caption_role": "minimal-hook-text",
+    "cta_timing_bin": "end-card",
+    "curiosity_mechanism": "pattern-preview",
+    "hook_window_bin": "0-1s",
+    "pacing_bin": "beat-sync",
+    "pattern_interrupt": "hard-cut",
+    "primary_driver": "motion-contrast-open",
+    "secondary_drivers": [
+      "template-preview",
+      "transition-flash"
+    ],
+    "social_proof_frame": "creator-adoption-bin",
+    "trust_mechanism": "tool-capability-digest",
+    "visual_contrast_bin": "before-after-split"
+  },
+  "automatic_learning": false,
+  "category_tag": "video-template",
+  "click_velocity_bin": "surge",
+  "content_angle_tag": "beat-sync-hook",
+  "factor_source": "manifest",
+  "item_id": "capcut-style-transition",
+  "platform_id": "WITHER",
+  "production_change_allowed": false,
+  "production_guidance": "Lead with 'motion-contrast-open' inside hook window 0-1s. Pacing: beat-sync; secondary drivers: template-preview, transition-flash. Curiosity mechanism: pattern-preview. Place CTA emphasis at end-card.",
+  "reuse_domains": [
+    "VIDEO_TEMPLATE_EFFECTS",
+    "SIGNATURE_MOTION",
+    "CAPCUT_STYLE_BRIDGE"
+  ],
+  "schema_version": "apf.shorts-production-asset/v1",
+  "verbatim_post_storage": false,
+  "watch_id": "wither-sns-digest"
+}

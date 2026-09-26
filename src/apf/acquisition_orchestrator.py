@@ -92,6 +92,13 @@ def _evidence_fingerprint(item: object) -> str:
     return _hash(data)
 
 
+def _is_canonical_uuid(value: str) -> bool:
+    try:
+        return str(UUID(value)) == value
+    except ValueError:
+        return False
+
+
 @dataclass(frozen=True)
 class AcquisitionJobRequest:
     tenant_id: str
@@ -105,7 +112,15 @@ class AcquisitionJobRequest:
     def __post_init__(self) -> None:
         if not all((self.tenant_id.strip(), self.principal_id.strip(), self.idempotency_key.strip())):
             raise JobError("MISSING_JOB_BINDING")
-        if scan_learning_text(f"{self.tenant_id} {self.principal_id} {self.idempotency_key}"):
+        # Canonical UUIDs are opaque identifiers. Their random digits can
+        # accidentally match a phone number or a valid Korean RRN checksum.
+        # Continue scanning every non-UUID value, including secret-like keys.
+        identifiers = (self.tenant_id, self.principal_id, self.idempotency_key)
+        if any(
+            scan_learning_text(value)
+            for value in identifiers
+            if not _is_canonical_uuid(value)
+        ):
             raise JobError("RAW_SECRET_BLOCKED")
         if self.auth_request and self.auth_request.correlation_id != self.correlation_id:
             raise JobError("CORRELATION_MISMATCH")
