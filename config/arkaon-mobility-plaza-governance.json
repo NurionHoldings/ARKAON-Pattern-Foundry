@@ -1,0 +1,22 @@
+{
+  "schema_version": "apf.arkaon-mobility-plaza-governance/v1",
+  "maximum_outcome": "GOVERNANCE_REVIEW",
+  "production_dispatch_from_plaza": false,
+  "presence_surveillance_allowed": false,
+  "continuous_tracking_allowed": false,
+  "max_membership_ttl_hours": 12,
+  "max_notice_ttl_hours": 24,
+  "max_advisory_occupancy_threshold": 64,
+  "forbidden_uses": [
+    "dispatch_queue",
+    "presence_surveillance",
+    "idle_time_penalty",
+    "ranking_for_offers",
+    "continuous_tracking",
+    "availability_inference"
+  ],
+  "notes": [
+    "plaza governance audits consent TTL, forbidden labor control, and PII-free notices",
+    "occupancy remains a count only; ARKAON advice stays advisory-only"
+  ]
+}

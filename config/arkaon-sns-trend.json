@@ -1,0 +1,14 @@
+{
+  "schema_version": "apf.sns-trend/v1",
+  "enabled": true,
+  "surge_velocity_bins": ["surge", "explosive", "very-high"],
+  "min_surge_items_for_report": 1,
+  "emit_market_proposals": true,
+  "automatic_implement_allowed": false,
+  "production_change_allowed": false,
+  "notes": [
+    "click metrics are velocity bins only — no raw counts, no post verbatim",
+    "trend_items use category_tag and content_angle_tag abstract labels",
+    "market pioneering proposals are research packets for operator review"
+  ]
+}

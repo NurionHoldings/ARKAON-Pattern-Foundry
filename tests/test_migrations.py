@@ -8,7 +8,7 @@ from apf.migrations import migration_versions
 def test_every_upgrade_has_a_downgrade():
     directory = Path("db/migrations")
     versions = migration_versions(directory)
-    assert versions == ("0001_core", "0002_target_repository")
+    assert versions == ("0001_core", "0002_target_repository", "0003_durable_review")
     assert all((directory / f"{version}.down.sql").exists() for version in versions)
 
 

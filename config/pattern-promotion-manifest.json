@@ -1,0 +1,10 @@
+{
+  "schema_version": "apf.pattern-promotion-manifest/v1",
+  "catalog_revision": null,
+  "decisions": [],
+  "notes": [
+    "each decision binds pattern_id, PromotionDecision payload, signature, and source",
+    "source must be EXTERNAL_ETHERNIAN for production; TEST_VECTOR is test-only",
+    "when catalog_revision is set it must match the current validated catalog revision"
+  ]
+}

@@ -55,6 +55,7 @@ class CollectionCycleResult:
     denied: int
     duplicate: int
     failed: int = 0
+    skipped_out_of_topic: int = 0
 
 
 class MemoryAuditSink:
@@ -102,6 +103,7 @@ class CollectorRuntime:
         *,
         clock: Callable[[], datetime] | None = None,
         content_hashes: ContentHashStore | None = None,
+        topic_filter: Callable[[CollectionCandidate], bool] | None = None,
     ) -> None:
         self.policy = policy
         self.provider = provider
@@ -109,6 +111,7 @@ class CollectorRuntime:
         self.audit = audit
         self._clock = clock or (lambda: datetime.now(UTC))
         self._content_hashes = content_hashes or MemoryContentHashStore()
+        self._topic_filter = topic_filter
 
     def _audit(
         self,
@@ -132,8 +135,11 @@ class CollectorRuntime:
         )
 
     def run_once(self) -> CollectionCycleResult:
-        considered = collected = denied = duplicate = failed = 0
+        considered = collected = denied = duplicate = failed = skipped_out_of_topic = 0
         for candidate in self.provider.candidates():
+            if self._topic_filter is not None and not self._topic_filter(candidate):
+                skipped_out_of_topic += 1
+                continue
             considered += 1
             decision = decide_collection(candidate, self.policy)
             if not decision.collect:
@@ -172,7 +178,7 @@ class CollectorRuntime:
 
             collected += 1
             self._audit(candidate, decision, content_hash=digest, content_bytes=len(payload))
-        return CollectionCycleResult(considered, collected, denied, duplicate, failed)
+        return CollectionCycleResult(considered, collected, denied, duplicate, failed, skipped_out_of_topic)
 
     def run_forever(self, stop: Event) -> None:
         if not self.policy.enabled:

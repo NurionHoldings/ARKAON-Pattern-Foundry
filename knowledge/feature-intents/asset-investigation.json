@@ -1,0 +1,70 @@
+{
+  "authorization": {
+    "basis": "SELF_DIAGNOSIS_SELF_GENERATION",
+    "mutate_locked_intent_dna": false,
+    "scope": "MISSING_INTENT_DNA_ONLY"
+  },
+  "completeness": 1.0,
+  "contributor": "ETERNIAN",
+  "evidence_refs": [
+    "config/arkaon-asset-investigation.json",
+    "src/apf/asset_investigation.py"
+  ],
+  "feature_id": "asset-investigation",
+  "feature_intent": {
+    "constraint": [
+      "investigation ranks asset and pattern signals; it never auto-promotes or mutates platforms; best-asset selection is evidence-bound ranking for eternian and operator review only"
+    ],
+    "evolution": [
+      "Pass 1 evidence routing",
+      "Pass 3 human lock"
+    ],
+    "invariant": [
+      "locked Intent_DNA mutation 금지",
+      "propose-only inbox 유지"
+    ],
+    "journey": [
+      "기능 추가 → intent 누락 감지 → Pass-0 seed 자가생성 → inbox 검토"
+    ],
+    "object": [
+      "asset investigation"
+    ],
+    "outcome": [
+      "Pass-0 Intent_DNA seed 생성",
+      "에테르니언 검토 후 CORE lock 가능"
+    ],
+    "owner": [
+      "누리온 Foundry 거버넌스",
+      "에테르니언 최종 lock 권한"
+    ],
+    "risk": [
+      "의도 누락 시 학습·승격 경로 단절",
+      "잘못된 seed는 eternian review에서 차단"
+    ],
+    "signal": [
+      "missing_intent_count",
+      "generated_seed_count",
+      "completeness"
+    ],
+    "value": [
+      "asset-investigation 기능의 의도·경계를 기계 판독 가능하게 고정"
+    ],
+    "who": [
+      "범(운영자)",
+      "에테르니언 검토자",
+      "아르카온 자가진단"
+    ],
+    "why": [
+      "ARKAON 자산 조사·우선순위 (R-011): Rank investigation priorities so ARKAON pursues the strongest evidence-bound assets first."
+    ]
+  },
+  "fingerprint": "3f4e6948981dbcc22f7692c998a0ba1ee5b67b2bae92d4d93d89b61387428aae",
+  "gates": {
+    "intent_dna_mutation": false,
+    "locked": false,
+    "review_status": "ETERNIAN_REVIEW_REQUIRED"
+  },
+  "pass_stage": 0,
+  "phase": "PASS0_SELF_GENERATED",
+  "schema_version": "apf.feature-intent-seed/v1"
+}

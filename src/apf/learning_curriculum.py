@@ -159,8 +159,8 @@ def _select_pool(
 def plan_curriculum(
     candidates: list[LearningCandidate],
     *,
-    max_items: int,
-    budget_limit: int,
+    max_items: int | None,
+    budget_limit: int | None,
     external_ratio: float = 0.65,
     exploration_ratio: float = 0.20,
     min_intent_relevance: float = 0.30,
@@ -169,8 +169,8 @@ def plan_curriculum(
     prior_external_cost: int = 0,
     prior_internal_cost: int = 0,
 ) -> CurriculumPlan:
-    """Build a deterministic, bounded 65/35 active-learning curriculum."""
-    if max_items < 0 or budget_limit < 0:
+    """Build a deterministic 65/35 active-learning curriculum (unbounded when limits are None)."""
+    if (max_items is not None and max_items < 0) or (budget_limit is not None and budget_limit < 0):
         raise ValueError("max_items and budget_limit must not be negative")
     if min(
         prior_external_items,
@@ -185,6 +185,10 @@ def plan_curriculum(
         raise ValueError("min_intent_relevance must be between 0 and 1")
 
     unique, rejected = _deduplicate(candidates, min_intent_relevance)
+    if max_items is None:
+        max_items = len(unique)
+    if budget_limit is None:
+        budget_limit = sum(candidate.estimated_cost for candidate in unique) or max(len(unique), 1)
     # Allocate against the cumulative target instead of rounding every batch down.
     # This gives a one-item batch to the external lane while deterministic carry
     # makes later batches repay the internal baseline (65/35 over time).

@@ -1,0 +1,70 @@
+{
+  "authorization": {
+    "basis": "SELF_DIAGNOSIS_SELF_GENERATION",
+    "mutate_locked_intent_dna": false,
+    "scope": "MISSING_INTENT_DNA_ONLY"
+  },
+  "completeness": 1.0,
+  "contributor": "ETERNIAN",
+  "evidence_refs": [
+    "config/arkaon-learning-impediment.json",
+    "src/apf/learning_impediment.py"
+  ],
+  "feature_id": "learning-impediment",
+  "feature_intent": {
+    "constraint": [
+      "detects ARKAON self-limits that hinder learning and requests modification from eternian/beom; includes learning storage capability and business improvement program (experience audit) gaps; no auto-fix; inbox → mailbox → user approval → fulfillment (#053)"
+    ],
+    "evolution": [
+      "Pass 1 evidence routing",
+      "Pass 3 human lock"
+    ],
+    "invariant": [
+      "locked Intent_DNA mutation 금지",
+      "propose-only inbox 유지"
+    ],
+    "journey": [
+      "기능 추가 → intent 누락 감지 → Pass-0 seed 자가생성 → inbox 검토"
+    ],
+    "object": [
+      "learning impediment"
+    ],
+    "outcome": [
+      "Pass-0 Intent_DNA seed 생성",
+      "에테르니언 검토 후 CORE lock 가능"
+    ],
+    "owner": [
+      "누리온 Foundry 거버넌스",
+      "에테르니언 최종 lock 권한"
+    ],
+    "risk": [
+      "의도 누락 시 학습·승격 경로 단절",
+      "잘못된 seed는 eternian review에서 차단"
+    ],
+    "signal": [
+      "missing_intent_count",
+      "generated_seed_count",
+      "completeness"
+    ],
+    "value": [
+      "learning-impediment 기능의 의도·경계를 기계 판독 가능하게 고정"
+    ],
+    "who": [
+      "범(운영자)",
+      "에테르니언 검토자",
+      "아르카온 자가진단"
+    ],
+    "why": [
+      "61. 학습 방해 self-limit · 수정 요청 (에테르니언/범): Detect ARKAON functional limits that hinder learning; request modification from eternian/beom."
+    ]
+  },
+  "fingerprint": "1b1df9cd6713982298c41433c172d652c0faed804f5ee07423af1a7677b07e61",
+  "gates": {
+    "intent_dna_mutation": false,
+    "locked": false,
+    "review_status": "ETERNIAN_REVIEW_REQUIRED"
+  },
+  "pass_stage": 0,
+  "phase": "PASS0_SELF_GENERATED",
+  "schema_version": "apf.feature-intent-seed/v1"
+}

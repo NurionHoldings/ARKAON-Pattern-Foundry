@@ -1,0 +1,22 @@
+{
+  "schema_version": "apf.arkaon-map-ops-gate/v1",
+  "maximum_outcome": "MAP_OPS_REVIEW",
+  "production_activation_allowed": false,
+  "automatic_route_selection": false,
+  "continuous_device_tracking": false,
+  "pay_change_from_shadow": false,
+  "mandatory_gates": [
+    "MAP_KNOWLEDGE_071",
+    "MAP_SANDBOX_072",
+    "DEVICE_AUTH_073",
+    "ETA_SHADOW_074",
+    "MAP_RESILIENCE_075",
+    "MAP_RELEASE_076"
+  ],
+  "eta_shadow_tolerance_s": 900,
+  "device_auth_max_ttl_minutes": 30,
+  "notes": [
+    "map ops gates are advisory review packets; live provider activation remains BLOCKED",
+    "ETA shadow compares predicted vs observed duration without pay or penalty changes"
+  ]
+}
