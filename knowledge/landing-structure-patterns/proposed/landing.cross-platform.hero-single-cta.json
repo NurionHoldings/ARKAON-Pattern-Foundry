@@ -1,0 +1,20 @@
+{
+  "automatic_promotion_allowed": false,
+  "evidence_digests": [
+    "23d30b2a999f77026868a9444460b8e7a95bc24e896f05c118d804352bd7340a",
+    "a67d948dd5d9b3ee253edeca6ab784c8d49470d6ca351fd94d06eee9ec498cd6"
+  ],
+  "pattern_id": "landing.cross-platform.hero-single-cta",
+  "pattern_token": "landing-pattern:hero-single-cta",
+  "platform_ids": [
+    "MAEJINNAM",
+    "ZAKSIMSPACE"
+  ],
+  "production_change_allowed": false,
+  "review_status": "PROPOSED",
+  "schema_version": "apf.landing-structure-pattern-proposal/v1",
+  "shared_route_refs": [
+    "surface/hero-primary-cta"
+  ],
+  "summary": "MAEJINNAM, ZAKSIMSPACE에서 landing-pattern:hero-single-cta structural evidence가 공유 route(surface/hero-primary-cta)로 관측되었습니다."
+}

@@ -68,6 +68,21 @@ def attestation_payload(item):
     return value
 
 
+def test_review_detail_is_principal_scoped(tmp_path):
+    client, store, _, tenant, principal, _ = setup(tmp_path)
+    record = store.create_job(make_job(tenant, principal))
+    task = store.create_review(
+        record.tenant_id, record.job_id, stage=ReviewStage.RIGHTS,
+        reason_code="RIGHTS_CHECK", evidence_fingerprint="sha256:" + "1" * 64,
+        expires_at=LATER,
+    )
+    response = client.get(f"/v1/console/reviews/{task.task_id}")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["task_id"] == task.task_id
+    assert body["request_fingerprint"] == record.request_fingerprint
+
+
 def test_real_sqlite_reviews_are_principal_and_tenant_scoped_and_xss_is_inert(tmp_path):
     client, store, _, tenant, principal, _ = setup(tmp_path)
     own = store.create_job(make_job(tenant, principal))

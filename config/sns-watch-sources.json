@@ -1,0 +1,38 @@
+{
+  "schema_version": "apf.sns-watch-sources/v1",
+  "sources": [
+    {
+      "watch_id": "maejinnam-sns-digest",
+      "kind": "LOCAL_MANIFEST",
+      "path": "knowledge/sns-digests/maejinnam.json",
+      "platform_id": "MAEJINNAM",
+      "domain_ids": ["HOME_SURFACE_OPTIMIZATION", "SIGNATURE_MOTION"],
+      "enabled": true
+    },
+    {
+      "watch_id": "dosirak-sns-digest",
+      "kind": "LOCAL_MANIFEST",
+      "path": "knowledge/sns-digests/dosirak-store.json",
+      "platform_id": "DOSIRAK_STORE",
+      "domain_ids": ["HOME_SURFACE_OPTIMIZATION", "PAYMENT_CHECKOUT_FLOW"],
+      "enabled": true
+    },
+    {
+      "watch_id": "wither-sns-digest",
+      "kind": "LOCAL_MANIFEST",
+      "path": "knowledge/sns-digests/wither.json",
+      "platform_id": "WITHER",
+      "domain_ids": ["TYPOGRAPHY_MOTION", "VIDEO_TEMPLATE_EFFECTS"],
+      "enabled": true
+    },
+    {
+      "watch_id": "web-platform-public-surface",
+      "kind": "PUBLIC_HTTPS_PROFILE",
+      "locator": "https://developer.mozilla.org/en-US/docs/Web",
+      "platform_id": "ARKAON_FOUNDRY",
+      "domain_ids": ["CROSS_FEATURE_COHERENCE", "TEMPLATE_COMPOSITION"],
+      "enabled": true,
+      "notes": "reference public HTTPS structural baseline; replace with authorized link-in-bio URLs per platform"
+    }
+  ]
+}

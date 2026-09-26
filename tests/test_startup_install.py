@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 import pytest
@@ -42,7 +43,8 @@ def test_installer_writes_only_below_explicit_user_config_root(tmp_path):
     installed = install_user_startup(config, user_config_root=root, system="Linux")
     assert installed.is_relative_to(root)
     assert installed.exists()
-    assert installed.stat().st_mode & 0o777 == 0o600
+    if os.name != "nt":
+        assert installed.stat().st_mode & 0o777 == 0o600
 
 
 def test_unsupported_platform_fails_closed():

@@ -3,7 +3,8 @@ from __future__ import annotations
 import json
 import re
 import sqlite3
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from enum import StrEnum
@@ -188,11 +189,15 @@ class DurableReviewRepository:
         self._now_provider = now_provider or (lambda: datetime.now(UTC))
         self._migrate()
 
-    def _connect(self) -> sqlite3.Connection:
+    @contextmanager
+    def _connect(self) -> Iterator[sqlite3.Connection]:
         db = sqlite3.connect(self.path, timeout=10, isolation_level=None)
         db.row_factory = sqlite3.Row
         db.execute("PRAGMA foreign_keys=ON")
-        return db
+        try:
+            yield db
+        finally:
+            db.close()
 
     def _now(self) -> datetime:
         value = self._now_provider()
@@ -619,6 +624,34 @@ class DurableReviewRepository:
                 "ORDER BY expires_at,task_id", (tenant_id, job_id),
             ).fetchall()
             return tuple(self._task(row) for row in rows)
+
+    def get_review_for_principal(self, tenant_id: str, principal_id: str, task_id: str) -> ReviewTask:
+        with self._connect() as db:
+            row = db.execute(
+                "SELECT * FROM review_tasks WHERE tenant_id=? AND principal_id=? AND task_id=?",
+                (tenant_id, principal_id, task_id),
+            ).fetchone()
+        if row is None:
+            raise DurableStoreError("REVIEW_NOT_FOUND")
+        return self._task(row)
+
+    def count_reviews_for_principal(self, tenant_id: str, principal_id: str) -> int:
+        with self._connect() as db:
+            row = db.execute(
+                "SELECT COUNT(*) AS total FROM review_tasks WHERE tenant_id=? AND principal_id=?",
+                (tenant_id, principal_id),
+            ).fetchone()
+        return int(row["total"])
+
+    def count_candidates_for_principal(self, tenant_id: str, principal_id: str) -> int:
+        with self._connect() as db:
+            row = db.execute(
+                "SELECT COUNT(*) AS total FROM candidate_manifests c JOIN durable_jobs j "
+                "ON j.tenant_id=c.tenant_id AND j.job_id=c.job_id "
+                "WHERE c.tenant_id=? AND j.principal_id=?",
+                (tenant_id, principal_id),
+            ).fetchone()
+        return int(row["total"])
 
     def list_reviews_for_principal(
         self, tenant_id: str, principal_id: str, *, limit: int = 50, offset: int = 0,

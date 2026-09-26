@@ -1,0 +1,11 @@
+{
+  "schema_version": "apf.github-onboarding/v1",
+  "enabled": true,
+  "oauth_authorize_base": "https://github.com/login/oauth/authorize",
+  "signup_url": "https://github.com/signup",
+  "login_url": "https://github.com/login",
+  "callback_path": "/v1/console/github/oauth/callback",
+  "session_ttl_minutes": 30,
+  "client_id_env": "ARKAON_GITHUB_OAUTH_CLIENT_ID",
+  "require_https_callback": true
+}
