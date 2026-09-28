@@ -1,0 +1,79 @@
+{
+  "schema_version": "apf.project-intent/1.0",
+  "project_id": "serion72-template-platform",
+  "display_name": "SERI ON 72 Template & Proposal Platform",
+  "source_repository": "NurionHoldings/serion72",
+  "purpose": "Create family-facing business proposal templates and prepare a controlled path toward an editable collaboration platform.",
+  "audience": [
+    "proposal_subject",
+    "family_decision_makers",
+    "business_planner"
+  ],
+  "intent_lock": "Turn living achievement and present activity into a continuing, next-generation business ecosystem without exposing internal development language.",
+  "presentation_rules": {
+    "language": "ko-KR",
+    "tone": "premium_calm_evidence_led",
+    "internal_terms_visible": false,
+    "direct_activity_media_preferred": true,
+    "industry_analogue_media_allowed": true,
+    "responsive_required": true,
+    "printable_required": true
+  },
+  "business_axis_contract": {
+    "required_fields": [
+      "goal",
+      "target",
+      "design",
+      "partners",
+      "revenue_or_funding",
+      "validation",
+      "decision"
+    ],
+    "portfolio_fields": [
+      "priority",
+      "governance",
+      "financial_scenarios",
+      "risk_controls",
+      "first_90_days"
+    ]
+  },
+  "motion_policy": {
+    "primary_motion_per_view": 1,
+    "preferred_properties": [
+      "transform",
+      "opacity"
+    ],
+    "reduced_motion_required": true,
+    "mobile_degradation_required": true,
+    "meaning_without_motion_required": true
+  },
+  "media_policy": {
+    "selection_order": [
+      "direct_activity",
+      "same_industry",
+      "adjacent_industry"
+    ],
+    "must_explain_one_of": [
+      "customer",
+      "space",
+      "action",
+      "outcome"
+    ],
+    "fallback_required": true
+  },
+  "platform_stages": [
+    "READ_ONLY_PROPOSAL",
+    "CONTROLLED_EDITOR",
+    "REVIEW_COLLABORATION",
+    "APPROVED_OPERATIONS_HANDOFF"
+  ],
+  "controls": {
+    "runtime": "INACTIVE",
+    "status": "ETHERNIAN_REVIEW_REQUIRED",
+    "automatic_asset_promotion": false,
+    "external_writes": false,
+    "personal_data": false,
+    "payments": false,
+    "deployment": false
+  }
+}

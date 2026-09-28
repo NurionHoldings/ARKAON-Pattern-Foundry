@@ -1,0 +1,63 @@
+{
+  "schema_version": "apf.project-capability/1.0",
+  "project_id": "serion72-template-platform",
+  "status": "ETHERNIAN_REVIEW_REQUIRED",
+  "runtime": "INACTIVE",
+  "capabilities": [
+    {
+      "id": "proposal.structure.compose",
+      "mode": "DESIGN_ONLY",
+      "description": "Compose a standard business-axis proposal without merging distinct ideas."
+    },
+    {
+      "id": "proposal.media.recommend",
+      "mode": "RECOMMEND_ONLY",
+      "description": "Recommend direct, same-industry, or adjacent-industry media with a visible fallback contract."
+    },
+    {
+      "id": "proposal.motion.adapt",
+      "mode": "DESIGN_ONLY",
+      "description": "Select restrained brand, reveal, and transition motion with mobile and reduced-motion variants."
+    },
+    {
+      "id": "proposal.responsive.audit",
+      "mode": "READ_ONLY",
+      "description": "Audit desktop, tablet, mobile, print, text zoom, touch targets, clipping, and horizontal overflow."
+    },
+    {
+      "id": "proposal.internal_terms.guard",
+      "mode": "READ_ONLY",
+      "description": "Detect ARKAON, audit, iteration, development, and implementation terms that should not appear in a family-facing proposal."
+    },
+    {
+      "id": "proposal.platform.plan",
+      "mode": "DESIGN_ONLY",
+      "description": "Prepare staged transition from read-only proposal to controlled editor, collaboration, and approved operations handoff."
+    }
+  ],
+  "forbidden_actions": [
+    "PROMOTE_PUBLIC_PATTERN",
+    "MODIFY_INTENT_DNA_SYSTEM_OF_RECORD",
+    "WRITE_EXTERNAL_SYSTEM",
+    "DEPLOY_AUTOMATICALLY",
+    "COLLECT_PERSONAL_DATA",
+    "ENABLE_PAYMENT",
+    "BYPASS_ETHERNIAN_REVIEW"
+  ],
+  "required_evidence": [
+    "proposal_preview",
+    "responsive_checklist",
+    "motion_accessibility_check",
+    "media_failure_fallback_check",
+    "internal_term_exposure_check",
+    "eternian_review_record",
+    "user_approval_record"
+  ],
+  "activation_gates": [
+    "ETHERNIAN_REVIEW_APPROVED",
+    "USER_APPROVED",
+    "DATA_SCOPE_DEFINED",
+    "AUTHORIZATION_MODEL_DEFINED",
+    "ROLLBACK_PLAN_DEFINED"
+  ]
+}
