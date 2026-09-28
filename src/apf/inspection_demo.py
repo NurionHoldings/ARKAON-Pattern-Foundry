@@ -5,7 +5,6 @@ from __future__ import annotations
 import base64
 import hashlib
 import hmac
-import html
 import json
 import os
 import re
@@ -21,6 +20,7 @@ from .business_card import BusinessCardRequest, _back, _front
 from .logo_draft import LogoDraftRequest, _svg
 
 COOKIE = "apf_inspection_demo"
+PRICES_KRW = {"logo": 50_000, "card": 10_000}
 STEPS = (
     ("요청 미리보기", "예시 요청의 목적과 필요한 결과물을 확인합니다."),
     ("결과물 미리보기", "예시 화면의 구성과 수령 형태를 확인합니다."),
@@ -183,15 +183,20 @@ def install_inspection_demo(app: FastAPI) -> None:
             'button{background:#173a79;color:white}</style><main><h1>간단한 시안 제작</h1>'
             '<p>입력에 따라 벡터 로고와 명함 앞·뒷면을 만듭니다. 파일은 아직 제공하지 않습니다.</p>'
             '<form method="post" action="/inspection/make">'
+            '<label>제작 항목<select name="product" required>'
+            '<option value="logo">로고 · 50,000원</option>'
+            '<option value="card">명함 · 10,000원</option>'
+            '<option value="both">로고 + 명함 · 60,000원</option></select></label>'
             '<label>브랜드명<input name="brand" required maxlength="64"></label>'
             '<label>한 줄 소개<input name="tagline" required maxlength="100"></label>'
             '<label>색상<input name="color" type="color" value="#2563eb"></label>'
             '<label>도형<select name="shape"><option value="orbit">원</option>'
             '<option value="arch">아치</option><option value="spark">별</option></select></label>'
-            '<label>명함 이름<input name="name" required maxlength="80"></label>'
-            '<label>직함<input name="title" required maxlength="100"></label>'
-            '<label>전화<input name="phone" required maxlength="80"></label>'
-            '<label>이메일<input name="email" type="email" required maxlength="160"></label>'
+            '<p>명함을 선택한 경우 아래 네 항목도 입력하세요.</p>'
+            '<label>명함 이름<input name="name" maxlength="80"></label>'
+            '<label>직함<input name="title" maxlength="100"></label>'
+            '<label>전화<input name="phone" maxlength="80"></label>'
+            '<label>이메일<input name="email" type="email" maxlength="160"></label>'
             '<button type="submit">로고·명함 시안 생성</button></form></main>',
             headers={"Cache-Control": "no-store", "Content-Security-Policy":
                      "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'"},
@@ -204,23 +209,32 @@ def install_inspection_demo(app: FastAPI) -> None:
         if len(body) > 4096:
             raise HTTPException(status_code=413, detail="input too large")
         values = parse_qs(body.decode("utf-8", errors="replace"))
+        product = values.get("product", [""])[0]
+        if product not in {"logo", "card", "both"}:
+            raise HTTPException(status_code=422, detail="invalid product selection")
         data = {key: values.get(key, [""])[0] for key in
                 ("brand", "tagline", "color", "shape", "name", "title", "phone", "email")}
         try:
             logo = LogoDraftRequest(name=data["brand"], tagline=data["tagline"],
                                     color=data["color"], shape=data["shape"])
-            BusinessCardRequest(logo_draft_id="inspection", name=data["name"],
-                                title=data["title"], phone=data["phone"],
-                                email=data["email"], brand_text=data["brand"])
+            if product in {"card", "both"}:
+                BusinessCardRequest(logo_draft_id="inspection", name=data["name"],
+                                    title=data["title"], phone=data["phone"],
+                                    email=data["email"], brand_text=data["brand"])
         except ValidationError:
             raise HTTPException(status_code=422, detail="invalid preview input") from None
         logo_svg = _svg(logo.name, logo.tagline, logo.color, logo.shape, 1)
-        cards = (_front(logo_svg, data["name"], data["title"], data["phone"],
-                        data["email"], data["brand"]), _back(logo_svg, data["brand"]))
+        pictures = ""
+        if product in {"logo", "both"}:
+            pictures += _image(logo_svg, "로고 미리보기")
+        if product in {"card", "both"}:
+            pictures += _image(_front(logo_svg, data["name"], data["title"], data["phone"],
+                                      data["email"], data["brand"]), "명함 앞면 미리보기")
+            pictures += _image(_back(logo_svg, data["brand"]), "명함 뒷면 미리보기")
         # Signed form carries only the kind, never the contact fields or a clean SVG.
         _, secret = configured()
         issued = int(time.time())
-        invoice_data = json.dumps({"kind": "logo_card", "issued": issued}, separators=(",", ":"))
+        invoice_data = json.dumps({"product": product, "issued": issued}, separators=(",", ":"))
         token = base64.urlsafe_b64encode(invoice_data.encode()).decode().rstrip("=")
         signature = hmac.new(secret, b"invoice:" + token.encode(), hashlib.sha256).hexdigest()
         invoice_form = "".join(
@@ -239,9 +253,8 @@ def install_inspection_demo(app: FastAPI) -> None:
             'img{width:100%;height:auto}button{font:inherit;padding:12px;background:#173a79;'
             'color:white;border:0;border-radius:9px}</style>'
             '<main><h1>실제 생성된 시안 · 미리보기</h1>'
-            '<p>로고와 명함 SVG를 입력값으로 생성했습니다. 미리보기 표시가 포함됩니다.</p>'
-            + _image(logo_svg, "로고 미리보기")
-            + _image(cards[0], "명함 앞면 미리보기") + _image(cards[1], "명함 뒷면 미리보기")
+            '<p>선택한 SVG 시안을 입력값으로 생성했습니다. 미리보기 표시가 포함됩니다.</p>'
+            + pictures
             + invoice_form + '<a href="/inspection/make">다시 만들기</a></main>',
             headers={"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff",
                      "Content-Security-Policy": "default-src 'none'; img-src data:; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'"},
@@ -263,26 +276,29 @@ def install_inspection_demo(app: FastAPI) -> None:
             expected = hmac.new(secret, b"invoice:" + token.encode(), hashlib.sha256).hexdigest()
             details = json.loads(base64.urlsafe_b64decode(token + "=" * (-len(token) % 4)))
             if (not hmac.compare_digest(signature, expected)
-                    or details["kind"] != "logo_card"
+                    or details["product"] not in {"logo", "card", "both"}
                     or not isinstance(details["issued"], int)
                     or not 0 <= time.time() - details["issued"] < 1800):
                 raise ValueError
         except (ValueError, KeyError, TypeError, json.JSONDecodeError):
             raise HTTPException(status_code=403, detail="invalid invoice request") from None
-        price_text = os.getenv("APF_DEMO_LOGO_CARD_PRICE_KRW", "")
-        if price_text and re.fullmatch(r"[1-9][0-9]{0,8}", price_text):
-            amount = f'{int(price_text):,}원 (운영 가격 설정값)'
-        else:
-            amount = "가격 확정 전 · 결제 불가"
+        product = details["product"]
+        selected = ("logo", "card") if product == "both" else (product,)
+        items = "".join(
+            f'<li>{"로고" if item == "logo" else "명함"}: {PRICES_KRW[item]:,}원</li>'
+            for item in selected
+        )
+        amount = sum(PRICES_KRW[item] for item in selected)
         invoice_id = hashlib.sha256(ticket.encode()).hexdigest()[:16].upper()
         return HTMLResponse(
             '<!doctype html><html lang="ko"><meta charset="utf-8">'
             '<meta name="viewport" content="width=device-width,initial-scale=1">'
             '<title>결제청구서 초안</title><main><h1>결제청구서 초안</h1>'
             f'<p>참조번호: {invoice_id}</p><p>발행일: {datetime.now(UTC).date()}</p>'
-            '<p>항목: 로고·명함 제작 결과물 수령</p>'
+            f'<p>제작 항목</p><ul>{items}</ul>'
             f'<p>요청한 기능: {"출력" if requested == "print" else "다운로드"}</p>'
-            f'<p>예상 청구액: {html.escape(amount)}</p>'
+            f'<p>표시 합계: {amount:,}원</p>'
+            '<p>부가세 포함 여부와 최종 결제 조건은 주문 단계에서 확정합니다.</p>'
             '<p>출력·다운로드 및 실제 제작 참여에는 회원가입 또는 로그인 후 결제가 필요합니다.</p>'
             '<p>이 문서는 결제 안내용 초안이며 결제 승인, 세금계산서 또는 확정 청구가 아닙니다.</p>'
             '<a href="/inspection/make">체험으로 돌아가기</a></main>',
