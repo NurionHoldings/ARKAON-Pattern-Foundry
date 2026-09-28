@@ -487,3 +487,17 @@ def test_business_card_api_uses_owned_logo_and_csrf(tmp_path):
         .headers["content-security-policy"]
         .endswith("sandbox")
     )
+    print_url = f"/v1/console/business-cards/{card.json()['card_id']}/print"
+    printed = client.get(print_url)
+    assert printed.status_code == 200
+    assert printed.text.count("data:image/svg+xml;base64,") == 2
+    assert "width:90mm;height:50mm" in printed.text
+    assert printed.headers["cache-control"] == "no-store"
+    other = TestClient(app, base_url="https://testserver")
+    other.post("/console/dev/session", json={
+        "tenant_id": str(tenant_id), "principal_id": str(uuid4()), "role": "owner",
+    })
+    denied = other.get(print_url)
+    assert denied.status_code in {403, 404, 422}
+    assert "data:image/svg+xml" not in denied.text
+    assert TestClient(app).get(print_url).status_code == 401
