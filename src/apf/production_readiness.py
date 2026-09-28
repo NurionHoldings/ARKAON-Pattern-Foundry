@@ -13,6 +13,11 @@ from uuid import UUID
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
+from .billing_entitlement import (
+    BillingEntitlementPolicy,
+    BillingVerificationMode,
+    build_billing_verify_url,
+)
 from .github_owner_auth import GitHubOwnerAuth, OwnerAuthError
 from .migrations import migration_versions
 from .repository import PostgresRepository
@@ -36,6 +41,11 @@ def production_ready(repository: object) -> bool:
             return False
         if not runtime.is_dir() or not foundry.is_dir():
             return False
+        billing = BillingEntitlementPolicy.load(foundry / "config" / "arkaon-billing-entitlement.json")
+        if (not billing.enabled or billing.mode is not BillingVerificationMode.BILLING_API
+                or billing.allow_digest_fallback or not os.environ.get(billing.api_token_env)):
+            return False
+        build_billing_verify_url(policy=billing)
         with repository._engine.connect() as connection:
             versions = {row[0] for row in connection.execute(text("SELECT version FROM schema_migrations"))}
             if not set(migration_versions()).issubset(versions):

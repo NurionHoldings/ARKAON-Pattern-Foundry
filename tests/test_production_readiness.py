@@ -6,6 +6,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.pool import StaticPool
 
 from apf.api import create_app
+from apf.billing_entitlement import BillingEntitlementPolicy, BillingVerificationMode
 from apf.github_owner_auth import GitHubOwnerAuth
 from apf.production_readiness import production_ready
 from apf.repository import MemoryRepository, PostgresRepository
@@ -40,6 +41,11 @@ def test_production_readiness_requires_migration_ledger_and_tenant(monkeypatch, 
     monkeypatch.setattr(Path, "is_dir", lambda self: str(self).startswith("/data/"))
     monkeypatch.setattr(GitHubOwnerAuth, "from_environment", lambda: object())
     monkeypatch.setattr(readiness, "migration_versions", lambda: ("0001_core",))
+    monkeypatch.setenv("ARKAON_BILLING_API_TOKEN", "test-service-token")
+    monkeypatch.setattr(BillingEntitlementPolicy, "load", lambda _path: BillingEntitlementPolicy(
+        mode=BillingVerificationMode.BILLING_API,
+        billing_api_base_url="https://billing.example.test", allow_digest_fallback=False,
+    ))
     assert production_ready(repo) is False
     with engine.begin() as conn:
         conn.exec_driver_sql("INSERT INTO schema_migrations VALUES ('0001_core')")
@@ -47,3 +53,8 @@ def test_production_readiness_requires_migration_ledger_and_tenant(monkeypatch, 
     with engine.begin() as conn:
         conn.exec_driver_sql("INSERT INTO tenants VALUES (?)", (str(tenant_id),))
     assert production_ready(repo) is True
+    monkeypatch.setattr(BillingEntitlementPolicy, "load", lambda _path: BillingEntitlementPolicy(
+        mode=BillingVerificationMode.DIGEST_THEN_API,
+        billing_api_base_url="https://billing.example.test", allow_digest_fallback=True,
+    ))
+    assert production_ready(repo) is False

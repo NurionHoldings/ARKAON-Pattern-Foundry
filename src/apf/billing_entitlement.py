@@ -206,6 +206,16 @@ class BillingEntitlementVerifier:
     ) -> bool:
         if not self.policy.enabled:
             return False
+        # A digest is derivable from public identifiers; it cannot prove payment.
+        # Production must ask the billing source of truth for every entitlement.
+        if os.getenv("APF_ENV", "").lower() in {"production", "prod"}:
+            if self.policy.mode is not BillingVerificationMode.BILLING_API:
+                return False
+            return verify_billing_api_entitlement(
+                policy=self.policy, tenant_id=tenant_id, principal_id=principal_id,
+                platform_id=platform_id, entitlement_token=payment_entitlement_digest,
+                http_post=self._http_post,
+            )
         digest_ok = verify_digest_entitlement(
             tenant_id=tenant_id,
             principal_id=principal_id,

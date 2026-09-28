@@ -20,6 +20,7 @@ from .design_reference_urls import DesignReferenceStore
 from .design_style_proposal import StyleProposalStore
 from .domain import AnalysisTarget, AnalysisTargetCreate, TargetState
 from .github_owner_auth import GitHubOwnerAuth
+from .inspection_demo import install_inspection_demo
 from .logo_draft import LogoDraftStore
 from .plain_language_approval import PlainLanguageApprovalStore
 from .popular_format import ProposalStore
@@ -91,6 +92,7 @@ def create_app(
     format_proposal_store: ProposalStore | None = None,
 ) -> FastAPI:
     application = FastAPI(title="ARKAON Pattern Foundry", version="0.1.0")
+    install_inspection_demo(application)
     application.state.repository = repository or repository_from_config()
     logo_store = logo_draft_store or LogoDraftStore(runtime_root())
     install_console(

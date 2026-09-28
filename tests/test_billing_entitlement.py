@@ -168,6 +168,35 @@ def test_verifier_billing_api_only_without_fallback(tmp_path, monkeypatch):
     )
 
 
+def test_production_rejects_digest_and_requires_live_billing_result(tmp_path, monkeypatch):
+    monkeypatch.setenv("APF_ENV", "production")
+    monkeypatch.setenv("ARKAON_BILLING_API_TOKEN", "service-token")
+    tenant, principal = str(uuid4()), str(uuid4())
+    digest = digest_entitlement(tenant_id=tenant, principal_id=principal, platform_id="demo")
+    arguments = {"tenant_id": tenant, "principal_id": principal,
+                 "platform_id": "demo", "payment_entitlement_digest": digest}
+    assert not BillingEntitlementVerifier(
+        foundry_root=tmp_path, policy=_policy(mode=BillingVerificationMode.DIGEST),
+    ).verify(**arguments)
+    assert not BillingEntitlementVerifier(
+        foundry_root=tmp_path, policy=_policy(mode=BillingVerificationMode.DIGEST_THEN_API),
+    ).verify(**arguments)
+
+    def unpaid(*_args):
+        return 402, b'{"entitled":false}'
+
+    assert not BillingEntitlementVerifier(
+        foundry_root=tmp_path, policy=_policy(allow_digest_fallback=True), http_post=unpaid,
+    ).verify(**arguments)
+
+    def paid(*_args):
+        return 200, b'{"entitled":true}'
+
+    assert BillingEntitlementVerifier(
+        foundry_root=tmp_path, policy=_policy(), http_post=paid,
+    ).verify(**arguments)
+
+
 def test_policy_load_from_config(tmp_path):
     config = tmp_path / "config"
     config.mkdir()
