@@ -50,6 +50,7 @@ def test_simple_logo_card_is_generated_but_release_requires_account_and_payment(
     client.post("/inspection/sign-in", data={"username": "01000000000", "pin": "1234"})
     assert client.get("/inspection/make").status_code == 200
     preview = client.post("/inspection/make", data={
+        "product": "both",
         "brand": "테스트", "tagline": "간단 소개", "color": "#2563eb", "shape": "orbit",
         "name": "홍길동", "title": "대표", "phone": "01000000000", "email": "a@example.com",
     })
@@ -64,13 +65,30 @@ def test_simple_logo_card_is_generated_but_release_requires_account_and_payment(
     assert "결제청구서 초안" in invoice.text
     assert "요청한 기능: 다운로드" in invoice.text
     assert "회원가입 또는 로그인 후 결제가 필요합니다" in invoice.text
-    assert "가격 확정 전 · 결제 불가" in invoice.text
+    assert "로고: 50,000원" in invoice.text
+    assert "명함: 10,000원" in invoice.text
+    assert "표시 합계: 60,000원" in invoice.text
     assert client.post("/inspection/invoice", data={"ticket": ticket.ticket + "x",
                                                    "requested": "print"}).status_code == 403
     assert client.post("/inspection/make", data={
+        "product": "both",
         "brand": "", "tagline": "x", "color": "red", "shape": "orbit",
         "name": "a", "title": "a", "phone": "a", "email": "a",
     }).status_code == 422
+    for product, expected, image_count in (("logo", "50,000원", 1), ("card", "10,000원", 2)):
+        separate = client.post("/inspection/make", data={
+            "product": product, "brand": "테스트", "tagline": "소개", "color": "#2563eb",
+            "shape": "arch", "name": "홍길동", "title": "대표", "phone": "010",
+            "email": "a@example.com",
+        })
+        assert separate.status_code == 200
+        assert separate.text.count("data:image/svg+xml;base64,") == image_count
+        parser = TicketParser()
+        parser.feed(separate.text)
+        billed = client.post("/inspection/invoice", data={"ticket": parser.ticket,
+                                                         "requested": "print"})
+        assert billed.status_code == 200
+        assert f"표시 합계: {expected}" in billed.text
 
 
 def test_inspection_disabled_without_separate_configuration(monkeypatch):
