@@ -223,9 +223,13 @@ def install_inspection_demo(app: FastAPI) -> None:
         invoice_data = json.dumps({"kind": "logo_card", "issued": issued}, separators=(",", ":"))
         token = base64.urlsafe_b64encode(invoice_data.encode()).decode().rstrip("=")
         signature = hmac.new(secret, b"invoice:" + token.encode(), hashlib.sha256).hexdigest()
-        invoice_form = (f'<form method="post" action="/inspection/invoice">'
-                        f'<input type="hidden" name="ticket" value="{token}.{signature}">'
-                        '<button type="submit">출력·다운로드 및 결제청구서 확인</button></form>')
+        invoice_form = "".join(
+            f'<form method="post" action="/inspection/invoice">'
+            f'<input type="hidden" name="ticket" value="{token}.{signature}">'
+            f'<input type="hidden" name="requested" value="{action}">'
+            f'<button type="submit">{label}</button></form>'
+            for action, label in (("print", "출력"), ("download", "다운로드"))
+        )
         return HTMLResponse(
             '<!doctype html><html lang="ko"><meta charset="utf-8">'
             '<meta name="viewport" content="width=device-width,initial-scale=1">'
@@ -250,6 +254,9 @@ def install_inspection_demo(app: FastAPI) -> None:
         if len(body) > 512:
             raise HTTPException(status_code=413, detail="input too large")
         ticket = parse_qs(body.decode("utf-8", errors="replace")).get("ticket", [""])[0]
+        requested = parse_qs(body.decode("utf-8", errors="replace")).get("requested", [""])[0]
+        if requested not in {"print", "download"}:
+            raise HTTPException(status_code=422, detail="invalid delivery action")
         try:
             token, signature = ticket.split(".", 1)
             _, secret = configured()
@@ -274,6 +281,7 @@ def install_inspection_demo(app: FastAPI) -> None:
             '<title>결제청구서 초안</title><main><h1>결제청구서 초안</h1>'
             f'<p>참조번호: {invoice_id}</p><p>발행일: {datetime.now(UTC).date()}</p>'
             '<p>항목: 로고·명함 제작 결과물 수령</p>'
+            f'<p>요청한 기능: {"출력" if requested == "print" else "다운로드"}</p>'
             f'<p>예상 청구액: {html.escape(amount)}</p>'
             '<p>출력·다운로드 및 실제 제작 참여에는 회원가입 또는 로그인 후 결제가 필요합니다.</p>'
             '<p>이 문서는 결제 안내용 초안이며 결제 승인, 세금계산서 또는 확정 청구가 아닙니다.</p>'
