@@ -21,6 +21,7 @@ def test_netlify_home_build_without_backend_keeps_demo_link_hidden(monkeypatch):
     assert 'id="inspection-link"' in html and 'href="/inspection" hidden' in html
     assert all(label in html for label in ("50,000", "10,000", "60,000"))
     assert (site / "assets" / "home.css").stat().st_size > 1000
+    assert "[hidden]{display:none!important}" in (site / "assets" / "home.css").read_text()
 
 
 def test_netlify_home_proxies_only_inspection_to_https_backend(monkeypatch):
