@@ -487,3 +487,26 @@ def test_business_card_api_uses_owned_logo_and_csrf(tmp_path):
         .headers["content-security-policy"]
         .endswith("sandbox")
     )
+    print_url = f"/v1/console/business-cards/{card.json()['card_id']}/print"
+    printed = client.get(print_url)
+    assert printed.status_code == 200
+    assert printed.text.count("data:image/svg+xml;base64,") == 2
+    assert "width:90mm;height:50mm" in printed.text
+    assert printed.headers["cache-control"] == "no-store"
+    mobile_url = f"/v1/console/business-cards/{card.json()['card_id']}/mobile"
+    mobile = client.get(mobile_url)
+    assert mobile.status_code == 200
+    assert 'name="viewport"' in mobile.text
+    assert "width:100%;height:auto;aspect-ratio:9/5" in mobile.text
+    assert mobile.text.count("data:image/svg+xml;base64,") == 2
+    assert mobile.headers["cache-control"] == "no-store"
+    other = TestClient(app, base_url="https://testserver")
+    other.post("/console/dev/session", json={
+        "tenant_id": str(tenant_id), "principal_id": str(uuid4()), "role": "owner",
+    })
+    denied = other.get(print_url)
+    assert denied.status_code in {403, 404, 422}
+    assert "data:image/svg+xml" not in denied.text
+    assert other.get(mobile_url).status_code != 200
+    assert TestClient(app).get(print_url).status_code == 401
+    assert TestClient(app).get(mobile_url).status_code == 401

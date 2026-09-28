@@ -2594,6 +2594,87 @@ def install_console(
             },
         )
 
+    @application.get("/v1/console/business-cards/{card_id}/print")
+    def print_business_card(
+        card_id: str,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[BusinessCardStore, Depends(business_cards)],
+    ) -> HTMLResponse:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        try:
+            sides = [
+                base64.b64encode(store.download(
+                    card_id, side, tenant_id=str(actor.tenant_id),
+                    owner_principal_id=str(actor.principal_id),
+                )[0].encode("utf-8")).decode("ascii")
+                for side in ("front", "back")
+            ]
+        except BusinessCardError as error:
+            raise business_card_error(error) from None
+        cards = "".join(
+            f'<figure><img alt="{label}" src="data:image/svg+xml;base64,{svg}"><figcaption>{label}</figcaption></figure>'
+            for label, svg in zip(("앞면", "뒷면"), sides, strict=True)
+        )
+
+        return HTMLResponse(
+            '<!doctype html><html lang="ko"><meta charset="utf-8">'
+            '<meta name="viewport" content="width=device-width,initial-scale=1">'
+            '<title>명함 인쇄</title><style>'
+            'body{font:16px system-ui;margin:20px;color:#222}figure{margin:0 0 20px}'
+            'img{display:block;width:90mm;height:50mm}figcaption{margin:6px 0}'
+            '@media print{@page{size:A4;margin:15mm}body{margin:0}'
+            'figure{break-inside:avoid;page-break-inside:avoid;margin:0 0 12mm}'
+            'figcaption,.toolbar{display:none}}</style>'
+            '<div class="toolbar"><button onclick="window.print()">인쇄</button>'
+            '<p>명함 앞면과 뒷면을 90 × 50 mm로 출력합니다. 인쇄 설정에서 배율 100%를 선택하세요.</p></div>'
+            + cards + '</html>',
+            headers={"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff",
+                     "Content-Security-Policy": "default-src 'none'; img-src data:; style-src 'unsafe-inline'; script-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'"},
+        )
+
+    @application.get("/v1/console/business-cards/{card_id}/mobile")
+    def mobile_business_card(
+        card_id: str,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        store: Annotated[BusinessCardStore, Depends(business_cards)],
+    ) -> HTMLResponse:
+        if actor.role != "owner":
+            raise HTTPException(status_code=403, detail="owner role required")
+        try:
+            front, _ = store.download(card_id, "front", tenant_id=str(actor.tenant_id),
+                                      owner_principal_id=str(actor.principal_id))
+            back, _ = store.download(card_id, "back", tenant_id=str(actor.tenant_id),
+                                     owner_principal_id=str(actor.principal_id))
+        except BusinessCardError as error:
+            raise business_card_error(error) from None
+        pictures = "".join(
+            f'<figure><img alt="명함 {label}" src="data:image/svg+xml;base64,'
+            f'{base64.b64encode(svg.encode("utf-8")).decode("ascii")}">'
+            f'<figcaption>{label}</figcaption></figure>'
+            for label, svg in (("앞면", front), ("뒷면", back))
+        )
+        return HTMLResponse(
+            '<!doctype html><html lang="ko"><meta charset="utf-8">'
+            '<meta name="viewport" content="width=device-width,initial-scale=1">'
+            '<title>내 디지털 명함</title><style>'
+            '*{box-sizing:border-box}body{font:16px/1.5 system-ui;background:#f3f6fb;'
+            'color:#17233c;margin:0;padding:20px}main{max-width:540px;margin:auto}'
+            'h1{font-size:1.5rem}figure{margin:0 0 18px;background:white;padding:12px;'
+            'border-radius:16px;box-shadow:0 6px 24px #16234318}'
+            'img{display:block;width:100%;height:auto;aspect-ratio:9/5;object-fit:contain}'
+            'figcaption{padding:8px 4px 0;color:#53627a}nav{display:flex;flex-wrap:wrap;gap:8px}'
+            'a{background:#17315e;color:white;padding:11px 14px;border-radius:9px;text-decoration:none}'
+            '@media(max-width:380px){body{padding:12px}figure{padding:8px}}</style>'
+            '<main><h1>내 디지털 명함</h1><p>모바일 화면에서 앞·뒷면을 확인하세요.</p>'
+            + pictures + f'<nav><a href="/v1/console/business-cards/{card_id}/download/front.svg">'
+            '앞면 저장</a>'
+            f'<a href="/v1/console/business-cards/{card_id}/download/back.svg">뒷면 저장</a>'
+            f'<a href="/v1/console/business-cards/{card_id}/print">인쇄 화면</a></nav></main>',
+            headers={"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff",
+                     "Content-Security-Policy": "default-src 'none'; img-src data:; style-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'"},
+        )
+
     def visual_error(error: VisualDialogueError) -> HTTPException:
         code = (
             409
