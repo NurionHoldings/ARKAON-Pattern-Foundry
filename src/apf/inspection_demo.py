@@ -2,21 +2,44 @@
 
 from __future__ import annotations
 
+import base64
 import hashlib
 import hmac
+import html
+import json
 import os
 import re
 import time
+from datetime import UTC, datetime
 from urllib.parse import parse_qs
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
+from pydantic import ValidationError
+
+from .business_card import BusinessCardRequest, _back, _front
+from .logo_draft import LogoDraftRequest, _svg
 
 COOKIE = "apf_inspection_demo"
 STEPS = (
     ("요청 미리보기", "예시 요청의 목적과 필요한 결과물을 확인합니다."),
     ("결과물 미리보기", "예시 화면의 구성과 수령 형태를 확인합니다."),
 )
+
+
+def _preview_svg(svg: str) -> str:
+    """Return only a marked preview; never expose an unmarked artifact in this flow."""
+    card = 'viewBox="0 0 1050 600"' in svg
+    cx, cy, x, y, size = (525, 300, 215, 315, 68) if card else (360, 90, 170, 105, 42)
+    overlay = (f'<g opacity=".28" transform="rotate(-20 {cx} {cy})">'
+               f'<text x="{x}" y="{y}" font-family="Arial" font-size="{size}" '
+               'font-weight="700" fill="#27334c">미리보기 · PREVIEW</text></g>')
+    return svg.replace("</svg>", overlay + "</svg>")
+
+
+def _image(svg: str, label: str) -> str:
+    encoded = base64.b64encode(_preview_svg(svg).encode()).decode("ascii")
+    return f'<figure><img alt="{label}" src="data:image/svg+xml;base64,{encoded}"><figcaption>{label}</figcaption></figure>'
 
 
 def install_inspection_demo(app: FastAPI) -> None:
@@ -93,8 +116,9 @@ def install_inspection_demo(app: FastAPI) -> None:
             'main{max-width:720px;margin:auto}li{background:white;margin:12px 0;padding:16px;'
             'border-radius:12px}p{margin:6px 0}a{color:#174583}'
             '</style><main><h1>요청과 결과물 미리보기</h1>'
-            '<p>체험 계정은 예시 요청과 결과물만 볼 수 있습니다. 실제 데이터와 연결되지 않습니다.</p>'
+            '<p>간단한 로고·명함은 입력에 맞춰 시안을 실제 생성합니다. 파일 수령은 로그인과 결제 후 가능합니다.</p>'
             '<ol>' + steps + '</ol>'
+            '<p><a href="/inspection/make">로고·명함 시안 만들기</a></p>'
             '<p><a href="/inspection/preview">요청·결과물 미리보기 열기</a></p>'
             '<p><a href="/inspection/participate">직접 제작에 참여하려면</a></p></main>',
             headers={"Cache-Control": "no-store", "Content-Security-Policy":
@@ -137,10 +161,123 @@ def install_inspection_demo(app: FastAPI) -> None:
             '<!doctype html><html lang="ko"><meta charset="utf-8">'
             '<meta name="viewport" content="width=device-width,initial-scale=1">'
             '<title>실제 제작 참여 안내</title><main><h1>실제 제작 참여 안내</h1>'
-            '<p>요청 제출, 시안 수정·승인, 제작 실행 및 결과물 수령에는 '
-            '회원가입 또는 로그인 후 결제 절차가 필요합니다.</p>'
+            '<p>템플릿·플랫폼 제작에 참여하려면 회원가입 또는 로그인이 필요합니다.</p>'
+            '<p>제작 계약 및 결과물 수령 단계에서는 별도 결제 절차를 안내합니다.</p>'
             '<p>현재 체험 계정에서는 진행할 수 없습니다. 회원가입·결제 연동이 준비되면 '
             '운영 화면에서 안내합니다.</p><a href="/inspection/preview">미리보기로 돌아가기</a></main>',
+            headers={"Cache-Control": "no-store", "Content-Security-Policy":
+                     "default-src 'none'; base-uri 'none'"},
+        )
+
+    @app.get("/inspection/make", response_class=HTMLResponse)
+    def inspection_make(request: Request) -> HTMLResponse:
+        authorized(request)
+        return HTMLResponse(
+            '<!doctype html><html lang="ko"><meta charset="utf-8">'
+            '<meta name="viewport" content="width=device-width,initial-scale=1">'
+            '<title>로고·명함 체험 제작</title><style>'
+            'body{font:16px/1.5 system-ui;background:#f4f6fb;padding:20px}'
+            'main{max-width:540px;margin:auto;background:white;padding:24px;border-radius:14px}'
+            'label,input,select,button{display:block;width:100%;box-sizing:border-box;margin:12px 0}'
+            'input,select,button{font:inherit;padding:10px;border:1px solid #b3bfd1;border-radius:8px}'
+            'button{background:#173a79;color:white}</style><main><h1>간단한 시안 제작</h1>'
+            '<p>입력에 따라 벡터 로고와 명함 앞·뒷면을 만듭니다. 파일은 아직 제공하지 않습니다.</p>'
+            '<form method="post" action="/inspection/make">'
+            '<label>브랜드명<input name="brand" required maxlength="64"></label>'
+            '<label>한 줄 소개<input name="tagline" required maxlength="100"></label>'
+            '<label>색상<input name="color" type="color" value="#2563eb"></label>'
+            '<label>도형<select name="shape"><option value="orbit">원</option>'
+            '<option value="arch">아치</option><option value="spark">별</option></select></label>'
+            '<label>명함 이름<input name="name" required maxlength="80"></label>'
+            '<label>직함<input name="title" required maxlength="100"></label>'
+            '<label>전화<input name="phone" required maxlength="80"></label>'
+            '<label>이메일<input name="email" type="email" required maxlength="160"></label>'
+            '<button type="submit">로고·명함 시안 생성</button></form></main>',
+            headers={"Cache-Control": "no-store", "Content-Security-Policy":
+                     "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'"},
+        )
+
+    @app.post("/inspection/make", response_class=HTMLResponse)
+    async def inspection_make_preview(request: Request) -> HTMLResponse:
+        authorized(request)
+        body = await request.body()
+        if len(body) > 4096:
+            raise HTTPException(status_code=413, detail="input too large")
+        values = parse_qs(body.decode("utf-8", errors="replace"))
+        data = {key: values.get(key, [""])[0] for key in
+                ("brand", "tagline", "color", "shape", "name", "title", "phone", "email")}
+        try:
+            logo = LogoDraftRequest(name=data["brand"], tagline=data["tagline"],
+                                    color=data["color"], shape=data["shape"])
+            BusinessCardRequest(logo_draft_id="inspection", name=data["name"],
+                                title=data["title"], phone=data["phone"],
+                                email=data["email"], brand_text=data["brand"])
+        except ValidationError:
+            raise HTTPException(status_code=422, detail="invalid preview input") from None
+        logo_svg = _svg(logo.name, logo.tagline, logo.color, logo.shape, 1)
+        cards = (_front(logo_svg, data["name"], data["title"], data["phone"],
+                        data["email"], data["brand"]), _back(logo_svg, data["brand"]))
+        # Signed form carries only the kind, never the contact fields or a clean SVG.
+        _, secret = configured()
+        issued = int(time.time())
+        invoice_data = json.dumps({"kind": "logo_card", "issued": issued}, separators=(",", ":"))
+        token = base64.urlsafe_b64encode(invoice_data.encode()).decode().rstrip("=")
+        signature = hmac.new(secret, b"invoice:" + token.encode(), hashlib.sha256).hexdigest()
+        invoice_form = (f'<form method="post" action="/inspection/invoice">'
+                        f'<input type="hidden" name="ticket" value="{token}.{signature}">'
+                        '<button type="submit">출력·다운로드 및 결제청구서 확인</button></form>')
+        return HTMLResponse(
+            '<!doctype html><html lang="ko"><meta charset="utf-8">'
+            '<meta name="viewport" content="width=device-width,initial-scale=1">'
+            '<title>생성된 시안 미리보기</title><style>'
+            'body{font:16px/1.5 system-ui;background:#f4f6fb;padding:16px}'
+            'main{max-width:760px;margin:auto}figure{background:white;padding:12px;border-radius:12px}'
+            'img{width:100%;height:auto}button{font:inherit;padding:12px;background:#173a79;'
+            'color:white;border:0;border-radius:9px}</style>'
+            '<main><h1>실제 생성된 시안 · 미리보기</h1>'
+            '<p>로고와 명함 SVG를 입력값으로 생성했습니다. 미리보기 표시가 포함됩니다.</p>'
+            + _image(logo_svg, "로고 미리보기")
+            + _image(cards[0], "명함 앞면 미리보기") + _image(cards[1], "명함 뒷면 미리보기")
+            + invoice_form + '<a href="/inspection/make">다시 만들기</a></main>',
+            headers={"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff",
+                     "Content-Security-Policy": "default-src 'none'; img-src data:; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'"},
+        )
+
+    @app.post("/inspection/invoice", response_class=HTMLResponse)
+    async def inspection_invoice(request: Request) -> HTMLResponse:
+        authorized(request)
+        body = await request.body()
+        if len(body) > 512:
+            raise HTTPException(status_code=413, detail="input too large")
+        ticket = parse_qs(body.decode("utf-8", errors="replace")).get("ticket", [""])[0]
+        try:
+            token, signature = ticket.split(".", 1)
+            _, secret = configured()
+            expected = hmac.new(secret, b"invoice:" + token.encode(), hashlib.sha256).hexdigest()
+            details = json.loads(base64.urlsafe_b64decode(token + "=" * (-len(token) % 4)))
+            if (not hmac.compare_digest(signature, expected)
+                    or details["kind"] != "logo_card"
+                    or not isinstance(details["issued"], int)
+                    or not 0 <= time.time() - details["issued"] < 1800):
+                raise ValueError
+        except (ValueError, KeyError, TypeError, json.JSONDecodeError):
+            raise HTTPException(status_code=403, detail="invalid invoice request") from None
+        price_text = os.getenv("APF_DEMO_LOGO_CARD_PRICE_KRW", "")
+        if price_text and re.fullmatch(r"[1-9][0-9]{0,8}", price_text):
+            amount = f'{int(price_text):,}원 (운영 가격 설정값)'
+        else:
+            amount = "가격 확정 전 · 결제 불가"
+        invoice_id = hashlib.sha256(ticket.encode()).hexdigest()[:16].upper()
+        return HTMLResponse(
+            '<!doctype html><html lang="ko"><meta charset="utf-8">'
+            '<meta name="viewport" content="width=device-width,initial-scale=1">'
+            '<title>결제청구서 초안</title><main><h1>결제청구서 초안</h1>'
+            f'<p>참조번호: {invoice_id}</p><p>발행일: {datetime.now(UTC).date()}</p>'
+            '<p>항목: 로고·명함 제작 결과물 수령</p>'
+            f'<p>예상 청구액: {html.escape(amount)}</p>'
+            '<p>출력·다운로드 및 실제 제작 참여에는 회원가입 또는 로그인 후 결제가 필요합니다.</p>'
+            '<p>이 문서는 결제 안내용 초안이며 결제 승인, 세금계산서 또는 확정 청구가 아닙니다.</p>'
+            '<a href="/inspection/make">체험으로 돌아가기</a></main>',
             headers={"Cache-Control": "no-store", "Content-Security-Policy":
                      "default-src 'none'; base-uri 'none'"},
         )
