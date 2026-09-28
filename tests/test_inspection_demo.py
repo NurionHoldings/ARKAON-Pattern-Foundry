@@ -58,12 +58,15 @@ def test_simple_logo_card_is_generated_but_release_requires_account_and_payment(
     assert "다운로드" in preview.text and "/download/" not in preview.text
     ticket = TicketParser()
     ticket.feed(preview.text)
-    invoice = client.post("/inspection/invoice", data={"ticket": ticket.ticket})
+    invoice = client.post("/inspection/invoice", data={"ticket": ticket.ticket,
+                                                       "requested": "download"})
     assert invoice.status_code == 200
     assert "결제청구서 초안" in invoice.text
+    assert "요청한 기능: 다운로드" in invoice.text
     assert "회원가입 또는 로그인 후 결제가 필요합니다" in invoice.text
     assert "가격 확정 전 · 결제 불가" in invoice.text
-    assert client.post("/inspection/invoice", data={"ticket": ticket.ticket + "x"}).status_code == 403
+    assert client.post("/inspection/invoice", data={"ticket": ticket.ticket + "x",
+                                                   "requested": "print"}).status_code == 403
     assert client.post("/inspection/make", data={
         "brand": "", "tagline": "x", "color": "red", "shape": "orbit",
         "name": "a", "title": "a", "phone": "a", "email": "a",
