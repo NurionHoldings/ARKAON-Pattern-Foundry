@@ -14,11 +14,8 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 
 COOKIE = "apf_inspection_demo"
 STEPS = (
-    ("요청", "필요한 결과물과 목적을 입력합니다."),
-    ("구성 확인", "아르카온이 작업 단계를 제안하고 사용자가 범위를 확인합니다."),
-    ("시안 검토", "로고·명함·웹 화면의 시안을 비교하고 수정합니다."),
-    ("승인", "선택한 시안과 적용 범위를 확인하고 승인합니다."),
-    ("수령", "완성 파일을 내려받고 인쇄 또는 배포 결과를 확인합니다."),
+    ("요청 미리보기", "예시 요청의 목적과 필요한 결과물을 확인합니다."),
+    ("결과물 미리보기", "예시 화면의 구성과 수령 형태를 확인합니다."),
 )
 
 
@@ -91,13 +88,59 @@ def install_inspection_demo(app: FastAPI) -> None:
         return HTMLResponse(
             '<!doctype html><html lang="ko"><meta charset="utf-8">'
             '<meta name="viewport" content="width=device-width,initial-scale=1">'
-            '<title>ARKAON 제작 단계</title><style>'
+            '<title>ARKAON 요청·결과물 미리보기</title><style>'
             'body{font:16px/1.55 system-ui;background:#f4f6fb;color:#162544;margin:0;padding:20px}'
             'main{max-width:720px;margin:auto}li{background:white;margin:12px 0;padding:16px;'
             'border-radius:12px}p{margin:6px 0}a{color:#174583}'
-            '</style><main><h1>요청부터 결과물 수령까지</h1>'
-            '<p>이 화면은 예시 작업 흐름입니다. 실제 제작·결제·배포를 실행하지 않습니다.</p>'
-            '<ol>' + steps + '</ol><a href="/inspection">체험 시작 화면</a></main>',
+            '</style><main><h1>요청과 결과물 미리보기</h1>'
+            '<p>체험 계정은 예시 요청과 결과물만 볼 수 있습니다. 실제 데이터와 연결되지 않습니다.</p>'
+            '<ol>' + steps + '</ol>'
+            '<p><a href="/inspection/preview">요청·결과물 미리보기 열기</a></p>'
+            '<p><a href="/inspection/participate">직접 제작에 참여하려면</a></p></main>',
             headers={"Cache-Control": "no-store", "Content-Security-Policy":
                      "default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'"},
+        )
+
+    @app.get("/inspection/preview", response_class=HTMLResponse)
+    def inspection_preview(request: Request) -> HTMLResponse:
+        authorized(request)
+        return HTMLResponse(
+            '<!doctype html><html lang="ko"><meta charset="utf-8">'
+            '<meta name="viewport" content="width=device-width,initial-scale=1">'
+            '<title>요청과 결과물 미리보기</title><style>'
+            'body{font:16px/1.6 system-ui;background:#f4f6fb;color:#162544;padding:18px}'
+            'main{max-width:680px;margin:auto}section{background:white;border-radius:14px;'
+            'padding:20px;margin:16px 0}a{color:#174583}'
+            '.samples{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}'
+            '.sample{border:1px solid #d6dfeb;border-radius:12px;padding:16px;min-height:120px}'
+            '.brand{font-size:1.5rem;font-weight:800;color:#174583}.sample small{display:block}'
+            '</style><main><h1>미리보기 전용</h1>'
+            '<section><h2>요청 예시</h2><p>목적: 소규모 사업 소개</p>'
+            '<p>필요한 구성: 로고, 모바일 명함, 소개 페이지</p>'
+            '<p>입력과 수정은 이 화면에서 할 수 없습니다.</p></section>'
+            '<section><h2>결과물 예시</h2><div class="samples">'
+            '<div class="sample"><small>로고 시안</small><p class="brand">가온 · STUDIO</p></div>'
+            '<div class="sample"><small>모바일 명함</small><p class="brand">가온</p>'
+            '<p>김가온 · 대표<br>연락처는 예시에서 제외</p></div>'
+            '<div class="sample"><small>소개 페이지 화면</small><h3>당신의 일을 소개합니다</h3>'
+            '<p>서비스 · 작업 사례 · 문의</p></div></div>'
+            '<p>실제 고객 파일이 아닌 설명용 미리보기입니다. 파일 다운로드·인쇄·배포는 제공하지 않습니다.</p>'
+            '</section><a href="/inspection/participate">직접 제작에 참여하려면</a></main>',
+            headers={"Cache-Control": "no-store", "Content-Security-Policy":
+                     "default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'"},
+        )
+
+    @app.get("/inspection/participate", response_class=HTMLResponse)
+    def inspection_participation_notice(request: Request) -> HTMLResponse:
+        authorized(request)
+        return HTMLResponse(
+            '<!doctype html><html lang="ko"><meta charset="utf-8">'
+            '<meta name="viewport" content="width=device-width,initial-scale=1">'
+            '<title>실제 제작 참여 안내</title><main><h1>실제 제작 참여 안내</h1>'
+            '<p>요청 제출, 시안 수정·승인, 제작 실행 및 결과물 수령에는 '
+            '회원가입 또는 로그인 후 결제 절차가 필요합니다.</p>'
+            '<p>현재 체험 계정에서는 진행할 수 없습니다. 회원가입·결제 연동이 준비되면 '
+            '운영 화면에서 안내합니다.</p><a href="/inspection/preview">미리보기로 돌아가기</a></main>',
+            headers={"Cache-Control": "no-store", "Content-Security-Policy":
+                     "default-src 'none'; base-uri 'none'"},
         )
