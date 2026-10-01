@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import subprocess
 from dataclasses import dataclass
@@ -65,6 +66,8 @@ def create_deployment_baseline(
     """Create a candidate baseline; owner deployment approval must persist it."""
     if _OBJECT_ID.fullmatch(deployed_commit_sha) is None:
         raise AuditBotError("DEPLOYMENT_BASELINE_COMMIT_INVALID")
+    if _git_head(repository_root) != deployed_commit_sha:
+        raise AuditBotError("DEPLOYMENT_BASELINE_HEAD_MISMATCH")
     policy = _read_json(policy_path, "INTERNAL_AUDIT_POLICY_INVALID")
     paths = policy.get("protected_paths")
     if not isinstance(paths, list) or not paths:
@@ -81,6 +84,49 @@ def create_deployment_baseline(
     }
     document["baseline_digest"] = _digest(document)
     return document
+
+
+def persist_deployment_baseline(path: Path, document: dict[str, object]) -> None:
+    """Durably create a baseline file without overwriting prior evidence."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    encoded = (json.dumps(document, indent=2, sort_keys=True) + "\n").encode()
+    try:
+        descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    except FileExistsError as exc:
+        raise AuditBotError("DEPLOYMENT_BASELINE_ALREADY_EXISTS") from exc
+    try:
+        with os.fdopen(descriptor, "wb") as stream:
+            stream.write(encoded)
+            stream.flush()
+            os.fsync(stream.fileno())
+    except BaseException:
+        path.unlink(missing_ok=True)
+        raise
+
+
+def activate_deployment_baseline_from_receipt(
+    candidate: dict[str, object], receipt: dict[str, object]
+) -> dict[str, object]:
+    """Validate a GitHub-returned owner receipt and bind it to one candidate."""
+    supplied = receipt.get("receipt_digest")
+    unsigned = {key: value for key, value in receipt.items() if key != "receipt_digest"}
+    if (
+        receipt.get("schema_version") != "apf.deployment-approval-receipt/1.0"
+        or receipt.get("decision") != "APPROVED"
+        or receipt.get("baseline_digest") != candidate.get("baseline_digest")
+        or supplied != _digest(unsigned)
+    ):
+        raise AuditBotError("DEPLOYMENT_APPROVAL_RECEIPT_INVALID")
+    approver = receipt.get("approver")
+    approved_at = receipt.get("approved_at")
+    if not isinstance(approver, str) or not isinstance(approved_at, str):
+        raise AuditBotError("DEPLOYMENT_APPROVAL_RECEIPT_INVALID")
+    return activate_deployment_baseline(
+        candidate,
+        approver=approver,
+        approved_at=approved_at,
+        deployment_approval_digest=str(supplied),
+    )
 
 
 def activate_deployment_baseline(

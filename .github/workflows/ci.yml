@@ -61,3 +61,8 @@ jobs:
           tests/test_audit_bot_internal.py
           tests/test_self_improvement_execution.py
           tests/test_self_improvement_relay.py
+      - shell: pwsh
+        run: |
+          [void][scriptblock]::Create((Get-Content -Raw orchestrator/manage-audit-baseline.ps1))
+          [void][scriptblock]::Create((Get-Content -Raw orchestrator/audit-bot-preflight.ps1))
+          [void][scriptblock]::Create((Get-Content -Raw orchestrator/audit-bot-smoke.ps1))

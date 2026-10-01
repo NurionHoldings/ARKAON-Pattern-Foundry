@@ -1,10 +1,15 @@
 import json
 import subprocess
+from hashlib import sha256
 
-from apf.arkaon_audit_bot import AuditDecision
+import pytest
+
+from apf.arkaon_audit_bot import AuditBotError, AuditDecision
 from apf.audit_bot_internal import (
     activate_deployment_baseline,
+    activate_deployment_baseline_from_receipt,
     create_deployment_baseline,
+    persist_deployment_baseline,
     run_internal_integrity_audit,
 )
 
@@ -100,3 +105,64 @@ def test_missing_baseline_holds_and_duplicate_owner_ledger_blocks(tmp_path):
     result = audit(repository, policy, foundry, baseline_path)
     assert result.decision == AuditDecision.BLOCKED
     assert any("OWNER_APPROVAL_LEDGER_DUPLICATE" in finding for finding in result.findings)
+
+
+def test_candidate_is_bound_to_current_head(tmp_path):
+    repository, _, policy, _, _ = setup(tmp_path)
+    with pytest.raises(AuditBotError, match="DEPLOYMENT_BASELINE_HEAD_MISMATCH"):
+        create_deployment_baseline(
+            repository_root=repository,
+            policy_path=policy,
+            deployed_commit_sha="a" * 40,
+        )
+
+
+def test_receipt_activation_and_exclusive_durable_persistence(tmp_path):
+    repository, _, policy, _, _ = setup(tmp_path)
+    candidate = create_deployment_baseline(
+        repository_root=repository,
+        policy_path=policy,
+        deployed_commit_sha=git(repository, "rev-parse", "HEAD"),
+    )
+    unsigned = {
+        "schema_version": "apf.deployment-approval-receipt/1.0",
+        "decision": "APPROVED",
+        "baseline_digest": candidate["baseline_digest"],
+        "approver": "최인석",
+        "approved_at": "2026-09-19T12:00:00+09:00",
+    }
+    digest = "sha256:" + sha256(
+        json.dumps(unsigned, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+    active = activate_deployment_baseline_from_receipt(
+        candidate, {**unsigned, "receipt_digest": digest}
+    )
+    assert active["state"] == "ACTIVE"
+    assert active["deployment_approval_digest"] == digest
+
+    output = tmp_path / "state" / "baseline.json"
+    persist_deployment_baseline(output, active)
+    assert json.loads(output.read_text(encoding="utf-8")) == active
+    with pytest.raises(AuditBotError, match="DEPLOYMENT_BASELINE_ALREADY_EXISTS"):
+        persist_deployment_baseline(output, active)
+
+
+def test_receipt_for_another_candidate_is_rejected(tmp_path):
+    repository, _, policy, _, _ = setup(tmp_path)
+    candidate = create_deployment_baseline(
+        repository_root=repository,
+        policy_path=policy,
+        deployed_commit_sha=git(repository, "rev-parse", "HEAD"),
+    )
+    receipt = {
+        "schema_version": "apf.deployment-approval-receipt/1.0",
+        "decision": "APPROVED",
+        "baseline_digest": "sha256:" + "0" * 64,
+        "approver": "최인석",
+        "approved_at": "2026-09-19T12:00:00+09:00",
+    }
+    receipt["receipt_digest"] = "sha256:" + sha256(
+        json.dumps(receipt, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+    with pytest.raises(AuditBotError, match="DEPLOYMENT_APPROVAL_RECEIPT_INVALID"):
+        activate_deployment_baseline_from_receipt(candidate, receipt)
