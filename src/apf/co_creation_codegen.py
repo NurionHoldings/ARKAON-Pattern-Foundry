@@ -221,6 +221,7 @@ class CoCreationCodegenEngine:
                 content = render_entry_effect(
                     title=effect_options.get("title", "ARKAON"),
                     subtitle=effect_options.get("subtitle", "당신의 아이디어가 현실이 되는 순간"),
+                    title_parts=effect_options.get("title_parts"),
                 )
             else:
                 content = _render_section_stub(

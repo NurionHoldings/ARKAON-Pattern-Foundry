@@ -18,3 +18,17 @@ def test_escape_text_and_validate_name():
         render_entry_effect("unknown")
     with pytest.raises(ValueError):
         render_entry_effect(title="")
+
+
+def test_layered_words_have_independent_order_and_safe_text():
+    page = render_entry_effect(title_parts=['더', '아리랑', '스토어'])
+    assert 'apf-word-left" aria-hidden="true">더' in page
+    assert 'apf-word-right" aria-hidden="true">스토어' in page
+    assert 'apf-word-center" aria-hidden="true">아리랑' in page
+    assert 'animation-delay:.4s' in page
+    assert 'animation-delay:1.6s' in page
+    assert 'animation-delay:2.8s' in page
+    assert 'aria-label="더 아리랑 스토어"' in page
+    assert '&lt;script&gt;' in render_entry_effect(title_parts=['더', '<script>', '스토어'])
+    with pytest.raises(ValueError):
+        render_entry_effect(title_parts=['더', '아리랑'])

@@ -30,3 +30,21 @@ CSP가 인라인 스크립트를 차단하는 사이트는 CSS/JS를 별도 파�
 {"section_id":"intro","purpose":"스토어 진입","pattern_token":"entry-effect:arkaon-cinematic-gate","entry_effect":{"title":"더 아리랑 스토어","subtitle":"THE ARIRANG STORE"}}
 ```
 테스트 예제: `examples/arirang-cinematic-gate.html`을 브라우저로 열면 즉시 재생된다.
+
+## 순차 레이어 모드: 중앙 적층 후 이동·돌출
+
+`title_parts=["더", "아리랑", "스토어"]`는 최종 읽기 순서인 왼쪽·중앙·오른쪽이다.
+시작 깊이는 더(앞), 스토어(중간), 아리랑(뒤)이며 모두 중앙에 겹쳐 놓는다.
+0.4초부터 더가 왼쪽으로 이동, 1.6초부터 스토어가 오른쪽으로 이동,
+2.8초부터 아리랑 세 글자 전체가 금색으로 변화하며 앞으로 돌출된다.
+각 단계는 1.2초이며 마지막 상태를 유지한다. 다시 보기는 전체 순서를 초기화한다.
+동작 감소 설정에서는 즉시 최종 배치를 보여준다.
+
+```python
+page = render_entry_effect("시네마틱 게이트",
+    title_parts=["더", "아리랑", "스토어"], subtitle="THE ARIRANG STORE")
+```
+
+공동제작의 `entry_effect` 옵션에도 `"title_parts":["더","아리랑","스토어"]`를 지정한다.
+각 문구는 최대 24자로 제한되며 긴 문구는 적용 화면 크기에 맞게 조정한다.
+`title_parts` 생략 시 기존 단일 타이틀 좌우 펼침을 유지한다.
