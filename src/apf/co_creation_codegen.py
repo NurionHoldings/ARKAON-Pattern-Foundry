@@ -9,9 +9,9 @@ from datetime import datetime
 from hashlib import sha256
 from pathlib import Path, PurePosixPath
 
-from .learning_safety import scan_learning_text
-from .entry_effects import render_entry_effect
 from .entry_effect_presets import is_entry_effect_token
+from .entry_effects import render_entry_effect
+from .learning_safety import scan_learning_text
 
 _ROUTE_SAFE = re.compile(r"[^a-zA-Z0-9._-]+")
 
@@ -232,6 +232,9 @@ class CoCreationCodegenEngine:
                         title=effect_options.get("title", "ARKAON"),
                         subtitle=effect_options.get("subtitle", "당신의 아이디어가 현실이 되는 순간"),
                         title_parts=effect_options.get("title_parts"),
+                        font=effect_options.get("font", "system"),
+                        font_family=effect_options.get("font_family"),
+                        text_segments=effect_options.get("text_segments"),
                     )
                 except ValueError as exc:
                     raise CoCreationCodegenRejected("EFFECT_OPTIONS", str(exc)) from exc

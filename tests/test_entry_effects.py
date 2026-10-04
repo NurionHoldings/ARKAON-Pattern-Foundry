@@ -1,6 +1,7 @@
 import pytest
-from apf.entry_effects import render_entry_effect, EFFECT_NAME, PATTERN_TOKEN
+
 from apf.co_creation_codegen import _render_section_stub
+from apf.entry_effects import EFFECT_NAME, PATTERN_TOKEN, render_entry_effect
 
 
 def test_named_effect_and_codegen():
@@ -34,7 +35,7 @@ def test_layered_words_have_independent_order_and_safe_text():
         render_entry_effect(title_parts=['더', '아리랑'])
 
 
-from apf.entry_effect_presets import PRESETS, resolve_effect, list_entry_effects
+from apf.entry_effect_presets import PRESETS, list_entry_effects, resolve_effect
 
 
 @pytest.mark.parametrize('effect_id', PRESETS)
@@ -60,3 +61,40 @@ def test_registry_supports_all_names_and_safe_customization(effect_id):
 def test_options_reject_css_injection_and_invalid_motion(options):
     with pytest.raises(ValueError):
         render_entry_effect(**options)
+
+
+@pytest.mark.parametrize('enter', ['none','fade-in','rise','zoom-in','flip-in'])
+def test_individual_text_effects_and_fonts(enter):
+    page = render_entry_effect(font='gothic', text_segments=[
+        {'text':'더', 'enter':enter, 'glow':'glow', 'font':'serif'},
+        {'text':'아리랑', 'delay':1, 'glow':'pulse', 'exit':'fade-out', 'hold':2},
+        {'text':'스토어', 'delay':2, 'glow':'shine', 'font_family':'Pretendard'},
+    ])
+    assert 'aria-label="더 아리랑 스토어"' in page
+    assert 'data-glow="pulse"' in page
+    assert '--apf-exit-delay:4.0s' in page
+    assert 'Batang' in page and 'Pretendard' in page
+    assert 'apf-custom-title' in page
+
+
+@pytest.mark.parametrize('options', [
+    {'font':'missing'}, {'font_family':'x;}</style><script>bad</script>'},
+    {'text_segments':[]}, {'text_segments':[{'text':'hi','glow':'missing'}]},
+    {'text_segments':[{'text':'hi','delay':float('nan')}]},
+    {'text_segments':[{'text':'hi','color':'red'}]},
+    {'text_segments':[{'text':'hi','weight':850}]},
+    {'title_parts':['더','아리랑','스토어'],'text_segments':[{'text':'hi'}]},
+])
+def test_individual_effect_validation(options):
+    with pytest.raises(ValueError):
+        render_entry_effect(**options)
+
+
+def test_layered_words_can_combine_individual_glow_and_exit():
+    page = render_entry_effect(title_parts=['더','아리랑','스토어'], text_segments=[
+        {'text':'더','glow':'glow'}, {'text':'아리랑','glow':'shine','font':'serif'},
+        {'text':'스토어','exit':'fade-out','delay':2},
+    ])
+    assert 'apf-word-left' in page and 'apf-word-center' in page
+    assert 'data-glow="shine"' in page
+    assert '--apf-exit-name:apf-text-fade-out' in page

@@ -67,3 +67,44 @@ CSP가 인라인 CSS/JS를 차단하면 외부 파일로 분리한다.
 검증 기록: 관련 pytest 34 PASS. jsdom에서 9종 선택, 문구 수정·이스케이프, 효과 ID 이벤트,
 시작/건너뛰기/다시 보기와 동작 감소 분기를 확인했다. DOM 검사는 브라우저 렌더 검사를 대체하지 않는다.
 재실행: jsdom이 설치된 환경에서 `node tests/entry_effect_dom_check.cjs`.
+
+## 문구별 개별 효과와 폰트
+
+`text_segments`에 문구별 설정을 지정한다. 최대 12개이며 각 문구는 1–80자다.
+
+- 등장 `enter`: `none`, `fade-in`, `rise`, `zoom-in`, `flip-in`
+- 빛 `glow`: `none`, `glow`(지속 발광), `pulse`(맥동), `shine`(빛 훑기)
+- 퇴장 `exit`: `none`, `fade-out`, `sink`, `zoom-out`
+- 시간(초): `delay`, `duration`, `hold`, `exit_duration`; 각 값 0–30
+- 색상: `color`, `glow_color`; #RRGGBB
+- 서체: `font`, `font_family`; 굵기 `weight` 100–900
+
+빛 맥동·훑기는 3회 반복 후 정착한다. 퇴장 시작은 delay+duration+hold이다.
+동작 감소 설정에서는 퇴장하지 않고 문구를 읽을 수 있게 유지한다.
+
+```python
+page = render_entry_effect('시네마틱 게이트', font='gothic',
+    text_segments=[
+        {'text':'더', 'enter':'fade-in', 'glow':'glow'},
+        {'text':'아리랑', 'delay':1, 'enter':'zoom-in', 'glow':'shine', 'font':'serif'},
+        {'text':'스토어', 'delay':2, 'enter':'rise', 'exit':'fade-out', 'hold':3},
+    ])
+```
+
+중앙 적층과 결합하려면 `title_parts`와 동일한 3개 문구를 같은 순서로 지정한다.
+외부 문구 이동과 내부 빛·등장·퇴장은 서로 다른 요소에 적용되어 transform 충돌을 피한다.
+API, CLI(`--font`, `--font-family`, `--text-segments 파일.json`), 공동제작
+`entry_effect`에서도 같은 옵션을 받는다. 예제는 `examples/arirang-text-effects.html`.
+
+서체 선택: system(시스템), gothic(맑은 고딕), serif(바탕·명조), gulim(굴림),
+arial, georgia, mono(고정폭). 해당 서체가 기기에 없으면 지정된 대체 서체로 표시된다.
+`font_family='Pretendard'`처럼 설치된 서체를 대입할 수 있다.
+스튜디오에서는 유효한 WOFF2 파일(2MB 이하)을 선택해 문구 전체에 적용하고
+다운로드 HTML에 폰트를 포함할 수 있다. 글자별 폰트 선택은 업로드 폰트를 해제한 상태에서 사용한다.
+폰트 파일 대입은 스튜디오 기능이며 서버 렌더 API는 서체 이름/스택을 받는다.
+
+## 통합 점검
+
+기존 PR의 import 순서 lint 오류를 수정했다. config 목록은 아르카온 자동 기능 탐색이
+읽는 객체 형태(schema_version/enabled/effects)로 정리했다. 전체 회귀 858 PASS / 13 SKIP
+(별도 DB가 필요한 테스트 포함). 관련 효과 테스트 49 PASS 및 DOM 동작 검사 통과.

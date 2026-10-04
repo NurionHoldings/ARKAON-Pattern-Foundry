@@ -16,4 +16,9 @@ for(const option of d.querySelectorAll('#effect option')){
  dom.window.document.querySelector('.apf-skip').click();assert.equal(entered,2);
  dom.window.close();
 }
+d.getElementById('effect').value='arkaon-cinematic-gate';d.getElementById('individual').checked=true;d.getElementById('layered').checked=true;
+const rows=d.querySelectorAll('.segment-row');rows[0].querySelector('[data-field="glow"]').value='glow';rows[1].querySelector('[data-field="font"]').value='serif';rows[2].querySelector('[data-field="exit"]').value='fade-out';
+d.getElementById('play').click();assert.equal(d.getElementById('error').textContent,'');
+const custom=new JSDOM(d.getElementById('preview').srcdoc);assert.equal(custom.window.document.querySelectorAll('.apf-text-segment').length,3);assert.equal(custom.window.document.querySelectorAll('.apf-word').length,3);assert(custom.window.document.querySelector('.apf-text-segment').getAttribute('style').includes('Malgun Gothic'));custom.window.close();
+d.getElementById('font-family').value='x;}</style>';d.getElementById('play').click();assert(d.getElementById('error').textContent.length>0);
 assert.deepEqual(errors,[]);gallery.window.close();console.log('DOM checks PASS: 9 selections, editable safe text, selected effect events, enter/skip/replay and reduced-motion flow');

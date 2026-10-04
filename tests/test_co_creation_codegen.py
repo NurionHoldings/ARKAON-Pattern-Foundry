@@ -187,3 +187,20 @@ def test_codegen_rejects_unknown_effect_before_writing_files(tmp_path):
         CoCreationCodegenEngine(foundry_root=tmp_path).run_codegen(
             proposal_id=proposal_id, operator_approval_digest=APPROVAL, now=NOW)
     assert not (tmp_path / 'state/co-creation/codegen' / proposal_id).exists()
+
+
+def test_codegen_applies_text_effects_and_font_selection(tmp_path):
+    proposal_id = _seed_proposal_and_scaffold(tmp_path)
+    path = next((tmp_path/'state/co-creation/scaffolds').glob('*.json'))
+    scaffold = json.loads(path.read_text())
+    scaffold['sections'][0]['pattern_token'] = 'entry-effect:arkaon-cinematic-gate'
+    scaffold['sections'][0]['entry_effect'] = {
+        'font':'serif', 'font_family':'Pretendard',
+        'text_segments':[{'text':'아리랑', 'glow':'shine', 'exit':'fade-out'}],
+    }
+    path.write_text(json.dumps(scaffold))
+    manifest = CoCreationCodegenEngine(foundry_root=tmp_path).run_codegen(
+        proposal_id=proposal_id, operator_approval_digest=APPROVAL, now=NOW)
+    page = (tmp_path/manifest.output_root/'sections/hero.html').read_text()
+    assert 'Pretendard' in page and 'data-glow="shine"' in page
+    assert 'apf-custom-title' in page
