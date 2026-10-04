@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>아르카온 시네마틱 게이트</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#071522;color:#eef3ff;font-family:system-ui,sans-serif}.apf-gate{position:relative;isolation:isolate;display:grid;place-items:center;min-height:100svh;overflow:hidden;background:radial-gradient(ellipse at center,#263b58 0%,#10263c 40%,#050c17 100%)}
+.apf-gate:before{content:"";position:absolute;inset:-30%;z-index:-1;background:radial-gradient(ellipse at 45% 50%,#7676cc35,transparent 45%),repeating-linear-gradient(117deg,transparent 0 120px,#8abbff05 121px 123px);animation:apf-atmosphere 12s ease-in-out infinite alternate}
+.apf-beam{position:absolute;top:50%;left:-20%;width:140%;height:2px;background:linear-gradient(90deg,transparent,#7887f2,#f5caff,#7887f2,transparent);box-shadow:0 0 16px 5px #ad79ff65;transform:rotate(-3deg);animation:apf-beam 3.8s ease both;pointer-events:none}.apf-beam:after{content:"";position:absolute;inset:-70px 25%;background:radial-gradient(ellipse,#d7a0ff42,transparent 65%)}
+.apf-content{text-align:center;z-index:1;padding:24px;width:100%;}.apf-title{margin:0;font-size:clamp(2.6rem,9vw,7rem);line-height:1.15;font-weight:900;letter-spacing:.06em;overflow-wrap:anywhere;background:linear-gradient(#fff4d6 5%,#c9aecb 45%,#fff0d4 52%,#977eaa 95%);background-clip:text;color:transparent;animation:apf-title-unfold 2.3s cubic-bezier(.16,1,.3,1) both;filter:drop-shadow(0 2px 0 #484759) drop-shadow(0 0 18px #d797ff60)}.apf-subtitle{color:#b9cae1;letter-spacing:.17em;font-size:clamp(.85rem,2vw,1.1rem);margin:24px 0 40px}.apf-enter,.apf-skip{cursor:pointer;font:inherit;color:#edf3ff;border:1px solid #a5b4e780;border-radius:8px;background:#152942cc;padding:14px 30px}.apf-enter:hover,.apf-enter:focus-visible{background:#35466b;outline:2px solid #d4b9ff;outline-offset:4px}.apf-skip{position:absolute;right:20px;top:20px;padding:8px 14px}.apf-gate.apf-leaving{animation:apf-exit .65s ease-in forwards;pointer-events:none}.apf-platform{min-height:100svh;padding:clamp(24px,6vw,80px)}[hidden]{display:none!important}
+@keyframes apf-title-unfold{0%{opacity:0;clip-path:inset(0 50%);transform:scaleX(.55);letter-spacing:-.08em}15%{opacity:1;clip-path:inset(0 43%)}75%{clip-path:inset(0 0);transform:scaleX(1.025);letter-spacing:.07em}100%{opacity:1;clip-path:inset(0 0);transform:scaleX(1);letter-spacing:.06em}}@keyframes apf-beam{0%{opacity:0;transform:translateX(-25%) rotate(-3deg) scaleX(.3)}35%,70%{opacity:1}100%{opacity:.6;transform:translateX(0) rotate(-3deg) scaleX(1)}}@keyframes apf-atmosphere{to{transform:translate(3%,2%) rotate(3deg)}}@keyframes apf-exit{to{opacity:0;transform:scale(1.08);filter:blur(8px)}}
+@media(prefers-reduced-motion:reduce){.apf-gate,.apf-gate:before,.apf-content,.apf-title,.apf-beam,.apf-gate.apf-leaving{animation:none!important}.apf-content{opacity:1;filter:none}}
+</style>
+<section class="apf-gate" data-effect="arkaon-cinematic-gate" aria-label="플랫폼 진입">
+<div class="apf-beam" aria-hidden="true"></div><button class="apf-skip" type="button">건너뛰기</button>
+<div class="apf-content"><h1 class="apf-title">더 아리랑 스토어</h1><p class="apf-subtitle">THE ARIRANG STORE</p><button class="apf-enter" type="button">플랫폼 시작하기</button></div>
+</section>
+<main class="apf-platform" hidden tabindex="-1"><h2>플랫폼에 오신 것을 환영합니다</h2><p>이 영역을 실제 플랫폼 화면으로 교체하세요.</p><button type="button" data-replay>진입 효과 다시 보기</button></main>
+<script>
+(()=>{const gate=document.querySelector('.apf-gate'),platform=document.querySelector('.apf-platform');let leaving=false,timer;
+function finish(){clearTimeout(timer);gate.hidden=true;gate.classList.remove('apf-leaving');platform.hidden=false;platform.focus();gate.dispatchEvent(new CustomEvent('arkaon:entered',{bubbles:true,detail:{effect:'arkaon-cinematic-gate'}}));}
+function enter(){if(leaving)return;leaving=true;if(matchMedia('(prefers-reduced-motion: reduce)').matches){finish();return;}gate.classList.add('apf-leaving');timer=setTimeout(finish,750);}
+gate.addEventListener('animationend',e=>{if(e.target===gate&&e.animationName==='apf-exit')finish();});gate.querySelectorAll('button').forEach(b=>b.addEventListener('click',enter));
+document.querySelector('[data-replay]').addEventListener('click',()=>{clearTimeout(timer);leaving=false;platform.hidden=true;gate.hidden=false;gate.classList.remove('apf-leaving');gate.querySelector('.apf-enter').focus();});
+})();
+</script></html>
