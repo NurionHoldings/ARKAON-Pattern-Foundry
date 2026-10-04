@@ -153,3 +153,37 @@ def test_bridge_codegen_emits_operator_packet(tmp_path):
     packet = json.loads(Path(paths[0]).read_text(encoding="utf-8"))
     assert packet["packet_kind"] == "CO_CREATION_CODEGEN_REVIEW"
     assert packet["manifest_digest"] == manifest.manifest_digest
+
+
+from apf.entry_effect_presets import PRESETS
+
+
+@pytest.mark.parametrize('effect_id', PRESETS)
+def test_codegen_effect_pages_with_configuration(tmp_path, effect_id):
+    proposal_id = _seed_proposal_and_scaffold(tmp_path)
+    scaffold_path = next((tmp_path / 'state/co-creation/scaffolds').glob('*.json'))
+    scaffold = json.loads(scaffold_path.read_text())
+    scaffold['sections'][0]['pattern_token'] = 'entry-effect:' + effect_id
+    scaffold['sections'][0]['entry_effect'] = {
+        'title': '더 아리랑 스토어', 'subtitle': 'THE ARIRANG STORE',
+        'accent': '#ffaabb', 'duration': 2,
+    }
+    scaffold_path.write_text(json.dumps(scaffold))
+    manifest = CoCreationCodegenEngine(foundry_root=tmp_path).run_codegen(
+        proposal_id=proposal_id, operator_approval_digest=APPROVAL, now=NOW)
+    page = (tmp_path / manifest.output_root / 'sections/hero.html').read_text()
+    assert f'data-effect="{effect_id}"' in page
+    assert '--apf-accent:#ffaabb' in page
+    assert '--apf-duration:2s' in page
+
+
+def test_codegen_rejects_unknown_effect_before_writing_files(tmp_path):
+    proposal_id = _seed_proposal_and_scaffold(tmp_path)
+    scaffold_path = next((tmp_path / 'state/co-creation/scaffolds').glob('*.json'))
+    scaffold = json.loads(scaffold_path.read_text())
+    scaffold['sections'][0]['pattern_token'] = 'entry-effect:missing'
+    scaffold_path.write_text(json.dumps(scaffold))
+    with pytest.raises(CoCreationCodegenRejected, match='Unknown entry effect'):
+        CoCreationCodegenEngine(foundry_root=tmp_path).run_codegen(
+            proposal_id=proposal_id, operator_approval_digest=APPROVAL, now=NOW)
+    assert not (tmp_path / 'state/co-creation/codegen' / proposal_id).exists()

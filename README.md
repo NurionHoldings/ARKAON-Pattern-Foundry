@@ -111,3 +111,9 @@ powershell.exe -ExecutionPolicy Bypass -File "D:\ARKAON_Pattern Foundry\orchestr
 ## 공개 저장소 정책
 
 이 저장소에는 공용 설계문서와 합성 예제만 둡니다. 고객 원본, 운영 DB, 개인정보, 자격증명, 비공개 소스, 내부 가격·계약정보는 저장하지 않습니다.
+
+## 진입 화면 효과
+
+[진입 효과 라이브러리 9종](docs/68-entry-effects-library.md) · [문구·색상·속도 비교 스튜디오](examples/entry-effects-studio.html)
+
+`render_entry_effect("아이리스 오픈", title="더 아리랑 스토어")`처럼 이름으로 재사용합니다.

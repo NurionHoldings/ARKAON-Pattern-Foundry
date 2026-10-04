@@ -1,0 +1,56 @@
+[
+  {
+    "id": "arkaon-cinematic-gate",
+    "name": "아르카온 시네마틱 게이트",
+    "description": "중앙 펼침 / 세 문구 순차 이동·돌출",
+    "pattern_token": "entry-effect:arkaon-cinematic-gate"
+  },
+  {
+    "id": "arkaon-iris-reveal",
+    "name": "아르카온 아이리스 오픈",
+    "description": "중앙 원형 마스크가 넓어지는 진입",
+    "pattern_token": "entry-effect:arkaon-iris-reveal"
+  },
+  {
+    "id": "arkaon-curtain-open",
+    "name": "아르카온 커튼 오픈",
+    "description": "좌우 커튼이 열리는 무대형 진입",
+    "pattern_token": "entry-effect:arkaon-curtain-open"
+  },
+  {
+    "id": "arkaon-stagger-rise",
+    "name": "아르카온 순차 타이포",
+    "description": "글자가 차례로 올라와 정렬",
+    "pattern_token": "entry-effect:arkaon-stagger-rise"
+  },
+  {
+    "id": "arkaon-focus-reveal",
+    "name": "아르카온 포커스 리빌",
+    "description": "흐릿한 글자가 선명하게 자리잡음",
+    "pattern_token": "entry-effect:arkaon-focus-reveal"
+  },
+  {
+    "id": "arkaon-neon-trace",
+    "name": "아르카온 네온 트레이스",
+    "description": "윤곽에서 발광 타이틀로 전환",
+    "pattern_token": "entry-effect:arkaon-neon-trace"
+  },
+  {
+    "id": "arkaon-perspective-flip",
+    "name": "아르카온 입체 플립",
+    "description": "원근 회전으로 타이틀 등장",
+    "pattern_token": "entry-effect:arkaon-perspective-flip"
+  },
+  {
+    "id": "arkaon-orbit-halo",
+    "name": "아르카온 오비트 헤일로",
+    "description": "빛의 궤도가 타이틀 주위에 정착",
+    "pattern_token": "entry-effect:arkaon-orbit-halo"
+  },
+  {
+    "id": "arkaon-scan-reveal",
+    "name": "아르카온 스캔 리빌",
+    "description": "빛이 위에서 아래로 문구를 스캔",
+    "pattern_token": "entry-effect:arkaon-scan-reveal"
+  }
+]
