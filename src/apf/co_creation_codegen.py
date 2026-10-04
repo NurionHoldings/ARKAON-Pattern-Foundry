@@ -9,6 +9,8 @@ from datetime import datetime
 from hashlib import sha256
 from pathlib import Path, PurePosixPath
 
+from .entry_effect_presets import is_entry_effect_token
+from .entry_effects import render_entry_effect
 from .learning_safety import scan_learning_text
 
 _ROUTE_SAFE = re.compile(r"[^a-zA-Z0-9._-]+")
@@ -132,6 +134,8 @@ def _find_scaffold_path(scaffold_root: Path, proposal_id: str) -> Path | None:
 
 
 def _render_section_stub(*, section_id: str, purpose: str, pattern_token: str | None, style_tags: tuple[str, ...]) -> str:
+    if pattern_token and is_entry_effect_token(pattern_token):
+        return render_entry_effect(pattern_token.removeprefix("entry-effect:"))
     tags = ", ".join(style_tags) if style_tags else "neutral-rhythm"
     token = pattern_token or "landing-pattern:unspecified"
     return (
@@ -211,12 +215,36 @@ class CoCreationCodegenEngine:
             if not pattern_token:
                 raise CoCreationCodegenRejected("EVIDENCE_GAP", f"pattern_token required for {section_id}")
             relative_path = f"sections/{section_id}.html"
-            content = _render_section_stub(
-                section_id=section_id,
-                purpose=purpose,
-                pattern_token=str(pattern_token),
-                style_tags=style_tags,
-            )
+            if str(pattern_token).startswith("entry-effect:") and not is_entry_effect_token(str(pattern_token)):
+                raise CoCreationCodegenRejected("UNKNOWN_EFFECT", "Unknown entry effect token")
+            if pattern_token and is_entry_effect_token(pattern_token):
+                effect_options = item.get("entry_effect", {})
+                if effect_options is None:
+                    effect_options = {}
+                if not isinstance(effect_options, dict):
+                    raise CoCreationCodegenRejected("EFFECT_OPTIONS", "entry_effect must be an object")
+                try:
+                    content = render_entry_effect(
+                        str(pattern_token).removeprefix("entry-effect:"),
+                        accent=effect_options.get("accent", "#ad79ff"),
+                        background=effect_options.get("background", "#071522"),
+                        duration=effect_options.get("duration", 4.0),
+                        title=effect_options.get("title", "ARKAON"),
+                        subtitle=effect_options.get("subtitle", "당신의 아이디어가 현실이 되는 순간"),
+                        title_parts=effect_options.get("title_parts"),
+                        font=effect_options.get("font", "system"),
+                        font_family=effect_options.get("font_family"),
+                        text_segments=effect_options.get("text_segments"),
+                    )
+                except ValueError as exc:
+                    raise CoCreationCodegenRejected("EFFECT_OPTIONS", str(exc)) from exc
+            else:
+                content = _render_section_stub(
+                    section_id=section_id,
+                    purpose=purpose,
+                    pattern_token=str(pattern_token),
+                    style_tags=style_tags,
+                )
             pending_files.append((relative_path, content, "section_stub"))
             scan_values.extend([section_id, purpose, str(pattern_token), content])
 
