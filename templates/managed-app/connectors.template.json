@@ -1,0 +1,59 @@
+{
+  "schema_version": "apf.managed-app-connectors/v1",
+  "canonical_contract": "source_event/v1",
+  "provider_profile": {
+    "provider_id": "required after agreement",
+    "owner_authorization_ref": "required evidence reference",
+    "official_docs_ref": "required official documentation URL/version",
+    "sandbox_ref": "secret manager reference only",
+    "mode": "manual | csv | rest-pull | webhook",
+    "credentials": {
+      "storage": "external secret manager",
+      "environment_variable_names": []
+    },
+    "status_translation": {},
+    "field_map": {},
+    "stable_source_id_field": "required for enabled API connector",
+    "currency": "KRW",
+    "timezone": "Asia/Seoul",
+    "pagination_or_cursor": "provider-defined",
+    "retry_and_rate_limit": "provider-defined",
+    "webhook_signature": {
+      "algorithm": "provider-defined",
+      "canonical_message": "provider-defined",
+      "timestamp_window_seconds": null
+    },
+    "enabled": false
+  },
+  "canonical_source_event": {
+    "provider_id": "string",
+    "source_event_id": "string",
+    "order_id": "string",
+    "tenant_key": "string",
+    "channel_key": "string",
+    "event_type": "sale | refund | cancel | adjustment",
+    "occurred_at": "ISO-8601 timestamp with timezone",
+    "currency": "ISO-4217 currency code",
+    "gross_paid_minor": "integer; actual amount after discount",
+    "tax_minor": "integer or null when source does not supply tax",
+    "discount_minor": "integer",
+    "settlement_reference": "string or null",
+    "source_updated_at": "ISO-8601 timestamp",
+    "source_payload_digest": "SHA-256 digest",
+    "raw_payload_reference": "access-controlled evidence reference, no secrets"
+  },
+  "required_test_cases": [
+    "normal sale",
+    "discount",
+    "full refund",
+    "partial refund",
+    "cancel",
+    "duplicate replay",
+    "out-of-order update",
+    "pagination boundary",
+    "timeout and retry",
+    "invalid signature",
+    "expired credential",
+    "least-privilege denial"
+  ]
+}

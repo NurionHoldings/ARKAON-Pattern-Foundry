@@ -1,0 +1,60 @@
+{
+  "schema_version": "apf.managed-app-acceptance/v1",
+  "gates": [
+    {
+      "id": "requirement-trace",
+      "severity": "blocker",
+      "check": "Every requested workflow has an implementation or explicit open decision."
+    },
+    {
+      "id": "tenant-isolation",
+      "severity": "blocker",
+      "check": "Cross-tenant screen, API, export, search, analytics and error paths are denied."
+    },
+    {
+      "id": "ledger-idempotency",
+      "severity": "blocker",
+      "check": "Same source event and repeated file do not duplicate posted records."
+    },
+    {
+      "id": "reversal-history",
+      "severity": "blocker",
+      "check": "Refund/cancel retains original event and a separately auditable reversal."
+    },
+    {
+      "id": "financial-calculation",
+      "severity": "blocker",
+      "check": "Representative cases match hand-calculated contract rules and rounding."
+    },
+    {
+      "id": "connector-contract",
+      "severity": "blocker_when_enabled",
+      "check": "Official docs, owner permission, sandbox evidence, signature/retry rules and source IDs are recorded."
+    },
+    {
+      "id": "secrets-and-privacy",
+      "severity": "blocker",
+      "check": "No secrets in repository/database/logs and no unnecessary customer data collected."
+    },
+    {
+      "id": "manual-import-recovery",
+      "severity": "blocker",
+      "check": "Bad imports are rejected atomically; valid retries are idempotent."
+    },
+    {
+      "id": "backup-restore",
+      "severity": "blocker_before_live",
+      "check": "Persistent data backup restores successfully to an isolated test environment."
+    },
+    {
+      "id": "operator-manual",
+      "severity": "blocker_before_live",
+      "check": "A non-specialist can run daily tasks, month close and common error recovery from the manual."
+    },
+    {
+      "id": "production-gate",
+      "severity": "human",
+      "check": "Named operator approves deploy, data migration, external access and money-related policy."
+    }
+  ]
+}

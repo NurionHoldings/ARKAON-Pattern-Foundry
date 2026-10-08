@@ -37,3 +37,16 @@ Status: operational design knowledge proposed from the `addon-polo` implementati
 The `NurionHoldings/addon-polo` prototype demonstrates role-scoped access, PBKDF2 password storage, CSRF-checked mutations, append-only sale/refund events, CSV batch validation and idempotency, monthly statement snapshots, settlement CSV comparison, audit records, and SQLite online backup. It currently accepts manual and CSV source data. POS, marketplace, live-commerce and bank APIs are not connected; each requires source-owner authorization, a current official schema, credential handling and reconciliation tests.
 
 This seed remains Pass 0 and propose-only. ETERNIAN review is required before any Intent_DNA lock, change to financial policy, connector activation, or production rollout.
+
+
+## Connector onboarding and analysis assistant
+
+- Keep one provider-neutral canonical event contract and implement each POS, commerce, PG and bank source as a replaceable adapter.
+- Obtain official schema, account-owner permission, stable source IDs, sample sale/refund/settlement records, cursor/replay behavior, rate limits and sandbox evidence before enabling a live adapter.
+- Keep provider credentials in deployment secret storage. Record only the secret reference in profiles; do not put credentials in the DB, logs or repository.
+- Normalize partner records, validate integer amounts/date/status mapping, then reuse the existing import path so idempotency, tenant scope and audit rules still apply.
+- Match separate PG and bank streams by settlement reference when available. Leave ambiguous matches in an operator review queue; do not silently infer or overwrite a payout.
+- The in-app ARKAON analysis layer reports evidence-backed amount differences, unlinked references, impossible tax amounts and channels without rows in a selected period. A blank period is a collection check prompt, not proof of missing sales.
+- The managed-app builder kit transfers these connector and analysis patterns to future inventory, booking, membership and reconciliation projects. Its validator/plan writer can prepare a full design packet; implementation stays within the repository's operator-authorized codegen and deployment gates.
+
+The current add-on branch includes a provider catalog, JSON-to-canonical-CSV normalizer, partner intake form, read-only connector readiness view and role-scoped analysis page. Actual POS/marketplace/PG/bank API activation remains pending until partner agreements and sandbox data are available.
