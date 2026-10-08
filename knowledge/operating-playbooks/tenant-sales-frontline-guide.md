@@ -1,6 +1,6 @@
 # 입점업체 매출·수수료 현장 업무 가이드
 
-이 가이드는 판매·세무·전산 경험이 없는 운영 담당자가 업무 순서를 익히도록 돕는 제안형 지식이다. 공식 실행 예제와 화면별 세부 절차는 [addon-polo 실무자 업무 매뉴얼](https://github.com/NurionHoldings/addon-polo/pull/1/files/docs/%EC%8B%A4%EB%AC%B4%EC%9E%90-%EC%97%85%EB%AC%B4%EB%A7%A4%EB%89%B4%EC%96%BC.md)을 참조한다.
+이 가이드는 판매·세무·전산 경험이 없는 운영 담당자가 업무 순서를 익히도록 돕는 제안형 지식이다. 화면별 세부 절차는 [addon-polo 실무자 업무 매뉴얼](https://github.com/NurionHoldings/addon-polo/blob/codex/operational-ledger-20261008/docs/%EC%8B%A4%EB%AC%B4%EC%9E%90-%EC%97%85%EB%AC%B4%EB%A7%A4%EB%89%B4%EC%96%BC.md)을 참조한다.
 
 ## 하루 업무
 
