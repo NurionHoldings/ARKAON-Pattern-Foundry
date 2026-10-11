@@ -22,14 +22,17 @@ h1{letter-spacing:.3em;font-size:clamp(1.5rem,4vw,2.6rem);margin:28px 0 8px}p{co
 <script>
 'use strict';
 const HOME='https://arkaonfoundry.netlify.app/';
+// Keep this entry at a separate URL from HOME to prevent redirect loops.
+const target=new URL(HOME);if(location.origin===target.origin&&location.pathname==='/'){document.documentElement.dataset.entryRouteError='true';}
 const scene=document.getElementById('scene'),status=document.getElementById('status');
 let started=false,recognition=null;const awakenButton=document.getElementById('awaken'),voiceButton=document.getElementById('voice');
+function goHome(){if(location.origin===target.origin&&location.pathname==='/'){status.textContent='진입 경로 설정을 확인해 주세요.';return}location.assign(HOME)}
 function enter(){
  if(started)return;started=true;awakenButton.disabled=true;voiceButton.disabled=true;
  if(recognition){try{recognition.stop()}catch(_){}}
  scene.classList.add('awake');status.textContent='당신을 인식했습니다. 아르카온으로 연결합니다.';
- if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){setTimeout(()=>location.assign(HOME),250);return}
- setTimeout(()=>{document.body.classList.add('entering');setTimeout(()=>location.assign(HOME),1600)},1100);
+ if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){setTimeout(()=>goHome(),250);return}
+ setTimeout(()=>{document.body.classList.add('entering');setTimeout(()=>goHome(),1600)},1100);
 }
 awakenButton.addEventListener('click',enter);
 voiceButton.addEventListener('click',()=>{if(started)return;
