@@ -33,3 +33,13 @@ Evidence:
 7. Do not autonomously merge, deploy, use credentials or ingest live payment data.
 
 This is a durable instruction/evidence packet, not proof that a running ARKAON agent consumed it.
+
+
+## Binding clarification — seller-owned PG choice
+- Seller selects one of the platform's approved PG providers; ARKAON must **not** design operator-assigned PG routing as the default.
+- Platform provides technical connectors between each seller's approved merchant account and the chosen PG, subject to PG agreement and API capabilities.
+- Track connection lifecycle, per-seller ownership checks, provider/merchant credentials references, and active status. Keep actual secrets outside Foundry.
+- For each order, snapshot selected PG and merchant account; later PG switching only affects new attempts. Existing refunds and reconciliation stay with original PG.
+- Direct-sale platform inventory uses the platform's separate merchant PG connection. Multi-seller orders must not be collapsed into an unsupported single-PG transaction.
+- Compare providers fairly; platform commissions and PG merchant fees are separate contracts. Audit unauthorized operator overrides and seller account hijack risks.
+- Add tests for seller choice persistence, merchant isolation, invalid connections, provider change during checkout, refund to original PG, and suspended merchant handling.
