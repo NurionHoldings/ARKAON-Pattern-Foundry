@@ -19,3 +19,12 @@ Intent: Sellers display selected products on Clearance-sale; buyers may follow a
 4. Evaluate PG compatibility, merchant-of-record, refund and commission obligations before live release.
 5. Report technical limitations and estimated coverage honestly; issue PR and evidence for ETERNIAN review, then operator approval.
 6. No automatic production upload, credential retrieval or deployment.
+
+
+## Operator clarification — required seller undertaking and broad storefront analysis
+- The seller's marketplace participation requires signed acceptance of a narrowly defined, enforceable referral-checkout integration obligation. Refusal blocks onboarding; acceptance alone never bypasses host platform policies or third-party rights.
+- ARKAON must maintain a capability registry for storefront technologies and propose native adapter, hosted checkout, custom integration, hosted storefront or unsupported HOLD. Universal **analysis scope** does not imply universal implementation ability.
+- Capture storefront ownership, API extensibility, legal/contract permissions, seller-authorized installation and test evidence. No covert checkout hijacking, credential collection or forced scripts.
+- If integration is unsupported, seller remains unpublished until an approved compatible checkout/storefront alternative is accepted.
+- Distinguish commercial contract acceptance from separately regulated privacy consents. Audit signing evidence, attribution window and order eligibility.
+- Generate compatibility findings, minimal adapter patches, security tests and rollback plans for ETERNIAN review; do not self-deploy.
