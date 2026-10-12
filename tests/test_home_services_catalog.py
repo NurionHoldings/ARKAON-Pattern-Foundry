@@ -8,7 +8,7 @@ def test_home_services_catalog_links_exist() -> None:
     catalog_path = ROOT / "config" / "arkaon-home-services.json"
     document = json.loads(catalog_path.read_text(encoding="utf-8"))
     assert document["schema_version"] == "apf.home-services/v1"
-    assert len(document["services"]) == 8
+    assert len(document["services"]) == 9
     for service in document["services"]:
         href = service["href"]
         assert href.startswith("/")

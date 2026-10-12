@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>아르카온 자가치유 · ARKAON</title>
+  <link rel="stylesheet" href="/services/services.css">
+</head>
+<body>
+  <div class="shell">
+    <div class="svc-top">
+      <h1>아르카온 자가치유</h1>
+      <a class="svc-home" href="/">← 홈</a>
+    </div>
+    <p class="muted">
+      아르카온이 스스로 공개 화면을 점검하고, 부족한 점을 <strong>범(운영자)</strong>·
+      <strong>에테르니언(검토)</strong>·<strong>관리자</strong>에게 요청합니다.
+      자동 배포·자동 병합은 하지 않습니다.
+    </p>
+    <div class="panel">
+      <h2>1. 자가 진단</h2>
+      <div class="btn-row">
+        <button type="button" id="runScan">미비점 스캔</button>
+      </div>
+      <ul class="list" id="findings"></ul>
+    </div>
+    <div class="panel">
+      <h2>2. 필요사항 요청</h2>
+      <p class="muted">
+        Foundry API에 <code>APF_ALLOW_PUBLIC_SELF_HEAL=true</code>이면 inbox로 바로 전송됩니다.
+        그렇지 않으면 JSON을 내려받아 저장소 <code>inbox/research/</code>에 넣거나,
+        운영 콘솔 세션에서 <code>/v1/console/platform-self-heal/surface-report</code>로 보낼 수 있습니다.
+      </p>
+      <div class="btn-row">
+        <button type="button" id="submitNeed" disabled>범·관리자에게 전달</button>
+        <a class="btn" href="/services/account.html">API URL 설정</a>
+        <a class="btn" href="/services/admin.html">관리자 콘솔</a>
+      </div>
+      <p id="submitStatus" class="muted" role="status"></p>
+    </div>
+  </div>
+  <script src="/services/services.js"></script>
+  <script src="/services/self-heal.js"></script>
+  <script>
+    let lastFindings = [];
+    const list = document.getElementById('findings');
+    const statusEl = document.getElementById('submitStatus');
+    const submitBtn = document.getElementById('submitNeed');
+
+    function renderFindings(items) {
+      list.replaceChildren();
+      if (!items.length) {
+        list.innerHTML = '<li class="ok">현재 스캔 규칙에서 BLOCKER급 미비점이 없습니다.</li>';
+        submitBtn.disabled = true;
+        return;
+      }
+      submitBtn.disabled = false;
+      for (const item of items) {
+        const li = document.createElement('li');
+        const who = { beom: '범', eternian: '에테르니언', admin: '관리자' }[item.assignee] || item.assignee;
+        li.innerHTML = `<span><span class="chip">${item.severity}</span> <strong>${item.gap_code}</strong><br>${item.summary}<br><span class="muted">요청 대상: ${who} — ${item.needed_from_admin}</span></span>`;
+        list.append(li);
+      }
+    }
+
+    document.getElementById('runScan').addEventListener('click', async () => {
+      statusEl.textContent = '스캔 중…';
+      lastFindings = await APFPlatformSelfHeal.runDiagnosis();
+      renderFindings(lastFindings);
+      statusEl.textContent = `진단 ${lastFindings.length}건 (아르카온 자가 인식)`;
+    });
+
+    submitBtn.addEventListener('click', async () => {
+      if (!lastFindings.length) return;
+      submitBtn.disabled = true;
+      statusEl.textContent = '전달 중…';
+      const result = await APFPlatformSelfHeal.submitReport(lastFindings);
+      if (result.ok) {
+        statusEl.className = 'ok';
+        statusEl.textContent = `inbox에 기록했습니다. packet ${result.body.packet_id || ''} · ${result.body.inbox_path || ''}`;
+      } else if (result.downloaded) {
+        statusEl.className = 'warn';
+        statusEl.textContent =
+          'API 공개 수신이 꺼져 있어 JSON을 내려받았습니다. 범/관리자가 inbox/research에 넣거나 Foundry에서 APF_ALLOW_PUBLIC_SELF_HEAL=true 후 다시 시도하세요.';
+      } else {
+        statusEl.className = 'warn';
+        statusEl.textContent = `전송 실패 (${result.status || 'network'}). account의 API URL을 확인하세요.`;
+      }
+      submitBtn.disabled = false;
+    });
+  </script>
+</body>
+</html>

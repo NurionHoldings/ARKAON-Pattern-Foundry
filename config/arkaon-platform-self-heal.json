@@ -1,0 +1,18 @@
+{
+  "schema_version": "apf.platform-self-heal/v1",
+  "platform_id": "ARKAON_FOUNDRY",
+  "maximum_outcome": "INBOX_REQUEST",
+  "automatic_implement_allowed": false,
+  "production_change_allowed": false,
+  "beom_assignee_gap_codes": [
+    "API_CONSOLE_UNREACHABLE",
+    "API_HEALTH_MISSING",
+    "FOUNDRY_API_NOT_CONFIGURED",
+    "CO_CREATE_NOT_WIRED",
+    "PUBLISH_AUTO_DEPLOY_MISSING"
+  ],
+  "eternian_assignee_gap_codes": [
+    "UX_CLAIM_MISMATCH",
+    "SERVICE_COPY_OVERCLAIM"
+  ]
+}
