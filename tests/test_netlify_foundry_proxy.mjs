@@ -59,6 +59,20 @@ test("proxy forwards session and CSRF headers without CORS", async () => {
   else process.env.APF_API_ORIGIN = previousOrigin;
 });
 
+test("unauthenticated console entry redirects to the public sign-in page", async () => {
+  const previousOrigin = process.env.APF_API_ORIGIN;
+  const previousFetch = globalThis.fetch;
+  process.env.APF_API_ORIGIN = "https://api.example.test";
+  globalThis.fetch = async () => Response.json({ detail: "console authentication required" }, { status: 401 });
+  const response = await handler(request("/console"));
+  assert.equal(response.status, 302);
+  assert.equal(response.headers.get("location"), "/console/login");
+  assert.equal(response.headers.get("cache-control"), "no-store");
+  globalThis.fetch = previousFetch;
+  if (previousOrigin === undefined) delete process.env.APF_API_ORIGIN;
+  else process.env.APF_API_ORIGIN = previousOrigin;
+});
+
 test("public proxy blocks the development session endpoint", async () => {
   const previousOrigin = process.env.APF_API_ORIGIN;
   const previousFetch = globalThis.fetch;
