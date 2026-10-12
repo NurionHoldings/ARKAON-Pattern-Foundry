@@ -294,7 +294,7 @@ def install_console(
         return store
 
     def foundry_root() -> Path:
-        return Path(os.getenv("APF_FOUNDRY_ROOT", Path(__file__).parents[2]))
+        return Path(__file__).parents[2]
 
     def change_controller() -> AdminChangeController:
         return AdminChangeController(foundry_root=foundry_root())
