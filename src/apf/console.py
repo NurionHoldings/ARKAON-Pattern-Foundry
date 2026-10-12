@@ -267,6 +267,31 @@ def install_console(
     application.state.plain_approval_store = approval_store
     application.state.visual_dialogue_store = visual_dialogue_store
     application.state.reference_consent_store = reference_consent_store
+    from .google_workspace_iam import install_google_workspace_iam
+
+    install_google_workspace_iam(application, ConsolePrincipal, SESSION_COOKIE, CSRF_COOKIE)
+
+    @application.middleware("http")
+    async def production_public_route_guard(request: Request, call_next):
+        environment = os.getenv("APF_ENV", "development").lower()
+        protected_paths = {
+            "/v1/targets",
+            "/docs",
+            "/redoc",
+            "/openapi.json",
+        }
+        if environment in {"production", "prod"} and (
+            request.url.path in protected_paths
+            or request.url.path.startswith("/v1/targets/")
+        ):
+            from fastapi.responses import JSONResponse
+
+            return JSONResponse(
+                {"detail": "Not Found"},
+                status_code=404,
+                headers={"Cache-Control": "no-store"},
+            )
+        return await call_next(request)
 
     def principal(
         request: Request,
@@ -294,7 +319,7 @@ def install_console(
         return store
 
     def foundry_root() -> Path:
-        return Path(__file__).parents[2]
+        return Path(os.getenv("APF_FOUNDRY_ROOT", Path(__file__).parents[2]))
 
     def change_controller() -> AdminChangeController:
         return AdminChangeController(foundry_root=foundry_root())
