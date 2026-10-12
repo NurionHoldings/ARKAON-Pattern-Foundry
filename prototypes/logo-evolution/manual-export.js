@@ -4,7 +4,7 @@ let regions=[],sprites=[],selected=-1,url=null,selection=null,drag=null,history=
 const levelMin={none:1,glow:2,sweep:3,pop:4};
 function buildSprite(r,pixels){const c=document.createElement("canvas");c.width=r.width;c.height=r.height;c.getContext("2d").putImageData(extractMaskedRegion(pixels,r),0,0);return c;}
 let sourcePixels=null;
-function refresh(){sprites=regions.map(r=>buildSprite(r,sourcePixels));const list=$("list");list.replaceChildren(...regions.map((r,i)=>{const b=document.createElement("button");b.className="entry"+(selected===i?" active":"");b.textContent=`${i+1}. ${r.name||"영역"} (${r.pixels}px)`;b.onclick=()=>select(i);return b;}));$("record").disabled=!regions.length;$("undo").disabled=!history.length;}
+function refresh(){sprites=sourcePixels?regions.map(r=>buildSprite(r,sourcePixels)):[];const list=$("list");list.replaceChildren(...regions.map((r,i)=>{const b=document.createElement("button");b.className="entry"+(selected===i?" active":"");b.textContent=`${i+1}. ${r.name||"영역"} (${r.pixels}px)`;b.onclick=()=>select(i);return b;}));$("record").disabled=!regions.length;$("undo").disabled=!history.length;}
 function select(i){selected=i;const r=regions[i];$("effect").value=r?.effect||"none";$("name").value=r?.name||"";refresh();}
 $("file").addEventListener("change",()=>{
  const f=$("file").files?.[0];if(!f)return;
