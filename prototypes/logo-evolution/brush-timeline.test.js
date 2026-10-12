@@ -1,0 +1,13 @@
+import {paintMask,effectAt,normalizedRegion} from "./brush-timeline.js";
+const assert=(condition,message)=>{if(!condition)throw Error(message)};
+const a=new Uint8ClampedArray(100);
+paintMask(a,10,10,{x:5,y:5,radius:1,mode:"add"});
+assert(a[55]===255,"paint center");assert(a[0]===0,"paint outside");
+paintMask(a,10,10,{x:5,y:5,radius:1,mode:"erase"});
+assert(a[55]===0,"erase center");
+assert(!effectAt(.5,{start:1,duration:2}).active,"before start");
+assert(effectAt(2,{start:1,duration:2}).active,"active");
+assert(!effectAt(4,{start:1,duration:2}).active,"after end");
+assert(Math.abs(effectAt(3.5,{start:1,duration:2,loop:true}).progress-.25)<1e-8,"loop");
+assert(normalizedRegion({name:"A",duration:500}).duration===60,"duration cap");
+document.body.textContent="PASS: brush and timeline assertions";
