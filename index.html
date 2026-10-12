@@ -1,17 +1,75 @@
 <!doctype html>
-<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ARKAON | 운영 홈 미리보기</title><meta name="theme-color" content="#080f1d">
-<style>:root{color-scheme:dark;font-family:system-ui,'Malgun Gothic',sans-serif}*{box-sizing:border-box}body{margin:0;background:#080f1d;color:#e7eef9}a{color:inherit}header{padding:24px max(20px,calc((100vw - 1120px)/2));border-bottom:1px solid #25364e;display:flex;justify-content:space-between;align-items:center;gap:12px}strong{letter-spacing:.18em;font-size:1.4rem}.tag{color:#95aec9;font-size:.82rem}main{max-width:1120px;margin:auto;padding:clamp(28px,6vw,80px) 20px}h1{font-size:clamp(2.1rem,5vw,4rem);line-height:1.15;max-width:850px;margin:16px 0}p{color:#b7c9dc;line-height:1.8}.eyebrow{color:#75d8f9;font-weight:700;letter-spacing:.15em}.notice{background:#16263a;border-left:3px solid #5cbad8;padding:14px 18px;border-radius:5px;margin:32px 0}section{margin-top:56px}h2{font-size:1.4rem}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}.card{background:#101e30;border:1px solid #28415c;border-radius:16px;padding:24px;min-height:180px}.card h3{margin:0 0 14px}.state{font-size:.78rem;color:#9cbed3}.card p{font-size:.95rem;margin-bottom:0}footer{border-top:1px solid #25364e;padding:25px;text-align:center;color:#9db0c3;font-size:.8rem}@media(prefers-reduced-motion:no-preference){.card{transition:transform .2s,border-color .2s}.card:hover{transform:translateY(-3px);border-color:#6cbfe0}}</style></head>
-<body><header><strong>ARKAON</strong><span class="tag">PATTERN FOUNDRY · 운영 홈 설계 미리보기</span></header>
-<main><div class="eyebrow">AI × HUMAN × CREATION</div><h1>상상에서 구현까지.<br>사람과 AI가 함께 만드는 공간.</h1><p>로고와 명함, 영상, 웹 템플릿, 디지털 플랫폼까지. ARKAON의 운영 홈 화면 구성을 먼저 확인하세요.</p>
-<div class="notice" role="status">이 화면은 <b>기능 검증용 미리보기</b>입니다. 실제 회원가입·결제·영상 생성·다운로드 기능이 작동한다고 표시하지 않습니다. 실운영 검증 완료 전 공개 서비스로 전환하지 않습니다.</div>
-<section aria-label="서비스 메뉴"><h2>제작 및 운영 메뉴</h2><div class="grid">
-<div class="card"><h3>로고 · 명함 제작</h3><span class="state">운영 기능 검증 대기</span><p>브랜드 아이덴티티 제작과 출력·다운로드 흐름</p></div>
-<div class="card"><h3>AI 영상 제작실</h3><span class="state">GPU 모델 연결 전</span><p>이미지 기반 영상 생성과 미리보기, 결과 관리</p></div>
-<div class="card"><h3>템플릿 · 홈페이지</h3><span class="state">기능별 검증 대기</span><p>반응형 웹과 업종별 템플릿 제작</p></div>
-<div class="card"><h3>이름@ 프로필</h3><span class="state">검색 연동 검증 대기</span><p>개인 프로필과 검색엔진 등록</p></div>
-<div class="card"><h3>사용자 × 아르카온 공동작업</h3><span class="state">인증 및 권한 검증 대기</span><p>요청, 검토, 승인, 결과물 관리</p></div>
-<div class="card"><h3>배포 · 운영 관리</h3><span class="state">외부 서비스 연결 검증 대기</span><p>GitHub 저장소 선택과 Netlify 배포</p></div>
-<div class="card"><h3>회원 · 결제 · 청구서</h3><span class="state">실결제 비활성화</span><p>가입, 권한, 미리보기와 결제 승인</p></div>
-<div class="card"><h3>운영자 자산관리</h3><span class="state">관리자 권한 검증 대기</span><p>작업 현황과 위험 알림, 승인 기록</p></div>
-</div></section></main><footer>ARKAON · 운영 홈 UI 미리보기 · 실서비스 기능 미연결</footer></body></html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080f1d">
+  <meta name="description" content="아르카온에서 로고, 명함, 영상, 홈페이지를 만들고 작업을 관리하세요.">
+  <title>아르카온 | 함께 만드는 디지털 공간</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+  <style>
+    :root{color-scheme:dark;font-family:Pretendard,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;font-synthesis:none}
+    *,*::before,*::after{box-sizing:border-box}
+    html{overflow-wrap:break-word;word-break:keep-all;text-size-adjust:100%;-webkit-text-size-adjust:100%}
+    body{margin:0;background:#080f1d;color:#e7eef9;font-size:16px;line-height:1.65;letter-spacing:-.015em}
+    a{color:inherit}
+    .shell{max-width:1160px;margin-inline:auto;padding-inline:clamp(20px,4vw,36px)}
+    header{border-bottom:1px solid #25364e}
+    .header-inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px 20px;padding-block:22px}
+    .brand{font-weight:800;letter-spacing:.08em;font-size:1.35rem}
+    .tag{color:#aec1d5;font-size:.875rem;letter-spacing:0}
+    main{padding-block:clamp(48px,7vw,88px)}
+    .eyebrow{color:#75d8f9;font-weight:700;font-size:.875rem;letter-spacing:.08em}
+    h1{font-size:clamp(2.15rem,5.1vw,4.2rem);font-weight:750;line-height:1.24;letter-spacing:-.045em;max-width:850px;margin:18px 0 24px}
+    .hero-line{display:block}
+    p{color:#bdcee0;line-height:1.8;margin:0}
+    .intro{max-width:760px;font-size:clamp(1rem,1.5vw,1.125rem)}
+    .notice{background:#16263a;border-left:3px solid #5cbad8;padding:18px 20px;border-radius:8px;margin:34px 0 0;color:#d5e5f3;line-height:1.75}
+    section{margin-top:clamp(52px,7vw,80px)}
+    h2{font-size:clamp(1.4rem,2.4vw,1.8rem);line-height:1.4;letter-spacing:-.025em;margin:0 0 24px}
+    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+    .card{background:#101e30;border:1px solid #28415c;border-radius:16px;padding:26px;min-width:0;min-height:180px}
+    .card h3{font-size:1.125rem;line-height:1.45;letter-spacing:-.02em;margin:0 0 12px}
+    .state{display:block;font-size:.875rem;color:#a9c5d9;margin-bottom:12px}
+    .card p{font-size:.975rem;line-height:1.7}
+    footer{border-top:1px solid #25364e;padding:28px 20px;text-align:center;color:#aebfd0;font-size:.875rem}
+    @media(max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:600px){
+      .header-inner{align-items:flex-start;padding-block:18px}
+      .tag{font-size:.78rem}
+      main{padding-block:42px 60px}
+      h1{font-size:clamp(2rem,8.2vw,2.7rem);line-height:1.3}
+      .hero-line{display:inline}
+      .hero-line+.hero-line::before{content:" "}
+      .grid{grid-template-columns:minmax(0,1fr);gap:12px}
+      .card{padding:22px;min-height:auto}
+      .notice{padding:16px}
+    }
+    @media(prefers-reduced-motion:no-preference){.card{transition:transform .2s,border-color .2s}.card:hover{transform:translateY(-3px);border-color:#6cbfe0}}
+  </style>
+</head>
+<body>
+  <header><div class="shell header-inner"><div class="brand">ARKAON</div><div class="tag">아르카온 · 디지털 제작 공간</div></div></header>
+  <main class="shell">
+    <div class="eyebrow">AI와 함께하는 창작</div>
+    <h1><span class="hero-line">상상에서 완성까지.</span><span class="hero-line">사람과 AI가 함께 만듭니다.</span></h1>
+    <p class="intro">로고와 명함부터 영상, 홈페이지, 디지털 서비스까지. 필요한 작업을 한곳에서 준비하고 관리하세요.</p>
+    <div class="notice" role="status">현재 일부 서비스는 준비 중입니다. 회원가입, 결제, 영상 제작, 파일 다운로드 등은 기능 검증 후 순차적으로 제공됩니다.</div>
+    <section aria-label="서비스 안내">
+      <h2>아르카온 서비스</h2>
+      <div class="grid">
+        <article class="card"><h3>로고·명함 만들기</h3><span class="state">서비스 준비 중</span><p>브랜드에 어울리는 로고와 명함을 디자인합니다.</p></article>
+        <article class="card"><h3>AI 영상 만들기</h3><span class="state">서비스 준비 중</span><p>이미지를 영상으로 만들고 결과물을 관리합니다.</p></article>
+        <article class="card"><h3>홈페이지 만들기</h3><span class="state">서비스 준비 중</span><p>업종과 목적에 맞는 홈페이지를 구성합니다.</p></article>
+        <article class="card"><h3>이름@ 개인 페이지</h3><span class="state">서비스 준비 중</span><p>나만의 소개 페이지를 만들고 검색 등록을 준비합니다.</p></article>
+        <article class="card"><h3>아르카온과 함께 작업하기</h3><span class="state">서비스 준비 중</span><p>작업을 요청하고 진행 과정과 결과물을 확인합니다.</p></article>
+        <article class="card"><h3>홈페이지 게시하기</h3><span class="state">서비스 준비 중</span><p>완성한 홈페이지를 저장하고 인터넷에 게시합니다.</p></article>
+        <article class="card"><h3>내 계정과 결제</h3><span class="state">서비스 준비 중</span><p>내 작업과 결제 내역을 한곳에서 관리합니다.</p></article>
+        <article class="card"><h3>관리자 메뉴</h3><span class="state">관리자 전용 · 준비 중</span><p>작업 현황과 승인 내역을 확인합니다.</p></article>
+      </div>
+    </section>
+  </main>
+  <footer>© ARKAON · 함께 만드는 디지털 공간</footer>
+</body>
+</html>
