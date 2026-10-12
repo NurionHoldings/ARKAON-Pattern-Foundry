@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "production_public_enabled": false,
+  "default_decision": "BLOCKED",
+  "required_gates": [
+    "security",
+    "authentication",
+    "billing",
+    "consent",
+    "data_persistence",
+    "backup_restore",
+    "observability",
+    "functional_e2e",
+    "accessibility",
+    "mobile",
+    "deployment_rollback",
+    "operator_approval"
+  ],
+  "workstreams": [
+    {
+      "id": "entrance",
+      "name": "Humanoid entrance",
+      "status": "prototype",
+      "public_enabled": false
+    },
+    {
+      "id": "video",
+      "name": "Self-hosted video generation",
+      "status": "scaffold",
+      "public_enabled": false
+    },
+    {
+      "id": "identity",
+      "name": "Login and user accounts",
+      "status": "unverified",
+      "public_enabled": false
+    },
+    {
+      "id": "payments",
+      "name": "Payment and invoice",
+      "status": "unverified",
+      "public_enabled": false
+    },
+    {
+      "id": "assets",
+      "name": "Assets and download permissions",
+      "status": "unverified",
+      "public_enabled": false
+    },
+    {
+      "id": "templates",
+      "name": "Templates and publishing",
+      "status": "unverified",
+      "public_enabled": false
+    },
+    {
+      "id": "search",
+      "name": "Search engine submission",
+      "status": "unverified",
+      "public_enabled": false
+    },
+    {
+      "id": "collaboration",
+      "name": "User-AI collaboration",
+      "status": "unverified",
+      "public_enabled": false
+    },
+    {
+      "id": "integrations",
+      "name": "GitHub and deployment integrations",
+      "status": "unverified",
+      "public_enabled": false
+    }
+  ]
+}
