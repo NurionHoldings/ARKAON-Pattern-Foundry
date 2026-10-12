@@ -1,19 +1,28 @@
 # Netlify to FastAPI same-origin connection
 
-`netlify/functions/foundry-proxy.mjs` handles `/health`, `/console`,
-`/console/*`, and `/v1/*`. It forwards those API paths to the HTTPS origin in
-`APF_API_ORIGIN`, forwards the session cookie and CSRF header, preserves
+`netlify/functions/foundry-proxy.mjs` exposes `/health`, `/console`,
+`/console/*`, and `/v1/console/*`. It forwards those paths to the HTTPS
+origin in `APF_API_ORIGIN`, forwards session and CSRF headers, preserves
 upstream cookies and security headers, and disables caching. Browser requests
-remain on the Netlify origin, so cross-origin cookies and credentialed CORS are
+stay on the Netlify origin, so cross-origin cookies and credentialed CORS are
 not needed.
+
+The proxy intentionally does not expose other `/v1/*` endpoints. The target
+API currently relies on a tenant header and does not use the console session
+dependency. Keep it outside the public proxy until it has its own authentication
+and authorization controls.
 
 ## Netlify configuration
 
 Add `APF_API_ORIGIN` in the Netlify site's environment settings with the
 **Functions** scope. Do not put it in `netlify.toml`: TOML variables are not
-available to function runtime. Set it only after a separately hosted FastAPI
-service has a public HTTPS origin, for example `https://foundry-api.example.com`
-(no path, query, username, or password).
+available to function runtime. Configure it after a separately hosted FastAPI
+service has a public HTTPS origin, for example
+`https://foundry-api.example.com` (no path, query, username, or password).
+
+Netlify documents that function runtime variables need the Functions scope, and
+that variables in `netlify.toml` are not available to functions:
+https://docs.netlify.com/build/functions/environment-variables/
 
 The function returns HTTP 503 for missing, non-HTTPS, loopback, and IP-address
 origins. It blocks `/console/dev/session` even if the upstream is misconfigured.
@@ -21,29 +30,48 @@ FastAPI must independently run in production mode and enforce session and CSRF
 checks. Do not add wildcard CORS or expose the session secret in client-side
 environment variables.
 
-Store these values in the **API host's** secret/configuration manager:
+## API host prerequisites
+
+The current app is not ready to be deployed as a stateless container without
+additional work. The console reads and writes repository-relative `state/`
+and `inbox/` files, while its persistent review adapter needs explicit
+PostgreSQL wiring. Provision durable storage and initialize it from a reviewed
+data snapshot; do not copy the live operator workspace into a public deployment
+without a data review.
+
+The API host must set these values through its secret/configuration manager:
 
 - `APF_ENV=production`.
 - `APF_CONSOLE_SESSION_SECRET`: a randomly generated secret.
-- `DATABASE_URL`: the production PostgreSQL connection string.
-- Leave `APF_ENABLE_DEV_SESSION` unset or set it to `false`.
+- `DATABASE_URL`: a production PostgreSQL connection string.
+- `APF_ENABLE_DEV_SESSION=false` or leave it unset.
+- IAM OIDC issuer/client settings and an explicit principal-to-tenant/role
+  allowlist, once the organization identity provider is selected.
 
-## Verification before enabling deployment
+The FastAPI code currently has a development-session endpoint and signed
+sessions, but the operations doc records that organization IAM session
+issuance is still required. Do not enable the console until that login path
+exists and is tested. The session endpoint must create the existing secure,
+HttpOnly session cookie only after validating the IAM authorization response
+and mapping an allowed identity to a server-managed tenant and role. Do not
+accept tenant, principal, or role assignments from browser-supplied login data.
 
-1. Run `node --test tests/test_netlify_foundry_proxy.mjs`.
-2. Use `netlify dev` with a non-production API origin to verify function routing.
-3. Deploy only a non-production branch preview after the API host and secrets
-   have been prepared.
-4. Verify `/health` returns HTTP 200 and `/console` plus
-   `/v1/console/mailbox` return HTTP 401 before login.
-5. Verify the authenticated browser session sets `HttpOnly; Secure;
-   SameSite=Strict` for `apf_console_session`, keeps the CSRF cookie readable,
-   and sends `X-CSRF-Token` for state-changing requests.
-6. Confirm FastAPI returns 404 for `/console/dev/session` in production, then
-   test the registered mailbox item through the authenticated console without
-   changing its state.
+## Preproduction verification
 
-This change configures the proxy only. It does not provision or deploy a
-FastAPI host, set secrets, create an IAM login flow, or approve production
-deployment. Keep `PRODUCT_IMPLEMENT_HOLD` in effect until those items are
-reviewed and explicitly authorized.
+1. Run `node --test tests/test_netlify_foundry_proxy.mjs` and the complete CI suite.
+2. Test proxy routing with a non-production API origin.
+3. In the API deployment, confirm `/console/dev/session` returns 404 and that
+   no browser-controlled fields can select tenant or role.
+4. Before login, verify proxied `/console` and an authenticated console API
+   return 401. Complete IAM login and verify the cookie is
+   `HttpOnly; Secure; SameSite=Strict`; verify state-changing calls require
+   the CSRF token.
+5. Verify the registered mailbox item through a read-only authenticated query,
+   confirming its state is unchanged.
+6. Enable a Netlify preview only after API, IAM, database, and reviewed data
+   initialization are ready. Production deployment and promotion remain on
+   `PRODUCT_IMPLEMENT_HOLD` pending explicit approval.
+
+This change only narrows the proxy and documents prerequisites. It does not
+provision a host, configure Netlify secrets, implement organization IAM, mutate
+mailbox state, or deploy the site.
