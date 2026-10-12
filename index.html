@@ -61,9 +61,7 @@
 </head>
 <body>
   <div id="entryScreen" class="entry-screen" role="dialog" aria-modal="true" aria-label="ARKAON 진입 영상">
-    <video id="entryVideo" autoplay playsinline muted preload="auto" aria-label="ARKAON 로고 진입 영상">
-      <source src="./assets/arkaon-entry-v17.mp4" type="video/mp4">
-    </video>
+    <video id="entryVideo" autoplay playsinline webkit-playsinline muted preload="auto" aria-label="ARKAON 로고 진입 영상" src="/assets/arkaon-entry-v17.mp4"></video>
     <div class="entry-controls"><span class="entry-brand">ARKAON</span><button type="button" id="skipEntry">홈으로 들어가기 <span aria-hidden="true">→</span></button></div>
   </div>
 
@@ -106,7 +104,6 @@
   };
   skip.addEventListener('click',close);
   video.addEventListener('ended',close);
-  video.addEventListener('error',close);
   window.addEventListener('keydown',e=>{if(!screen.hidden&&e.key==='Escape')close();});
   if(reduced){
     screen.hidden=true;
@@ -117,10 +114,34 @@
   const end=()=>clearTimeout(fallback);
   video.addEventListener('ended',end,{once:true});
   skip.addEventListener('click',end,{once:true});
-  const start=()=>{video.play().catch(()=>{});};
-  if(video.readyState>=2)start();
-  else video.addEventListener('loadeddata',start,{once:true});
-  start();
+  video.muted=true;
+  video.defaultMuted=true;
+  video.playsInline=true;
+  const entrySrc='/assets/arkaon-entry-v17.mp4';
+  let playAttempts=0;
+  const tryPlay=()=>{
+    if(dismissed||screen.hidden)return;
+    playAttempts+=1;
+    const p=video.play();
+    if(p&&typeof p.catch==='function')p.catch(()=>{});
+  };
+  video.addEventListener('loadeddata',tryPlay,{once:true});
+  video.addEventListener('canplay',tryPlay,{once:true});
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)tryPlay();},{once:true});
+  let loadRetries=0;
+  video.addEventListener('error',()=>{
+    if(dismissed)return;
+    if(loadRetries<2){
+      loadRetries+=1;
+      video.src=entrySrc;
+      video.load();
+      tryPlay();
+      return;
+    }
+    if(playAttempts<5)setTimeout(tryPlay,500);
+  });
+  if(!video.getAttribute('src'))video.src=entrySrc;
+  tryPlay();
 })();
 </script>
 </body>
