@@ -1,0 +1,12 @@
+{
+  "assetId":"demoLogo01",
+  "version":1,
+  "intentFingerprint":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "sourceHash":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "canvas":{"width":1024,"height":1024},
+  "intentAxes":{"WHY":["식별 가능한 브랜드"],"WHO":["브랜드 소유자"],"VALUE":["일관된 시각 정체성"],"OUTCOME":["수정 가능한 로고"],"JOURNEY":["생성","검토","편집"],"OBJECT":["로고"],"OWNER":["자산 소유자"],"INVARIANT":["브랜드명 보존"],"CONSTRAINT":["권한 확인"],"RISK":["원본 훼손 방지"],"SIGNAL":["수정 대상 재탐색 감소"],"EVOLUTION":["효과 확장"]},
+  "layers":[
+    {"id":"brandText01","kind":"text","label":"브랜드 글자","stability":"CORE","bounds":{"x":160,"y":420,"width":704,"height":180},"intentLinks":["INVARIANT","OUTCOME"],"source":{"type":"text-run","ref":"layers/text/brandText01.json"}},
+    {"id":"symbol01","kind":"symbol","label":"심볼","stability":"CONFIGURABLE","bounds":{"x":300,"y":120,"width":424,"height":290},"intentLinks":["VALUE","EVOLUTION"],"source":{"type":"svg-node","ref":"layers/symbol/symbol01.svg"}}
+  ]
+}
