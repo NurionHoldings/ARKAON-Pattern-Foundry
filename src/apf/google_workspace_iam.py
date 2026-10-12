@@ -13,11 +13,12 @@ from typing import Any
 from urllib.parse import urlencode, urlsplit
 from uuid import UUID
 
-import requests
 from fastapi import APIRouter, HTTPException, Request, Response
 from fastapi.responses import HTMLResponse, RedirectResponse
+from google.auth.exceptions import GoogleAuthError
 from google.auth.transport.requests import Request as GoogleRequest
 from google.oauth2 import id_token
+import requests
 
 GOOGLE_AUTHORIZATION_ENDPOINT = "https://accounts.google.com/o/oauth2/v2/auth"
 GOOGLE_TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token"
@@ -270,7 +271,7 @@ def install_google_workspace_iam(application, principal_type, session_cookie: st
             claims = id_token.verify_oauth2_token(
                 encoded_id_token, GoogleRequest(), audience=settings.client_id
             )
-        except Exception:
+        except (GoogleAuthError, requests.RequestException, ValueError, KeyError, TypeError):
             raise HTTPException(status_code=401, detail="organization sign-in failed") from None
 
         issuer = claims.get("iss")
