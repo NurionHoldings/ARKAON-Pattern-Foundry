@@ -1,0 +1,15 @@
+name: Production Readiness Gate
+on:
+  pull_request:
+    paths:
+      - 'ops/production-readiness.json'
+      - 'scripts/check_production_readiness.py'
+      - '.github/workflows/production-readiness.yml'
+  workflow_dispatch:
+jobs:
+  readiness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate production gates (blocked until evidence complete)
+        run: python scripts/check_production_readiness.py
