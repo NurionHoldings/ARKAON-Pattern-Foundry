@@ -56,6 +56,13 @@
       "status": "restricted",
       "href": "/services/admin.html",
       "summary": "운영·승인 콘솔로 이동합니다. 권한이 있는 계정만 이용할 수 있습니다."
+    },
+    {
+      "id": "platform-self-heal",
+      "title": "아르카온 자가치유",
+      "status": "available",
+      "href": "/services/self-heal.html",
+      "summary": "미비점을 스스로 진단하고 범·에테르니언·관리자에게 필요사항을 요청합니다."
     }
   ]
 }

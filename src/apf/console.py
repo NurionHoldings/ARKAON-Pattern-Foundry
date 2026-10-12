@@ -96,6 +96,22 @@ class CoCreationBuildRequest(BaseModel):
     operator_approval_digest: str = Field(pattern=r"^[0-9a-f]{64}$")
 
 
+class PlatformSelfHealFindingPayload(BaseModel):
+    gap_code: str = Field(min_length=1, max_length=64)
+    severity: Literal["BLOCKER", "HIGH", "MEDIUM", "LOW"]
+    summary: str = Field(min_length=1, max_length=2000)
+    needed_from_admin: str = Field(min_length=1, max_length=2000)
+    self_heal_step: str = Field(default="", max_length=2000)
+    assignee: Literal["beom", "eternian", "admin"] | None = None
+
+
+class PlatformSelfHealReportPayload(BaseModel):
+    platform_id: str = Field(default="ARKAON_FOUNDRY", min_length=1, max_length=128)
+    surface_url: str = Field(min_length=1, max_length=512)
+    findings: list[PlatformSelfHealFindingPayload] = Field(min_length=1, max_length=24)
+    include_static_assessment: bool = True
+
+
 class CoCreationCodegenRequest(BaseModel):
     proposal_id: str = Field(min_length=8, max_length=64)
     operator_approval_digest: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -1842,6 +1858,55 @@ def install_console(
             )
         except VisualDialogueError as error:
             raise visual_error(error) from None
+
+    @application.get("/v1/console/platform-self-heal/local-assessment")
+    def platform_self_heal_local_assessment(
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+    ) -> dict[str, object]:
+        del actor
+        from .platform_self_heal import assess_static_platform
+
+        findings = assess_static_platform(foundry_root())
+        return {
+            "platform_id": "ARKAON_FOUNDRY",
+            "finding_count": len(findings),
+            "findings": [item.to_document() for item in findings],
+        }
+
+    def _ingest_self_heal(payload: PlatformSelfHealReportPayload) -> dict[str, object]:
+        from .platform_self_heal import PlatformSelfHealRejected, ingest_surface_report
+
+        finding_payloads = tuple(item.model_dump() for item in payload.findings)
+        try:
+            return ingest_surface_report(
+                foundry_root=foundry_root(),
+                platform_id=payload.platform_id,
+                surface_url=payload.surface_url,
+                finding_payloads=finding_payloads,
+                now=datetime.now().astimezone(),
+                include_static_assessment=payload.include_static_assessment,
+            )
+        except PlatformSelfHealRejected as error:
+            raise HTTPException(status_code=422, detail=error.code) from None
+
+    @application.post("/v1/console/platform-self-heal/surface-report")
+    def platform_self_heal_surface_report_authenticated(
+        payload: PlatformSelfHealReportPayload,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        if actor.role not in {"owner", "operator", "reviewer"}:
+            raise HTTPException(status_code=403, detail="insufficient role for self-heal ingest")
+        return _ingest_self_heal(payload)
+
+    @application.post("/v1/public/platform-self-heal")
+    def platform_self_heal_public_report(
+        payload: PlatformSelfHealReportPayload,
+    ) -> dict[str, object]:
+        if os.getenv("APF_ALLOW_PUBLIC_SELF_HEAL", "").lower() != "true":
+            raise HTTPException(status_code=404, detail="not found")
+        return _ingest_self_heal(payload)
 
 
 def console_security_from_config(

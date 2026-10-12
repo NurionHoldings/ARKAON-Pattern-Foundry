@@ -3,6 +3,8 @@
   "console_path": "/console",
   "platform_dialogue_path": "/console/platform-dialogues",
   "co_creation_chat_path": "/v1/console/co-creation/chat",
+  "platform_self_heal_path": "/v1/public/platform-self-heal",
+  "platform_self_heal_console_path": "/v1/console/platform-self-heal/surface-report",
   "health_path": "/health",
   "note": "정적 Netlify 호스트만 사용 중이면 API는 별도 Foundry 서버에 두고, 계정·서비스 화면에서 API 주소를 설정하세요."
 }
