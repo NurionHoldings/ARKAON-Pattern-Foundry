@@ -27,8 +27,8 @@
     "external_material_included": false
   },
   "evidence_hashes": {
-    "src/apf/role_benchmark.py": "9e2876bbb0ca519d000dca636d6588a9e6d54403bb338052640d0d502eef7f32",
-    "tests/test_role_benchmark.py": "b6aed2393e191b0a15c51fee95fcc5bd1143056ffb29056baab59a0df3d33e82"
+    "src/apf/role_benchmark.py": "e36930778d8b12ad0474b56a6e79a04c5f4a6d57e2529a63ed9ab28e9abd3329",
+    "tests/test_role_benchmark.py": "90de4c0ec8aea326a4cd3992e265112233a2850a1f8e6e1474890464e32f236a"
   },
   "source_refs": [
     "src/apf/role_benchmark.py"
@@ -53,5 +53,5 @@
   "status": "ETHERNIAN_REVIEW_REQUIRED",
   "owned_asset": false,
   "semantic_fingerprint": "1e7d0b156d927c29e2a1db0135ed75e92012ce045dac2ff44b5f49ef4a3bee88",
-  "package_hash": "4bd1359b51ea2a958833ad52e91ab49b20b9f8777c6bb3d3f653504ac2f1eca7"
+  "package_hash": "b72313cff51390975458a0130c63fe5f74c605faf3035d181e33745bb68d99e3"
 }
