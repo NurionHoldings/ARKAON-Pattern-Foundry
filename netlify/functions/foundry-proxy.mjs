@@ -43,7 +43,7 @@ function validPath(path) {
     /[\u0000-\u001f\u007f]/.test(path) ||
     path.split("/").some((part) => part === "." || part === "..")
   ) return false;
-  return path === "/health" || path === "/console" || path.startsWith("/console/") || path.startsWith("/v1/");
+  return path === "/health" || path === "/console" || path.startsWith("/console/") || path.startsWith("/v1/console/");
 }
 
 function requestHeaders(source) {
@@ -93,5 +93,5 @@ export async function handler(request) {
   }
 }
 
-export const config = { path: ["/health", "/console", "/console/*", "/v1/*"] };
+export const config = { path: ["/health", "/console", "/console/*", "/v1/console/*"] };
 export default handler;
