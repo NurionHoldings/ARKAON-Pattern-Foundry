@@ -10,7 +10,7 @@ function request(path, { method = "GET", query = "", headers = {}, body } = {}) 
 test("function binds API paths and requires a public HTTPS API origin", async () => {
   const previous = process.env.APF_API_ORIGIN;
   delete process.env.APF_API_ORIGIN;
-  assert.deepEqual(config.path, ["/health", "/console", "/console/*", "/v1/*"]);
+  assert.deepEqual(config.path, ["/health", "/console", "/console/*", "/v1/console/*"]);
   assert.equal((await handler(request("/health"))).status, 503);
   process.env.APF_API_ORIGIN = "http://api.example.test";
   assert.equal((await handler(request("/health"))).status, 503);
@@ -74,4 +74,5 @@ test("proxy rejects traversal and unapproved routes", async () => {
   process.env.APF_API_ORIGIN = "https://api.example.test";
   assert.equal((await handler(request("/v1/../console/dev/session"))).status, 404);
   assert.equal((await handler(request("/admin"))).status, 404);
+  assert.equal((await handler(request("/v1/targets", { method: "GET" }))).status, 404);
 });
