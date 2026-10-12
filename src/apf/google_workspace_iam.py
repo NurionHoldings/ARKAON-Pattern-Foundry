@@ -95,6 +95,10 @@ class GoogleWorkspaceSettings:
                 or not isinstance(raw_entry, dict)
                 or not {"tenant_id", "principal_id", "role"} <= set(raw_entry)
                 or set(raw_entry) - {"tenant_id", "principal_id", "role", "google_sub"}
+                or any(
+                    not isinstance(raw_entry.get(key), str)
+                    for key in ("tenant_id", "principal_id", "role")
+                )
             ):
                 raise GoogleIAMConfigurationError("invalid IAM principal map entry")
             try:
