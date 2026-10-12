@@ -17,7 +17,10 @@
     .shell{max-width:1160px;margin-inline:auto;padding-inline:clamp(20px,4vw,36px)}
     header{border-bottom:1px solid #25364e}
     .header-inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px 20px;padding-block:22px}
-    .brand{font-weight:800;letter-spacing:.08em;font-size:1.35rem}
+    .brand{display:inline-flex;align-items:center;min-height:2.25rem;font-weight:800;letter-spacing:.08em;font-size:1.35rem;line-height:1}
+    .brand-logo{height:2.25rem;width:auto;max-width:min(200px,42vw);object-fit:contain;display:block;pointer-events:none}
+    .brand:has(.brand-logo:not([hidden])) .brand-mark{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(prefers-reduced-motion:reduce){.brand-logo{display:none!important}}
     .tag{color:#aec1d5;font-size:.875rem;letter-spacing:0}
     main{padding-block:clamp(48px,7vw,88px)}
     .eyebrow{color:#75d8f9;font-weight:700;font-size:.875rem;letter-spacing:.08em}
@@ -65,7 +68,7 @@
     <div class="entry-controls"><span class="entry-brand">ARKAON</span><button type="button" id="skipEntry">홈으로 들어가기 <span aria-hidden="true">→</span></button></div>
   </div>
 
-  <header><div class="shell header-inner"><div class="brand">ARKAON</div><div class="tag">아르카온 · 디지털 제작 공간</div></div></header>
+  <header><div class="shell header-inner"><div class="brand" aria-label="ARKAON"><video id="brandLogoVideo" class="brand-logo" playsinline webkit-playsinline muted loop preload="metadata" aria-hidden="true" tabindex="-1"></video><span class="brand-mark">ARKAON</span></div><div class="tag">아르카온 · 디지털 제작 공간</div></div></header>
   <main class="shell">
     <div class="eyebrow">AI와 함께하는 창작</div>
     <h1><span class="hero-line">상상에서 완성까지.</span><span class="hero-line">사람과 AI가 함께 만듭니다.</span></h1>
@@ -89,10 +92,24 @@
 
 <script>
 (()=>{
+  const ENTRY_SRC='/assets/arkaon-entry-v17.mp4';
+  const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const brandVideo=document.getElementById('brandLogoVideo');
+  const playMuted=(el)=>{
+    if(!el)return;
+    el.muted=true;
+    el.defaultMuted=true;
+    el.playsInline=true;
+    const p=el.play();
+    if(p&&typeof p.catch==='function')p.catch(()=>{});
+  };
+  if(brandVideo){
+    if(reduced)brandVideo.hidden=true;
+    else brandVideo.src=ENTRY_SRC;
+  }
   const screen=document.getElementById('entryScreen');
   const video=document.getElementById('entryVideo');
   const skip=document.getElementById('skipEntry');
-  const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   let dismissed=false;
   const close=()=>{
     if(dismissed)return;
@@ -101,6 +118,7 @@
     screen.hidden=true;
     document.body.classList.remove('entry-active');
     skip.blur();
+    if(brandVideo&&!reduced)playMuted(brandVideo);
   };
   skip.addEventListener('click',close);
   video.addEventListener('ended',close);
@@ -109,15 +127,12 @@
     screen.hidden=true;
     return;
   }
+  if(brandVideo)brandVideo.pause();
   document.body.classList.add('entry-active');
   const fallback=setTimeout(close,120000);
   const end=()=>clearTimeout(fallback);
   video.addEventListener('ended',end,{once:true});
   skip.addEventListener('click',end,{once:true});
-  video.muted=true;
-  video.defaultMuted=true;
-  video.playsInline=true;
-  const entrySrc='/assets/arkaon-entry-v17.mp4';
   let playAttempts=0;
   const tryPlay=()=>{
     if(dismissed||screen.hidden)return;
@@ -133,14 +148,14 @@
     if(dismissed)return;
     if(loadRetries<2){
       loadRetries+=1;
-      video.src=entrySrc;
+      video.src=ENTRY_SRC;
       video.load();
       tryPlay();
       return;
     }
     if(playAttempts<5)setTimeout(tryPlay,500);
   });
-  if(!video.getAttribute('src'))video.src=entrySrc;
+  if(!video.getAttribute('src'))video.src=ENTRY_SRC;
   tryPlay();
 })();
 </script>
