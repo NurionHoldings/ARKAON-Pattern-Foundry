@@ -33,19 +33,21 @@ environment variables.
 ## API host prerequisites
 
 The current app is not ready to be deployed as a stateless container without
-additional work. The console reads and writes `state/` and `inbox/` beneath
-`APF_FOUNDRY_ROOT`; set this to a durable data mount and initialize it from a
-reviewed data snapshot. The persistent review adapter still needs explicit
-PostgreSQL wiring. Do not copy the live operator workspace into a public
-deployment without a data review.
+additional work. Console routes read and write repository-relative `state/` and
+`inbox/` files; some stores honor `APF_FOUNDRY_ROOT`, but the route-level file
+access is not consistently redirected to a durable data mount. The persistent
+review adapter also needs explicit PostgreSQL wiring. Unify these storage
+paths and initialize them from a reviewed data snapshot before hosting. Do not
+copy the live operator workspace into a public deployment without a data
+review.
 
 The API host must set these values through its secret/configuration manager:
 
 - `APF_ENV=production`.
 - `APF_CONSOLE_SESSION_SECRET`: a randomly generated secret.
 - `DATABASE_URL`: a production PostgreSQL connection string.
-- `APF_FOUNDRY_ROOT`: the durable, reviewed data mount containing the required
-  `inbox/` and `state/` directories.
+- `APF_FOUNDRY_ROOT`: only configures the stores that currently honor it; it
+  does not yet redirect all console file access to persistent storage.
 - `APF_ENABLE_DEV_SESSION=false` or leave it unset.
 - IAM OIDC issuer/client settings and an explicit principal-to-tenant/role
   allowlist, once the organization identity provider is selected.
