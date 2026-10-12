@@ -2,12 +2,11 @@ import json
 from urllib.parse import parse_qs, urlsplit
 from uuid import uuid4
 
-import pytest
 from fastapi.testclient import TestClient
 
 import apf.google_workspace_iam as google_iam
 from apf.api import create_app
-from apf.console import ConsoleSecurity
+from apf.console import SESSION_COOKIE, ConsoleSecurity
 from apf.repository import MemoryRepository
 
 
@@ -69,7 +68,7 @@ def test_google_login_uses_state_nonce_pkce_and_secure_transaction_cookie(monkey
 
 def test_google_callback_validates_iam_and_issues_server_mapped_session(monkeypatch):
     tenant_id, principal_id = configure_google(monkeypatch)
-    _, client = make_client()
+    app, client = make_client()
     start = client.get("/console/auth/login", follow_redirects=False)
     query = parse_qs(urlsplit(start.headers["location"]).query)
     nonce = query["nonce"][0]
@@ -107,6 +106,10 @@ def test_google_callback_validates_iam_and_issues_server_mapped_session(monkeypa
     csrf = next(value for value in cookies if value.startswith("apf_console_csrf="))
     assert "HttpOnly" in session and "Secure" in session and "SameSite=strict" in session
     assert "Secure" in csrf and "SameSite=strict" in csrf
+    actor = app.state.console_security.verify(client.cookies.get(SESSION_COOKIE))
+    assert actor.tenant_id == tenant_id
+    assert actor.principal_id == principal_id
+    assert actor.role == "operator"
     assert client.get("/console").status_code == 200
     principal = client.get("/v1/console/predeployment")
     assert principal.status_code == 200
