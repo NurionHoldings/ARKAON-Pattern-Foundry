@@ -47,9 +47,26 @@
       .notice{padding:16px}
     }
     @media(prefers-reduced-motion:no-preference){.card{transition:transform .2s,border-color .2s}.card:hover{transform:translateY(-3px);border-color:#6cbfe0}}
+
+    .entry-screen{position:fixed;inset:0;z-index:9999;background:#030810;display:grid;place-items:center;overflow:hidden}
+    .entry-screen[hidden]{display:none!important}
+    .entry-screen video{width:100%;height:100%;object-fit:contain;background:#030810}
+    .entry-controls{position:absolute;inset:auto 0 0;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:24px max(22px,4vw);background:linear-gradient(transparent,#030810c9)}
+    .entry-controls button{font:600 15px inherit;font-family:inherit;background:#10263d;color:#eef8ff;border:1px solid #739cbd;border-radius:24px;padding:11px 20px;cursor:pointer}
+    .entry-controls button:focus-visible{outline:3px solid #9ee6ff;outline-offset:3px}
+    .entry-brand{font-size:clamp(15px,2.5vw,22px);font-weight:800;letter-spacing:.16em;color:#e8f6ff}
+    @media(prefers-reduced-motion:reduce){.entry-screen{display:none!important}}
+    body.entry-active{overflow:hidden}
   </style>
 </head>
 <body>
+  <div id="entryScreen" class="entry-screen" role="dialog" aria-modal="true" aria-label="ARKAON 진입 영상">
+    <video id="entryVideo" autoplay playsinline muted preload="auto" aria-label="ARKAON 로고 진입 영상">
+      <source src="./assets/arkaon-entry-v17.mp4" type="video/mp4">
+    </video>
+    <div class="entry-controls"><span class="entry-brand">ARKAON</span><button type="button" id="skipEntry">홈으로 들어가기 <span aria-hidden="true">→</span></button></div>
+  </div>
+
   <header><div class="shell header-inner"><div class="brand">ARKAON</div><div class="tag">아르카온 · 디지털 제작 공간</div></div></header>
   <main class="shell">
     <div class="eyebrow">AI와 함께하는 창작</div>
@@ -71,5 +88,40 @@
     </section>
   </main>
   <footer>© ARKAON · 함께 만드는 디지털 공간</footer>
+
+<script>
+(()=>{
+  const screen=document.getElementById('entryScreen');
+  const video=document.getElementById('entryVideo');
+  const skip=document.getElementById('skipEntry');
+  const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let dismissed=false;
+  const close=()=>{
+    if(dismissed)return;
+    dismissed=true;
+    video.pause();
+    screen.hidden=true;
+    document.body.classList.remove('entry-active');
+    skip.blur();
+  };
+  skip.addEventListener('click',close);
+  video.addEventListener('ended',close);
+  video.addEventListener('error',close);
+  window.addEventListener('keydown',e=>{if(!screen.hidden&&e.key==='Escape')close();});
+  if(reduced){
+    screen.hidden=true;
+    return;
+  }
+  document.body.classList.add('entry-active');
+  const fallback=setTimeout(close,120000);
+  const end=()=>clearTimeout(fallback);
+  video.addEventListener('ended',end,{once:true});
+  skip.addEventListener('click',end,{once:true});
+  const start=()=>{video.play().catch(()=>{});};
+  if(video.readyState>=2)start();
+  else video.addEventListener('loadeddata',start,{once:true});
+  start();
+})();
+</script>
 </body>
 </html>
