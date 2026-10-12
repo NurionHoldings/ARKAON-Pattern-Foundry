@@ -1,6 +1,7 @@
 import shutil
 from datetime import UTC, datetime
 from pathlib import Path
+from uuid import uuid4
 
 import pytest
 from fastapi.testclient import TestClient
@@ -13,7 +14,23 @@ from apf.platform_self_heal import (
     ingest_surface_report,
 )
 from apf.repository import MemoryRepository
-from tests.test_console import make_client
+
+
+def _make_client():
+    app = create_app(
+        repository=MemoryRepository(),
+        console_security=ConsoleSecurity(
+            environment="test", secret="s" * 32, allow_dev_sessions=True
+        ),
+    )
+    client = TestClient(app, base_url="https://testserver")
+    tenant_id, principal_id = uuid4(), uuid4()
+    response = client.post(
+        "/console/dev/session",
+        json={"tenant_id": str(tenant_id), "principal_id": str(principal_id), "role": "operator"},
+    )
+    assert response.status_code == 200
+    return client, response.json()["csrf_token"]
 
 
 def test_ingest_writes_inbox_and_syncs_mailbox(tmp_path: Path) -> None:
@@ -79,7 +96,7 @@ def _seed_self_heal_config(tmp_path: Path) -> None:
 def test_console_self_heal_surface_report(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     _seed_self_heal_config(tmp_path)
     monkeypatch.setenv("APF_FOUNDRY_ROOT", str(tmp_path))
-    client, _, _, csrf = make_client()
+    client, csrf = _make_client()
     payload = {
         "platform_id": "ARKAON_FOUNDRY",
         "surface_url": "https://testserver/",
