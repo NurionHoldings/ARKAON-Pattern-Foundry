@@ -42,9 +42,10 @@ https://render.com/docs/disks
 
 Create a reviewed data snapshot under the mounted root before enabling the
 service. Do not copy the live operator workspace or alter mailbox statuses.
-The `ConsoleReviewStore` still needs explicit durable PostgreSQL wiring for
-review APIs; configure the production database only after that integration is
-complete.
+`create_app()` wires `ConsoleReviewStore` from `DATABASE_URL` and Eternian review
+public key configuration (see `docs/27-postgresql-repository.md`). Run PostgreSQL
+live proof and review adapter checks before pointing production traffic at review
+APIs.
 
 ## Render environment values
 
@@ -55,6 +56,7 @@ Set values in the Render service's environment and secret manager:
 - `APF_CONSOLE_SESSION_SECRET`: generate a random secret.
 - `APF_FOUNDRY_ROOT=/var/data`.
 - `DATABASE_URL`: private connection string for the production PostgreSQL service.
+- `APF_ETERNIAN_REVIEW_PUBLIC_KEY_B64`: urlsafe Ed25519 public key for review attestations.
 - `APF_CONSOLE_PUBLIC_ORIGIN=https://arkaonfoundry.netlify.app`.
 - `APF_GOOGLE_OIDC_CLIENT_ID`: the Google OAuth web-client ID.
 - `APF_GOOGLE_OIDC_CLIENT_SECRET`: the Google OAuth web-client secret.
