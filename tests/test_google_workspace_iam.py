@@ -175,6 +175,7 @@ def test_production_blocks_unauthenticated_target_api_and_openapi(monkeypatch):
     app = create_app(
         repository=MemoryRepository(),
         console_security=ConsoleSecurity(environment="production", secret="s" * 32),
+        console_review_store=object(),
     )
     client = TestClient(app, base_url="https://api.example.test")
     assert client.get("/v1/targets").status_code == 404
