@@ -60,13 +60,9 @@ function render(now){
   ctx.strokeStyle=`rgba(86,195,255,${.25*amp})`;ctx.lineWidth=2;
   const radius=40+((t*40)%140);ctx.beginPath();ctx.ellipse(w/2,h/2,radius,radius*.6,0,0,Math.PI*2);ctx.stroke();
  }
- if(playing&&!reduced.matches)frameId=requestAnimationFrame(render);
 }
 function restart(){cancelAnimationFrame(frameId);render(performance.now());}
-for(const el of [level,type,intensity])el.addEventListener("input",restart);
-reduced.addEventListener("change",restart);
 document.addEventListener("visibilitychange",()=>{if(document.hidden){cancelAnimationFrame(frameId);}else restart();});
-function tick(now){render(now);if(playing&&!reduced.matches)frameId=requestAnimationFrame(tick);}
 function startLoop(){cancelAnimationFrame(frameId);const step=now=>{render(now);if(playing&&!reduced.matches)frameId=requestAnimationFrame(step);};frameId=requestAnimationFrame(step);}
 for(const el of [level,type,intensity])el.addEventListener("input",startLoop);
 play.addEventListener("click",startLoop);
