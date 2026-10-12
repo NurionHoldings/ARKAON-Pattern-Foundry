@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>내 계정과 결제 · 아르카온</title>
+  <link rel="stylesheet" href="/services/services.css">
+</head>
+<body>
+  <div class="shell">
+    <div class="svc-top"><h1>내 계정과 결제</h1><a class="svc-home" href="/">← 홈</a></div>
+    <div class="panel">
+      <h2>Foundry API 연결</h2>
+      <p class="muted">공동 창작·승인 콘솔은 FastAPI Foundry 서버에서 동작합니다. API 루트 URL(예: https://api.example.com)을 입력하세요.</p>
+      <label>API 기준 URL<input id="apiBase" type="url" placeholder="https://your-foundry-host" maxlength="256"></label>
+      <div class="btn-row">
+        <button type="button" id="saveApi">저장</button>
+        <button type="button" id="testApi">연결 확인</button>
+      </div>
+      <p id="apiStatus" class="muted" role="status"></p>
+    </div>
+    <div class="panel">
+      <h2>이 브라우저의 작업</h2>
+      <ul class="list" id="projects"></ul>
+      <p class="warn">결제·회원 청구는 샌드박스 검증 중입니다. 실제 과금은 별도 승인 후 제공됩니다.</p>
+    </div>
+  </div>
+  <script src="/services/services.js"></script>
+  <script>
+    const {readProjects,getApiBase,setApiBase,probeApi}=APFHomeServices;
+    document.getElementById('apiBase').value=getApiBase();
+    document.getElementById('saveApi').addEventListener('click',()=>{
+      setApiBase(document.getElementById('apiBase').value);
+      document.getElementById('apiStatus').textContent='저장했습니다.';
+    });
+    document.getElementById('testApi').addEventListener('click',async()=>{
+      const base=document.getElementById('apiBase').value.trim()||getApiBase();
+      const result=await probeApi(base);
+      document.getElementById('apiStatus').textContent=result.ok?'연결됨 (/health OK)':'연결되지 않았습니다. URL·CORS·서버 실행 상태를 확인하세요.';
+      document.getElementById('apiStatus').className=result.ok?'ok':'warn';
+    });
+    const root=document.getElementById('projects');
+    const items=readProjects();
+    if(!items.length) root.innerHTML='<li class="muted">저장된 작업이 없습니다.</li>';
+    else for(const item of items){
+      const li=document.createElement('li');
+      li.innerHTML=`<span>${item.title} <span class="chip">${item.type}</span></span><span class="muted">${item.updated_at?.slice(0,19)||''}</span>`;
+      root.append(li);
+    }
+  </script>
+</body>
+</html>

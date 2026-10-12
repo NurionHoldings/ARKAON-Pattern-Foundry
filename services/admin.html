@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>관리자 메뉴 · 아르카온</title>
+  <link rel="stylesheet" href="/services/services.css">
+</head>
+<body>
+  <div class="shell">
+    <div class="svc-top"><h1>관리자 메뉴</h1><a class="svc-home" href="/">← 홈</a></div>
+    <p class="muted">운영·승인·공동 창작 API는 Foundry 서버에서 제공됩니다. 권한이 있는 세션으로만 접근할 수 있습니다.</p>
+    <div class="panel" id="console">
+      <h2>운영 콘솔</h2>
+      <p id="consoleHint"></p>
+      <div class="btn-row">
+        <a class="btn" id="consoleLink" href="/console">운영·검토 콘솔 열기</a>
+        <a class="btn" id="dialogueLink" href="/console">플랫폼 이미지 대화</a>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>로컬 개발</h2>
+      <p class="muted">저장소에서 API를 실행한 뒤 <code>/console/dev/session</code>으로 역할 세션을 만든 다음 콘솔을 이용합니다. 자동 병합·운영 배포는 콘솔에서도 허용되지 않습니다.</p>
+      <p><a href="/services/account.html">API 기준 URL 설정</a></p>
+    </div>
+  </div>
+  <script src="/services/services.js"></script>
+  <script>
+    (async()=>{
+      const base=APFHomeServices.getApiBase();
+      let consolePath='/console';
+      try{
+        const hints=await fetch('/config/arkaon-public-api.json').then(r=>r.json());
+        consolePath=hints.console_path||consolePath;
+      }catch{/* ignore */}
+      const url=base?`${base}${consolePath}`:consolePath;
+      document.getElementById('consoleLink').href=url;
+      document.getElementById('dialogueLink').href=base?`${base}/console`:url;
+      document.getElementById('consoleHint').textContent=base
+        ? `연결 대상: ${base} (동일 출처가 아니면 로그인 쿠키가 공유되지 않을 수 있습니다.)`
+        : 'Netlify 정적 호스트만 사용 중입니다. Foundry API URL을 계정 화면에 설정하거나 API와 같은 출처에서 이 페이지를 제공하세요.';
+    })();
+  </script>
+</body>
+</html>
