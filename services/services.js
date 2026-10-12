@@ -1,6 +1,7 @@
 (() => {
   const STORAGE_KEY = 'apf.home.projects.v1';
   const API_KEY = 'apf.home.apiBase.v1';
+  const MAX_VIDEO_STORE_BYTES = 2.5 * 1024 * 1024;
 
   function escapeHtml(value) {
     return String(value)
@@ -97,16 +98,52 @@
     }
   }
 
+  function readFileAsDataUrl(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ''));
+      reader.onerror = () => reject(reader.error || new Error('read failed'));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function saveVideoUpload(file, { title } = {}) {
+    if (!file || !String(file.type || '').startsWith('video/')) {
+      throw new Error('VIDEO_TYPE');
+    }
+    const entry = {
+      type: 'ai-video-upload',
+      title: title || file.name.replace(/\.[^.]+$/, '') || '업로드 영상',
+      fileName: file.name,
+      mimeType: file.type,
+      byteSize: file.size,
+    };
+    if (file.size <= MAX_VIDEO_STORE_BYTES) {
+      entry.videoDataUrl = await readFileAsDataUrl(file);
+    }
+    return saveProject(entry);
+  }
+
+  function downloadDataUrl(filename, dataUrl) {
+    const anchor = document.createElement('a');
+    anchor.href = dataUrl;
+    anchor.download = filename;
+    anchor.click();
+  }
+
   window.APFHomeServices = {
     escapeHtml,
     readProjects,
     saveProject,
     downloadText,
+    downloadDataUrl,
     siteHtml,
     personalPageHtml,
     businessCardHtml,
     getApiBase,
     setApiBase,
     probeApi,
+    saveVideoUpload,
+    MAX_VIDEO_STORE_BYTES,
   };
 })();
