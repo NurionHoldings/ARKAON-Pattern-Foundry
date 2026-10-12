@@ -7,82 +7,124 @@ upstream cookies and security headers, and disables caching. Browser requests
 stay on the Netlify origin, so cross-origin cookies and credentialed CORS are
 not needed.
 
-The proxy intentionally does not expose other `/v1/*` endpoints. The target
-API currently relies on a tenant header and does not use the console session
-dependency. Keep it outside the public proxy until it has its own authentication
-and authorization controls.
+An unauthenticated `/console` request is redirected by the Netlify function to
+the public `/console/login` page. That page starts Google Workspace OIDC. The
+callback returns through the same Netlify origin and sets the existing
+`HttpOnly; Secure; SameSite=Strict` console session and CSRF cookies.
 
-This proxy allowlist does not secure direct requests to the API host. The public
-FastAPI origin itself must also deny or authenticate every route that is not
-intended for public access. In the current app, `/v1/targets` routes rely on a
-tenant header and are not protected by the console session. Do not expose the
-API host until those routes have server-side authorization or are blocked at the
-API origin. Netlify's proxy path filter is not an origin firewall.
+## Public route controls
 
-## Netlify configuration
+The proxy intentionally does not expose other `/v1/*` endpoints. Production
+FastAPI also returns 404 for `/v1/targets`, `/v1/targets/*`, and API schema
+routes. The target API relies on a tenant header and has no user authorization,
+so it must remain disabled in production until a separate authenticated API
+design is approved.
 
-Add `APF_API_ORIGIN` in the Netlify site's environment settings with the
-**Functions** scope. Do not put it in `netlify.toml`: TOML variables are not
-available to function runtime. Configure it after a separately hosted FastAPI
-service has a public HTTPS origin, for example
-`https://foundry-api.example.com` (no path, query, username, or password).
+The proxy path filter is not an origin firewall. These production checks are
+also enforced by FastAPI because callers can address the public API origin
+directly. The development session endpoint is disabled in production by
+`ConsoleSecurity` and blocked at the Netlify proxy.
 
-Netlify documents that function runtime variables need the Functions scope, and
-that variables in `netlify.toml` are not available to functions:
-https://docs.netlify.com/build/functions/environment-variables/
+## Render API service
 
-The function returns HTTP 503 for missing, non-HTTPS, loopback, and IP-address
-origins. It blocks `/console/dev/session` even if the upstream is misconfigured.
-FastAPI must independently run in production mode and enforce session and CSRF
-checks. Do not add wildcard CORS or expose the session secret in client-side
-environment variables.
+The branch includes a Docker image that binds to Render's `PORT`. A practical
+initial host is a Render Web Service with managed PostgreSQL and a persistent
+disk mounted at `/var/data`. Set `APF_FOUNDRY_ROOT=/var/data`; console routes
+and stores use this root for `state/` and `inbox/` data.
 
-## API host prerequisites
+Render documents public web services with custom domains, TLS, secrets,
+health-check paths, and persistent disks. A persistent disk preserves data
+under its mount path, but is attached to only one service instance. Treat this
+as a single-instance console until state is moved to shared durable services
+and multi-instance behavior is validated:
+https://render.com/docs/web-services
+https://render.com/docs/disks
 
-The current app is not ready to be deployed as a stateless container without
-additional work. Console routes read and write repository-relative `state/` and
-`inbox/` files; some stores honor `APF_FOUNDRY_ROOT`, but the route-level file
-access is not consistently redirected to a durable data mount. The persistent
-review adapter also needs explicit PostgreSQL wiring. Unify these storage
-paths and initialize them from a reviewed data snapshot before hosting. Do not
-copy the live operator workspace into a public deployment without a data
-review.
+Create a reviewed data snapshot under the mounted root before enabling the
+service. Do not copy the live operator workspace or alter mailbox statuses.
+The `ConsoleReviewStore` still needs explicit durable PostgreSQL wiring for
+review APIs; configure the production database only after that integration is
+complete.
 
-The API host must set these values through its secret/configuration manager:
+## Render environment values
+
+Set values in the Render service's environment and secret manager:
 
 - `APF_ENV=production`.
-- `APF_CONSOLE_SESSION_SECRET`: a randomly generated secret.
-- `DATABASE_URL`: a production PostgreSQL connection string.
-- `APF_FOUNDRY_ROOT`: only configures the stores that currently honor it; it
-  does not yet redirect all console file access to persistent storage.
-- `APF_ENABLE_DEV_SESSION=false` or leave it unset.
-- IAM OIDC issuer/client settings and an explicit principal-to-tenant/role
-  allowlist, once the organization identity provider is selected.
+- `APF_ENABLE_DEV_SESSION=false`.
+- `APF_CONSOLE_SESSION_SECRET`: generate a random secret.
+- `APF_FOUNDRY_ROOT=/var/data`.
+- `DATABASE_URL`: private connection string for the production PostgreSQL service.
+- `APF_CONSOLE_PUBLIC_ORIGIN=https://arkaonfoundry.netlify.app`.
+- `APF_GOOGLE_OIDC_CLIENT_ID`: the Google OAuth web-client ID.
+- `APF_GOOGLE_OIDC_CLIENT_SECRET`: the Google OAuth web-client secret.
+- `APF_GOOGLE_WORKSPACE_DOMAINS`: comma-separated exact Workspace domain allowlist.
+- `APF_IAM_PRINCIPAL_MAP_JSON`: server-managed email-to-principal mapping.
 
-The FastAPI code currently has a development-session endpoint and signed
-sessions, but the operations doc records that organization IAM session
-issuance is still required. Do not enable the console until that login path
-exists and is tested. The session endpoint must create the existing secure,
-HttpOnly session cookie only after validating the IAM authorization response
-and mapping an allowed identity to a server-managed tenant and role. Do not
-accept tenant, principal, or role assignments from browser-supplied login data.
+Example mapping shape (replace placeholders; these are not credentials):
+
+```json
+{
+  "operator@example.org": {
+    "tenant_id": "00000000-0000-4000-8000-000000000001",
+    "principal_id": "00000000-0000-4000-8000-000000000002",
+    "role": "operator",
+    "google_sub": "optional-stable-google-subject"
+  }
+}
+```
+
+Only mapped, verified Workspace identities in an allowed `hd` domain receive a
+session. Tenant, principal, and role come from the server map; browser input
+cannot choose them. Google requires the OAuth redirect URI to match exactly.
+Register:
+
+`https://arkaonfoundry.netlify.app/console/auth/callback`
+
+If the Netlify site later uses a custom domain, update both
+`APF_CONSOLE_PUBLIC_ORIGIN` and the Google OAuth client's authorized redirect
+URI. Google recommends validating the signed ID token, issuer, audience,
+expiry, nonce, and Workspace `hd` claim:
+https://developers.google.com/identity/openid-connect/openid-connect
+https://developers.google.com/identity/protocols/oauth2/web-server
+
+## Netlify function configuration
+
+After the API service has a public HTTPS origin, set `APF_API_ORIGIN` on the
+Netlify site with the **Functions** scope. For example:
+
+`https://arkaon-api.onrender.com`
+
+Do not put this variable in `netlify.toml`; Netlify documents that TOML
+variables are unavailable to function runtime. Do not set it until the API
+origin exists and the direct-origin route gates above are verified:
+https://docs.netlify.com/build/functions/environment-variables/
+
+## Remaining site integration
+
+The current `main` frontend has a separate connectivity probe that reports
+`not_configured` when its saved API base is blank. Before the production site
+can show the API as connected, update that frontend to use same-origin
+`/health` by default and treat a protected-route 401 as reachable. This change
+belongs with the current frontend files on `main`; they are not present on the
+older design work branch.
 
 ## Preproduction verification
 
-1. Run `node --test tests/test_netlify_foundry_proxy.mjs` and the complete CI suite.
-2. Test proxy routing with a non-production API origin.
-3. In the API deployment, confirm `/console/dev/session` returns 404 and that
-   no browser-controlled fields can select tenant or role.
-4. Before login, verify proxied `/console` and an authenticated console API
-   return 401. Complete IAM login and verify the cookie is
-   `HttpOnly; Secure; SameSite=Strict`; verify state-changing calls require
-   the CSRF token.
-5. Verify the registered mailbox item through a read-only authenticated query,
-   confirming its state is unchanged.
-6. Enable a Netlify preview only after API, IAM, database, and reviewed data
-   initialization are ready. Production deployment and promotion remain on
-   `PRODUCT_IMPLEMENT_HOLD` pending explicit approval.
+1. Run the full CI suite and container smoke test.
+2. Configure a non-production Render service, reviewed data snapshot, database,
+   and Google OAuth client. Keep `APF_ENABLE_DEV_SESSION=false`.
+3. Confirm direct API `/health` is 200; `/v1/targets`,
+   `/v1/targets/<id>`, `/openapi.json`, and
+   `/console/dev/session` are 404 in production mode.
+4. Set Netlify `APF_API_ORIGIN` with Functions scope and verify proxied
+   `/health`, the 302 sign-in redirect, and `/console/login`.
+5. Complete Google Workspace login; verify only an allowlisted identity gets
+   the session cookies and state-changing requests require the CSRF token.
+6. Read the registered mailbox item through an authenticated, read-only query
+   and confirm its status is unchanged.
 
-This change only narrows the proxy and documents prerequisites. It does not
-provision a host, configure Netlify secrets, implement organization IAM, mutate
-mailbox state, or deploy the site.
+This branch change does not create Render resources, set environment secrets,
+register a Google OAuth client, configure Netlify, modify mailbox state, or
+deploy the production site. Keep `PRODUCT_IMPLEMENT_HOLD` until all checks and
+the remaining frontend and PostgreSQL wiring are reviewed.
