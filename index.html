@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#080f1d">
   <meta name="description" content="아르카온에서 로고, 명함, 영상, 홈페이지를 만들고 작업을 관리하세요.">
   <title>아르카온 | 함께 만드는 디지털 공간</title>
@@ -54,20 +54,29 @@
     }
     @media(prefers-reduced-motion:no-preference){a.card{transition:transform .2s,border-color .2s}a.card:hover{transform:translateY(-3px);border-color:#6cbfe0}}
 
-    .entry-screen{position:fixed;inset:0;z-index:9999;background:#030810;display:grid;place-items:center;overflow:hidden}
+    .entry-screen{position:fixed;inset:0;z-index:9999;background:#030810;display:flex;flex-direction:column;overflow:hidden;height:100svh;height:100dvh;max-height:-webkit-fill-available;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
     .entry-screen[hidden]{display:none!important}
-    .entry-screen video{width:100%;height:100%;object-fit:contain;background:#030810}
-    .entry-controls{position:absolute;inset:auto 0 0;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:24px max(22px,4vw);background:linear-gradient(transparent,#030810c9)}
-    .entry-controls button{font:600 15px inherit;font-family:inherit;background:#10263d;color:#eef8ff;border:1px solid #739cbd;border-radius:24px;padding:11px 20px;cursor:pointer}
+    .entry-stage{flex:1 1 auto;min-height:0;display:flex;align-items:center;justify-content:center;padding:clamp(8px,2vh,20px) clamp(12px,3vw,28px)}
+    .entry-screen video{display:block;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;object-position:center;background:#030810}
+    .entry-controls{flex:0 0 auto;position:relative;display:flex;justify-content:space-between;align-items:center;gap:10px 14px;padding:16px clamp(16px,4vw,28px) max(16px,env(safe-area-inset-bottom,0px));background:linear-gradient(transparent,#030810e6 28%,#030810)}
+    .entry-controls button{font:600 15px inherit;font-family:inherit;background:#10263d;color:#eef8ff;border:1px solid #739cbd;border-radius:24px;padding:11px 20px;cursor:pointer;white-space:nowrap}
     .entry-controls button:focus-visible{outline:3px solid #9ee6ff;outline-offset:3px}
-    .entry-brand{font-size:clamp(15px,2.5vw,22px);font-weight:800;letter-spacing:.16em;color:#e8f6ff}
+    .entry-brand{font-size:clamp(14px,2.5vw,22px);font-weight:800;letter-spacing:.12em;color:#e8f6ff;flex-shrink:0}
+    @media(max-width:600px){
+      .entry-stage{padding:8px 10px 4px}
+      .entry-controls{flex-wrap:wrap;justify-content:center;text-align:center;padding-top:12px;padding-bottom:max(14px,env(safe-area-inset-bottom,14px))}
+      .entry-controls button{width:100%;max-width:320px;padding:13px 18px;font-size:16px}
+      .entry-brand{width:100%;text-align:center;letter-spacing:.18em}
+    }
     @media(prefers-reduced-motion:reduce){.entry-screen{display:none!important}}
-    body.entry-active{overflow:hidden}
+    body.entry-active{overflow:hidden;touch-action:none}
   </style>
 </head>
 <body>
   <div id="entryScreen" class="entry-screen" role="dialog" aria-modal="true" aria-label="ARKAON 진입 영상">
-    <video id="entryVideo" autoplay playsinline webkit-playsinline muted preload="auto" aria-label="ARKAON 로고 진입 영상" src="/assets/arkaon-entry-v17.mp4"></video>
+    <div class="entry-stage">
+      <video id="entryVideo" autoplay playsinline webkit-playsinline muted preload="auto" aria-label="ARKAON 로고 진입 영상" src="/assets/arkaon-entry-v17.mp4"></video>
+    </div>
     <div class="entry-controls"><span class="entry-brand">ARKAON</span><button type="button" id="skipEntry">홈으로 들어가기 <span aria-hidden="true">→</span></button></div>
   </div>
 
