@@ -32,9 +32,12 @@
     section{margin-top:clamp(52px,7vw,80px)}
     h2{font-size:clamp(1.4rem,2.4vw,1.8rem);line-height:1.4;letter-spacing:-.025em;margin:0 0 24px}
     .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-    .card{background:#101e30;border:1px solid #28415c;border-radius:16px;padding:26px;min-width:0;min-height:180px}
+    a.card{display:block;text-decoration:none;color:inherit;cursor:pointer;background:#101e30;border:1px solid #28415c;border-radius:16px;padding:26px;min-width:0;min-height:180px}
+    a.card:focus-visible{outline:3px solid #9ee6ff;outline-offset:3px}
     .card h3{font-size:1.125rem;line-height:1.45;letter-spacing:-.02em;margin:0 0 12px}
     .state{display:block;font-size:.875rem;color:#a9c5d9;margin-bottom:12px}
+    .state-live{color:#7de8b8}
+    .state-admin{color:#f5d99b}
     .card p{font-size:.975rem;line-height:1.7}
     footer{border-top:1px solid #25364e;padding:28px 20px;text-align:center;color:#aebfd0;font-size:.875rem}
     @media(max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -49,7 +52,7 @@
       .card{padding:22px;min-height:auto}
       .notice{padding:16px}
     }
-    @media(prefers-reduced-motion:no-preference){.card{transition:transform .2s,border-color .2s}.card:hover{transform:translateY(-3px);border-color:#6cbfe0}}
+    @media(prefers-reduced-motion:no-preference){a.card{transition:transform .2s,border-color .2s}a.card:hover{transform:translateY(-3px);border-color:#6cbfe0}}
 
     .entry-screen{position:fixed;inset:0;z-index:9999;background:#030810;display:grid;place-items:center;overflow:hidden}
     .entry-screen[hidden]{display:none!important}
@@ -73,18 +76,19 @@
     <div class="eyebrow">AI와 함께하는 창작</div>
     <h1><span class="hero-line">상상에서 완성까지.</span><span class="hero-line">사람과 AI가 함께 만듭니다.</span></h1>
     <p class="intro">로고와 명함부터 영상, 홈페이지, 디지털 서비스까지. 필요한 작업을 한곳에서 준비하고 관리하세요.</p>
-    <div class="notice" role="status">현재 일부 서비스는 준비 중입니다. 회원가입, 결제, 영상 제작, 파일 다운로드 등은 기능 검증 후 순차적으로 제공됩니다.</div>
+    <div class="notice" role="status">아래 서비스 카드를 눌러 바로 시작할 수 있습니다. 실제 과금·운영 배포·Foundry API 연동은 <a href="/services/account.html">계정</a>과 <a href="/services/admin.html">관리자</a> 안내에 따릅니다.</div>
     <section aria-label="서비스 안내">
       <h2>아르카온 서비스</h2>
-      <div class="grid">
-        <article class="card"><h3>로고·명함 만들기</h3><span class="state">서비스 준비 중</span><p>브랜드에 어울리는 로고와 명함을 디자인합니다.</p></article>
-        <article class="card"><h3>AI 영상 만들기</h3><span class="state">서비스 준비 중</span><p>이미지를 영상으로 만들고 결과물을 관리합니다.</p></article>
-        <article class="card"><h3>홈페이지 만들기</h3><span class="state">서비스 준비 중</span><p>업종과 목적에 맞는 홈페이지를 구성합니다.</p></article>
-        <article class="card"><h3>이름@ 개인 페이지</h3><span class="state">서비스 준비 중</span><p>나만의 소개 페이지를 만들고 검색 등록을 준비합니다.</p></article>
-        <article class="card"><h3>아르카온과 함께 작업하기</h3><span class="state">서비스 준비 중</span><p>작업을 요청하고 진행 과정과 결과물을 확인합니다.</p></article>
-        <article class="card"><h3>홈페이지 게시하기</h3><span class="state">서비스 준비 중</span><p>완성한 홈페이지를 저장하고 인터넷에 게시합니다.</p></article>
-        <article class="card"><h3>내 계정과 결제</h3><span class="state">서비스 준비 중</span><p>내 작업과 결제 내역을 한곳에서 관리합니다.</p></article>
-        <article class="card"><h3>관리자 메뉴</h3><span class="state">관리자 전용 · 준비 중</span><p>작업 현황과 승인 내역을 확인합니다.</p></article>
+      <p class="intro" style="margin-bottom:20px;font-size:.95rem"><a href="/services/">전체 서비스 목록</a></p>
+      <div class="grid" id="serviceGrid">
+        <a class="card" href="/services/logo-card.html"><h3>로고·명함 만들기</h3><span class="state state-live">이용 가능</span><p>브랜드에 어울리는 로고와 명함을 디자인합니다.</p></a>
+        <a class="card" href="/services/ai-video.html"><h3>AI 영상 만들기</h3><span class="state state-live">이용 가능</span><p>진입·브랜드 영상과 진입 효과 스튜디오로 제작합니다.</p></a>
+        <a class="card" href="/services/site-builder.html"><h3>홈페이지 만들기</h3><span class="state state-live">이용 가능</span><p>업종과 목적에 맞는 홈페이지 초안을 만듭니다.</p></a>
+        <a class="card" href="/services/personal-page.html"><h3>이름@ 개인 페이지</h3><span class="state state-live">이용 가능</span><p>나만의 소개 페이지를 만들고 HTML로 저장합니다.</p></a>
+        <a class="card" href="/services/co-create.html"><h3>아르카온과 함께 작업하기</h3><span class="state state-live">이용 가능</span><p>작업을 요청하고 API 연결 시 공동 창작으로 이어갑니다.</p></a>
+        <a class="card" href="/services/publish.html"><h3>홈페이지 게시하기</h3><span class="state state-live">이용 가능</span><p>저장한 페이지를 내보내고 게시 절차를 안내합니다.</p></a>
+        <a class="card" href="/services/account.html"><h3>내 계정과 결제</h3><span class="state state-live">이용 가능</span><p>브라우저에 저장된 작업과 API 설정을 관리합니다.</p></a>
+        <a class="card" href="/services/admin.html"><h3>관리자 메뉴</h3><span class="state state-admin">관리자 · 권한 필요</span><p>작업 현황과 승인 콘솔로 이동합니다.</p></a>
       </div>
     </section>
   </main>

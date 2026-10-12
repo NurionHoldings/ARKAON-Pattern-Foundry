@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>홈페이지 만들기 · 아르카온</title>
+  <link rel="stylesheet" href="/services/services.css">
+</head>
+<body>
+  <div class="shell">
+    <div class="svc-top"><h1>홈페이지 만들기</h1><a class="svc-home" href="/">← 홈</a></div>
+    <form class="panel" id="form">
+      <h2>한 페이지 초안</h2>
+      <label>사이트 이름<input id="title" required maxlength="80" value="우리 가게"></label>
+      <label>부제<input id="tagline" maxlength="160" value="정성과 AI가 만나는 공간"></label>
+      <label>소개<textarea id="body" maxlength="2000">방문을 환영합니다. 서비스와 연락처를 이 페이지에 담았습니다.</textarea></label>
+      <label>이메일<input id="email" type="email" maxlength="120"></label>
+      <label>전화<input id="phone" maxlength="40"></label>
+      <label>강조색<input id="accent" type="color" value="#5cbad8"></label>
+      <div class="btn-row">
+        <button type="submit">HTML 저장 · 내 작업에 추가</button>
+      </div>
+    </form>
+    <div class="panel preview"><iframe id="preview" title="홈페이지 미리보기"></iframe></div>
+  </div>
+  <script src="/services/services.js"></script>
+  <script>
+    const {siteHtml,downloadText,saveProject}=APFHomeServices;
+    const fields=['title','tagline','body','email','phone','accent'];
+    function values(){return Object.fromEntries(fields.map(id=>[id,document.getElementById(id).value]));}
+    function render(){document.getElementById('preview').srcdoc=siteHtml(values());}
+    fields.forEach(id=>document.getElementById(id).addEventListener('input',render));
+    document.getElementById('form').addEventListener('submit',e=>{e.preventDefault();const v=values();const html=siteHtml(v);
+      const saved=saveProject({type:'site',title:v.title,html});downloadText(`${v.title}-home.html`,html);alert(`저장했습니다. 게시는 /services/publish.html 에서 이어가세요. (id: ${saved.id.slice(0,8)}…)`);});
+    render();
+  </script>
+</body>
+</html>

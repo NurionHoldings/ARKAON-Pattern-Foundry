@@ -1,0 +1,26 @@
+:root{color-scheme:dark;font-family:Pretendard,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;font-synthesis:none}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:#080f1d;color:#e7eef9;font-size:16px;line-height:1.65;letter-spacing:-.015em}
+a{color:#9ee6ff}
+.shell{max-width:960px;margin-inline:auto;padding:24px clamp(20px,4vw,36px) 64px}
+.svc-top{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between;margin-bottom:28px;padding-bottom:18px;border-bottom:1px solid #25364e}
+.svc-top h1{margin:0;font-size:clamp(1.35rem,3vw,1.75rem);letter-spacing:-.03em}
+.svc-home{font-size:.9rem;text-decoration:none;color:#aec1d5}
+.svc-home:hover{color:#e7eef9}
+.panel{background:#101e30;border:1px solid #28415c;border-radius:16px;padding:22px;margin-top:18px}
+.panel h2{margin:0 0 14px;font-size:1.15rem}
+label{display:grid;gap:6px;margin-bottom:14px;font-size:.9rem;color:#c5d6e8}
+input,textarea,select{font:inherit;font-family:inherit;background:#0c1828;color:#e7eef9;border:1px solid #3d5875;border-radius:10px;padding:10px 12px;width:100%}
+textarea{min-height:96px;resize:vertical}
+button,.btn{font:inherit;font-family:inherit;cursor:pointer;border-radius:10px;padding:11px 18px;border:1px solid #5a8ab0;background:#16324f;color:#eef8ff}
+button:hover,.btn:hover{border-color:#7eb8e0}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #9ee6ff;outline-offset:2px}
+.btn-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+.muted{color:#9eb2c8;font-size:.9rem}
+.ok{color:#7de8b8}
+.warn{color:#f5d99b}
+.preview{margin-top:16px;border:1px solid #28415c;border-radius:12px;overflow:hidden;background:#030810;min-height:200px}
+.preview iframe{width:100%;min-height:360px;border:0;display:block}
+.list{margin:0;padding:0;list-style:none}
+.list li{padding:12px 0;border-bottom:1px solid #25364e;display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:space-between;align-items:center}
+.chip{font-size:.78rem;padding:3px 10px;border-radius:999px;background:#1a3348;color:#b8d4ea}

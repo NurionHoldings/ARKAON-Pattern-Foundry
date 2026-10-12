@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>아르카온과 함께 작업하기 · 아르카온</title>
+  <link rel="stylesheet" href="/services/services.css">
+</head>
+<body>
+  <div class="shell">
+    <div class="svc-top"><h1>아르카온과 함께 작업하기</h1><a class="svc-home" href="/">← 홈</a></div>
+    <p class="muted">요청을 이 브라우저에 저장하고, Foundry API가 연결되면 공동 창작 채팅으로 전달할 수 있습니다.</p>
+    <form class="panel" id="form">
+      <h2>작업 요청</h2>
+      <label>제목<input id="title" required maxlength="120"></label>
+      <label>범위<select id="scope"><option value="LANDING">랜딩·홈페이지</option><option value="PLATFORM">플랫폼·서비스</option><option value="BRAND">브랜드·로고</option></select></label>
+      <label>요청 내용<textarea id="message" required maxlength="4000" placeholder="만들고 싶은 것, 참고 URL, 마감 희망 등"></textarea></label>
+      <div class="btn-row">
+        <button type="submit">요청 저장</button>
+        <button type="button" id="sendApi" hidden>API로 전송 (세션 필요)</button>
+      </div>
+      <p id="status" class="muted" role="status"></p>
+    </form>
+    <div class="panel"><h2>최근 요청</h2><ul class="list" id="requests"></ul></div>
+  </div>
+  <script src="/services/services.js"></script>
+  <script>
+    const {saveProject,readProjects,getApiBase}=APFHomeServices;
+    function renderList(){
+      const root=document.getElementById('requests');root.replaceChildren();
+      const items=readProjects().filter(p=>p.type==='work-request');
+      if(!items.length){root.innerHTML='<li class="muted">저장된 요청이 없습니다.</li>';return;}
+      for(const item of items){
+        const li=document.createElement('li');
+        const wrap=document.createElement('span');
+        const strong=document.createElement('strong');strong.textContent=item.title;
+        const meta=document.createElement('span');meta.className='muted';meta.textContent=`${item.scope} · ${(item.updated_at||'').slice(0,10)}`;
+        wrap.append(strong,document.createElement('br'),meta);
+        li.append(wrap);root.append(li);
+      }
+    }
+    document.getElementById('form').addEventListener('submit',e=>{
+      e.preventDefault();
+      const title=document.getElementById('title').value.trim();
+      const message=document.getElementById('message').value.trim();
+      const scope=document.getElementById('scope').value;
+      saveProject({type:'work-request',title,message,scope});
+      document.getElementById('status').textContent='요청을 저장했습니다. 계정 화면에서 API를 연결하면 Foundry로 보낼 수 있습니다.';
+      document.getElementById('form').reset();renderList();
+    });
+    const base=getApiBase();
+    const sendBtn=document.getElementById('sendApi');
+    if(base){sendBtn.hidden=false;sendBtn.addEventListener('click',()=>{window.location.href='/services/admin.html#console';});}
+    renderList();
+  </script>
+</body>
+</html>
