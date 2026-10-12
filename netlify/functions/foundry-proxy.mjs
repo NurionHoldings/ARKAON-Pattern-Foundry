@@ -85,6 +85,12 @@ export async function handler(request) {
   if (method !== "GET" && method !== "HEAD") options.body = await request.arrayBuffer();
   try {
     const upstream = await fetch(upstreamUrl, options);
+    if (path === "/console" && upstream.status === 401) {
+      return new Response(null, {
+        status: 302,
+        headers: { location: "/console/login", "cache-control": "no-store" },
+      });
+    }
     const body = method === "HEAD" || upstream.status === 204 || upstream.status === 304
       ? null : await upstream.arrayBuffer();
     return new Response(body, { status: upstream.status, headers: responseHeaders(upstream.headers) });
