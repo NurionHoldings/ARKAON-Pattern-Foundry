@@ -224,6 +224,8 @@ def install_google_workspace_iam(application, principal_type, session_cookie: st
         response = RedirectResponse(
             f"{GOOGLE_AUTHORIZATION_ENDPOINT}?{query}", status_code=302
         )
+        response.headers["Cache-Control"] = "no-store"
+        response.headers["Referrer-Policy"] = "no-referrer"
         response.set_cookie(
             TRANSACTION_COOKIE,
             transaction,
@@ -302,8 +304,22 @@ def install_google_workspace_iam(application, principal_type, session_cookie: st
             principal_id=UUID(principal_record["principal_id"]),
             role=principal_record["role"],
         )
-        response = RedirectResponse(
-            f"{settings.public_origin}/console", status_code=303
+        response = HTMLResponse(
+            "<!doctype html><html lang=\"ko\"><meta charset=\"utf-8\">"
+            "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"
+            "<meta name=\"referrer\" content=\"no-referrer\">"
+            "<title>로그인 완료</title><main><h1>로그인 완료</h1>"
+            f"<p><a href=\"{settings.public_origin}/console\">운영 콘솔 계속하기</a></p>"
+            "</main></html>",
+            headers={
+                "Cache-Control": "no-store",
+                "Content-Security-Policy": (
+                    "default-src 'none'; style-src 'unsafe-inline'; "
+                    "base-uri 'none'; frame-ancestors 'none'; form-action 'self'"
+                ),
+                "Referrer-Policy": "no-referrer",
+                "X-Content-Type-Options": "nosniff",
+            },
         )
         response.set_cookie(
             session_cookie,
