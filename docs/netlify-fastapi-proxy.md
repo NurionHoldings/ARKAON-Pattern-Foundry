@@ -12,6 +12,13 @@ API currently relies on a tenant header and does not use the console session
 dependency. Keep it outside the public proxy until it has its own authentication
 and authorization controls.
 
+This proxy allowlist does not secure direct requests to the API host. The public
+FastAPI origin itself must also deny or authenticate every route that is not
+intended for public access. In the current app, `/v1/targets` routes rely on a
+tenant header and are not protected by the console session. Do not expose the
+API host until those routes have server-side authorization or are blocked at the
+API origin. Netlify's proxy path filter is not an origin firewall.
+
 ## Netlify configuration
 
 Add `APF_API_ORIGIN` in the Netlify site's environment settings with the
