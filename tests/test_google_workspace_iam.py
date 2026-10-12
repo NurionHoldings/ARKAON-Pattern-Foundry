@@ -99,8 +99,9 @@ def test_google_callback_validates_iam_and_issues_server_mapped_session(monkeypa
         "/console/auth/callback?code=one-time-code&state=" + query["state"][0],
         follow_redirects=False,
     )
-    assert response.status_code == 303
-    assert response.headers["location"] == "https://arkaonfoundry.netlify.app/console"
+    assert response.status_code == 200
+    assert 'href="https://arkaonfoundry.netlify.app/console"' in response.text
+    assert response.headers["cache-control"] == "no-store"
     cookies = response.headers.get_list("set-cookie")
     session = next(value for value in cookies if value.startswith("apf_console_session="))
     csrf = next(value for value in cookies if value.startswith("apf_console_csrf="))
