@@ -2,7 +2,7 @@ import {generateEditableLogo} from "./editable-logo-generator.js";
 import {recordEditorCanvas,supportedVideoFormats} from "./video-export.js";
 import {effectAt} from "./brush-timeline.js";
 const $=id=>document.getElementById(id),stage=$("stage"),ctx=stage.getContext("2d");
-let result=null,im=null,objectUrl=null,videoUrl=null,recording=false,recordTime=null,started=performance.now();
+let result=null,im=null,objectUrl=null,videoUrl=null,recording=false,recordTime=null,started=performance.now(),symbolMask=null;
 let effects={symbol01:{effect:"glow",start:0,duration:2,loop:true}};
 function save(blob,name){const u=URL.createObjectURL(blob),a=document.createElement("a");a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1500);}
 async function generate(){
@@ -12,6 +12,8 @@ async function generate(){
   const u=URL.createObjectURL(next.sourceBlob),image=new Image();
   await new Promise((resolve,reject)=>{image.onload=resolve;image.onerror=()=>reject(Error("SVG preview failed"));image.src=u;});
   if(objectUrl)URL.revokeObjectURL(objectUrl);objectUrl=u;im=image;result=next;
+  symbolMask=document.createElement("canvas");symbolMask.width=512;symbolMask.height=512;
+  const mc=symbolMask.getContext("2d");mc.strokeStyle=next.accent;mc.lineWidth=13;mc.beginPath();mc.arc(256,177.5,69,0,Math.PI*2);mc.stroke();mc.fillStyle=next.accent;mc.beginPath();mc.moveTo(217.5,177.5);mc.lineTo(256,137.5);mc.lineTo(294.5,177.5);mc.lineTo(256,217.5);mc.closePath();mc.fill();
   effects={symbol01:{effect:"glow",start:0,duration:2,loop:true}};
   $("layer").replaceChildren(...next.manifest.layers.map(l=>{const o=document.createElement("option");o.value=l.id;o.textContent=l.label+(l.stability==="CORE"?" [CORE]":"");return o;}));
   $("layer").value="symbol01";sync();
@@ -42,15 +44,12 @@ function render(now){
   const e=effects.symbol01,phase=effectAt(t,e),level=Number($("level").value);
   if(e&&phase.active&&level>=2&&e.effect!=="none"){
    // Clip native SVG symbol by using the SVG node's exact shape as a mask.
-   const mask=document.createElement("canvas");mask.width=512;mask.height=512;
-   const mc=mask.getContext("2d");
-   mc.strokeStyle=result.accent;mc.lineWidth=13;mc.beginPath();mc.arc(256,177.5,69,0,Math.PI*2);mc.stroke();
-   mc.fillStyle=result.accent;mc.beginPath();mc.moveTo(217.5,177.5);mc.lineTo(256,137.5);mc.lineTo(294.5,177.5);mc.lineTo(256,217.5);mc.closePath();mc.fill();
+   const mask=symbolMask;
    ctx.save();
    if(e.effect==="glow"){ctx.shadowColor=result.accent;ctx.shadowBlur=25*(.5+.5*Math.sin(Math.PI*phase.progress));ctx.drawImage(mask,ox,oy);}
    if(e.effect==="pop"&&level>=4){const z=1+.1*Math.sin(Math.PI*phase.progress);ctx.translate(ox+256,oy+177.5);ctx.scale(z,z);ctx.drawImage(mask,-256,-177.5);}
    if(e.effect==="sweep"&&level>=3){
-    mc.globalCompositeOperation="source-atop";const x=(phase.progress*1.5-.25)*512,g=mc.createLinearGradient(x-35,0,x+35,0);g.addColorStop(0,"#ffffff00");g.addColorStop(.5,"#ffffffbb");g.addColorStop(1,"#ffffff00");mc.fillStyle=g;mc.fillRect(0,0,512,512);ctx.drawImage(mask,ox,oy);
+    const temp=document.createElement("canvas");temp.width=512;temp.height=512;const tc=temp.getContext("2d");tc.drawImage(mask,0,0);tc.globalCompositeOperation="source-atop";const x=(phase.progress*1.5-.25)*512,g=tc.createLinearGradient(x-35,0,x+35,0);g.addColorStop(0,"#ffffff00");g.addColorStop(.5,"#ffffffbb");g.addColorStop(1,"#ffffff00");tc.fillStyle=g;tc.fillRect(0,0,512,512);ctx.drawImage(temp,ox,oy);
    }
    ctx.restore();
   }
