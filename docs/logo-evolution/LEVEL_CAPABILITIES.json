@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "levels": {
+    "1": [
+      "original"
+    ],
+    "2": [
+      "color_shift",
+      "outline_neon"
+    ],
+    "3": [
+      "text_stagger",
+      "specular_sweep",
+      "trace_current"
+    ],
+    "4": [
+      "depth_pop",
+      "radial_wave",
+      "material_reflection"
+    ],
+    "5": [
+      "cinematic_timeline",
+      "high_quality_composite"
+    ]
+  },
+  "logoTypes": {
+    "text": [
+      "color_shift",
+      "text_stagger",
+      "depth_pop",
+      "specular_sweep"
+    ],
+    "geometric": [
+      "outline_neon",
+      "trace_current",
+      "radial_wave"
+    ],
+    "metallic": [
+      "specular_sweep",
+      "material_reflection"
+    ],
+    "character": [
+      "color_shift",
+      "specular_sweep"
+    ],
+    "symbol": [
+      "outline_neon",
+      "radial_wave",
+      "depth_pop"
+    ]
+  },
+  "fallback": "omit_incompatible_and_explain",
+  "maxTextScale": 1.1
+}

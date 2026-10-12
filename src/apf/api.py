@@ -24,6 +24,7 @@ from .repository import (
     RevisionConflict,
     TargetRepository,
 )
+from .review_store_config import console_review_store_from_config, is_production_environment
 from .state_machine import TARGET_TRANSITIONS, InvalidTransition, transition
 from .visual_platform_dialogue import VisualPlatformDialogueStore
 
@@ -62,9 +63,15 @@ def create_app(
 ) -> FastAPI:
     application = FastAPI(title="ARKAON Pattern Foundry", version="0.1.0")
     application.state.repository = repository or repository_from_config()
+    resolved_review_store = console_review_store
+    if resolved_review_store is None:
+        resolved_review_store = console_review_store_from_config()
+    environment = os.getenv("APF_ENV", "development")
+    if is_production_environment(environment) and resolved_review_store is None:
+        raise RuntimeError("console durable review store is required in production")
     install_console(
         application, security=console_security or console_security_from_config(),
-        review_store=console_review_store,
+        review_store=resolved_review_store,
         approval_store=plain_approval_store or PlainLanguageApprovalStore(
             Path(os.getenv("APF_FOUNDRY_ROOT", Path(__file__).parents[2]))
         ),

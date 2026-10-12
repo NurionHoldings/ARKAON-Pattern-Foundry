@@ -20,6 +20,7 @@ jobs:
       - run: pip install -e '.[dev]'
       - run: ruff check src tests
       - run: pytest -q
+      - run: node --test tests/test_netlify_foundry_proxy.mjs
   postgres-integration:
     runs-on: ubuntu-latest
     services:

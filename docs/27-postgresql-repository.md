@@ -19,6 +19,16 @@ PostgreSQL 어댑터는 모든 조회·변경에 `tenant_id`를 포함하고, �
 모든 upgrade에는 대응하는 `.down.sql`이 필요하다. 생성은 PostgreSQL READ COMMITTED와
 고유 제약의 대기/가시성 규칙을 사용하며, 갱신은 단일 원자적 CAS 문장이다.
 
+## 콘솔 durable review 연결
+
+`create_app()`은 `DATABASE_URL`이 있으면 마이그레이션을 적용한 뒤
+`PostgresDurableReviewRepository`를 붙인다. Eternian 검토 서명 검증용 공개키는
+`APF_ETERNIAN_REVIEW_PUBLIC_KEY_B64` 또는
+`config/arkaon-pattern-promotion.json`의 `ethernian_public_key_b64`에서 읽는다.
+운영(`APF_ENV=production`)에서는 PostgreSQL과 공개키, 세션 비밀값이 모두 없으면
+기동을 거부한다. 개발 환경에서 `DATABASE_URL`이 없으면
+`state/console-durable.sqlite` SQLite 저장소를 선택적으로 사용한다.
+
 ## 검증 상태
 
 - 결정적 MemoryRepository 계약 및 API 회귀: PASS
