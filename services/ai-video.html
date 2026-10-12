@@ -5,23 +5,159 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <title>AI 영상 만들기 · 아르카온</title>
   <link rel="stylesheet" href="/services/services.css">
+  <style>
+    .video-frame{display:block;width:100%;max-width:100%;height:auto;max-height:min(70dvh,480px);object-fit:contain;background:#030810;border-radius:12px}
+    .upload-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+    .upload-row input[type=file]{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+    .upload-label{display:inline-block;cursor:pointer}
+  </style>
 </head>
 <body>
   <div class="shell">
     <div class="svc-top"><h1>AI 영상 만들기</h1><a class="svc-home" href="/">← 홈</a></div>
-    <p class="muted">브랜드 진입 영상(V17)을 확인하고, HTML 진입 효과·모션 타이틀 제작 도구로 확장하세요.</p>
+    <p class="muted">브랜드 진입 영상(V17)을 참고하고, 직접 만든 MP4·WebM을 업로드해 미리 보고 저장할 수 있습니다.</p>
+
     <div class="panel">
-      <h2>ARKAON V17 진입 영상</h2>
-      <video controls playsinline preload="metadata" style="display:block;width:100%;max-width:100%;height:auto;max-height:min(70dvh,480px);object-fit:contain;background:#030810;border-radius:12px" src="/assets/arkaon-entry-v17.mp4"></video>
+      <h2>내 영상 업로드</h2>
+      <p class="muted">MP4, WebM, MOV 등 브라우저에서 재생 가능한 형식 · 약 2.5MB 이하만 이 브라우저 작업함에 자동 저장됩니다.</p>
+      <div class="upload-row">
+        <label class="btn upload-label" for="videoUpload">영상 파일 선택</label>
+        <input id="videoUpload" type="file" accept="video/mp4,video/webm,video/quicktime,.mp4,.webm,.mov">
+        <button type="button" id="saveUpload" disabled>내 작업에 저장</button>
+        <button type="button" id="clearUpload" hidden>선택 취소</button>
+      </div>
+      <label style="margin-top:14px">저장 이름<input id="uploadTitle" maxlength="80" placeholder="예: 브랜드 인트로 v2"></label>
+      <video id="userPreview" class="video-frame" style="margin-top:12px" controls playsinline hidden></video>
+      <p id="uploadStatus" class="muted" role="status"></p>
+    </div>
+
+    <div class="panel">
+      <h2>ARKAON V17 진입 영상 (샘플)</h2>
+      <video class="video-frame" controls playsinline preload="metadata" src="/assets/arkaon-entry-v17.mp4"></video>
       <div class="btn-row" style="margin-top:14px">
         <a class="btn" download href="/assets/arkaon-entry-v17.mp4">MP4 다운로드</a>
         <a class="btn" href="/examples/entry-effects-studio.html">진입 효과 스튜디오 열기</a>
       </div>
     </div>
+
+    <div class="panel">
+      <h2>저장된 영상</h2>
+      <ul class="list" id="savedVideos"></ul>
+    </div>
+
     <div class="panel">
       <h2>다음 단계</h2>
-      <p>스튜디오에서 문구·색·9종 효과를 조합한 뒤 HTML을 내려받아 홈·랜딩에 붙일 수 있습니다. 자동 게시와 결제 연동은 <a href="/services/publish.html">게시하기</a>와 <a href="/services/account.html">계정</a>에서 단계적으로 제공합니다.</p>
+      <p>스튜디오에서 HTML 진입 효과를 만들거나 <a href="/services/publish.html">게시하기</a>에서 내보낼 수 있습니다. Foundry API 연동은 <a href="/services/account.html">계정</a>에서 설정합니다.</p>
     </div>
   </div>
+  <script src="/services/services.js"></script>
+  <script>
+    const {readProjects,saveVideoUpload,downloadDataUrl,MAX_VIDEO_STORE_BYTES}=APFHomeServices;
+    const input=document.getElementById('videoUpload');
+    const preview=document.getElementById('userPreview');
+    const saveBtn=document.getElementById('saveUpload');
+    const clearBtn=document.getElementById('clearUpload');
+    const statusEl=document.getElementById('uploadStatus');
+    const titleInput=document.getElementById('uploadTitle');
+    let objectUrl='';
+    let pendingFile=null;
+
+    function setStatus(text,kind='muted'){
+      statusEl.textContent=text;
+      statusEl.className=kind==='warn'?'warn':kind==='ok'?'ok':'muted';
+    }
+
+    function clearSelection(){
+      if(objectUrl)URL.revokeObjectURL(objectUrl);
+      objectUrl='';pendingFile=null;
+      input.value='';
+      preview.removeAttribute('src');
+      preview.hidden=true;
+      saveBtn.disabled=true;
+      clearBtn.hidden=true;
+      setStatus('');
+    }
+
+    function renderSaved(){
+      const root=document.getElementById('savedVideos');
+      root.replaceChildren();
+      const items=readProjects().filter(p=>p.type==='ai-video-upload');
+      if(!items.length){
+        root.innerHTML='<li class="muted">저장된 영상이 없습니다.</li>';
+        return;
+      }
+      for(const item of items){
+        const li=document.createElement('li');
+        const label=document.createElement('span');
+        const sizeMb=(item.byteSize/(1024*1024)).toFixed(2);
+        label.textContent=`${item.title} (${item.fileName || 'video'} · ${sizeMb}MB)`;
+        const actions=document.createElement('span');
+        actions.className='btn-row';
+        actions.style.margin='0';
+        if(item.videoDataUrl){
+          const play=document.createElement('button');
+          play.type='button';play.textContent='미리보기';
+          play.addEventListener('click',()=>{
+            preview.src=item.videoDataUrl;
+            preview.hidden=false;
+            preview.scrollIntoView({behavior:'smooth',block:'nearest'});
+          });
+          const dl=document.createElement('button');
+          dl.type='button';dl.textContent='다시 받기';
+          dl.addEventListener('click',()=>downloadDataUrl(item.fileName||`${item.title}.mp4`,item.videoDataUrl));
+          actions.append(play,dl);
+        }else{
+          const note=document.createElement('span');
+          note.className='muted';
+          note.textContent='용량 초과로 메타만 저장됨';
+          actions.append(note);
+        }
+        li.append(label,actions);
+        root.append(li);
+      }
+    }
+
+    input.addEventListener('change',()=>{
+      clearSelection();
+      const file=input.files&&input.files[0];
+      if(!file)return;
+      if(!String(file.type).startsWith('video/')){
+        setStatus('동영상 파일(MP4, WebM 등)을 선택해 주세요.','warn');
+        return;
+      }
+      pendingFile=file;
+      objectUrl=URL.createObjectURL(file);
+      preview.src=objectUrl;
+      preview.hidden=false;
+      saveBtn.disabled=false;
+      clearBtn.hidden=false;
+      if(!titleInput.value.trim())titleInput.value=file.name.replace(/\.[^.]+$/, '');
+      const mb=(file.size/(1024*1024)).toFixed(2);
+      const limit=(MAX_VIDEO_STORE_BYTES/(1024*1024)).toFixed(1);
+      setStatus(file.size>MAX_VIDEO_STORE_BYTES
+        ? `선택됨 (${mb}MB). ${limit}MB 초과 시 미리보기만 가능하고 메타만 저장됩니다.`
+        : `선택됨 (${mb}MB). 저장하면 이 브라우저 작업함에 보관됩니다.`);
+    });
+
+    clearBtn.addEventListener('click',clearSelection);
+
+    saveBtn.addEventListener('click',async()=>{
+      if(!pendingFile)return;
+      saveBtn.disabled=true;
+      try{
+        const saved=await saveVideoUpload(pendingFile,{title:titleInput.value.trim()});
+        setStatus(saved.videoDataUrl
+          ? `저장했습니다. (id: ${saved.id.slice(0,8)}…)`
+          : '파일이 커서 이름·정보만 저장했습니다. 원본은 PC에 보관해 주세요.','ok');
+        renderSaved();
+      }catch(e){
+        setStatus(e.message==='VIDEO_TYPE'?'동영상 형식만 업로드할 수 있습니다.':'저장하지 못했습니다.','warn');
+      }finally{
+        saveBtn.disabled=!pendingFile;
+      }
+    });
+
+    renderSaved();
+  </script>
 </body>
 </html>
