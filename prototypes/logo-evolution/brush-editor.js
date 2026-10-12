@@ -1,7 +1,8 @@
+import {recordEditorCanvas,supportedVideoFormats} from "./video-export.js";
 import {createComponentMasks,extractMaskedRegion} from "./precision-mask.js";
 import {paintMask,effectAt} from "./brush-timeline.js";
 const $=id=>document.getElementById(id),stage=$("stage"),ctx=stage.getContext("2d"),src=document.createElement("canvas"),sc=src.getContext("2d",{willReadFrequently:true});
-let pixels=null,regions=[],selected=-1,url=null,playing=false,prev=0,brushDown=false,history=[],time=0;
+let pixels=null,regions=[],selected=-1,url=null,playing=false,prev=0,brushDown=false,history=[],time=0,recording=false,videoUrl=null;
 const minLevel={none:1,glow:2,sweep:3,pop:4};
 function bounds(){const s=Math.min(960/src.width,600/src.height);return {s,x:(960-src.width*s)/2,y:(600-src.height*s)/2};}
 function position(e){const rect=stage.getBoundingClientRect(),p={x:(e.clientX-rect.left)*960/rect.width,y:(e.clientY-rect.top)*600/rect.height},{x,y,s}=bounds();return {x:Math.floor((p.x-x)/s),y:Math.floor((p.y-y)/s)};}
@@ -60,7 +61,7 @@ $("time").oninput=()=>{playing=false;$("play").textContent="재생";time=Number(
 $("play").onclick=()=>{playing=!playing;$("play").textContent=playing?"일시정지":"재생";};
 $("reset").onclick=()=>{playing=false;time=0;$("time").value="0";$("play").textContent="재생";};
 function render(now){
- if(!prev)prev=now;if(playing)time=Math.min(10,time+Math.min(100,now-prev)/1000);prev=now;
+ if(!prev)prev=now;if(playing&&!recording)time=Math.min(10,time+Math.min(100,now-prev)/1000);prev=now;
  if(time>=10){playing=false;$("play").textContent="재생";}if(playing)$("time").value=time;
  $("timeLabel").textContent=time.toFixed(1)+"초";
  ctx.fillStyle="#17263b";ctx.fillRect(0,0,960,600);
@@ -79,7 +80,7 @@ function render(now){
    }
    ctx.restore();
   }
-  if(selected>=0){const r=regions[selected];ctx.strokeStyle="#ffd67b";ctx.lineWidth=2;ctx.strokeRect(x+r.x*s,y+r.y*s,r.width*s,r.height*s);}
+  if(selected>=0&&!recording){const r=regions[selected];ctx.strokeStyle="#ffd67b";ctx.lineWidth=2;ctx.strokeRect(x+r.x*s,y+r.y*s,r.width*s,r.height*s);}
  }
  requestAnimationFrame(render);
 }
@@ -91,3 +92,19 @@ $("save").onclick=()=>{
 };
 window.addEventListener("pagehide",()=>{if(url)URL.revokeObjectURL(url);});
 choose(-1);
+
+$("exportVideo").onclick=async()=>{
+ if(!pixels||recording)return;
+ recording=true;playing=false;$("exportVideo").disabled=true;
+ const oldTime=time;time=0;
+ try{
+  const result=await recordEditorCanvas(stage,{durationSeconds:5,fps:30,onTick:t=>{time=t;}});
+  if(videoUrl)URL.revokeObjectURL(videoUrl);
+  videoUrl=URL.createObjectURL(result.blob);
+  const a=$("videoDownload");a.href=videoUrl;a.download="arkaon-logo-evolution."+result.extension;a.textContent=result.extension.toUpperCase()+" 영상 다운로드";a.hidden=false;
+  $("status").textContent="영상 녹화 완료: "+result.mimeType+" (브라우저 실시간 캡처)";
+ }catch(err){$("status").textContent="영상 출력 실패: "+err.message;}
+ finally{recording=false;time=oldTime;$("exportVideo").disabled=false;}
+};
+$("exportVideo").disabled=!supportedVideoFormats().length;
+window.addEventListener("pagehide",()=>{if(videoUrl)URL.revokeObjectURL(videoUrl);});
