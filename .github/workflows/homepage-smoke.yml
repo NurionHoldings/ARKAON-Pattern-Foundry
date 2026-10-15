@@ -1,0 +1,15 @@
+name: Homepage Smoke
+on:
+  push:
+    branches: [main]
+    paths: ['index.html', 'scripts/check_homepage.py', '.github/workflows/homepage-smoke.yml']
+  pull_request:
+    paths: ['index.html', 'scripts/check_homepage.py', '.github/workflows/homepage-smoke.yml']
+  workflow_dispatch:
+jobs:
+  static-home:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate homepage
+        run: python scripts/check_homepage.py
