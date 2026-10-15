@@ -1,0 +1,17 @@
+{
+  "schema_version": "apf.managed-app-builder/v1",
+  "enabled": true,
+  "execution_mode": "independent_draft_authoring",
+  "require_operator_approval_digest_for_code_changes": true,
+  "automatic_deploy_allowed": false,
+  "automatic_external_connector_activation": false,
+  "automatic_money_movement_allowed": false,
+  "automatic_secret_creation_allowed": false,
+  "automatic_locked_intent_mutation_allowed": false,
+  "intake_template": "templates/managed-app/intake.example.json",
+  "connector_template": "templates/managed-app/connectors.template.json",
+  "acceptance_template": "templates/managed-app/acceptance.template.json",
+  "packet_validator": "src/apf/managed_app_packet.py",
+  "playbook": "knowledge/implementation-playbooks/managed-app-builder.md",
+  "required_handoff": ["tests_and_commands", "operator_manual", "backup_restore", "open_provider_questions", "review_pull_request"]
+}

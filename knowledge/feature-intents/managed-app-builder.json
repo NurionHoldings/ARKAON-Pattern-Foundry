@@ -1,0 +1,99 @@
+{
+  "authorization": {
+    "basis": "SELF_DIAGNOSIS_SELF_GENERATION",
+    "mutate_locked_intent_dna": false,
+    "scope": "MISSING_INTENT_DNA_ONLY"
+  },
+  "completeness": 1.0,
+  "contributor": "ETERNIAN",
+  "evidence_refs": [
+    "docs/60-managed-app-builder.md",
+    "knowledge/implementation-playbooks/managed-app-builder.md",
+    "src/apf/managed_app_packet.py",
+    "templates/managed-app/intake.example.json",
+    "https://github.com/NurionHoldings/addon-polo/pull/1"
+  ],
+  "feature_id": "managed-app-builder",
+  "feature_intent": {
+    "constraint": [
+      "external connectors require official provider documentation, source-owner authorization, stable event identifiers and sandbox evidence before activation",
+      "production deployment, money movement, secret creation, irreversible migrations and locked Intent_DNA edits remain outside autonomous execution",
+      "project-specific business, tax, contract and retention rules must be marked as assumptions until an accountable owner confirms them",
+      "analysis results must link to source evidence and state their period, scope and uncertainty"
+    ],
+    "evolution": [
+      "Pass 1 gather actual implementation outcomes, failed assumptions and test evidence from repeated managed-app projects",
+      "Pass 2 improve provider-neutral templates and validated architecture recipes",
+      "Pass 3 propose stable, privacy-reviewed lessons for ETERNIAN review before Intent_DNA lock"
+    ],
+    "invariant": [
+      "one repeatable path from plain-language need through requirements, data model, code, tests and operator manual",
+      "tenant/account authorization is enforced in every screen, query, analysis and export",
+      "replayed source events are idempotent and financial corrections preserve the original event",
+      "open decisions and assumptions remain visible in the handoff",
+      "independent draft development does not bypass approval or deployment gates"
+    ],
+    "journey": [
+      "read repo instructions → map people, workflows, data and risks → validate intake → design canonical model and connectors → implement vertical slice → test security and calculations → package deployment and manual → submit evidence-linked PR",
+      "provider details missing → prepare vendor intake and adapter contract → keep connector disabled → activate only after sandbox and owner approval"
+    ],
+    "object": [
+      "management-app intake packet",
+      "role and data-scope matrix",
+      "connector profile and canonical event",
+      "acceptance evidence and operator runbook",
+      "review pull request"
+    ],
+    "outcome": [
+      "ARKAON can plan and independently implement a bounded management-program feature from an approved request",
+      "a non-specialist operator can start, reconcile, close, recover and understand the delivered system",
+      "provider-specific code is testable and replaceable without changing canonical business records",
+      "each delivery carries tests, deployment steps, backups, data boundaries and unresolved questions"
+    ],
+    "owner": [
+      "ARKAON project implementer under an authorized request",
+      "business owner accountable for contracts, rates, tax rules and data permission",
+      "operator accountable for production approval",
+      "ETERNIAN reviewer for knowledge promotion and Intent_DNA lock"
+    ],
+    "risk": [
+      "an unstated business rule silently produces an incorrect financial result",
+      "cross-tenant analytics or exports expose private business records",
+      "provider status, signatures, retries or payout semantics are assumed incorrectly",
+      "passing unit tests are mistaken for production authorization or vendor certification",
+      "over-generalized learning retains credentials, customer data or private contract terms"
+    ],
+    "signal": [
+      "intake validation errors and unresolved assumption count",
+      "acceptance gate pass/fail evidence",
+      "cross-tenant denial tests and replay duplicate rate",
+      "provider sandbox conformance and reconciliation mismatch aging",
+      "manual usability findings and restore-test result",
+      "rework caused by missing requirements or unsupported assumptions"
+    ],
+    "value": [
+      "shorten delivery time for future inventory, booking, membership, settlement and administrative systems using tested patterns",
+      "raise completeness and operator usability without weakening privacy, financial integrity or review gates",
+      "turn each authorized implementation into reusable, evidence-backed engineering knowledge"
+    ],
+    "who": [
+      "business requester and accountable system owner",
+      "non-specialist operations user",
+      "finance/data source owner",
+      "ARKAON independent draft developer",
+      "ETERNIAN governance reviewer"
+    ],
+    "why": [
+      "The addon-polo tenant sales project demonstrates a reusable pattern for building an operational management system from discovery through CSV-first ingestion, settlement analysis, tests, Docker and a non-specialist manual."
+    ]
+  },
+  "fingerprint": "a4ffb1ff8085cd67affa2e6d04378a7482a9e29a71d646d6b4dcce9a057f259f",
+  "gates": {
+    "intent_dna_mutation": false,
+    "locked": false,
+    "review_status": "ETERNIAN_REVIEW_REQUIRED"
+  },
+  "pass_stage": 0,
+  "phase": "PASS0_SELF_GENERATED",
+  "schema_version": "apf.feature-intent-seed/v1"
+}

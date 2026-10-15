@@ -1,0 +1,41 @@
+{
+  "schema_version": "apf.managed-app-builder/v1",
+  "capability": "Develop bounded business-management applications from plain-language intake through tested review pull request.",
+  "execution_mode": "independent_feature_development_with_operator_gates",
+  "playbook": "knowledge/implementation-playbooks/managed-app-builder.md",
+  "intake_template": "templates/managed-app/intake.example.json",
+  "connector_template": "templates/managed-app/connectors.template.json",
+  "acceptance_template": "templates/managed-app/acceptance.template.json",
+  "validator": "src/apf/managed_app_packet.py",
+  "required_outputs": [
+    "requirements_and_plain_language_glossary",
+    "role_and_data_scope_matrix",
+    "data_model_and_event_invariants",
+    "connector_profiles_and_partner_questions",
+    "explainable_analysis_rules",
+    "application_slice_and_tests",
+    "deployment_backup_and_recovery_runbook",
+    "non_specialist_operations_manual",
+    "evidence_linked_pull_request"
+  ],
+  "phases": [
+    {"id": "discover", "gate": "approved_scope_and_assumptions"},
+    {"id": "model", "gate": "data_rules_roles_and_sources_defined"},
+    {"id": "connect", "gate": "official_docs_and_owner_authorization_for_external_sources"},
+    {"id": "implement", "gate": "operator_authorized_feature_branch"},
+    {"id": "verify", "gate": "acceptance_tests_and_isolation_checks_pass"},
+    {"id": "handoff", "gate": "manual_backup_restore_and_pending_decisions_documented"}
+  ],
+  "non_autonomous_actions": [
+    "production deployment",
+    "money movement or custody",
+    "production secret creation or disclosure",
+    "irreversible production data migration",
+    "locked Intent_DNA mutation"
+  ],
+  "learning": {
+    "retain": ["generalized defects", "test patterns", "connector contract lessons", "rework-preventing operator questions"],
+    "exclude": ["credentials", "customer personal data", "private contract values", "unapproved source code"],
+    "promotion": "propose_only_until_ETERNIAN_review"
+  }
+}

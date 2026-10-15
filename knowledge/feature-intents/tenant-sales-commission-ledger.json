@@ -1,0 +1,88 @@
+{
+  "authorization": {
+    "basis": "SELF_DIAGNOSIS_SELF_GENERATION",
+    "mutate_locked_intent_dna": false,
+    "scope": "MISSING_INTENT_DNA_ONLY"
+  },
+  "completeness": 1.0,
+  "contributor": "ETERNIAN",
+  "evidence_refs": [
+    "https://github.com/NurionHoldings/addon-polo",
+    "knowledge/operating-playbooks/tenant-sales-commission-ledger.md"
+  ],
+  "feature_id": "tenant-sales-commission-ledger",
+  "feature_intent": {
+    "constraint": [
+      "channel integrations use seller-authorized official APIs, webhooks or supplied exports; never collect platform passwords or scrape authenticated pages",
+      "financial corrections append refund or reversal events; never rewrite or delete the original sale",
+      "settlement detection raises a review item and never initiates money movement or silent correction",
+      "tenant data and payout detail remain isolated by role and minimum required access"
+    ],
+    "evolution": [
+      "Pass 1 evidence routing for POS, commerce-channel and bank settlement sources",
+      "Pass 2 validated adapters and reconciliation exception metrics",
+      "Pass 3 human-reviewed promotion to locked Intent_DNA"
+    ],
+    "invariant": [
+      "one append-only canonical event ledger with source idempotency",
+      "commission basis, rate and commission VAT are contract-versioned and independently auditable",
+      "tenant scope is enforced on every read and export",
+      "propose-only knowledge generation; never mutate locked Intent_DNA"
+    ],
+    "journey": [
+      "register tenant and channel → ingest POS/live/online sales → append returns → reconcile provider settlement and bank deposit → issue monthly commission statement → record collection",
+      "source mismatch → preserve evidence → classify exception → operator resolves with an auditable adjustment"
+    ],
+    "object": [
+      "tenant sales event",
+      "channel settlement batch",
+      "bank deposit match",
+      "commission statement and audit record"
+    ],
+    "outcome": [
+      "operator can identify missing sales, duplicate imports and unmatched settlement amounts",
+      "each tenant receives a reproducible monthly commission statement with separate commission VAT",
+      "Pass-0 intent seed is reviewed before any lock or production behavior change"
+    ],
+    "owner": [
+      "building owner and authorized finance operator",
+      "tenant data owner for seller-authorized channel access",
+      "ETERNIAN for review before intent lock"
+    ],
+    "risk": [
+      "omitted or duplicated source events understate or overstate commission",
+      "wrong refund, tax or contract basis creates a disputed invoice",
+      "cross-tenant access or exposing payout account data breaches confidentiality",
+      "provider-specific API, tax and settlement timing cannot be inferred from a generic connector"
+    ],
+    "signal": [
+      "source event duplicate rate",
+      "unmatched payout value and aging",
+      "sales-to-channel settlement variance",
+      "commission statement corrections and tenant-scope denials",
+      "CSV batch atomic rejection count"
+    ],
+    "value": [
+      "prevent commission leakage with traceable evidence from sale event through bank settlement",
+      "reduce monthly close effort while preserving tenant trust and financial auditability"
+    ],
+    "who": [
+      "building owner / operations administrator",
+      "finance and settlement staff",
+      "tenant operator",
+      "ARKAON self-diagnosis and ETERNIAN reviewer"
+    ],
+    "why": [
+      "NurionHoldings/addon-polo implementation: shared POS and channel intake, append-only sales ledger, commission statement snapshots and settlement reconciliation"
+    ]
+  },
+  "fingerprint": "69ab273dc9defcb65edab1cfe99eede84904df46f5abfca476ed9f1ce1b72cd8",
+  "gates": {
+    "intent_dna_mutation": false,
+    "locked": false,
+    "review_status": "ETERNIAN_REVIEW_REQUIRED"
+  },
+  "pass_stage": 0,
+  "phase": "PASS0_SELF_GENERATED",
+  "schema_version": "apf.feature-intent-seed/v1"
+}

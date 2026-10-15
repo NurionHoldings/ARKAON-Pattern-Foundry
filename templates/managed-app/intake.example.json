@@ -1,0 +1,143 @@
+{
+  "schema_version": "apf.managed-app-intake/v1",
+  "application": {
+    "name": "Tenant Sales and Commission Control",
+    "owner": "Building operator",
+    "business_goal": "Record tenant sales across shared POS and approved online channels, reconcile deposits and calculate contract-based commission.",
+    "users": [
+      {
+        "role": "administrator",
+        "scope": "all tenants and configuration"
+      },
+      {
+        "role": "finance",
+        "scope": "all tenant transactions and reconciliation"
+      },
+      {
+        "role": "tenant",
+        "scope": "own sales and own statements only"
+      }
+    ]
+  },
+  "workflows": [
+    "register tenant and channel",
+    "import or enter sale and append reversal events",
+    "compare provider settlement with bank deposit",
+    "review differences",
+    "snapshot monthly commission statement",
+    "record commission received",
+    "review explainable monthly exceptions"
+  ],
+  "data_entities": [
+    "tenant",
+    "channel",
+    "sale_event",
+    "payout_batch",
+    "commission_statement",
+    "import_batch",
+    "audit_event"
+  ],
+  "business_rules": [
+    "posted sale events are append-only; refund and cancellation are new negative events",
+    "source event ID plus channel is unique for replay protection",
+    "commission rate and tax treatment come from the tenant contract and are snapshotted on close",
+    "commission VAT is represented as a separate amount",
+    "never move or hold tenant sales proceeds"
+  ],
+  "source_systems": [
+    {
+      "id": "shared-pos",
+      "name": "Shared POS",
+      "mode": "csv",
+      "enabled": true,
+      "owner_authorized": true,
+      "official_docs_ref": "operator-provided CSV dictionary",
+      "stable_event_id_field": "event_id",
+      "credential_ref": ""
+    },
+    {
+      "id": "commerce-live",
+      "name": "Online and live channels",
+      "mode": "rest-pull",
+      "enabled": false,
+      "owner_authorized": false,
+      "official_docs_ref": "pending partner agreement",
+      "stable_event_id_field": "pending",
+      "credential_ref": "pending secret reference"
+    },
+    {
+      "id": "pg-settlement",
+      "name": "PG/card settlement",
+      "mode": "csv",
+      "enabled": true,
+      "owner_authorized": true,
+      "official_docs_ref": "operator-provided settlement file",
+      "stable_event_id_field": "settlement_ref",
+      "credential_ref": ""
+    },
+    {
+      "id": "bank",
+      "name": "Bank deposit",
+      "mode": "csv",
+      "enabled": true,
+      "owner_authorized": true,
+      "official_docs_ref": "operator-provided bank transaction file",
+      "stable_event_id_field": "bank_ref",
+      "credential_ref": ""
+    }
+  ],
+  "security": {
+    "tenant_isolation": true,
+    "least_privilege": true,
+    "secret_storage": "external_secret_manager_or_environment_injection",
+    "correction_model": "append_reversal_and_audit",
+    "production_change_allowed": false
+  },
+  "privacy": {
+    "customer_fields_required": false,
+    "retention_policy": "define_with_operator_and_contract",
+    "exports_are_role_scoped": true
+  },
+  "analytics": [
+    {
+      "id": "unmatched-deposit",
+      "rule": "expected provider amount differs from bank credit",
+      "evidence": "settlement reference, date, expected and received amounts"
+    },
+    {
+      "id": "missing-source-period",
+      "rule": "active channel has no imported rows in selected period",
+      "interpretation": "review prompt, not proof of missing sales"
+    },
+    {
+      "id": "tax-outlier",
+      "rule": "absolute tax exceeds absolute paid amount",
+      "interpretation": "operator review"
+    }
+  ],
+  "deployment": {
+    "containerized": true,
+    "https_required": true,
+    "persistent_storage": true,
+    "backup_restore_test_required": true
+  },
+  "acceptance_criteria": [
+    "tenant cannot read another tenant's sales, statement or exports",
+    "replaying the same source event does not add another sale",
+    "invalid import has no partial financial writes",
+    "refund preserves and reverses the original sale",
+    "monthly commission example matches an independent calculation",
+    "unmatched payout shows both compared values and reference",
+    "backup can be restored to a test database"
+  ],
+  "open_questions": [
+    "confirm each tenant contract's exact commission base, rounding and refund carry-forward rule",
+    "obtain official POS, marketplace, live-commerce, PG and bank API documents and sandbox access",
+    "confirm hosting owner, retention period and production acceptance operator"
+  ],
+  "approval": {
+    "code_change_authorized": true,
+    "production_deploy_authorized": false,
+    "locked_intent_mutation": false
+  }
+}

@@ -91,6 +91,7 @@ REGISTER → AUTHORIZE → SNAPSHOT → EXTRACT_INTENT_DNA → ANALYZE
 - [SNS 정기 분석](docs/56-sns-periodic-analysis.md)
 - [신규 시장 등장·변화 감지](docs/57-emerging-market-watch.md)
 - [SNS 클릭 급등·트렌드·시장 개척 제안](docs/58-sns-trend-market-proposal.md)
+- [ARKAON 관리 프로그램 독자 개발 역량](docs/60-managed-app-builder.md)
 
 ## 중앙 오케스트레이터
 
