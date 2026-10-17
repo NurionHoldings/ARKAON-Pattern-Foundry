@@ -1,7 +1,13 @@
 import json
 from datetime import UTC, datetime
+from hashlib import sha256
 
-from apf.mailbox_maintenance import apply_archive, build_plan, reconcile_mailbox_index
+from apf.mailbox_maintenance import (
+    apply_archive,
+    build_plan,
+    reconcile_mailbox_index,
+    run_maintenance,
+)
 
 NOW = datetime(2031, 1, 1, tzinfo=UTC)
 
@@ -77,13 +83,96 @@ def test_invalid_json_is_reported_without_archiving(tmp_path):
 def test_relayed_self_improvement_is_archived_not_delivered(tmp_path):
     inbox = tmp_path / "inbox"
     request = inbox / "self-improvement" / "smoke.json"
-    write_packet(request, state="INBOX_POSTED", request_id="smoke-001")
+    document = delivery_packet()
+    write_packet(request, **document)
 
-    plan = build_plan(inbox, relayed_request_ids=frozenset({"smoke-001"}))
+    plan = build_plan(inbox, relay_receipts={"smoke-001": {
+        "scope_digest": document["scope_digest"], "pull_request_url": "https://github.test/pull/1",
+    }})
 
     assert plan.deliver == ()
     assert plan.relayed == (request,)
     assert plan.archive == (request,)
+
+
+def delivery_packet():
+    scope = {"request_id": "smoke-001", "intent_dna": "approved scope",
+             "capability_gap": "delivery gap", "evidence_refs": [],
+             "proposed_change": "repair delivery", "expected_benefit": "no lost request",
+             "risks": [], "validation_plan": ["test delivery"], "source_tier": "PUBLIC"}
+    digest = sha256(json.dumps(scope, ensure_ascii=False, sort_keys=True,
+                               separators=(",", ":")).encode()).hexdigest()
+    return {**scope, "scope_digest": digest, "state": "INBOX_POSTED",
+            "schema_version": "apf.self-improvement-request/1.0",
+            "production_change_allowed": False, "automatic_merge_allowed": False,
+            "deployment_allowed": False}
+
+
+def test_non_utf8_packet_cannot_stop_or_be_archived_by_maintenance(tmp_path):
+    bad = tmp_path / "inbox/research/000-bad.json"
+    bad.parent.mkdir(parents=True)
+    bad.write_bytes(b"\xff\xfe")
+    good = bad.with_name("001-good.json")
+    write_packet(good, status="PENDING")
+    report = run_maintenance(foundry_root=tmp_path, apply_archive_changes=True)
+    assert report["counts"]["invalid"] == 1
+    assert report["counts"]["pending"] == 1
+    assert bad.read_bytes() == b"\xff\xfe"
+    assert good.exists()
+
+
+def test_receipt_scope_or_boundary_mismatch_never_archives(tmp_path):
+    inbox = tmp_path / "inbox"
+    packet = inbox / "self-improvement/request.json"
+    original = delivery_packet()
+    receipt = {"smoke-001": {"scope_digest": original["scope_digest"],
+                              "pull_request_url": "https://github.test/pull/1"}}
+    changed = {**original, "proposed_change": "tampered"}
+    for document in (changed, {**original, "deployment_allowed": True}):
+        write_packet(packet, **document)
+        plan = build_plan(inbox, relay_receipts=receipt)
+        assert plan.invalid == (packet,)
+        assert plan.archive == ()
+        assert packet.exists()
+
+
+def test_wrong_or_incomplete_receipt_is_not_delivery_proof(tmp_path):
+    packet = tmp_path / "inbox/self-improvement/request.json"
+    document = delivery_packet()
+    write_packet(packet, **document)
+    for receipt in ({"scope_digest": "wrong", "pull_request_url": "https://github.test/pull/1"},
+                    {"scope_digest": document["scope_digest"]}):
+        plan = build_plan(tmp_path / "inbox", relay_receipts={"smoke-001": receipt})
+        assert plan.invalid == (packet,)
+        assert plan.archive == ()
+
+
+def test_receipt_for_same_id_does_not_archive_research(tmp_path):
+    packet = tmp_path / "inbox/research/request.json"
+    document = delivery_packet()
+    write_packet(packet, **document)
+    plan = build_plan(tmp_path / "inbox", relay_receipts={"smoke-001": {
+        "scope_digest": document["scope_digest"], "pull_request_url": "https://github.test/pull/1"}})
+    assert plan.pending == (packet,)
+    assert plan.archive == ()
+
+
+def test_unknown_receipt_schema_and_non_object_entries_cannot_archive(tmp_path):
+    packet = tmp_path / "inbox/self-improvement/request.json"
+    document = delivery_packet()
+    write_packet(packet, **document)
+    state_path = tmp_path / "state/self-improvement-relay.json"
+    for state in (
+        {"schema_version": "unknown", "receipts": {"smoke-001": {
+            "scope_digest": document["scope_digest"], "pull_request_url": "https://github.test/pull/1"}}},
+        {"schema_version": "apf.self-improvement-relay-state/1.0",
+         "receipts": {"smoke-001": "not-a-receipt"}},
+    ):
+        write_packet(state_path, **state)
+        report = run_maintenance(foundry_root=tmp_path, apply_archive_changes=True)
+        assert report["counts"]["pending"] == 1
+        assert report["counts"]["archived"] == 0
+        assert packet.exists()
 
 
 def test_reconcile_closes_pending_when_payload_archived(tmp_path):

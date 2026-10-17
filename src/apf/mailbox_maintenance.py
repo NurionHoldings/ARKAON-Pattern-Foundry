@@ -25,7 +25,7 @@ class MailboxPlan:
 def _load(path: Path) -> dict[str, Any] | None:
     try:
         value = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
+    except (OSError, UnicodeError, json.JSONDecodeError):
         return None
     return value if isinstance(value, dict) else None
 
@@ -78,7 +78,7 @@ def build_plan(
     inbox_root: Path,
     *,
     batch_size: int = 30,
-    relayed_request_ids: frozenset[str] = frozenset(),
+    relay_receipts: dict[str, dict[str, str]] | None = None,
 ) -> MailboxPlan:
     if batch_size <= 0:
         raise ValueError("batch_size must be positive")
@@ -94,7 +94,21 @@ def build_plan(
             invalid.append(path)
             continue
         request_id = document.get("request_id")
-        if isinstance(request_id, str) and request_id in relayed_request_ids:
+        receipt = (relay_receipts or {}).get(request_id) if isinstance(request_id, str) else None
+        if receipt is not None and path.parent.name == "self-improvement":
+            # An ID alone is not delivery proof. Validate the current scope and
+            # propose-only boundaries before trusting the durable receipt.
+            from .self_improvement_relay import RelayError, validate_request
+
+            try:
+                _, digest = validate_request(document)
+            except RelayError:
+                invalid.append(path)
+                continue
+            url = receipt.get("pull_request_url")
+            if receipt.get("scope_digest") != digest or not isinstance(url, str) or not url.strip():
+                invalid.append(path)
+                continue
             archive.append(path)
             relayed.append(path)
             continue
@@ -135,15 +149,15 @@ def apply_archive(plan: MailboxPlan, *, inbox_root: Path, archive_root: Path) ->
     return tuple(moved)
 
 
-def _relayed_request_ids(foundry_root: Path) -> frozenset[str]:
+def _relay_receipts(foundry_root: Path) -> dict[str, dict[str, str]]:
     state_path = foundry_root / "state" / "self-improvement-relay.json"
     document = _load(state_path)
-    if document is None:
-        return frozenset()
+    if document is None or document.get("schema_version") != "apf.self-improvement-relay-state/1.0":
+        return {}
     receipts = document.get("receipts")
     if not isinstance(receipts, dict):
-        return frozenset()
-    return frozenset(str(request_id) for request_id in receipts)
+        return {}
+    return {key: value for key, value in receipts.items() if isinstance(value, dict)}
 
 
 def _plan_document(
@@ -276,7 +290,7 @@ def run_maintenance(
     plan = build_plan(
         root / "inbox",
         batch_size=batch_size,
-        relayed_request_ids=_relayed_request_ids(root),
+        relay_receipts=_relay_receipts(root),
     )
     moved: tuple[Path, ...] = ()
     if apply_archive_changes:
