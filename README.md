@@ -117,3 +117,7 @@ powershell.exe -ExecutionPolicy Bypass -File "D:\ARKAON_Pattern Foundry\orchestr
 [진입 효과 라이브러리 9종](docs/68-entry-effects-library.md) · [문구·색상·속도 비교 스튜디오](examples/entry-effects-studio.html)
 
 `render_entry_effect("아이리스 오픈", title="더 아리랑 스토어")`처럼 이름으로 재사용합니다.
+
+## 주거형 요양시설 생성 지식과 검산
+
+`/console/care-facility`에서 방 수·정원·개별 화장실과 공간·면적 예산을 검산하고, 사용자가 구성 digest를 확인한 뒤 장면별 이미지 요청 패킷을 만든다. [실행 안내](docs/care-facility-generation.md). 이 기능은 제안 전용이며 법정 적합성, 실측 배치, 모델 가중치 학습이나 자동 이미지 호출·배포를 뜻하지 않는다. 기존 HOLD·승격·권한 경계는 유지한다.
