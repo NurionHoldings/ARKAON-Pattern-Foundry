@@ -1,0 +1,27 @@
+{
+  "schema_version": "apf.care-operations-workflow/v1",
+  "brand": "해온",
+  "meaning": "밝은 햇살과 따뜻한 온기를 품는 곳",
+  "floor": "3",
+  "planned_capacity": 49,
+  "workflow": [
+    "업무 선택",
+    "필드·검증 규칙 구성",
+    "구성 해시 확인",
+    "실행 가능한 HTML 생성",
+    "운영자 시험",
+    "서버 인증·저장·백업 연결 후 별도 운영 검토"
+  ],
+  "modules": [
+    "office",
+    "accounting",
+    "benefit",
+    "food_inventory",
+    "supplies_inventory"
+  ],
+  "implementation": "src/apf/care_operations.py",
+  "model_weights_updated": false,
+  "automatic_external_submission": false,
+  "statutory_fee_database": "NOT_CONNECTED",
+  "production_change_allowed": false
+}

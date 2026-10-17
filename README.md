@@ -121,3 +121,7 @@ powershell.exe -ExecutionPolicy Bypass -File "D:\ARKAON_Pattern Foundry\orchestr
 ## 주거형 요양시설 생성 지식과 검산
 
 `/console/care-facility`에서 방 수·정원·개별 화장실과 공간·면적 예산을 검산하고, 사용자가 구성 digest를 확인한 뒤 장면별 이미지 요청 패킷을 만든다. [실행 안내](docs/care-facility-generation.md). 이 기능은 제안 전용이며 법정 적합성, 실측 배치, 모델 가중치 학습이나 자동 이미지 호출·배포를 뜻하지 않는다. 기존 HOLD·승격·권한 경계는 유지한다.
+
+### 해온 업무 프로그램 생성
+
+인증된 `/console/care-operations`에서 사무·회계·요양급여 검토·식자재 수불·기타 재고 업무를 선택하고, 구성 해시 확인 후 실제 동작하는 단일 HTML 프로그램을 생성합니다. 생성물은 세션 메모리 기반 미리보기이며 운영 배포나 법정 청구 제출을 수행하지 않습니다. 자세한 흐름은 [해온 업무 생성 문서](docs/haeon-care-operations.md)를 참조하세요.
