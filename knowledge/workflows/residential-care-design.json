@@ -1,0 +1,39 @@
+{
+  "schema_version": "apf.generation-workflow-knowledge/v1",
+  "workflow_id": "residential-care-design",
+  "status": "PROPOSAL_ONLY",
+  "training_weights_changed": false,
+  "project_example": "examples/thearirang-care-49-brief.json",
+  "sequence": [
+    "capture_owner_requirements",
+    "check_capacity_and_ensuites",
+    "distinguish_legal_design_measured_values",
+    "review_required_and_owner_spaces",
+    "calculate_area_budget_without_certifying_fit",
+    "user_confirm_canonical_brief_digest",
+    "emit_separate_scene_prompts",
+    "review_visual_against_confirmed_program",
+    "external_professional_and_authority_review"
+  ],
+  "invariants": [
+    "Never silently change room counts to resolve capacity mismatch",
+    "Do not use generated imagery as evidence of legal compliance or exact bed/WC counts",
+    "Store the project case separately from reusable reasoning",
+    "Room toilets and bathing facilities are distinct; kitchen is separate from dining",
+    "Staff work/rest/changing rooms have distinct functions",
+    "Revised requirements invalidate prior brief confirmation",
+    "No network provider calls, auto-promotion or deploy authority in this module"
+  ],
+  "review_requirements": [
+    "official current sources and local interpretation",
+    "ownership and authorized source material",
+    "windows, fire compartments, stairs and evacuation",
+    "accessible bedroom and WC geometry",
+    "drainage, ventilation, hot water and structural interfaces"
+  ],
+  "last_source_review": "2026-10-17",
+  "legal_source_snapshot": "https://www.law.go.kr/LSW/flDownload.do?bylClsCd=110201&flSeq=149738323",
+  "legal_snapshot_is_complete": false,
+  "runtime_module": "apf.care_facility_design",
+  "console_route": "/console/care-facility"
+}

@@ -1,0 +1,118 @@
+{
+  "target_residents": 49,
+  "room_types": [
+    {
+      "occupancy": 1,
+      "count": 7,
+      "ensuite_wc": true,
+      "bedroom_target_m2": 12,
+      "toilet_target_m2": 5.5
+    },
+    {
+      "occupancy": 2,
+      "count": 7,
+      "ensuite_wc": true,
+      "bedroom_target_m2": 20,
+      "toilet_target_m2": 5.5
+    },
+    {
+      "occupancy": 3,
+      "count": 4,
+      "ensuite_wc": true,
+      "bedroom_target_m2": 28,
+      "toilet_target_m2": 5.5
+    },
+    {
+      "occupancy": 4,
+      "count": 4,
+      "ensuite_wc": true,
+      "bedroom_target_m2": 36,
+      "toilet_target_m2": 5.5
+    }
+  ],
+  "ensuite_each_room": true,
+  "kitchen_pyeong": 15,
+  "support_spaces": [
+    {
+      "kind": "living_dining",
+      "target_m2": 50
+    },
+    {
+      "kind": "program",
+      "target_m2": 40
+    },
+    {
+      "kind": "physical_occupational_therapy",
+      "target_m2": 25
+    },
+    {
+      "kind": "nursing",
+      "target_m2": 18
+    },
+    {
+      "kind": "caregiver_work",
+      "target_m2": 18
+    },
+    {
+      "kind": "office_counseling",
+      "target_m2": 20
+    },
+    {
+      "kind": "volunteer",
+      "target_m2": 10
+    },
+    {
+      "kind": "male_bathing",
+      "target_m2": 18
+    },
+    {
+      "kind": "female_bathing",
+      "target_m2": 18
+    },
+    {
+      "kind": "food_storage",
+      "target_m2": 8
+    },
+    {
+      "kind": "clean_linen",
+      "target_m2": 10
+    },
+    {
+      "kind": "dirty_utility",
+      "target_m2": 8
+    },
+    {
+      "kind": "laundry_drying",
+      "target_m2": 12
+    },
+    {
+      "kind": "staff_rest",
+      "target_m2": 16
+    },
+    {
+      "kind": "staff_changing",
+      "target_m2": 16
+    },
+    {
+      "kind": "public_toilet",
+      "target_m2": 12
+    },
+    {
+      "kind": "clean_utility",
+      "target_m2": 8
+    },
+    {
+      "kind": "evacuation_reserve",
+      "target_m2": 30
+    },
+    {
+      "kind": "circulation_reserve",
+      "target_m2": 180
+    },
+    {
+      "kind": "structure_reserve",
+      "target_m2": 100
+    }
+  ],
+  "available_area_m2": null
+}

@@ -17,6 +17,7 @@ from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
 from .admin_change_control import AdminChangeController, ChangeControlRejected
+from .care_facility_design import CareDesignRequest, build_care_design_packet
 from .durable_review import (
     DurableStoreError,
     ReviewAttestation,
@@ -371,6 +372,37 @@ def install_console(
                 "X-Content-Type-Options": "nosniff",
             },
         )
+
+    @application.get("/console/care-facility", response_class=HTMLResponse, include_in_schema=False)
+    def care_facility_page(
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+    ) -> HTMLResponse:
+        del actor
+        return HTMLResponse(
+            Path(__file__).with_name("care_facility_ui.html").read_text(encoding="utf-8"),
+            headers={
+                "Cache-Control": "no-store",
+                "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; "
+                "script-src 'unsafe-inline'; connect-src 'self'; base-uri 'none'; "
+                "frame-ancestors 'none'; form-action 'self'",
+                "Referrer-Policy": "no-referrer",
+                "X-Content-Type-Options": "nosniff",
+            },
+        )
+
+    @application.post("/v1/console/care-facility/plan")
+    def care_facility_plan(
+        payload: CareDesignRequest,
+        response: Response,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        if actor.role not in {"owner", "operator", "reviewer"}:
+            raise HTTPException(status_code=403, detail="design review role required")
+        response.headers["Cache-Control"] = "no-store"
+        # Pure computation: no cross-tenant store, provider call, promotion or deployment.
+        return build_care_design_packet(payload)
 
     @application.get("/v1/console/map-ops-gate")
     def map_ops_gate_reports(
