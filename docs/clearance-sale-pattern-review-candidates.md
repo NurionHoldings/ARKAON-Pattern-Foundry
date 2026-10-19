@@ -75,3 +75,30 @@
 3. 기존 패턴과의 중복 제거 및 `docs/05-pattern-package.md` 표준 패키지·시험 항목 충족.
 4. `docs/07-state-machine.md` 승인 단계와 `docs/47-pattern-promotion-reuse-proof.md` 외부 서명 검증을 충족하기 전 **공식 승격 불가**.
 5. `PRODUCT_IMPLEMENT_HOLD` 및 Draft PR 상태 유지. CI와 승인 없이 병합·배포 금지.
+
+## 원본 소스 직접 대조 기록 (2026-10-19)
+
+이번 검토는 다음 원본 파일을 GitHub에서 직접 읽어 정적 증거를 확인했다. **코드를 실행하거나 CI를 통과시킨 것은 아니다.**
+
+| 검증 ID | 직접 확인한 파일 | 정적 관찰 결과 | 남은 증거 |
+| --- | --- | --- | --- |
+| V01 | `backend/inventory_rules.py` | `available_quantity`, `reserve`, `release`, `validate_inventory_adjustment`에서 정수 타입 및 재고 불변식 검사 구현 확인 | 테스트 실행 로그, 동시성 검증 |
+| V02 | `backend/seller_dashboard_contract.py` | SKU/상품명 trim·길이 검사 및 기존 상품 SKU 중복 검사 구현 확인 | 실행 로그, tenant 범위 DB 유일성 |
+| V03 | `backend/seller_dashboard_contract.py` | 가격 0~10억 원, 보유수량 0~100만, 예약수량 보유 이하, bool 타입 분리 확인 | 실행 로그, 경계값 독립 검증 |
+| V04 | `tests/test_seller_dashboard_demo.py` | 비영속·외부 호출 금지 문자열 검사와 임시 상품 메모리 표시 관련 정적 회귀 테스트 존재 확인 | 실제 브라우저 E2E |
+| V05 | `tests/test_seller_dashboard_demo.py` | `aria-live`, 한국어 오류, 테이블·DOM 안전성 문자열 검사 존재 확인 | 접근성·키보드 E2E |
+| V06 | 원본 PR #5 정책 관련 파일 | 이번 단계에서 해당 파일 내용 직접 대조하지 않음 | 보호 경로 검증 스크립트와 실행 결과 |
+| V07 | 원본 공유 문서 및 PR 기록 | 결제 문제로 CI 미검증 상태 유지 | 결제 해결 후 CI Green 및 승인 |
+
+### 관찰된 위험과 후속 검증 포인트
+- **정적 테스트 ≠ 실행 통과:** 테스트가 작성된 사실과 실제 실행 성공을 구분한다.
+- **중복검사 경쟁 조건:** `preview_product_registration`의 중복 검사는 스냅샷 기반이며 동시 등록의 유일성을 보장하지 않는다.
+- **시연과 운영의 분리:** 메모리 임시 항목을 포함한 요약 수치는 가상 데이터로만 해석해야 한다.
+- **재고 불변식의 범위:** 순수 함수 수준의 불변식은 실제 DB 트랜잭션·락·다중 판매자 격리를 입증하지 않는다.
+- **추가 검토 후에도 자동 승격 금지:** V08~V10은 계속 미시작이며 `PRODUCT_IMPLEMENT_HOLD`를 해제하지 않는다.
+
+### 후속 작업 우선순위
+1. **즉시 가능:** 원본 테스트의 정적 품질 감사, 오류 코드 계약과 미등록 표시 UX 검토.
+2. **운영자 선행:** GitHub 결제 오류 조치.
+3. **장애 해결 후:** 원본 PR #5 CI 재실행 및 브라우저 E2E, 증거 링크와 실제 결과 수집.
+4. **승인 전:** 기존 패턴과 중복 여부 재심사, 공식 패키지 생성 필요성 및 보안 승인 판단.
