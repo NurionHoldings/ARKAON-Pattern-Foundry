@@ -42,3 +42,36 @@
 - ARKAON PRODUCT_IMPLEMENT_HOLD 변경 없음.
 - 이 문서는 자동 학습 실행·코드 복제·패턴 승격·배포 승인이 아님.
 - 후보별 독립 근거 검증과 운영자 승인 전 자산 등록/자동 적용 금지.
+
+## 기존 ARKAON 설계와의 중복·차이 분석 (문서 근거 기반)
+
+| 후보 | 기존 ARKAON 기준 | 중복되는 부분 | 아직 별도로 입증해야 할 부분 |
+| --- | --- | --- | --- |
+| 1. 도메인 검증 분리 | `docs/05-pattern-package.md` (invariants.yaml, tests.yaml), `docs/11-intent-dna.md` (INVARIANT) | 불변식·검증 정의 자체는 기존에 있음 | 실제 재고 예약 경계조건의 재사용 가능성, 독립 실행 증거 |
+| 2. 한국어 사전검사 | `docs/05-pattern-package.md` (interfaces, tests), `docs/07-state-machine.md` (Gate) | 입력 검증 및 실패 전이는 기존 계약과 일부 중복 | 필드별 오류 코드, 한국어 메시지 분리, SKU tenant 범위 유일성 |
+| 3. 비영속 시연 | `docs/40-arkaon-reflective-learning.md` (합성 Shadow, 공유 제한), `docs/11-intent-dna.md` (CONSTRAINT) | 합성·격리 원칙과 중복 | 실제 브라우저 저장·네트워크 비사용 증명 및 E2E |
+| 4. 감사·릴리스 게이트 | `docs/07-state-machine.md` (승인 게이트), `docs/47-pattern-promotion-reuse-proof.md` (서명·승격 검증) | 승인·증빙·승격 제한은 기존 체계에 이미 있음 | GitHub CI 차단 시 fail-closed 동작과 외부 결제 장애 복구 증빙 |
+
+**판정:** 네 후보 모두 현 단계에서는 기존 ARKAON 표준의 대체물이 아니라 *적용 사례 및 테스트 강화 후보*다. 중복된 패턴을 새 공식 패키지로 등록하지 않는다.
+
+## 단계별 검증 매트릭스
+
+| ID | 시험 | 통과 조건 | 현재 증거 | 판정 |
+| --- | --- | --- | --- | --- |
+| V01 | 상품 수량 불변식 | 예약 수량이 보유 수량을 넘지 않음; bool·음수·초과 요청 거부 | 원본 Python 테스트 작성 | 실행 결과 미확인 |
+| V02 | 상품 코드 정규화·중복 | 공백 정규화 후 중복 거부, 빈 문자열·길이 초과 거부 | 원본 함수·테스트 작성 | 실행 결과 미확인 |
+| V03 | 원화 가격·수량 경계 | 정수·최대값만 허용; 음수·문자열·소수·bool 거부 | 원본 함수·테스트 작성 | 실행 결과 미확인 |
+| V04 | 비영속 브라우저 시연 | 새로고침 시 임시 상품 소멸, 외부 요청·저장 없음 | 정적 HTML 및 문자열 검사 | 브라우저 E2E 미실행 |
+| V05 | 오류 표시 및 접근성 | 오류 필드와 한국어 안내 일치, 키보드 탐색·상태 알림 확인 | HTML 속성·정적 검사 | 브라우저 접근성 미실행 |
+| V06 | intent_DNA 경로 통제 | 보호 경로 및 우회 경로 차단, 감사 증빙 생성 | 정책·스크립트 존재 | CI 실행 결과 미확인 |
+| V07 | CI·사람 승인 | 전체 CI Green 및 운영자 승인 전 배포·승격 없음 | GitHub 결제 경고로 Actions 차단 | **BLOCKED** |
+| V08 | 공식 Pattern Package 적합성 | `docs/05-pattern-package.md` 필수 파일·점수 80점 이상·필수 ERROR 0건 | 공식 패키지 생성 안 함 | NOT_STARTED |
+| V09 | 승격 상태 전이 | `docs/07-state-machine.md` 순서, actor/evidence/revision, 승인 독립성 준수 | 문서상 후보 유지 | NOT_STARTED |
+| V10 | 운영 승격 서명 | 외부 서명 검증·승인·reuse proof 만족, TEST_VECTOR 운영 인정 금지 | `docs/47-pattern-promotion-reuse-proof.md` 기준 확인 | NOT_STARTED |
+
+### 통과 게이트
+1. 원본 PR #5 GitHub 결제 장애 해결 후 실제 테스트 로그와 브라우저 E2E 증거 확보.
+2. 각 후보의 원본 근거·라이선스·권한·오염 검토를 독립 수행하고 `docs/11-intent-dna.md`의 핵심 축과 충돌 여부 확인.
+3. 기존 패턴과의 중복 제거 및 `docs/05-pattern-package.md` 표준 패키지·시험 항목 충족.
+4. `docs/07-state-machine.md` 승인 단계와 `docs/47-pattern-promotion-reuse-proof.md` 외부 서명 검증을 충족하기 전 **공식 승격 불가**.
+5. `PRODUCT_IMPLEMENT_HOLD` 및 Draft PR 상태 유지. CI와 승인 없이 병합·배포 금지.
