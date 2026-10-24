@@ -1,0 +1,124 @@
+{
+  "schema_version": "apf.brand-element-sandbox-evidence/v1",
+  "created_at": "2026-10-24T04:29:57.076Z",
+  "baseline_commit": "ab3a2a9e7f6fe7b473403786b84b66270eff664c",
+  "candidate_code_commit": "9fc74c7cd822fb996c5f5a7b21034146a254ae0b",
+  "contributor": "ETERNIAN_IMPLEMENTATION",
+  "independent_audit_status": "NOT_RUN",
+  "arkaon_first_verification": "NOT_RUN",
+  "improvement_accepted": false,
+  "environment": {
+    "node": "v24.19.0",
+    "platform": "linux"
+  },
+  "measurement_scope": "NODE_RENDER_ONLY",
+  "results": [
+    {
+      "brief_digest": "2bf71a2ad9cef852f204cb5fa55d120e69e982c4a4c394ce8cad4671f48e4537",
+      "artifacts": {
+        "baseline": {
+          "path": "brief-1-baseline.html",
+          "sha256": "54cd07e857c7e24123840c63b210f5fcec2f17678f2ad738d96e381355e57d16",
+          "render_ms_median": 0.017656000000002336,
+          "render_ms_p95": 0.056933999999998264,
+          "iterations": 100
+        },
+        "candidate": {
+          "path": "brief-1-candidate.html",
+          "sha256": "c13a9ac08afe1a289251b56f070ce053d024012f0249533b6376200b2d925656",
+          "render_ms_median": 0.016283999999998855,
+          "render_ms_p95": 0.05808600000000297,
+          "iterations": 100
+        }
+      }
+    },
+    {
+      "brief_digest": "5d6859f11aea2c33bca7ceef25bff54124e311615b460e06aa5b6201a6019d0f",
+      "artifacts": {
+        "baseline": {
+          "path": "brief-2-baseline.html",
+          "sha256": "41b39fd5339596fd1e837d7539b1c32aa2b94c1c4c4e0df007b1ce528e789c14",
+          "render_ms_median": 0.012979000000001406,
+          "render_ms_p95": 0.10611699999999757,
+          "iterations": 100
+        },
+        "candidate": {
+          "path": "brief-2-candidate.html",
+          "sha256": "576cc365e8e123ce690ac5fa880058dd83bda964df09e4529e3a6c74a22382af",
+          "render_ms_median": 0.015583000000006564,
+          "render_ms_p95": 0.08790000000000475,
+          "iterations": 100
+        }
+      }
+    },
+    {
+      "brief_digest": "e2add44cf526ddd0ec1b336c531c7af727b38827799b94cff2d614212e9375ab",
+      "artifacts": {
+        "baseline": {
+          "path": "brief-3-baseline.html",
+          "sha256": "6ad415432fc620a880eff16e0b325511dfc3bae2cde1525e50ef36810acdeab6",
+          "render_ms_median": 0.019138999999995576,
+          "render_ms_p95": 0.08541700000000674,
+          "iterations": 100
+        },
+        "candidate": {
+          "path": "brief-3-candidate.html",
+          "sha256": "035a865475e5b48d6fd3b166d099c2750675646001cb6cb9e9ec49dc91d13796",
+          "render_ms_median": 0.018997999999996296,
+          "render_ms_p95": 0.07147600000000409,
+          "iterations": 100
+        }
+      }
+    }
+  ],
+  "planned_browser_widths": [
+    360,
+    390,
+    768,
+    1440
+  ],
+  "browser_12_condition_comparison": "PASS",
+  "browser_undo_redo": "PASS",
+  "browser_save_reopen": "PASS",
+  "ci_run_id": 40066376419,
+  "rollback": "Revert sandbox PR; preserve existing project data",
+  "ci_evidence": {
+    "tested_head": "fc82af73d0adcd754dfcc0834e1f3eb30cc5cb6e",
+    "run_url": "https://github.com/NurionHoldings/ARKAON-Pattern-Foundry/actions/runs/40066376419",
+    "checks": {
+      "test": "success",
+      "postgres-integration": "success",
+      "windows-audit-controls": "success"
+    }
+  },
+  "browser_environment": {
+    "attempted_url": "https://deploy-preview-123--arkaonfoundry.netlify.app/services/logo-card.html",
+    "observed_page_title": "Site not found",
+    "blocker": "PR #123 preview URL returns Netlify Site not found; no candidate UI available at this address",
+    "status": "BLOCKED",
+    "viewport_control": "Chromium Playwright CI: actual 360/390/768/1440px viewports verified; Netlify preview remains independently BLOCKED",
+    "local_ci_preview_status": "PASS",
+    "local_preview_url": "http://127.0.0.1:40471/services/logo-card.html"
+  },
+  "previous_ci_evidence": {
+    "tested_head": "bd7cd99a69c39393cddf23f88d2c79bc00194281",
+    "run_url": "https://github.com/NurionHoldings/ARKAON-Pattern-Foundry/actions/runs/40062577184",
+    "checks": {
+      "test": "success",
+      "postgres-integration": "success",
+      "windows-audit-controls": "success"
+    }
+  },
+  "browser_comparison_scope": "Chromium viewport emulation: editor/iframe horizontal overflow, SVG text bounds and line overlap; human visual quality review remains NOT_RUN",
+  "browser_evidence": {
+    "tested_head": "fc82af73d0adcd754dfcc0834e1f3eb30cc5cb6e",
+    "manifest": "browser-manifest.json",
+    "ci_run_id": 40066376449,
+    "comparison_conditions": 12,
+    "baseline_candidate_rows": 24,
+    "artifact_id": 12549099271,
+    "verified_file_hashes": 96,
+    "baseline_failed_conditions": 4,
+    "candidate_failed_conditions": 0
+  }
+}

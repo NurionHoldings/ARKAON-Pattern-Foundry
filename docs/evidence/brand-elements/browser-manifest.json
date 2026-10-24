@@ -1,0 +1,1618 @@
+{
+  "schema_version": "apf.brand-browser-regression/v1",
+  "created_at": "2026-10-24T05:28:56.436Z",
+  "baseline_commit": "ab3a2a9e7f6fe7b473403786b84b66270eff664c",
+  "candidate_commit": "fc82af73d0adcd754dfcc0834e1f3eb30cc5cb6e",
+  "contributor": "ETERNIAN_TEST_HARNESS",
+  "arkaon_first_verification": "NOT_RUN",
+  "independent_audit_status": "NOT_RUN",
+  "visual_human_review": "NOT_RUN",
+  "improvement_accepted": false,
+  "measurements": [
+    {
+      "brief": 1,
+      "brief_digest": "355dc10caea34ded8d059bd8d1931c3f975f59ef7a72b43c19d80998e655383a",
+      "width": 360,
+      "variant": "baseline",
+      "form_values": {
+        "industry": "태양광 시공",
+        "audience": "건물주",
+        "services": "설치 조건 상담\n시공 범위 안내",
+        "strengths": "조건을 쉽게 설명",
+        "businessName": "햇살 에너지",
+        "initials": "ON",
+        "tagline": "가상 사업 소개",
+        "brandIntro": "입력한 사업 사실을 바탕으로 편집하는 시험용 소개입니다.",
+        "cardLayout": "company",
+        "person": "가상 담당",
+        "role": "담당",
+        "email": "solar@example.com",
+        "phone": "",
+        "website": "https://example.com",
+        "address": "시험용 가상 주소",
+        "conceptId": "horizon",
+        "conceptRound": "0",
+        "conceptRotation": "0",
+        "conceptWeight": "3",
+        "logoLockup": "horizontal",
+        "logoTone": "light",
+        "style": "orbit",
+        "accent": "#31594c"
+      },
+      "outer": {
+        "viewport": 360,
+        "scroll": 360,
+        "client": 360
+      },
+      "inner": {
+        "width": 324,
+        "scroll": 324,
+        "issues": []
+      },
+      "issues": [],
+      "status": "PASS",
+      "screenshot": {
+        "path": "brief-1-360-baseline.png",
+        "sha256": "e2f972283141338f764102ca26e56d858d04787c70988fd3e8fdb9a90615176e"
+      },
+      "result_screenshot": {
+        "path": "brief-1-360-baseline-result.png",
+        "sha256": "44bf206ab390e351b5abdfae1bf0387959d71f0287ef3d6d0ae8537d79b09c86"
+      },
+      "dom": {
+        "path": "brief-1-360-baseline.html",
+        "sha256": "369a91deef9a79e2b74f630c9e5e4fee976f8b1d1c8cdc5a77c2e6eb9d95e4a1"
+      },
+      "rendered_html": {
+        "path": "brief-1-360-baseline-result.html",
+        "sha256": "950074abd1548a35b90e398b26626b58ac8b3c7c08037b79ad2b18036c7bec1a"
+      }
+    },
+    {
+      "brief": 1,
+      "brief_digest": "355dc10caea34ded8d059bd8d1931c3f975f59ef7a72b43c19d80998e655383a",
+      "width": 360,
+      "variant": "candidate",
+      "form_values": {
+        "industry": "태양광 시공",
+        "audience": "건물주",
+        "services": "설치 조건 상담\n시공 범위 안내",
+        "strengths": "조건을 쉽게 설명",
+        "businessName": "햇살 에너지",
+        "initials": "ON",
+        "tagline": "가상 사업 소개",
+        "brandIntro": "입력한 사업 사실을 바탕으로 편집하는 시험용 소개입니다.",
+        "cardLayout": "company",
+        "person": "가상 담당",
+        "role": "담당",
+        "email": "solar@example.com",
+        "phone": "",
+        "website": "https://example.com",
+        "address": "시험용 가상 주소",
+        "conceptId": "horizon",
+        "conceptRound": "0",
+        "conceptRotation": "0",
+        "conceptWeight": "3",
+        "symbolSize": "80",
+        "logoGap": "16",
+        "letterSpacing": "0",
+        "logoAlign": "left",
+        "logoLockup": "horizontal",
+        "logoTone": "light",
+        "style": "orbit",
+        "accent": "#31594c"
+      },
+      "outer": {
+        "viewport": 360,
+        "scroll": 360,
+        "client": 360
+      },
+      "inner": {
+        "width": 324,
+        "scroll": 324,
+        "issues": []
+      },
+      "issues": [],
+      "status": "PASS",
+      "screenshot": {
+        "path": "brief-1-360-candidate.png",
+        "sha256": "2957d7c1846c037767b80510ba13b2d6fc834f518e0ccace3c83f9fe4e08ae5e"
+      },
+      "result_screenshot": {
+        "path": "brief-1-360-candidate-result.png",
+        "sha256": "cd9b8080c3c80bd3d70412cfa101e9fbfeaa9287cd35cfe66cd76757d4dad70b"
+      },
+      "dom": {
+        "path": "brief-1-360-candidate.html",
+        "sha256": "c7f35b02915db2aefa27627fddffe3649951fc45819361bb570dcbfb0bc0c49f"
+      },
+      "rendered_html": {
+        "path": "brief-1-360-candidate-result.html",
+        "sha256": "c206f8df4796ce19888b3eee599b95f5c94796a5b5470f0ae489aeb62d8120f1"
+      }
+    },
+    {
+      "brief": 1,
+      "brief_digest": "355dc10caea34ded8d059bd8d1931c3f975f59ef7a72b43c19d80998e655383a",
+      "width": 390,
+      "variant": "baseline",
+      "form_values": {
+        "industry": "태양광 시공",
+        "audience": "건물주",
+        "services": "설치 조건 상담\n시공 범위 안내",
+        "strengths": "조건을 쉽게 설명",
+        "businessName": "햇살 에너지",
+        "initials": "ON",
+        "tagline": "가상 사업 소개",
+        "brandIntro": "입력한 사업 사실을 바탕으로 편집하는 시험용 소개입니다.",
+        "cardLayout": "company",
+        "person": "가상 담당",
+        "role": "담당",
+        "email": "solar@example.com",
+        "phone": "",
+        "website": "https://example.com",
+        "address": "시험용 가상 주소",
+        "conceptId": "horizon",
+        "conceptRound": "0",
+        "conceptRotation": "0",
+        "conceptWeight": "3",
+        "logoLockup": "horizontal",
+        "logoTone": "light",
+        "style": "orbit",
+        "accent": "#31594c"
+      },
+      "outer": {
+        "viewport": 390,
+        "scroll": 390,
+        "client": 390
+      },
+      "inner": {
+        "width": 351,
+        "scroll": 351,
+        "issues": []
+      },
+      "issues": [],
+      "status": "PASS",
+      "screenshot": {
+        "path": "brief-1-390-baseline.png",
+        "sha256": "b00eb478385f0f983387301c992a559a032bc7a8b3b76b3dad2d594c5920592d"
+      },
+      "result_screenshot": {
+        "path": "brief-1-390-baseline-result.png",
+        "sha256": "077f618b65a1f123f83a4ee9504d10315ef1e312f1b147c549030be119975613"
+      },
+      "dom": {
+        "path": "brief-1-390-baseline.html",
+        "sha256": "ec6f08da6a53ab30f5a388a66599573c9f2224958fe30251d8f7d5b6aebeb07c"
+      },
+      "rendered_html": {
+        "path": "brief-1-390-baseline-result.html",
+        "sha256": "950074abd1548a35b90e398b26626b58ac8b3c7c08037b79ad2b18036c7bec1a"
+      }
+    },
+    {
+      "brief": 1,
+      "brief_digest": "355dc10caea34ded8d059bd8d1931c3f975f59ef7a72b43c19d80998e655383a",
+      "width": 390,
+      "variant": "candidate",
+      "form_values": {
+        "industry": "태양광 시공",
+        "audience": "건물주",
+        "services": "설치 조건 상담\n시공 범위 안내",
+        "strengths": "조건을 쉽게 설명",
+        "businessName": "햇살 에너지",
+        "initials": "ON",
+        "tagline": "가상 사업 소개",
+        "brandIntro": "입력한 사업 사실을 바탕으로 편집하는 시험용 소개입니다.",
+        "cardLayout": "company",
+        "person": "가상 담당",
+        "role": "담당",
+        "email": "solar@example.com",
+        "phone": "",
+        "website": "https://example.com",
+        "address": "시험용 가상 주소",
+        "conceptId": "horizon",
+        "conceptRound": "0",
+        "conceptRotation": "0",
+        "conceptWeight": "3",
+        "symbolSize": "80",
+        "logoGap": "16",
+        "letterSpacing": "0",
+        "logoAlign": "left",
+        "logoLockup": "horizontal",
+        "logoTone": "light",
+        "style": "orbit",
+        "accent": "#31594c"
+      },
+      "outer": {
+        "viewport": 390,
+        "scroll": 390,
+        "client": 390
+      },
+      "inner": {
+        "width": 351,
+        "scroll": 351,
+        "issues": []
+      },
+      "issues": [],
+      "status": "PASS",
+      "screenshot": {
+        "path": "brief-1-390-candidate.png",
+        "sha256": "647fd66df34e75d12be5d0d3755bb7fb4298b1f0202a1d6991d9c197f60b5d26"
+      },
+      "result_screenshot": {
+        "path": "brief-1-390-candidate-result.png",
+        "sha256": "e09ad5824e4920bb341c9c2a4af4da621887a5e1a7f45192c76f31ab2902a01a"
+      },
+      "dom": {
+        "path": "brief-1-390-candidate.html",
+        "sha256": "e89c645fa5ec057d49ad4828df468e8a4196c0aa5da3848e1f1e13b79e35215f"
+      },
+      "rendered_html": {
+        "path": "brief-1-390-candidate-result.html",
+        "sha256": "c206f8df4796ce19888b3eee599b95f5c94796a5b5470f0ae489aeb62d8120f1"
+      }
+    },
+    {
+      "brief": 1,
+      "brief_digest": "355dc10caea34ded8d059bd8d1931c3f975f59ef7a72b43c19d80998e655383a",
+      "width": 768,
+      "variant": "baseline",
+      "form_values": {
+        "industry": "태양광 시공",
+        "audience": "건물주",
+        "services": "설치 조건 상담\n시공 범위 안내",
+        "strengths": "조건을 쉽게 설명",
+        "businessName": "햇살 에너지",
+        "initials": "ON",
+        "tagline": "가상 사업 소개",
+        "brandIntro": "입력한 사업 사실을 바탕으로 편집하는 시험용 소개입니다.",
+        "cardLayout": "company",
+        "person": "가상 담당",
+        "role": "담당",
+        "email": "solar@example.com",
+        "phone": "",
+        "website": "https://example.com",
+        "address": "시험용 가상 주소",
+        "conceptId": "horizon",
+        "conceptRound": "0",
+        "conceptRotation": "0",
+        "conceptWeight": "3",
+        "logoLockup": "horizontal",
+        "logoTone": "light",
+        "style": "orbit",
+        "accent": "#31594c"
+      },
+      "outer": {
+        "viewport": 768,
+        "scroll": 768,
+        "client": 768
+      },
+      "inner": {
+        "width": 691,
+        "scroll": 691,
+        "issues": []
+      },
+      "issues": [],
+      "status": "PASS",
+      "screenshot": {
+        "path": "brief-1-768-baseline.png",
+        "sha256": "1e1ff533ef3c1b5effbde0da83a8cb114034933ccb315984abe9097993a946ed"
+      },
+      "result_screenshot": {
+        "path": "brief-1-768-baseline-result.png",
+        "sha256": "f07cfc32da494316c3b80f4408cd9e74368be4226347c695e10c92564362fba2"
+      },
+      "dom": {
+        "path": "brief-1-768-baseline.html",
+        "sha256": "fce4b7e5b5dd73b526c6c2ac2e777b29a9c30bf4bca9405cc67f9bc8c1d07e84"
+      },
+      "rendered_html": {
+        "path": "brief-1-768-baseline-result.html",
+        "sha256": "950074abd1548a35b90e398b26626b58ac8b3c7c08037b79ad2b18036c7bec1a"
+      }
+    },
+    {
+      "brief": 1,
+      "brief_digest": "355dc10caea34ded8d059bd8d1931c3f975f59ef7a72b43c19d80998e655383a",
+      "width": 768,
+      "variant": "candidate",
+      "form_values": {
+        "industry": "태양광 시공",
+        "audience": "건물주",
+        "services": "설치 조건 상담\n시공 범위 안내",
+        "strengths": "조건을 쉽게 설명",
+        "businessName": "햇살 에너지",
+        "initials": "ON",
+        "tagline": "가상 사업 소개",
+        "brandIntro": "입력한 사업 사실을 바탕으로 편집하는 시험용 소개입니다.",
+        "cardLayout": "company",
+        "person": "가상 담당",
+        "role": "담당",
+        "email": "solar@example.com",
+        "phone": "",
+        "website": "https://example.com",
+        "address": "시험용 가상 주소",
+        "conceptId": "horizon",
+        "conceptRound": "0",
+        "conceptRotation": "0",
+        "conceptWeight": "3",
+        "symbolSize": "80",
+        "logoGap": "16",
+        "letterSpacing": "0",
+        "logoAlign": "left",
+        "logoLockup": "horizontal",
+        "logoTone": "light",
+        "style": "orbit",
+        "accent": "#31594c"
+      },
+      "outer": {
+        "viewport": 768,
+        "scroll": 768,
+        "client": 768
+      },
+      "inner": {
+        "width": 691,
+        "scroll": 691,
+        "issues": []
+      },
+      "issues": [],
+      "status": "PASS",
+      "screenshot": {
+        "path": "brief-1-768-candidate.png",
+        "sha256": "d34d2a5893c9d73c37450262d24cfc9685b96afbb9ad73422c3172cfee93944e"
+      },
+      "result_screenshot": {
+        "path": "brief-1-768-candidate-result.png",
+        "sha256": "d79cf18dccdaae4d9787a83b3acc5b81695f8f8ff2f9aefe8766011e0c2196a7"
+      },
+      "dom": {
+        "path": "brief-1-768-candidate.html",
+        "sha256": "9f18837799a2954de11601e9a3a0ec60aae4b8a7c814d525a27181a70d5d9d32"
+      },
+      "rendered_html": {
+        "path": "brief-1-768-candidate-result.html",
+        "sha256": "c206f8df4796ce19888b3eee599b95f5c94796a5b5470f0ae489aeb62d8120f1"
+      }
+    },
+    {
+      "brief": 1,
+      "brief_digest": "355dc10caea34ded8d059bd8d1931c3f975f59ef7a72b43c19d80998e655383a",
+      "width": 1440,
+      "variant": "baseline",
+      "form_values": {
+        "industry": "태양광 시공",
+        "audience": "건물주",
+        "services": "설치 조건 상담\n시공 범위 안내",
+        "strengths": "조건을 쉽게 설명",
+        "businessName": "햇살 에너지",
+        "initials": "ON",
+        "tagline": "가상 사업 소개",
+        "brandIntro": "입력한 사업 사실을 바탕으로 편집하는 시험용 소개입니다.",
+        "cardLayout": "company",
+        "person": "가상 담당",
+        "role": "담당",
+        "email": "solar@example.com",
+        "phone": "",
+        "website": "https://example.com",
+        "address": "시험용 가상 주소",
+        "conceptId": "horizon",
+        "conceptRound": "0",
+        "conceptRotation": "0",
+        "conceptWeight": "3",
+        "logoLockup": "horizontal",
+        "logoTone": "light",
+        "style": "orbit",
+        "accent": "#31594c"
+      },
+      "outer": {
+        "viewport": 1440,
+        "scroll": 1440,
+        "client": 1440
+      },
+      "inner": {
+        "width": 808,
+        "scroll": 808,
+        "issues": []
+      },
+      "issues": [],
+      "status": "PASS",
+      "screenshot": {
+        "path": "brief-1-1440-baseline.png",
+        "sha256": "68b9539697ec3894ba5ef5c58066a06f7ec4d9eb153bc26a7db5466c4ebfb2eb"
+      },
+      "result_screenshot": {
+        "path": "brief-1-1440-baseline-result.png",
+        "sha256": "30e2f10762aa59c134335a668bff1bad37ffae0e3ada8720277503bb5c2642bd"
+      },
+      "dom": {
+        "path": "brief-1-1440-baseline.html",
+        "sha256": "40f6053315c3eb4c7c982e12277ecc63485eb882b1a58b0fab2b2140a3702b83"
+      },
+      "rendered_html": {
+        "path": "brief-1-1440-baseline-result.html",
+        "sha256": "950074abd1548a35b90e398b26626b58ac8b3c7c08037b79ad2b18036c7bec1a"
+      }
+    },
+    {
+      "brief": 1,
+      "brief_digest": "355dc10caea34ded8d059bd8d1931c3f975f59ef7a72b43c19d80998e655383a",
+      "width": 1440,
+      "variant": "candidate",
+      "form_values": {
+        "industry": "태양광 시공",
+        "audience": "건물주",
+        "services": "설치 조건 상담\n시공 범위 안내",
+        "strengths": "조건을 쉽게 설명",
+        "businessName": "햇살 에너지",
+        "initials": "ON",
+        "tagline": "가상 사업 소개",
+        "brandIntro": "입력한 사업 사실을 바탕으로 편집하는 시험용 소개입니다.",
+        "cardLayout": "company",
+        "person": "가상 담당",
+        "role": "담당",
+        "email": "solar@example.com",
+        "phone": "",
+        "website": "https://example.com",
+        "address": "시험용 가상 주소",
+        "conceptId": "horizon",
+        "conceptRound": "0",
+        "conceptRotation": "0",
+        "conceptWeight": "3",
+        "symbolSize": "80",
+        "logoGap": "16",
+        "letterSpacing": "0",
+        "logoAlign": "left",
+        "logoLockup": "horizontal",
+        "logoTone": "light",
+        "style": "orbit",
+        "accent": "#31594c"
+      },
+      "outer": {
+        "viewport": 1440,
+        "scroll": 1440,
+        "client": 1440
+      },
+      "inner": {
+        "width": 808,
+        "scroll": 808,
+        "issues": []
+      },
+      "issues": [],
+      "status": "PASS",
+      "screenshot": {
+        "path": "brief-1-1440-candidate.png",
+        "sha256": "b986c4302895bdbad69202f564add1cbc3632d93a23090652e8ae52dfeb6b3d4"
+      },
+      "result_screenshot": {
+        "path": "brief-1-1440-candidate-result.png",
+        "sha256": "af1654464f807d3a4939fb36389969bcf60a529b3f99e890d572efee4182119c"
+      },
+      "dom": {
+        "path": "brief-1-1440-candidate.html",
+        "sha256": "9023992272dec5fdb36cc7d63fbc59196284b57526c27282366edb579c12f44b"
+      },
+      "rendered_html": {
+        "path": "brief-1-1440-candidate-result.html",
+        "sha256": "c206f8df4796ce19888b3eee599b95f5c94796a5b5470f0ae489aeb62d8120f1"
+      }
+    },
+    {
+      "brief": 2,
+      "brief_digest": "5c6f59d7c20bffbaef60ebe7a1fae5eb5ef972b44a550f8e9c88c0107859a15b",
+      "width": 360,
+      "variant": "baseline",
+      "form_values": {
+        "industry": "카페",
+        "audience": "동네 주민",
+        "services": "커피\n브런치",
+        "strengths": "편안한 공간",
+        "businessName": "동네 작은 카페",
+        "initials": "ON",
+        "tagline": "가상 사업 소개",
+        "brandIntro": "입력한 사업 사실을 바탕으로 편집하는 시험용 소개입니다.",
+        "cardLayout": "company",
+        "person": "가상 담당",
+        "role": "담당",
+        "email": "cafe@example.com",
+        "phone": "",
+        "website": "https://example.com",
+        "address": "시험용 가상 주소",
+        "conceptId": "horizon",
+        "conceptRound": "0",
+        "conceptRotation": "-15",
+        "conceptWeight": "3",
+        "logoLockup": "horizontal",
+        "logoTone": "light",
+        "style": "orbit",
+        "accent": "#31594c"
+      },
+      "outer": {
+        "viewport": 360,
+        "scroll": 360,
+        "client": 360
+      },
+      "inner": {
+        "width": 324,
+        "scroll": 324,
+        "issues": []
+      },
+      "issues": [],
+      "status": "PASS",
+      "screenshot": {
+        "path": "brief-2-360-baseline.png",
+        "sha256": "46bad9604a7cca044390afdc93fec2ea4ba4fa0133b2450d960c0f9bedaa75da"
+      },
+      "result_screenshot": {
+        "path": "brief-2-360-baseline-result.png",
+        "sha256": "fdd03eed9030595236866a807e4949a7806d51e4bb0d8bcb419c68f2f30b5250"
+      },
+      "dom": {
+        "path": "brief-2-360-baseline.html",
+        "sha256": "9ab14154003586ed0c798b18db04ab6249d9451b1539a6aac761b9d07b8f6eb9"
+      },
+      "rendered_html": {
+        "path": "brief-2-360-baseline-result.html",
+        "sha256": "27cbb7439725b6d88e95c79489d20d1b237d5231d85760ee2cde81881246e4c0"
+      }
+    },
+    {
+      "brief": 2,
+      "brief_digest": "5c6f59d7c20bffbaef60ebe7a1fae5eb5ef972b44a550f8e9c88c0107859a15b",
+      "width": 360,
+      "variant": "candidate",
+      "form_values": {
+        "industry": "카페",
+        "audience": "동네 주민",
+        "services": "커피\n브런치",
+        "strengths": "편안한 공간",
+        "businessName": "동네 작은 카페",
+        "initials": "ON",
+        "tagline": "가상 사업 소개",
+        "brandIntro": "입력한 사업 사실을 바탕으로 편집하는 시험용 소개입니다.",
+        "cardLayout": "company",
+        "person": "가상 담당",
+        "role": "담당",
+        "email": "cafe@example.com",
+        "phone": "",
+        "website": "https://example.com",
+        "address": "시험용 가상 주소",
+        "conceptId": "horizon",
+        "conceptRound": "0",
+        "conceptRotation": "-15",
+        "conceptWeight": "3",
+        "symbolSize": "80",
+        "logoGap": "16",
+        "letterSpacing": "0",
+        "logoAlign": "left",
+        "logoLockup": "horizontal",
+        "logoTone": "light",
+        "style": "orbit",
+        "accent": "#31594c"
+      },
+      "outer": {
+        "viewport": 360,
+        "scroll": 360,
+        "client": 360
+      },
+      "inner": {
+        "width": 324,
+        "scroll": 324,
+        "issues": []
+      },
+      "issues": [],
+      "status": "PASS",
+      "screenshot": {
+        "path": "brief-2-360-candidate.png",
+        "sha256": "4f7e8e206aebc780bbd54719b2efb026115d668c8c2ed22f881771123899e034"
+      },
+      "result_screenshot": {
+        "path": "brief-2-360-candidate-result.png",
+        "sha256": "96d3d5e6095e13b65599bf4a7b67f7078dab42508f33422b6ceb61e681ee57ce"
+      },
+      "dom": {
+        "path": "brief-2-360-candidate.html",
+        "sha256": "c075c23eaa9bf02ffa71623dab4d5170342a95e6f812c090d2c5d27ea275ecba"
+      },
+      "rendered_html": {
+        "path": "brief-2-360-candidate-result.html",
+        "sha256": "2420f3fd297475abd2963a85e8cb8b98674624ad165cbb638483720145e6c891"
+      }
+    },
+    {
+      "brief": 2,
+      "brief_digest": "5c6f59d7c20bffbaef60ebe7a1fae5eb5ef972b44a550f8e9c88c0107859a15b",
+      "width": 390,
+      "variant": "baseline",
+      "form_values": {
+        "industry": "카페",
+        "audience": "동네 주민",
+        "services": "커피\n브런치",
+        "strengths": "편안한 공간",
+        "businessName": "동네 작은 카페",
+        "initials": "ON",
+        "tagline": "가상 사업 소개",
+        "brandIntro": "입력한 사업 사실을 바탕으로 편집하는 시험용 소개입니다.",
+        "cardLayout": "company",
+        "person": "가상 담당",
+        "role": "담당",
+        "email": "cafe@example.com",
+        "phone": "",
+        "website": "https://example.com",
+        "address": "시험용 가상 주소",
+        "conceptId": "horizon",
+        "conceptRound": "0",
+        "conceptRotation": "-15",
+        "conceptWeight": "3",
+        "logoLockup": "horizontal",
+        "logoTone": "light",
+        "style": "orbit",
+        "accent": "#31594c"
+      },
+      "outer": {
+        "viewport": 390,
+        "scroll": 390,
+        "client": 390
+      },
+      "inner": {
+        "width": 351,
+        "scroll": 351,
+        "issues": []
+      },
+      "issues": [],
+      "status": "PASS",
+      "screenshot": {
+        "path": "brief-2-390-baseline.png",
+        "sha256": "08a8a9c5e73a54ba5261e7c01065bd7986399c91e68879debfb89622eda7d966"
+      },
+      "result_screenshot": {
+        "path": "brief-2-390-baseline-result.png",
+        "sha256": "4ea40699dde8ba399fabdb4098b9549df7be77936f577dea4abc3a9198be69f9"
+      },
+      "dom": {
+        "path": "brief-2-390-baseline.html",
+        "sha256": "a5b6e5730215b9a4f2386f6329ae68b0c20ae4bc4ea9710101507717cf3b776d"
+      },
+      "rendered_html": {
+        "path": "brief-2-390-baseline-result.html",
+        "sha256": "27cbb7439725b6d88e95c79489d20d1b237d5231d85760ee2cde81881246e4c0"
+      }
+    },
+    {
+      "brief": 2,
+      "brief_digest": "5c6f59d7c20bffbaef60ebe7a1fae5eb5ef972b44a550f8e9c88c0107859a15b",
+      "width": 390,
+      "variant": "candidate",
+      "form_values": {
+        "industry": "카페",
+        "audience": "동네 주민",
+        "services": "커피\n브런치",
+        "strengths": "편안한 공간",
+        "businessName": "동네 작은 카페",
+        "initials": "ON",
+        "tagline": "가상 사업 소개",
+        "brandIntro": "입력한 사업 사실을 바탕으로 편집하는 시험용 소개입니다.",
+        "cardLayout": "company",
+        "person": "가상 담당",
+        "role": "담당",
+        "email": "cafe@example.com",
+        "phone": "",
+        "website": "https://example.com",
+        "address": "시험용 가상 주소",
+        "conceptId": "horizon",
+        "conceptRound": "0",
+        "conceptRotation": "-15",
+        "conceptWeight": "3",
+        "symbolSize": "80",
+        "logoGap": "16",
+        "letterSpacing": "0",
+        "logoAlign": "left",
+        "logoLockup": "horizontal",
+        "logoTone": "light",
+        "style": "orbit",
+        "accent": "#31594c"
+      },
+      "outer": {
+        "viewport": 390,
+        "scroll": 390,
+        "client": 390
+      },
+      "inner": {
+        "width": 351,
+        "scroll": 351,
+        "issues": []
+      },
+      "issues": [],
+      "status": "PASS",
+      "screenshot": {
+        "path": "brief-2-390-candidate.png",
+        "sha256": "c3f35c04993e9af5857656e65cffa993681f05adce34b3674e940a925293fde3"
+      },
+      "result_screenshot": {
+        "path": "brief-2-390-candidate-result.png",
+        "sha256": "835ae2cfbdf3d681640304b5893aa00297fac342630bac0269ad4c2179d70c40"
+      },
+      "dom": {
+        "path": "brief-2-390-candidate.html",
+        "sha256": "10a5027ffeb0bd5fc8ed75d56e3a83a83c0b2c752985b72f7490300f49bc5648"
+      },
+      "rendered_html": {
+        "path": "brief-2-390-candidate-result.html",
+        "sha256": "2420f3fd297475abd2963a85e8cb8b98674624ad165cbb638483720145e6c891"
+      }
+    },
+    {
+      "brief": 2,
+      "brief_digest": "5c6f59d7c20bffbaef60ebe7a1fae5eb5ef972b44a550f8e9c88c0107859a15b",
+      "width": 768,
+      "variant": "baseline",
+      "form_values": {
+        "industry": "카페",
+        "audience": "동네 주민",
+        "services": "커피\n브런치",
+        "strengths": "편안한 공간",
+        "businessName": "동네 작은 카페",
+        "initials": "ON",
+        "tagline": "가상 사업 소개",
+        "brandIntro": "입력한 사업 사실을 바탕으로 편집하는 시험용 소개입니다.",
+        "cardLayout": "company",
+        "person": "가상 담당",
+        "role": "담당",
+        "email": "cafe@example.com",
+        "phone": "",
+        "website": "https://example.com",
+        "address": "시험용 가상 주소",
+        "conceptId": "horizon",
+        "conceptRound": "0",
+        "conceptRotation": "-15",
+        "conceptWeight": "3",
+        "logoLockup": "horizontal",
+        "logoTone": "light",
+        "style": "orbit",
+        "accent": "#31594c"
+      },
+      "outer": {
+        "viewport": 768,
+        "scroll": 768,
+        "client": 768
+      },
+      "inner": {
+        "width": 691,
+        "scroll": 691,
+        "issues": []
+      },
+      "issues": [],
+      "status": "PASS",
+      "screenshot": {
+        "path": "brief-2-768-baseline.png",
+        "sha256": "b25f11fc44e6f14eaf72bc38a9b4f28abd9e691a8fee448450604b7a45e42aed"
+      },
+      "result_screenshot": {
+        "path": "brief-2-768-baseline-result.png",
+        "sha256": "77722205e9a6f62d46ec0a8686de49ac21d2cb8e492be76ce74dd2074156eca1"
+      },
+      "dom": {
+        "path": "brief-2-768-baseline.html",
+        "sha256": "ad17318df9f62aeba3965a31104f83f8f515f2c002129d4b2df80dbb89dd368e"
+      },
+      "rendered_html": {
+        "path": "brief-2-768-baseline-result.html",
+        "sha256": "27cbb7439725b6d88e95c79489d20d1b237d5231d85760ee2cde81881246e4c0"
+      }
+    },
+    {
+      "brief": 2,
+      "brief_digest": "5c6f59d7c20bffbaef60ebe7a1fae5eb5ef972b44a550f8e9c88c0107859a15b",
+      "width": 768,
+      "variant": "candidate",
+      "form_values": {
+        "industry": "카페",
+        "audience": "동네 주민",
+        "services": "커피\n브런치",
+        "strengths": "편안한 공간",
+        "businessName": "동네 작은 카페",
+        "initials": "ON",
+        "tagline": "가상 사업 소개",
+        "brandIntro": "입력한 사업 사실을 바탕으로 편집하는 시험용 소개입니다.",
+        "cardLayout": "company",
+        "person": "가상 담당",
+        "role": "담당",
+        "email": "cafe@example.com",
+        "phone": "",
+        "website": "https://example.com",
+        "address": "시험용 가상 주소",
+        "conceptId": "horizon",
+        "conceptRound": "0",
+        "conceptRotation": "-15",
+        "conceptWeight": "3",
+        "symbolSize": "80",
+        "logoGap": "16",
+        "letterSpacing": "0",
+        "logoAlign": "left",
+        "logoLockup": "horizontal",
+        "logoTone": "light",
+        "style": "orbit",
+        "accent": "#31594c"
+      },
+      "outer": {
+        "viewport": 768,
+        "scroll": 768,
+        "client": 768
+      },
+      "inner": {
+        "width": 691,
+        "scroll": 691,
+        "issues": []
+      },
+      "issues": [],
+      "status": "PASS",
+      "screenshot": {
+        "path": "brief-2-768-candidate.png",
+        "sha256": "d37da7d82e9958585be1a2f8dbf46dcba9e47ccbb1870c66c059fac310a45994"
+      },
+      "result_screenshot": {
+        "path": "brief-2-768-candidate-result.png",
+        "sha256": "7196a1a3415874d163ec7142fecf94ff94b39d57a7f0b47dccb1df8520cd7f37"
+      },
+      "dom": {
+        "path": "brief-2-768-candidate.html",
+        "sha256": "07a3e4c6430590d0543b619e924ee3c46bfbce9700a56f4b6a6443cf1ef6d993"
+      },
+      "rendered_html": {
+        "path": "brief-2-768-candidate-result.html",
+        "sha256": "2420f3fd297475abd2963a85e8cb8b98674624ad165cbb638483720145e6c891"
+      }
+    },
+    {
+      "brief": 2,
+      "brief_digest": "5c6f59d7c20bffbaef60ebe7a1fae5eb5ef972b44a550f8e9c88c0107859a15b",
+      "width": 1440,
+      "variant": "baseline",
+      "form_values": {
+        "industry": "카페",
+        "audience": "동네 주민",
+        "services": "커피\n브런치",
+        "strengths": "편안한 공간",
+        "businessName": "동네 작은 카페",
+        "initials": "ON",
+        "tagline": "가상 사업 소개",
+        "brandIntro": "입력한 사업 사실을 바탕으로 편집하는 시험용 소개입니다.",
+        "cardLayout": "company",
+        "person": "가상 담당",
+        "role": "담당",
+        "email": "cafe@example.com",
+        "phone": "",
+        "website": "https://example.com",
+        "address": "시험용 가상 주소",
+        "conceptId": "horizon",
+        "conceptRound": "0",
+        "conceptRotation": "-15",
+        "conceptWeight": "3",
+        "logoLockup": "horizontal",
+        "logoTone": "light",
+        "style": "orbit",
+        "accent": "#31594c"
+      },
+      "outer": {
+        "viewport": 1440,
+        "scroll": 1440,
+        "client": 1440
+      },
+      "inner": {
+        "width": 808,
+        "scroll": 808,
+        "issues": []
+      },
+      "issues": [],
+      "status": "PASS",
+      "screenshot": {
+        "path": "brief-2-1440-baseline.png",
+        "sha256": "519fa65ee30142cbd0e275d4b3b0fd43842e0430821f229b763c9fd7bfc608a0"
+      },
+      "result_screenshot": {
+        "path": "brief-2-1440-baseline-result.png",
+        "sha256": "16ccf1475b9c8db5615c9d72ad6186dd72ec7b7755ac9789460d4d6beb6e7f3d"
+      },
+      "dom": {
+        "path": "brief-2-1440-baseline.html",
+        "sha256": "8add590da2f20cc90b2fdb7cbd9f03ef7cbc4910a0820c19b010b75c63cf33df"
+      },
+      "rendered_html": {
+        "path": "brief-2-1440-baseline-result.html",
+        "sha256": "27cbb7439725b6d88e95c79489d20d1b237d5231d85760ee2cde81881246e4c0"
+      }
+    },
+    {
+      "brief": 2,
+      "brief_digest": "5c6f59d7c20bffbaef60ebe7a1fae5eb5ef972b44a550f8e9c88c0107859a15b",
+      "width": 1440,
+      "variant": "candidate",
+      "form_values": {
+        "industry": "카페",
+        "audience": "동네 주민",
+        "services": "커피\n브런치",
+        "strengths": "편안한 공간",
+        "businessName": "동네 작은 카페",
+        "initials": "ON",
+        "tagline": "가상 사업 소개",
+        "brandIntro": "입력한 사업 사실을 바탕으로 편집하는 시험용 소개입니다.",
+        "cardLayout": "company",
+        "person": "가상 담당",
+        "role": "담당",
+        "email": "cafe@example.com",
+        "phone": "",
+        "website": "https://example.com",
+        "address": "시험용 가상 주소",
+        "conceptId": "horizon",
+        "conceptRound": "0",
+        "conceptRotation": "-15",
+        "conceptWeight": "3",
+        "symbolSize": "80",
+        "logoGap": "16",
+        "letterSpacing": "0",
+        "logoAlign": "left",
+        "logoLockup": "horizontal",
+        "logoTone": "light",
+        "style": "orbit",
+        "accent": "#31594c"
+      },
+      "outer": {
+        "viewport": 1440,
+        "scroll": 1440,
+        "client": 1440
+      },
+      "inner": {
+        "width": 808,
+        "scroll": 808,
+        "issues": []
+      },
+      "issues": [],
+      "status": "PASS",
+      "screenshot": {
+        "path": "brief-2-1440-candidate.png",
+        "sha256": "3abf2bb39139373092e9f231ddb00d01fcc4351af450a64937c0f3eea2e411cd"
+      },
+      "result_screenshot": {
+        "path": "brief-2-1440-candidate-result.png",
+        "sha256": "bd102084ddbde5e6d29cd133ac0e1070610a93b9abe8e4f701d7d079c2654d94"
+      },
+      "dom": {
+        "path": "brief-2-1440-candidate.html",
+        "sha256": "974c64ae92aec39842b2b87411d660af693ed4a1ddfaa8fea9ab8523db1d3ca2"
+      },
+      "rendered_html": {
+        "path": "brief-2-1440-candidate-result.html",
+        "sha256": "2420f3fd297475abd2963a85e8cb8b98674624ad165cbb638483720145e6c891"
+      }
+    },
+    {
+      "brief": 3,
+      "brief_digest": "4ddb495ffa4255b37c093a7ca80c98612dfceb72b098d2a65cdaf3f482ea1cbf",
+      "width": 360,
+      "variant": "baseline",
+      "form_values": {
+        "industry": "개인 디자이너",
+        "audience": "소상공인",
+        "services": "브랜드 기획\n시각 디자인",
+        "strengths": "이해하기 쉬운 설명",
+        "businessName": "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라",
+        "initials": "ON",
+        "tagline": "가상 사업 소개",
+        "brandIntro": "입력한 사업 사실을 바탕으로 편집하는 시험용 소개입니다.",
+        "cardLayout": "company",
+        "person": "가상 담당",
+        "role": "담당",
+        "email": "design@example.com",
+        "phone": "",
+        "website": "https://example.com",
+        "address": "시험용 가상 주소",
+        "conceptId": "horizon",
+        "conceptRound": "0",
+        "conceptRotation": "15",
+        "conceptWeight": "5",
+        "logoLockup": "horizontal",
+        "logoTone": "light",
+        "style": "orbit",
+        "accent": "#31594c"
+      },
+      "outer": {
+        "viewport": 360,
+        "scroll": 360,
+        "client": 360
+      },
+      "inner": {
+        "width": 324,
+        "scroll": 324,
+        "issues": [
+          "svg-text-outside-viewbox",
+          "svg-text-outside-viewbox",
+          "svg-text-outside-viewbox",
+          "svg-text-outside-viewbox",
+          "svg-text-outside-viewbox",
+          "svg-text-outside-viewbox"
+        ]
+      },
+      "issues": [
+        "svg-text-outside-viewbox",
+        "svg-text-outside-viewbox",
+        "svg-text-outside-viewbox",
+        "svg-text-outside-viewbox",
+        "svg-text-outside-viewbox",
+        "svg-text-outside-viewbox"
+      ],
+      "status": "FAIL",
+      "screenshot": {
+        "path": "brief-3-360-baseline.png",
+        "sha256": "eecadf0b1de9464579af39e05b3647616884e6a4638606412d4ed652ede69d1c"
+      },
+      "result_screenshot": {
+        "path": "brief-3-360-baseline-result.png",
+        "sha256": "4678e113ebe756685071e3e5507cc15e107f678fb8e6eca835a617992ab424f5"
+      },
+      "dom": {
+        "path": "brief-3-360-baseline.html",
+        "sha256": "68a9de8d7bd33aa5ed73726ab738f8a1fa0d5e4a85547bd5e82df024cab717e8"
+      },
+      "rendered_html": {
+        "path": "brief-3-360-baseline-result.html",
+        "sha256": "a5d85f4468bdcaae8d2124bc311036d9defc913fe609e75eec284db42866648d"
+      }
+    },
+    {
+      "brief": 3,
+      "brief_digest": "4ddb495ffa4255b37c093a7ca80c98612dfceb72b098d2a65cdaf3f482ea1cbf",
+      "width": 360,
+      "variant": "candidate",
+      "form_values": {
+        "industry": "개인 디자이너",
+        "audience": "소상공인",
+        "services": "브랜드 기획\n시각 디자인",
+        "strengths": "이해하기 쉬운 설명",
+        "businessName": "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라",
+        "initials": "ON",
+        "tagline": "가상 사업 소개",
+        "brandIntro": "입력한 사업 사실을 바탕으로 편집하는 시험용 소개입니다.",
+        "cardLayout": "company",
+        "person": "가상 담당",
+        "role": "담당",
+        "email": "design@example.com",
+        "phone": "",
+        "website": "https://example.com",
+        "address": "시험용 가상 주소",
+        "conceptId": "horizon",
+        "conceptRound": "0",
+        "conceptRotation": "15",
+        "conceptWeight": "5",
+        "symbolSize": "80",
+        "logoGap": "16",
+        "letterSpacing": "0",
+        "logoAlign": "left",
+        "logoLockup": "horizontal",
+        "logoTone": "light",
+        "style": "orbit",
+        "accent": "#31594c"
+      },
+      "outer": {
+        "viewport": 360,
+        "scroll": 360,
+        "client": 360
+      },
+      "inner": {
+        "width": 324,
+        "scroll": 324,
+        "issues": []
+      },
+      "issues": [],
+      "status": "PASS",
+      "screenshot": {
+        "path": "brief-3-360-candidate.png",
+        "sha256": "59bcf6a4cde7e56e684cd7ecea7936568ebd898e089af334fbf2ea153a070f51"
+      },
+      "result_screenshot": {
+        "path": "brief-3-360-candidate-result.png",
+        "sha256": "70a20ecaea7f550899d0dff1d1a4a68713f29ff89efab273f529a5f9a71279f4"
+      },
+      "dom": {
+        "path": "brief-3-360-candidate.html",
+        "sha256": "2ad1e7fa5b889c689049d83d10810a0bfd929fb139c7dab44540339701cf47b3"
+      },
+      "rendered_html": {
+        "path": "brief-3-360-candidate-result.html",
+        "sha256": "340f366b42334c23ff61a56fe277add4ee375fd01ba16dd5b7fd2f8b3cc33035"
+      }
+    },
+    {
+      "brief": 3,
+      "brief_digest": "4ddb495ffa4255b37c093a7ca80c98612dfceb72b098d2a65cdaf3f482ea1cbf",
+      "width": 390,
+      "variant": "baseline",
+      "form_values": {
+        "industry": "개인 디자이너",
+        "audience": "소상공인",
+        "services": "브랜드 기획\n시각 디자인",
+        "strengths": "이해하기 쉬운 설명",
+        "businessName": "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라",
+        "initials": "ON",
+        "tagline": "가상 사업 소개",
+        "brandIntro": "입력한 사업 사실을 바탕으로 편집하는 시험용 소개입니다.",
+        "cardLayout": "company",
+        "person": "가상 담당",
+        "role": "담당",
+        "email": "design@example.com",
+        "phone": "",
+        "website": "https://example.com",
+        "address": "시험용 가상 주소",
+        "conceptId": "horizon",
+        "conceptRound": "0",
+        "conceptRotation": "15",
+        "conceptWeight": "5",
+        "logoLockup": "horizontal",
+        "logoTone": "light",
+        "style": "orbit",
+        "accent": "#31594c"
+      },
+      "outer": {
+        "viewport": 390,
+        "scroll": 390,
+        "client": 390
+      },
+      "inner": {
+        "width": 351,
+        "scroll": 351,
+        "issues": [
+          "svg-text-outside-viewbox",
+          "svg-text-outside-viewbox",
+          "svg-text-outside-viewbox",
+          "svg-text-outside-viewbox",
+          "svg-text-outside-viewbox",
+          "svg-text-outside-viewbox"
+        ]
+      },
+      "issues": [
+        "svg-text-outside-viewbox",
+        "svg-text-outside-viewbox",
+        "svg-text-outside-viewbox",
+        "svg-text-outside-viewbox",
+        "svg-text-outside-viewbox",
+        "svg-text-outside-viewbox"
+      ],
+      "status": "FAIL",
+      "screenshot": {
+        "path": "brief-3-390-baseline.png",
+        "sha256": "c5a155562a68590acafd82c1ad8e3399c5898df19dbd9df826d33970bf550576"
+      },
+      "result_screenshot": {
+        "path": "brief-3-390-baseline-result.png",
+        "sha256": "44aa07707701008e5b5aa35ed95d209a615d595591d0b443851f673a78676fbb"
+      },
+      "dom": {
+        "path": "brief-3-390-baseline.html",
+        "sha256": "c56425d29c8772af937460de7b072c7e86a14c57075ce8a87ce397269cb58f40"
+      },
+      "rendered_html": {
+        "path": "brief-3-390-baseline-result.html",
+        "sha256": "a5d85f4468bdcaae8d2124bc311036d9defc913fe609e75eec284db42866648d"
+      }
+    },
+    {
+      "brief": 3,
+      "brief_digest": "4ddb495ffa4255b37c093a7ca80c98612dfceb72b098d2a65cdaf3f482ea1cbf",
+      "width": 390,
+      "variant": "candidate",
+      "form_values": {
+        "industry": "개인 디자이너",
+        "audience": "소상공인",
+        "services": "브랜드 기획\n시각 디자인",
+        "strengths": "이해하기 쉬운 설명",
+        "businessName": "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라",
+        "initials": "ON",
+        "tagline": "가상 사업 소개",
+        "brandIntro": "입력한 사업 사실을 바탕으로 편집하는 시험용 소개입니다.",
+        "cardLayout": "company",
+        "person": "가상 담당",
+        "role": "담당",
+        "email": "design@example.com",
+        "phone": "",
+        "website": "https://example.com",
+        "address": "시험용 가상 주소",
+        "conceptId": "horizon",
+        "conceptRound": "0",
+        "conceptRotation": "15",
+        "conceptWeight": "5",
+        "symbolSize": "80",
+        "logoGap": "16",
+        "letterSpacing": "0",
+        "logoAlign": "left",
+        "logoLockup": "horizontal",
+        "logoTone": "light",
+        "style": "orbit",
+        "accent": "#31594c"
+      },
+      "outer": {
+        "viewport": 390,
+        "scroll": 390,
+        "client": 390
+      },
+      "inner": {
+        "width": 351,
+        "scroll": 351,
+        "issues": []
+      },
+      "issues": [],
+      "status": "PASS",
+      "screenshot": {
+        "path": "brief-3-390-candidate.png",
+        "sha256": "f25a873e93cedc35b68af7438fc15a8e1aeb72721e55b363829d183b4f09d7bc"
+      },
+      "result_screenshot": {
+        "path": "brief-3-390-candidate-result.png",
+        "sha256": "0f86474a0740ecf33a6d2dc97e8c43f0fc46fce47d09bf259b6b113227317e05"
+      },
+      "dom": {
+        "path": "brief-3-390-candidate.html",
+        "sha256": "defaac697383ada176bda10b9456ba60f70adf8ee9246bfd149dfe975e1abf0f"
+      },
+      "rendered_html": {
+        "path": "brief-3-390-candidate-result.html",
+        "sha256": "340f366b42334c23ff61a56fe277add4ee375fd01ba16dd5b7fd2f8b3cc33035"
+      }
+    },
+    {
+      "brief": 3,
+      "brief_digest": "4ddb495ffa4255b37c093a7ca80c98612dfceb72b098d2a65cdaf3f482ea1cbf",
+      "width": 768,
+      "variant": "baseline",
+      "form_values": {
+        "industry": "개인 디자이너",
+        "audience": "소상공인",
+        "services": "브랜드 기획\n시각 디자인",
+        "strengths": "이해하기 쉬운 설명",
+        "businessName": "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라",
+        "initials": "ON",
+        "tagline": "가상 사업 소개",
+        "brandIntro": "입력한 사업 사실을 바탕으로 편집하는 시험용 소개입니다.",
+        "cardLayout": "company",
+        "person": "가상 담당",
+        "role": "담당",
+        "email": "design@example.com",
+        "phone": "",
+        "website": "https://example.com",
+        "address": "시험용 가상 주소",
+        "conceptId": "horizon",
+        "conceptRound": "0",
+        "conceptRotation": "15",
+        "conceptWeight": "5",
+        "logoLockup": "horizontal",
+        "logoTone": "light",
+        "style": "orbit",
+        "accent": "#31594c"
+      },
+      "outer": {
+        "viewport": 768,
+        "scroll": 768,
+        "client": 768
+      },
+      "inner": {
+        "width": 691,
+        "scroll": 691,
+        "issues": [
+          "svg-text-outside-viewbox",
+          "svg-text-outside-viewbox",
+          "svg-text-outside-viewbox",
+          "svg-text-outside-viewbox",
+          "svg-text-outside-viewbox",
+          "svg-text-outside-viewbox"
+        ]
+      },
+      "issues": [
+        "svg-text-outside-viewbox",
+        "svg-text-outside-viewbox",
+        "svg-text-outside-viewbox",
+        "svg-text-outside-viewbox",
+        "svg-text-outside-viewbox",
+        "svg-text-outside-viewbox"
+      ],
+      "status": "FAIL",
+      "screenshot": {
+        "path": "brief-3-768-baseline.png",
+        "sha256": "5f3a93619d0a793acea04d39a11fa2706f336322e5380c4370f97812c307a1aa"
+      },
+      "result_screenshot": {
+        "path": "brief-3-768-baseline-result.png",
+        "sha256": "c46a5f52cce4bdceebaf09696b80a55bb5e014ff4ae1527b6f76bcce54d2e43c"
+      },
+      "dom": {
+        "path": "brief-3-768-baseline.html",
+        "sha256": "6a9e27c02a1ed4b2d4c54b977e957a4da4ecdf1404d47209b5bc531ad6b5c634"
+      },
+      "rendered_html": {
+        "path": "brief-3-768-baseline-result.html",
+        "sha256": "a5d85f4468bdcaae8d2124bc311036d9defc913fe609e75eec284db42866648d"
+      }
+    },
+    {
+      "brief": 3,
+      "brief_digest": "4ddb495ffa4255b37c093a7ca80c98612dfceb72b098d2a65cdaf3f482ea1cbf",
+      "width": 768,
+      "variant": "candidate",
+      "form_values": {
+        "industry": "개인 디자이너",
+        "audience": "소상공인",
+        "services": "브랜드 기획\n시각 디자인",
+        "strengths": "이해하기 쉬운 설명",
+        "businessName": "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라",
+        "initials": "ON",
+        "tagline": "가상 사업 소개",
+        "brandIntro": "입력한 사업 사실을 바탕으로 편집하는 시험용 소개입니다.",
+        "cardLayout": "company",
+        "person": "가상 담당",
+        "role": "담당",
+        "email": "design@example.com",
+        "phone": "",
+        "website": "https://example.com",
+        "address": "시험용 가상 주소",
+        "conceptId": "horizon",
+        "conceptRound": "0",
+        "conceptRotation": "15",
+        "conceptWeight": "5",
+        "symbolSize": "80",
+        "logoGap": "16",
+        "letterSpacing": "0",
+        "logoAlign": "left",
+        "logoLockup": "horizontal",
+        "logoTone": "light",
+        "style": "orbit",
+        "accent": "#31594c"
+      },
+      "outer": {
+        "viewport": 768,
+        "scroll": 768,
+        "client": 768
+      },
+      "inner": {
+        "width": 691,
+        "scroll": 691,
+        "issues": []
+      },
+      "issues": [],
+      "status": "PASS",
+      "screenshot": {
+        "path": "brief-3-768-candidate.png",
+        "sha256": "9f0bbba6b8f0f70e89c4a12d37e4912ed8584d7681727c61b19cdfe03df8b2e3"
+      },
+      "result_screenshot": {
+        "path": "brief-3-768-candidate-result.png",
+        "sha256": "107991ed8fdc416f93f8916c31ef78dfc6a2b4f10f41d01062d81c4df706b328"
+      },
+      "dom": {
+        "path": "brief-3-768-candidate.html",
+        "sha256": "487ef44f35eaa60b669a04f687721d89def8b2ce5a873a1b4aa14fba7435bf39"
+      },
+      "rendered_html": {
+        "path": "brief-3-768-candidate-result.html",
+        "sha256": "340f366b42334c23ff61a56fe277add4ee375fd01ba16dd5b7fd2f8b3cc33035"
+      }
+    },
+    {
+      "brief": 3,
+      "brief_digest": "4ddb495ffa4255b37c093a7ca80c98612dfceb72b098d2a65cdaf3f482ea1cbf",
+      "width": 1440,
+      "variant": "baseline",
+      "form_values": {
+        "industry": "개인 디자이너",
+        "audience": "소상공인",
+        "services": "브랜드 기획\n시각 디자인",
+        "strengths": "이해하기 쉬운 설명",
+        "businessName": "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라",
+        "initials": "ON",
+        "tagline": "가상 사업 소개",
+        "brandIntro": "입력한 사업 사실을 바탕으로 편집하는 시험용 소개입니다.",
+        "cardLayout": "company",
+        "person": "가상 담당",
+        "role": "담당",
+        "email": "design@example.com",
+        "phone": "",
+        "website": "https://example.com",
+        "address": "시험용 가상 주소",
+        "conceptId": "horizon",
+        "conceptRound": "0",
+        "conceptRotation": "15",
+        "conceptWeight": "5",
+        "logoLockup": "horizontal",
+        "logoTone": "light",
+        "style": "orbit",
+        "accent": "#31594c"
+      },
+      "outer": {
+        "viewport": 1440,
+        "scroll": 1440,
+        "client": 1440
+      },
+      "inner": {
+        "width": 808,
+        "scroll": 808,
+        "issues": [
+          "svg-text-outside-viewbox",
+          "svg-text-outside-viewbox",
+          "svg-text-outside-viewbox",
+          "svg-text-outside-viewbox",
+          "svg-text-outside-viewbox",
+          "svg-text-outside-viewbox"
+        ]
+      },
+      "issues": [
+        "svg-text-outside-viewbox",
+        "svg-text-outside-viewbox",
+        "svg-text-outside-viewbox",
+        "svg-text-outside-viewbox",
+        "svg-text-outside-viewbox",
+        "svg-text-outside-viewbox"
+      ],
+      "status": "FAIL",
+      "screenshot": {
+        "path": "brief-3-1440-baseline.png",
+        "sha256": "2a4769c4abfca482b6a692a30b7a380a49e6e5638f323ccd8e730fccc92e40a2"
+      },
+      "result_screenshot": {
+        "path": "brief-3-1440-baseline-result.png",
+        "sha256": "5882f3512a3b43b94638a5795ca50182b5070c831e76bf79732bcc59298e3c4a"
+      },
+      "dom": {
+        "path": "brief-3-1440-baseline.html",
+        "sha256": "1a9b43b1220f1b7dccdc4d30ebf2ee3e92a17cf8938faaf8cc36051d5cc3980e"
+      },
+      "rendered_html": {
+        "path": "brief-3-1440-baseline-result.html",
+        "sha256": "a5d85f4468bdcaae8d2124bc311036d9defc913fe609e75eec284db42866648d"
+      }
+    },
+    {
+      "brief": 3,
+      "brief_digest": "4ddb495ffa4255b37c093a7ca80c98612dfceb72b098d2a65cdaf3f482ea1cbf",
+      "width": 1440,
+      "variant": "candidate",
+      "form_values": {
+        "industry": "개인 디자이너",
+        "audience": "소상공인",
+        "services": "브랜드 기획\n시각 디자인",
+        "strengths": "이해하기 쉬운 설명",
+        "businessName": "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라",
+        "initials": "ON",
+        "tagline": "가상 사업 소개",
+        "brandIntro": "입력한 사업 사실을 바탕으로 편집하는 시험용 소개입니다.",
+        "cardLayout": "company",
+        "person": "가상 담당",
+        "role": "담당",
+        "email": "design@example.com",
+        "phone": "",
+        "website": "https://example.com",
+        "address": "시험용 가상 주소",
+        "conceptId": "horizon",
+        "conceptRound": "0",
+        "conceptRotation": "15",
+        "conceptWeight": "5",
+        "symbolSize": "80",
+        "logoGap": "16",
+        "letterSpacing": "0",
+        "logoAlign": "left",
+        "logoLockup": "horizontal",
+        "logoTone": "light",
+        "style": "orbit",
+        "accent": "#31594c"
+      },
+      "outer": {
+        "viewport": 1440,
+        "scroll": 1440,
+        "client": 1440
+      },
+      "inner": {
+        "width": 808,
+        "scroll": 808,
+        "issues": []
+      },
+      "issues": [],
+      "status": "PASS",
+      "screenshot": {
+        "path": "brief-3-1440-candidate.png",
+        "sha256": "5c015ff6754d9cf9c5493162d4a8d0b40ee731b506ac86cd9967f2dd2ea0d54c"
+      },
+      "result_screenshot": {
+        "path": "brief-3-1440-candidate-result.png",
+        "sha256": "dc6aaa8de14f415db389b670309907f6f90013ffb8432f129987a0e4f6f69f84"
+      },
+      "dom": {
+        "path": "brief-3-1440-candidate.html",
+        "sha256": "7c25583282465af10552e2dbd680976e30ff31510c0bccf667130258ec559539"
+      },
+      "rendered_html": {
+        "path": "brief-3-1440-candidate-result.html",
+        "sha256": "340f366b42334c23ff61a56fe277add4ee375fd01ba16dd5b7fd2f8b3cc33035"
+      }
+    }
+  ],
+  "browser_undo_redo": "PASS",
+  "browser_save_reopen": "PASS",
+  "ci_run_id": "40066376449",
+  "limits": [
+    "Chromium desktop viewport emulation; no physical mobile device",
+    "DOM overflow/text bounds checks do not establish design quality or all possible overlaps"
+  ],
+  "local_preview_url": "http://127.0.0.1:40471/services/logo-card.html",
+  "browser_version": "151.0.7922.34",
+  "undo_redo_evidence": {
+    "initial": {
+      "symbolSize": "80",
+      "logoGap": "30",
+      "letterSpacing": "2",
+      "logoAlign": "right",
+      "businessName": "햇살 에너지",
+      "tagline": "가상 사업 소개",
+      "person": "가상 담당"
+    },
+    "final": {
+      "symbolSize": "86",
+      "logoGap": "30",
+      "letterSpacing": "2",
+      "logoAlign": "right",
+      "businessName": "햇살 에너지",
+      "tagline": "가상 사업 소개",
+      "person": "가상 담당"
+    },
+    "undone": {
+      "symbolSize": "80",
+      "logoGap": "30",
+      "letterSpacing": "2",
+      "logoAlign": "right",
+      "businessName": "햇살 에너지",
+      "tagline": "가상 사업 소개",
+      "person": "가상 담당"
+    },
+    "redone": {
+      "symbolSize": "86",
+      "logoGap": "30",
+      "letterSpacing": "2",
+      "logoAlign": "right",
+      "businessName": "햇살 에너지",
+      "tagline": "가상 사업 소개",
+      "person": "가상 담당"
+    },
+    "initialSvg": "f48784a164c226a65fdc9dd7fef65e130897e7dc0694b62dd50c791033860b7e",
+    "finalSvg": "b4eaf9d4c7888f1f1b7f31b731ec931ec8f43dc318dde70d059fad6e625bf98d",
+    "undoneSvg": "f48784a164c226a65fdc9dd7fef65e130897e7dc0694b62dd50c791033860b7e",
+    "redoneSvg": "b4eaf9d4c7888f1f1b7f31b731ec931ec8f43dc318dde70d059fad6e625bf98d"
+  },
+  "save_reopen_evidence": {
+    "url": "http://127.0.0.1:40471/services/logo-card.html?project=a06359ed-ef8a-4eb1-9670-914f63e7e6c2",
+    "restored": {
+      "symbolSize": "86",
+      "logoGap": "30",
+      "letterSpacing": "2",
+      "logoAlign": "right",
+      "businessName": "햇살 에너지",
+      "tagline": "가상 사업 소개",
+      "person": "가상 담당"
+    },
+    "restoredSvg": "b4eaf9d4c7888f1f1b7f31b731ec931ec8f43dc318dde70d059fad6e625bf98d"
+  },
+  "runtime_errors": [],
+  "browser_12_condition_comparison": "PASS",
+  "status": "PASS",
+  "artifact": {
+    "id": 12549099271,
+    "run_id": 40066376449,
+    "url": "https://github.com/NurionHoldings/ARKAON-Pattern-Foundry/actions/runs/40066376449",
+    "archive_sha256": "3e16eccc8d2949d7d18ea6c7ed144001e8badb2f2c874556184f3fa7a132e3cd",
+    "retention_days": 14
+  },
+  "evidence_integrity": {
+    "verified_files": 96,
+    "mismatches": 0
+  },
+  "visual_spot_checks": {
+    "reviewer": "ETERNIAN_IMPLEMENTER",
+    "conditions": [
+      "brief-3 / 360px / baseline and candidate result PNG"
+    ],
+    "observation": "Baseline long Korean name exceeds SVG bounds; candidate wraps within bounds. This is not independent audit or full visual review."
+  }
+}

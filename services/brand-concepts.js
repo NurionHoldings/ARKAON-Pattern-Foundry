@@ -1,6 +1,7 @@
 /* Explainable procedural concepts. Originality/trademark clearance requires review. */
 (() => {
   'use strict';
+  const editing=typeof module!=='undefined'?require('./brand-editing.js'):window.APFBrandEditing;
   const esc=v=>String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const families=[
     {id:'horizon',name:'지평선',meaning:'새로운 시작과 확장',shape:'<path d="M16 58H84M25 52A25 25 0 0 1 75 52M50 14V22M20 25L26 31M80 25L74 31"/>',layout:'company'},
@@ -32,16 +33,10 @@
   }
   function svg(raw){
     const f=families.find(f=>f.id===raw.conceptId);if(!f)return null;
-    const mode=['horizontal','stacked','symbol'].includes(raw.logoLockup)?raw.logoLockup:'horizontal';
-    const tone=raw.logoTone==='dark'?'#ffffff':raw.logoTone==='mono'?'#172b24':/^#[0-9a-f]{6}$/i.test(raw.accent||'')?raw.accent:'#31594c';
     const rotation=[0,15,-15].includes(Number(raw.conceptRotation))?Number(raw.conceptRotation):0;
     const weight=[3,4,5].includes(Number(raw.conceptWeight))?Number(raw.conceptWeight):4;
-    const dims=mode==='horizontal'?'0 0 480 120':mode==='stacked'?'0 0 320 200':'0 0 120 120';
-    const tr=mode==='stacked'?'translate(110 0)':'translate(10 10)';
-    const name=String(raw.businessName||'브랜드 이름');
-    const lines=[];for(let i=0;i<Array.from(name).length;i+=20)lines.push(Array.from(name).slice(i,i+20).join(''));
-    const shown=lines.slice(0,3);const text=mode==='symbol'?'':shown.map((line,i)=>`<text x="${mode==='stacked'?160:125}" y="${(mode==='stacked'?135:42)+i*25}" text-anchor="${mode==='stacked'?'middle':'start'}" font-family="system-ui,sans-serif" font-size="${mode==='stacked'?14:20}" font-weight="700" fill="${tone}">${esc(line)}</text>`).join('');
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${dims}" role="img" aria-label="${esc(name)} ${esc(f.name)} 로고 초안"><g transform="${tr}"><g transform="rotate(${rotation} 50 50)" fill="none" stroke="${tone}" stroke-width="${weight}" stroke-linecap="round" stroke-linejoin="round">${f.shape}</g></g>${text}</svg>`;
+    const mark=`<g transform="rotate(${rotation} 50 50)" fill="none" stroke="currentColor" stroke-width="${weight}" stroke-linecap="round" stroke-linejoin="round">${f.shape}</g>`;
+    return editing.compose(raw,mark,f.name);
   }
   const api={concepts,applyConcept,svg};if(typeof module!=='undefined')module.exports=api;
   if(typeof window!=='undefined')window.APFBrandConcepts=api;
