@@ -77,14 +77,14 @@
     768,
     1440
   ],
-  "browser_12_condition_comparison": "NOT_RUN",
-  "browser_undo_redo": "NOT_RUN",
-  "browser_save_reopen": "NOT_RUN",
-  "ci_run_id": 40062577184,
+  "browser_12_condition_comparison": "PASS",
+  "browser_undo_redo": "PASS",
+  "browser_save_reopen": "PASS",
+  "ci_run_id": 40066376419,
   "rollback": "Revert sandbox PR; preserve existing project data",
   "ci_evidence": {
-    "tested_head": "bd7cd99a69c39393cddf23f88d2c79bc00194281",
-    "run_url": "https://github.com/NurionHoldings/ARKAON-Pattern-Foundry/actions/runs/40062577184",
+    "tested_head": "fc82af73d0adcd754dfcc0834e1f3eb30cc5cb6e",
+    "run_url": "https://github.com/NurionHoldings/ARKAON-Pattern-Foundry/actions/runs/40066376419",
     "checks": {
       "test": "success",
       "postgres-integration": "success",
@@ -96,6 +96,29 @@
     "observed_page_title": "Site not found",
     "blocker": "PR #123 preview URL returns Netlify Site not found; no candidate UI available at this address",
     "status": "BLOCKED",
-    "viewport_control": "Current cloud browser API does not expose viewport resizing; 12-condition comparison remains NOT_RUN"
+    "viewport_control": "Chromium Playwright CI: actual 360/390/768/1440px viewports verified; Netlify preview remains independently BLOCKED",
+    "local_ci_preview_status": "PASS",
+    "local_preview_url": "http://127.0.0.1:40471/services/logo-card.html"
+  },
+  "previous_ci_evidence": {
+    "tested_head": "bd7cd99a69c39393cddf23f88d2c79bc00194281",
+    "run_url": "https://github.com/NurionHoldings/ARKAON-Pattern-Foundry/actions/runs/40062577184",
+    "checks": {
+      "test": "success",
+      "postgres-integration": "success",
+      "windows-audit-controls": "success"
+    }
+  },
+  "browser_comparison_scope": "Chromium viewport emulation: editor/iframe horizontal overflow, SVG text bounds and line overlap; human visual quality review remains NOT_RUN",
+  "browser_evidence": {
+    "tested_head": "fc82af73d0adcd754dfcc0834e1f3eb30cc5cb6e",
+    "manifest": "browser-manifest.json",
+    "ci_run_id": 40066376449,
+    "comparison_conditions": 12,
+    "baseline_candidate_rows": 24,
+    "artifact_id": 12549099271,
+    "verified_file_hashes": 96,
+    "baseline_failed_conditions": 4,
+    "candidate_failed_conditions": 0
   }
 }

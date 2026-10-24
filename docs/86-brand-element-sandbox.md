@@ -52,3 +52,19 @@ contents:read만 사용하며 실패 시에도 manifest/DOM/스크린샷을 14�
 기존 docs/evidence/brand-elements/manifest.json의 NOT_RUN은 실행 전 수동 승격하지 않는다.
 실제 새 workflow 실행에서 나온 browser-manifest의 tested SHA/CI run과 결과를 별도로
 결속한 후만 자동 검사 상태를 갱신한다. Netlify preview BLOCKED는 독립 상태로 유지한다.
+
+
+## 실제 실행 결과 — fc82af7
+
+GitHub browser run 40066376449 성공. 같은 head의 일반/PostgreSQL/Windows run 40066376419
+성공. Chromium에서 24개 전후 렌더, 후보 12개 조건의 자동 넘침/글자 경계 검사 PASS,
+10단계 undo/redo 입력값·SVG 해시 복원 PASS, 같은 context 새 탭 저장 복원 PASS다.
+기준선은 긴 한글 상호에서 4개 viewport 모두 SVG 경계 문제를 검출했고 후보는 해당 검사
+실패 0건이다. PNG/DOM/HTML 96개 해시를 다운로드한 artifact와 대조해 불일치 0건이다.
+
+browser-manifest.json에 실제 실행 SHA/조건/폼 입력값/증거 해시/CI run/artifact를 보존한다.
+전체 artifact는 GitHub Actions에서 14일 유지되며 긴 상호 360px 전후 결과 PNG 2장은
+저장소에도 보존한다. 에테르니언 구현자가 이 2장을 직접 살펴 기준선의 글자 잘림과
+후보의 줄바꿈을 확인했다. 전체 시각 검토·실기기 검증·아르카온 1차 검증·독립 감사는
+NOT_RUN이다. Netlify 미리보기 BLOCKED는 CI 로컬 미리보기 성공과 분리해 유지한다.
+improvement_accepted=false 및 병합/운영반영 HOLD 유지.
