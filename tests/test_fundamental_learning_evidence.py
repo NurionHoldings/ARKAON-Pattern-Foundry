@@ -1,10 +1,13 @@
 from hashlib import sha256
 
+import pytest
+
 from apf.fundamental_learning_evidence import (
     compute_trace_digest,
     failure_feedback_chain_valid,
     held_out_task_valid,
     improvement_metrics_valid,
+    load_reflective_lesson,
     verify_lesson_work_trace,
 )
 
@@ -49,7 +52,7 @@ def test_improvement_metrics_strict():
             "target_failure_delta": -3,
             "safe_failure_count": 0,
             "regression_count": 0,
-            "ci_commit_sha": "abc1234",
+            "ci_commit_sha": "a" * 40,
             "ci_verified_green": True,
             "ci_run_id": "run-1",
         }
@@ -82,3 +85,23 @@ def test_held_out_task_requires_execution_evidence():
         training_fingerprint=None,
     )
     assert not bad and reason2 == "not_separated_from_training"
+
+
+@pytest.mark.parametrize("changes", [
+    {"baseline_failure_count": None}, {"post_failure_count": None},
+    {"baseline_failure_count": -1}, {"baseline_failure_count": True},
+    {"target_failure_delta": float("nan")}, {"target_failure_delta": float("-inf")},
+    {"target_failure_delta": -0.5}, {"safe_failure_count": False},
+    {"ci_commit_sha": "not-a-sha"}, {"ci_run_id": ""},
+])
+def test_metrics_reject_missing_or_nonfinite_counts_and_weak_ci_identity(changes):
+    metrics = {"schema_version": "apf.improvement-recognition-metrics/v1",
+               "baseline_failure_count": 10, "post_failure_count": 7,
+               "target_failure_delta": -3, "safe_failure_count": 0, "regression_count": 0,
+               "ci_commit_sha": "a" * 40, "ci_run_id": "run-1", "ci_verified_green": True}
+    assert improvement_metrics_valid({**metrics, **changes})[0] is False
+
+
+@pytest.mark.parametrize("lesson_id", ["../../outside", "/tmp/outside", "..", "a/b", "a\\b"])
+def test_lesson_lookup_rejects_path_escape(tmp_path, lesson_id):
+    assert load_reflective_lesson(tmp_path, lesson_id) is None

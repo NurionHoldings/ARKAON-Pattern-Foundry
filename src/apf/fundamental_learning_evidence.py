@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from datetime import UTC, datetime
 from hashlib import sha256
 from pathlib import Path
@@ -101,7 +102,12 @@ def verify_lesson_work_trace(document: dict[str, Any]) -> tuple[bool, str]:
 
 
 def load_reflective_lesson(foundry_root: Path, lesson_id: str) -> dict[str, Any] | None:
-    path = foundry_root / "knowledge" / "reflective-lessons" / f"{lesson_id}.json"
+    if not re.fullmatch(r"[A-Za-z0-9_-]+", lesson_id):
+        return None
+    root = (foundry_root / "knowledge" / "reflective-lessons").resolve()
+    path = root / f"{lesson_id}.json"
+    if not path.resolve().is_relative_to(root):
+        return None
     if not path.is_file():
         return None
     return json.loads(path.read_text(encoding="utf-8"))
@@ -145,27 +151,25 @@ def improvement_metrics_valid(document: dict[str, Any]) -> tuple[bool, list[str]
     if document.get("schema_version") != "apf.improvement-recognition-metrics/v1":
         return False, ["schema_version"]
     delta = document.get("target_failure_delta")
-    if not isinstance(delta, (int, float)) or delta >= 0:
+    if type(delta) is not int or delta >= 0:
         blockers.append("target_failure_delta_must_be_negative")
-    if document.get("safe_failure_count", -1) != 0:
+    if type(document.get("safe_failure_count")) is not int or document["safe_failure_count"] != 0:
         blockers.append("safe_failure_count_must_be_zero")
-    if document.get("regression_count", -1) != 0:
+    if type(document.get("regression_count")) is not int or document["regression_count"] != 0:
         blockers.append("regression_count_must_be_zero")
     baseline = document.get("baseline_failure_count")
     post = document.get("post_failure_count")
-    if (
-        isinstance(baseline, (int, float))
-        and isinstance(post, (int, float))
-        and isinstance(delta, (int, float))
-        and int(baseline) + int(delta) != int(post)
-    ):
+    counts_valid = type(baseline) is int and type(post) is int and baseline >= 0 and post >= 0
+    if not counts_valid:
+        blockers.append("nonnegative_integer_failure_counts_required")
+    elif type(delta) is int and baseline + delta != post:
         blockers.append("failure_counts_inconsistent_with_delta")
     ci_sha = document.get("ci_commit_sha")
-    if not isinstance(ci_sha, str) or len(ci_sha) < 7:
+    if not isinstance(ci_sha, str) or not re.fullmatch(r"[0-9a-f]{40}", ci_sha):
         blockers.append("ci_commit_sha_required")
     if document.get("ci_verified_green") is not True:
         blockers.append("ci_verified_green_required")
-    if not isinstance(document.get("ci_run_id"), str):
+    if not isinstance(document.get("ci_run_id"), str) or not document["ci_run_id"].strip():
         blockers.append("ci_run_id_required")
     return len(blockers) == 0, blockers
 
