@@ -64,10 +64,38 @@
       const refs = extractReferenceUrls(message);
       const apiBase = getApiBase();
       if (refs.length && apiBase) {
-        stashReferenceConsentResume({ title, message, scope, reference_urls: refs, return_path: '/services/site-builder.html' });
+        const sessionId = crypto.randomUUID();
+        const proposalId = crypto.randomUUID().replace(/-/g, '').slice(0, 24);
+        const brief = buildStudioBriefFromWorkRequest({ title, message, scope });
+        const studioProject = saveProject({
+          type: 'site',
+          title: brief.title,
+          brief,
+          html: '',
+          creation_mode: 'co_creation_linked_studio',
+          co_creation_session_id: sessionId,
+          co_creation_proposal_id: proposalId,
+          publish_ready: false,
+        });
+        saveCoCreationStudioDraft(sessionId, { brief, proposal_id: proposalId, project_id: studioProject.id });
+        const returnUrl = new URL('/services/site-builder.html', window.location.origin);
+        returnUrl.searchParams.set('session', sessionId);
+        returnUrl.searchParams.set('proposal', proposalId);
+        returnUrl.searchParams.set('project', studioProject.id);
+        stashReferenceConsentResume({
+          title,
+          message,
+          scope,
+          brief,
+          session_id: sessionId,
+          proposal_id: proposalId,
+          project_id: studioProject.id,
+          reference_urls: refs,
+          return_path: returnUrl.pathname + returnUrl.search,
+        });
         document.getElementById('status').textContent =
-          '참고 URL이 포함되어 있습니다. Foundry 동의 화면에서 범위·고지를 확인한 뒤 스튜디오로 돌아옵니다.';
-        window.location.href = `${apiBase}/reference-material-consent?return=/services/site-builder.html`;
+          '참고 URL이 포함되어 있습니다. 동의 후 스튜디오로 돌아가며 입력 내용을 유지합니다.';
+        window.location.href = `${apiBase}/reference-material-consent?return=${encodeURIComponent(returnUrl.toString())}`;
         return;
       }
       const sessionId = crypto.randomUUID();

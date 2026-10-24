@@ -32,3 +32,13 @@ Foundry API `POST /v1/console/co-creation/chat`도 채팅 후 동일 세션에 s
 - `src/apf/co_creation_studio.py` — brief 추출·저장·채워진 섹션 HTML
 - `src/apf/co_creation_product_improvement.py` — 전후 비교·채점 artifact
 - `src/apf/co_creation_reference_gate.py` — consent 게이트
+
+## 연결 보완 (검토 후속)
+
+- 동의 UI: `return` 절대 URL → 기록 성공 시 스튜디오로 redirect + `reference_consent_request_id`
+- co-create: 동의 전 session/brief/project·stash(`title`/`message`/`brief`)·return URL query
+- studio: 서버 `GET` 초안, `PUT` 시 `X-CSRF-Token` 및 실패 시 HTTP 상태 메시지
+- session id: 문자 제거(sanitize) 대신 형식 검증·`SESSION_ID_INVALID`
+- receipt: `receipt_digest`·`notice_version`·co-creation 허용 decision 재검증
+
+**판정:** 개별 기능·자동시험 통과 ≠ 브라우저 완주·교차 사용자·독립 감사 완료.

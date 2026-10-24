@@ -644,14 +644,16 @@ def install_console(
         csrf_verified: Annotated[None, Depends(csrf_guard)],
     ) -> dict[str, object]:
         del csrf_verified
+        from .co_creation_reference_gate import (
+            ReferenceGateRejected,
+            assert_reference_consent_or_raise,
+        )
         from .conversational_co_creation import (
             CoCreationRejected,
             CoCreationScope,
             ConversationalCoCreationEngine,
         )
         from .conversational_co_creation_bridge import bridge_co_creation_proposal
-
-        from .co_creation_reference_gate import ReferenceGateRejected, assert_reference_consent_or_raise
 
         root = foundry_root()
         now = datetime.now().astimezone()
@@ -731,9 +733,17 @@ def install_console(
         session_id: str,
         actor: Annotated[ConsolePrincipal, Depends(principal)],
     ) -> dict[str, object]:
-        from .co_creation_studio import load_studio_draft, studio_open_query
+        from .co_creation_studio import (
+            CoCreationStudioRejected,
+            assert_valid_session_id,
+            load_studio_draft,
+            studio_open_query,
+        )
 
-        safe_session_id = session_id.strip()
+        try:
+            safe_session_id = assert_valid_session_id(session_id)
+        except CoCreationStudioRejected as error:
+            raise HTTPException(status_code=422, detail=error.code) from None
         draft = load_studio_draft(foundry_root(), safe_session_id)
         if draft is None:
             raise HTTPException(status_code=404, detail="studio draft not found")
@@ -758,11 +768,15 @@ def install_console(
         from .co_creation_studio import (
             CoCreationStudioRejected,
             StudioBrief,
+            assert_valid_session_id,
             load_studio_draft,
             save_studio_draft,
         )
 
-        safe_session_id = session_id.strip()
+        try:
+            safe_session_id = assert_valid_session_id(session_id)
+        except CoCreationStudioRejected as error:
+            raise HTTPException(status_code=422, detail=error.code) from None
         existing = load_studio_draft(foundry_root(), safe_session_id)
         if existing is None:
             raise HTTPException(status_code=404, detail="studio draft not found")
@@ -810,9 +824,18 @@ def install_console(
             CoCreationProductImprovementEngine,
             ProductImprovementRejected,
         )
-        from .co_creation_studio import StudioBrief, load_studio_draft
+        from .co_creation_studio import (
+            CoCreationStudioRejected,
+            StudioBrief,
+            assert_valid_session_id,
+            load_studio_draft,
+        )
 
-        draft = load_studio_draft(foundry_root(), session_id.strip())
+        try:
+            safe_session_id = assert_valid_session_id(session_id)
+        except CoCreationStudioRejected as error:
+            raise HTTPException(status_code=422, detail=error.code) from None
+        draft = load_studio_draft(foundry_root(), safe_session_id)
         if draft is None:
             raise HTTPException(status_code=404, detail="studio draft not found")
         if draft.get("tenant_id") != str(actor.tenant_id) or draft.get("principal_id") != str(
@@ -838,7 +861,7 @@ def install_console(
         engine = CoCreationProductImprovementEngine(foundry_root=foundry_root())
         try:
             evaluation = engine.evaluate(
-                session_id=session_id.strip(),
+                session_id=safe_session_id,
                 proposal_id=payload.proposal_id,
                 brief=brief,
                 candidate_html=payload.candidate_html,

@@ -123,10 +123,49 @@
       const raw = sessionStorage.getItem(REFERENCE_STASH_KEY);
       if (!raw) return null;
       sessionStorage.removeItem(REFERENCE_STASH_KEY);
-      return JSON.parse(raw);
+      return resumeCoCreationStash(JSON.parse(raw));
     } catch {
       return null;
     }
+  }
+
+  function resumeCoCreationStash(stash) {
+    if (!stash || typeof stash !== 'object') return null;
+    if (!stash.brief && stash.title && stash.message) {
+      stash.brief = buildStudioBriefFromWorkRequest({
+        title: stash.title,
+        message: stash.message,
+        scope: stash.scope || 'LANDING',
+      });
+    }
+    return stash;
+  }
+
+  function readCsrfToken() {
+    const match = document.cookie.split('; ').find((row) => row.startsWith('apf_console_csrf='));
+    return match ? decodeURIComponent(match.split('=').slice(1).join('=')) : '';
+  }
+
+  async function consoleApiFetch(path, options = {}) {
+    const base = getApiBase();
+    if (!base) throw new Error('API_NOT_CONFIGURED');
+    const method = (options.method || 'GET').toUpperCase();
+    const headers = { ...(options.headers || {}) };
+    if (method !== 'GET' && method !== 'HEAD') {
+      headers['X-CSRF-Token'] = readCsrfToken();
+    }
+    return fetch(`${base}${path}`, { ...options, credentials: 'include', headers });
+  }
+
+  async function fetchCoCreationStudioDraft(sessionId) {
+    if (!sessionId) return null;
+    const response = await consoleApiFetch(
+      `/v1/console/co-creation/studio/${encodeURIComponent(sessionId)}`,
+      { method: 'GET' },
+    );
+    if (!response.ok) return null;
+    const body = await response.json();
+    return body.draft || null;
   }
 
   function saveProject(entry) {
@@ -255,6 +294,10 @@
     extractReferenceUrls,
     stashReferenceConsentResume,
     popReferenceConsentStash,
+    resumeCoCreationStash,
+    readCsrfToken,
+    consoleApiFetch,
+    fetchCoCreationStudioDraft,
     MAX_VIDEO_STORE_BYTES,
   };
 })();

@@ -12,20 +12,67 @@ from apf.co_creation_reference_gate import (
     ReferenceGateRejected,
     assert_reference_consent_or_raise,
     reference_scope_digest,
+    verify_receipt_integrity,
 )
 from apf.co_creation_studio import (
+    CoCreationStudioRejected,
     StudioBrief,
-    build_studio_brief_from_conversation,
+    assert_valid_session_id,
     brief_has_empty_sections,
+    build_studio_brief_from_conversation,
     load_studio_draft,
     render_filled_section_html,
     save_studio_draft,
-    sync_studio_draft_from_proposal,
 )
-from apf.conversational_co_creation import CoCreationScope, ConversationalCoCreationEngine
-
+from apf.conversational_co_creation import (
+    CoCreationProposal,
+    CoCreationScope,
+    ConversationalCoCreationEngine,
+    EvidenceRef,
+    TemplateSectionBlueprint,
+)
+from apf.reference_material_consent import NOTICE_TEXT, NOTICE_VERSION
+from apf.reference_material_consent import digest as reference_digest
 
 NOW = datetime(2031, 9, 1, tzinfo=UTC)
+
+
+def _receipt_document(
+    *,
+    request_id: str,
+    scope_digest: str,
+    principal_id: str,
+    decision_code: str = "REFERENCE_ANALYSIS_ALLOWED",
+) -> dict[str, object]:
+    request_digest = "sha256:" + "a" * 64
+    consent_digest = "sha256:" + "b" * 64
+    decision: dict[str, object] = {
+        "decision": decision_code,
+        "reason": "USER_REQUEST_AND_NOTICE_CONFIRMED",
+        "allowed_mode": "PRINCIPLE_REFERENCE",
+        "request_digest": request_digest,
+        "consent_digest": consent_digest,
+        "direct_expression_reuse_allowed": False,
+        "implementation_allowed": decision_code == "SANDBOX_IMPLEMENTATION_ALLOWED",
+        "merge_allowed": False,
+        "deployment_allowed": False,
+        "modification_proposals": [],
+    }
+    receipt: dict[str, object] = {
+        "schema_version": "apf.reference-material-consent-receipt/1.0",
+        "request_id": request_id,
+        "scope_digest": scope_digest,
+        "request_digest": request_digest,
+        "consent_digest": consent_digest,
+        "principal_id": principal_id,
+        "notice_version": NOTICE_VERSION,
+        "notice_digest": reference_digest(NOTICE_TEXT),
+        "decision": decision,
+    }
+    receipt["receipt_digest"] = reference_digest(
+        {key: value for key, value in receipt.items() if key != "receipt_digest"}
+    )
+    return receipt
 
 
 def _write_policy(tmp_path: Path) -> None:
@@ -70,8 +117,6 @@ def test_brief_from_conversation_has_no_empty_sections():
         "차별점: 작은 화면에서도 읽기 쉬운 구성\n"
         "연락: studio@example.com"
     )
-    from apf.conversational_co_creation import CoCreationProposal, EvidenceRef, TemplateSectionBlueprint
-
     proposal = CoCreationProposal(
         proposal_id="p" * 24,
         session_id=str(uuid4()),
@@ -252,19 +297,12 @@ def test_reference_consent_blocks_missing_receipt(tmp_path):
 
 def test_reference_consent_rejects_scope_mismatch(tmp_path):
     request_id = "req-scope-test"
-    scope = reference_scope_digest(urls=("https://example.com/a",), intended_use="use-a")
     wrong_scope = reference_scope_digest(urls=("https://example.com/b",), intended_use="use-b")
     receipt_dir = tmp_path / "state" / "reference-material-consents"
     receipt_dir.mkdir(parents=True)
     principal = str(uuid4())
     (receipt_dir / f"{request_id}.json").write_text(
-        json.dumps(
-            {
-                "scope_digest": wrong_scope,
-                "principal_id": principal,
-                "decision": {"decision": "REFERENCE_ANALYSIS_ALLOWED"},
-            }
-        ),
+        json.dumps(_receipt_document(request_id=request_id, scope_digest=wrong_scope, principal_id=principal)),
         encoding="utf-8",
     )
     with pytest.raises(ReferenceGateRejected) as error:
@@ -278,6 +316,42 @@ def test_reference_consent_rejects_scope_mismatch(tmp_path):
             intended_use="use-a",
         )
     assert error.value.code == "REFERENCE_CONSENT_SCOPE_MISMATCH"
+
+
+def test_session_id_invalid_rejected_not_sanitized(tmp_path):
+    with pytest.raises(CoCreationStudioRejected) as error:
+        assert_valid_session_id("aa/bb")
+    assert error.value.code == "SESSION_ID_INVALID"
+    session_a = str(uuid4())
+    session_b = str(uuid4())
+    brief = StudioBrief(
+        industry="service",
+        title="A",
+        audience="B",
+        story="C",
+        offerings="X | Y",
+        difference="D",
+        process="1",
+        contact="e@example.com",
+    )
+    save_studio_draft(
+        foundry_root=tmp_path,
+        session_id=session_a,
+        proposal_id="p" * 24,
+        tenant_id=str(uuid4()),
+        principal_id=str(uuid4()),
+        brief=brief,
+        now=NOW,
+    )
+    assert load_studio_draft(tmp_path, session_b) is None
+
+
+def test_receipt_integrity_rejects_tampered_digest():
+    receipt = _receipt_document(request_id="r1", scope_digest="sha256:" + "c" * 64, principal_id=str(uuid4()))
+    receipt["receipt_digest"] = "sha256:" + "d" * 64
+    ok, reason = verify_receipt_integrity(receipt)
+    assert not ok
+    assert reason == "RECEIPT_DIGEST_MISMATCH"
 
 
 def test_render_filled_section_includes_title_and_body():

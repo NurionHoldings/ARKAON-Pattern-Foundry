@@ -14,6 +14,7 @@ from typing import Any
 from .conversational_co_creation import ChatTurn, CoCreationProposal, TemplateSectionBlueprint
 
 SCHEMA_STUDIO_DRAFT = "apf.co-creation-studio-draft/v1"
+SESSION_ID_RE = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9._-]{7,127}$")
 
 _PLACEHOLDER_MARKERS = (
     "입력 필요",
@@ -203,8 +204,15 @@ def _draft_digest(body: dict[str, Any]) -> str:
     return sha256(json.dumps(body, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
 
 
+def assert_valid_session_id(session_id: str) -> str:
+    cleaned = session_id.strip()
+    if not SESSION_ID_RE.fullmatch(cleaned):
+        raise CoCreationStudioRejected("SESSION_ID_INVALID", "invalid co-creation session id")
+    return cleaned
+
+
 def studio_draft_path(foundry_root: Path, session_id: str) -> Path:
-    safe = re.sub(r"[^a-zA-Z0-9-]", "", session_id)
+    safe = assert_valid_session_id(session_id)
     return foundry_root / "state" / "co-creation" / "studio-drafts" / f"{safe}.json"
 
 
@@ -221,6 +229,7 @@ def save_studio_draft(
 ) -> dict[str, object]:
     if now.tzinfo is None:
         raise CoCreationStudioRejected("TIMESTAMP", "timezone-aware timestamp required")
+    assert_valid_session_id(session_id)
     complete, gaps = brief_has_empty_sections(brief)
     if not complete:
         raise CoCreationStudioRejected("BRIEF_INCOMPLETE", "studio brief has empty sections: " + ",".join(gaps))

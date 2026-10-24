@@ -8,9 +8,22 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
-from .reference_material_consent import digest as reference_digest
+from .reference_material_consent import (
+    NOTICE_TEXT,
+    NOTICE_VERSION,
+)
+from .reference_material_consent import (
+    digest as reference_digest,
+)
 
 _URL_IN_TEXT = re.compile(r"https?://[^\s<>\"']+", re.IGNORECASE)
+
+_CO_CREATION_ALLOWED_DECISIONS = frozenset(
+    {
+        "REFERENCE_ANALYSIS_ALLOWED",
+        "SANDBOX_IMPLEMENTATION_ALLOWED",
+    }
+)
 
 
 class ReferenceGateRejected(ValueError):
@@ -46,6 +59,43 @@ def reference_scope_digest(*, urls: tuple[str, ...], intended_use: str) -> str:
     return reference_digest(body)
 
 
+def verify_receipt_integrity(receipt: dict[str, Any]) -> tuple[bool, str]:
+    if receipt.get("schema_version") != "apf.reference-material-consent-receipt/1.0":
+        return False, "RECEIPT_SCHEMA"
+    stored = receipt.get("receipt_digest")
+    if not isinstance(stored, str) or not stored.startswith("sha256:"):
+        return False, "RECEIPT_DIGEST_MISSING"
+    body = {key: value for key, value in receipt.items() if key != "receipt_digest"}
+    if reference_digest(body) != stored:
+        return False, "RECEIPT_DIGEST_MISMATCH"
+    if receipt.get("notice_version") != NOTICE_VERSION:
+        return False, "NOTICE_VERSION_MISMATCH"
+    if receipt.get("notice_digest") != reference_digest(NOTICE_TEXT):
+        return False, "NOTICE_DIGEST_MISMATCH"
+    decision = receipt.get("decision")
+    if not isinstance(decision, dict):
+        return False, "DECISION_MISSING"
+    if decision.get("request_digest") != receipt.get("request_digest"):
+        return False, "REQUEST_DIGEST_MISMATCH"
+    if decision.get("consent_digest") != receipt.get("consent_digest"):
+        return False, "CONSENT_DIGEST_MISMATCH"
+    return True, "ok"
+
+
+def receipt_allows_co_creation_reference(receipt: dict[str, Any]) -> tuple[bool, str]:
+    decision = receipt.get("decision")
+    if not isinstance(decision, dict):
+        return False, "DECISION_MISSING"
+    code = str(decision.get("decision", ""))
+    if code == "BLOCKED":
+        return False, str(decision.get("reason", "BLOCKED"))
+    if code not in _CO_CREATION_ALLOWED_DECISIONS:
+        return False, "DECISION_NOT_ALLOWED_FOR_CO_CREATION"
+    if code == "SANDBOX_IMPLEMENTATION_ALLOWED" and decision.get("implementation_allowed") is not True:
+        return False, "IMPLEMENTATION_NOT_ALLOWED"
+    return True, code
+
+
 def _load_receipt(path: Path) -> dict[str, Any] | None:
     if not path.is_file():
         return None
@@ -67,14 +117,15 @@ def find_valid_receipt(
     receipt = _load_receipt(path)
     if receipt is None:
         return None
+    ok, _reason = verify_receipt_integrity(receipt)
+    if not ok:
+        return None
     if receipt.get("scope_digest") != scope_digest:
         return None
     if str(receipt.get("principal_id", "")) != principal_id:
         return None
-    decision = receipt.get("decision")
-    if not isinstance(decision, dict):
-        return None
-    if decision.get("decision") == "BLOCKED":
+    allowed, _code = receipt_allows_co_creation_reference(receipt)
+    if not allowed:
         return None
     return receipt
 
@@ -112,7 +163,7 @@ def assert_reference_consent_or_raise(
     if receipt is None:
         raise ReferenceGateRejected(
             "REFERENCE_CONSENT_SCOPE_MISMATCH",
-            "consent receipt missing or scope changed",
+            "consent receipt missing, tampered, or not allowed for co-creation reference use",
             consent_path="/reference-material-consent",
         )
     decision = receipt.get("decision")
