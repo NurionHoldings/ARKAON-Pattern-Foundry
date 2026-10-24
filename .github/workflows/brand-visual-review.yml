@@ -1,0 +1,37 @@
+name: Brand visual usability review
+on:
+  pull_request:
+    branches: [fix/123-brand-audit-remediation]
+    paths: ['tools/review-brand-usability.cjs', '.github/workflows/brand-visual-review.yml']
+permissions:
+  contents: read
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: review
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: 1b2c86b0aadc42453022cb9eec2435b177d56808
+          path: target
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install isolated Playwright
+        run: |
+          npm install --prefix "$RUNNER_TEMP/brand-visual" --no-package-lock --ignore-scripts playwright@1.62.1
+          "$RUNNER_TEMP/brand-visual/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Collect visual and usability evidence from immutable target
+        run: NODE_PATH="$RUNNER_TEMP/brand-visual/node_modules" node review/tools/review-brand-usability.cjs target 1b2c86b0aadc42453022cb9eec2435b177d56808 visual-evidence
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: brand-visual-review-${{ github.event.pull_request.head.sha }}
+          path: visual-evidence/
+          retention-days: 14

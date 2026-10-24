@@ -1,0 +1,1458 @@
+[
+  {
+    "id": "case-0",
+    "width": 390,
+    "concept": "horizon",
+    "lockup": "horizontal",
+    "tone": "light",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-0.png",
+      "sha256": "13db12c7f6461659af1c8370496a99650ea1924f81cc30902b0beb50320eaa7e"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-1",
+    "width": 390,
+    "concept": "horizon",
+    "lockup": "horizontal",
+    "tone": "light",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-1.png",
+      "sha256": "091cbf4a58be98e244427c40cf9f75747f9131ce88e89084f94fbb8c8efb6df9"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-2",
+    "width": 390,
+    "concept": "horizon",
+    "lockup": "horizontal",
+    "tone": "dark",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-2.png",
+      "sha256": "b8c6fad3d726c8be28d35040e2ce129b413859acae7921e86e56096979b230b3"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-3",
+    "width": 390,
+    "concept": "horizon",
+    "lockup": "horizontal",
+    "tone": "dark",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-3.png",
+      "sha256": "12e81bcc77136a2e2451c7214b06d1cd79952d808a6969a794097c53d7a414bf"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-4",
+    "width": 390,
+    "concept": "horizon",
+    "lockup": "horizontal",
+    "tone": "mono",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-4.png",
+      "sha256": "65dec410ad7e0f1ee1a52719a5ee908a3c1a9a99676ed479bec9eaf8f5ad79b9"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-5",
+    "width": 390,
+    "concept": "horizon",
+    "lockup": "horizontal",
+    "tone": "mono",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-5.png",
+      "sha256": "d6545408d00df07c04c32b8b197275459af2a209c4b75ff32b38e229e5cd70fd"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-6",
+    "width": 390,
+    "concept": "horizon",
+    "lockup": "stacked",
+    "tone": "light",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-6.png",
+      "sha256": "860b2c101deaa912a51d50d14a9dd5ec7e88efc7226df2c213eb5e26147d7b6b"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-7",
+    "width": 390,
+    "concept": "horizon",
+    "lockup": "stacked",
+    "tone": "light",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-7.png",
+      "sha256": "b7db7dea88ea3d22b5c8adcd48ef122fbab939fea494e4887c5c5bfd1cdce4c6"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-8",
+    "width": 390,
+    "concept": "horizon",
+    "lockup": "stacked",
+    "tone": "dark",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-8.png",
+      "sha256": "46da283bf1be1ae31cb0e4a0490eaa1f093e437b19151b2185080ca5b4f5f0dd"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-9",
+    "width": 390,
+    "concept": "horizon",
+    "lockup": "stacked",
+    "tone": "dark",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-9.png",
+      "sha256": "46e4f52300ea8ebc585092306cbb049c83fd918f138c4692dfa86bfef46df643"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-10",
+    "width": 390,
+    "concept": "horizon",
+    "lockup": "stacked",
+    "tone": "mono",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-10.png",
+      "sha256": "a80d271c1e70c59d00ec413def4e26a5845b1dfceb08e3f9af642a1a9782ce15"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-11",
+    "width": 390,
+    "concept": "horizon",
+    "lockup": "stacked",
+    "tone": "mono",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-11.png",
+      "sha256": "d124d71639f926911322b4fde6aba9daed104163ad541b52828b80c2b784369b"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-12",
+    "width": 390,
+    "concept": "horizon",
+    "lockup": "symbol",
+    "tone": "light",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-12.png",
+      "sha256": "11864bb7c9046e5ed39874465ba5c9ea112849aa38a0ef445e1c6722953f2e54"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-13",
+    "width": 390,
+    "concept": "horizon",
+    "lockup": "symbol",
+    "tone": "light",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-13.png",
+      "sha256": "cafc96a15de7d025a1965d9a0c2c392bbfea3ed54b7c44c014a6e12986d0abc8"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-14",
+    "width": 390,
+    "concept": "horizon",
+    "lockup": "symbol",
+    "tone": "dark",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-14.png",
+      "sha256": "0a00357c042429f4b00cfc049a883a9168fe5645c98a39ca8612f7f650626163"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-15",
+    "width": 390,
+    "concept": "horizon",
+    "lockup": "symbol",
+    "tone": "dark",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-15.png",
+      "sha256": "e95aab5039bbbdc08401d3c30216cf3313287e4926cc94db623c91410c3cc83a"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-16",
+    "width": 390,
+    "concept": "horizon",
+    "lockup": "symbol",
+    "tone": "mono",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-16.png",
+      "sha256": "8cbc7d3dfd32a8e2a90f4e088fa82a56fd1e31051b71d574d1ab3458cc6a253b"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-17",
+    "width": 390,
+    "concept": "horizon",
+    "lockup": "symbol",
+    "tone": "mono",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-17.png",
+      "sha256": "e789410c6ab4868df179c1c5ab48413d0668067e4fb003fe793683baa62f48a8"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-18",
+    "width": 390,
+    "concept": "bridge",
+    "lockup": "horizontal",
+    "tone": "light",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-18.png",
+      "sha256": "74c6c52401908e8a8420ed6a54fa3d8292e2ded5cedd30ce44fcf3384ef61031"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-19",
+    "width": 390,
+    "concept": "bridge",
+    "lockup": "horizontal",
+    "tone": "light",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-19.png",
+      "sha256": "5eacd67b0ffaa848fcfd42dd18fb1f95ca4c1f5bdea563d9bd591b6696c1f3e5"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-20",
+    "width": 390,
+    "concept": "bridge",
+    "lockup": "horizontal",
+    "tone": "dark",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-20.png",
+      "sha256": "1a745bc9e096298ad63b5d41c71abe7b23278332ea07b59f4c098b8e7062bfa7"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-21",
+    "width": 390,
+    "concept": "bridge",
+    "lockup": "horizontal",
+    "tone": "dark",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-21.png",
+      "sha256": "a4237e343ee8c48ce8c939b9adfc9206f766b7703b49e7f19df56edce002c347"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-22",
+    "width": 390,
+    "concept": "bridge",
+    "lockup": "horizontal",
+    "tone": "mono",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-22.png",
+      "sha256": "ab8e25db20fc9849b36f1fb873b20dd9e7aa074399c15501b33679cfa121f843"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-23",
+    "width": 390,
+    "concept": "bridge",
+    "lockup": "horizontal",
+    "tone": "mono",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-23.png",
+      "sha256": "72962ea5448c30c48d497cfe73a2927410639560838ac315beb823d5db4eed57"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-24",
+    "width": 390,
+    "concept": "bridge",
+    "lockup": "stacked",
+    "tone": "light",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-24.png",
+      "sha256": "75c931f6e76f80152810852a23b802b4f7e5f7849c3aba079ab6183fbcfb04fd"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-25",
+    "width": 390,
+    "concept": "bridge",
+    "lockup": "stacked",
+    "tone": "light",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-25.png",
+      "sha256": "74c154da5c6bfd6e2864f1084d5dbee5d0d43c45586055d930ae03b1e73cb7af"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-26",
+    "width": 390,
+    "concept": "bridge",
+    "lockup": "stacked",
+    "tone": "dark",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-26.png",
+      "sha256": "b36d4811da60c4d05fe699c89958914777ecb135954d6e9f118c14fbeb9aea4e"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-27",
+    "width": 390,
+    "concept": "bridge",
+    "lockup": "stacked",
+    "tone": "dark",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-27.png",
+      "sha256": "b4126c80565ee195376140c8e045895498c61377cfb99393da9aa1b6f527648d"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-28",
+    "width": 390,
+    "concept": "bridge",
+    "lockup": "stacked",
+    "tone": "mono",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-28.png",
+      "sha256": "652820f2455881a3f2437fd8e841d40569beb6edf9205e72cb905f72161a08c6"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-29",
+    "width": 390,
+    "concept": "bridge",
+    "lockup": "stacked",
+    "tone": "mono",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-29.png",
+      "sha256": "ceb21cc8826ccb35cdab386bd52d06afd04aa34ed98b48f01c4e237a9aa3c169"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-30",
+    "width": 390,
+    "concept": "bridge",
+    "lockup": "symbol",
+    "tone": "light",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-30.png",
+      "sha256": "2ce3267a91a9ab61f54a546631e2da3513dcc49e4380f852c32a96a419224b48"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-31",
+    "width": 390,
+    "concept": "bridge",
+    "lockup": "symbol",
+    "tone": "light",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-31.png",
+      "sha256": "eea5299a25fa67bf8f18b34f6694cc36089d7cb499b8f2f974bbaf628db75846"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-32",
+    "width": 390,
+    "concept": "bridge",
+    "lockup": "symbol",
+    "tone": "dark",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-32.png",
+      "sha256": "03205cdebe804755957152bb4f91347316227a34e07b992d0e5dd96aee4cfed0"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-33",
+    "width": 390,
+    "concept": "bridge",
+    "lockup": "symbol",
+    "tone": "dark",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-33.png",
+      "sha256": "7a8324e7637903c8022ae819ecfd1f8be2de50c23f1401211f2c053909bc0219"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-34",
+    "width": 390,
+    "concept": "bridge",
+    "lockup": "symbol",
+    "tone": "mono",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-34.png",
+      "sha256": "af4108a5823848e85fee5afb3a53286e40e7405d4e771533d89bbd9075289629"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-35",
+    "width": 390,
+    "concept": "bridge",
+    "lockup": "symbol",
+    "tone": "mono",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-35.png",
+      "sha256": "af1c705d1c02fbdad428641cb2270cb60976495e5117d9120a31568a97e64049"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-36",
+    "width": 390,
+    "concept": "facet",
+    "lockup": "horizontal",
+    "tone": "light",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-36.png",
+      "sha256": "0e1fbe745ea8a8bddbbc496ebcc2c291ea0a17b577ccf0de73bc2eca2bdd3d75"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-37",
+    "width": 390,
+    "concept": "facet",
+    "lockup": "horizontal",
+    "tone": "light",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-37.png",
+      "sha256": "a779d25b3729943cb89ee8195dcb0e1b835c4538600668742a3733039bd3307b"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-38",
+    "width": 390,
+    "concept": "facet",
+    "lockup": "horizontal",
+    "tone": "dark",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-38.png",
+      "sha256": "befed5568e438063d550348eecd4a608423265f0c6504a884ed62de206c23686"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-39",
+    "width": 390,
+    "concept": "facet",
+    "lockup": "horizontal",
+    "tone": "dark",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-39.png",
+      "sha256": "cc6e65a3eab9a6c5a059f152a5f7397e92515745c00117aaec09a64a8bf0ab21"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-40",
+    "width": 390,
+    "concept": "facet",
+    "lockup": "horizontal",
+    "tone": "mono",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-40.png",
+      "sha256": "6f65720e58cf46435040d0b9675222d4bb682a0e1c03b88edd9eebb261dcea9a"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-41",
+    "width": 390,
+    "concept": "facet",
+    "lockup": "horizontal",
+    "tone": "mono",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-41.png",
+      "sha256": "06a8fa069c0be1104db4a9838713393131132b1be246ef854b916c6f1db846cf"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-42",
+    "width": 390,
+    "concept": "facet",
+    "lockup": "stacked",
+    "tone": "light",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-42.png",
+      "sha256": "497f7e222de43a48c7f036bf1efc3a7d4cd18bfeef2eb6ef7d4d809438c248c5"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-43",
+    "width": 390,
+    "concept": "facet",
+    "lockup": "stacked",
+    "tone": "light",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-43.png",
+      "sha256": "730683b46591d6b53683a5e3c809526e2fca772eeb1b355f9277bb679c85e61d"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-44",
+    "width": 390,
+    "concept": "facet",
+    "lockup": "stacked",
+    "tone": "dark",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-44.png",
+      "sha256": "648aed6a55325a4b97d2f9db2b0c787d049340ac24873ec648411a72478e1039"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-45",
+    "width": 390,
+    "concept": "facet",
+    "lockup": "stacked",
+    "tone": "dark",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-45.png",
+      "sha256": "8fbf81fd549fef5714a5b7cb118903f2d1fc0e71fccb348635da3d1eb37f0eb1"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-46",
+    "width": 390,
+    "concept": "facet",
+    "lockup": "stacked",
+    "tone": "mono",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-46.png",
+      "sha256": "8eb509f49fefee46832c1b530c081458b21f5748520077d803c1a24e96274ebc"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-47",
+    "width": 390,
+    "concept": "facet",
+    "lockup": "stacked",
+    "tone": "mono",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-47.png",
+      "sha256": "b75ece332262008073e1b8a8ee40d87cf28ffb8c9a9e2b629adf85dee9380b4f"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-48",
+    "width": 390,
+    "concept": "facet",
+    "lockup": "symbol",
+    "tone": "light",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-48.png",
+      "sha256": "a6317b1b6cf7deb7c11431fc2616b1b85af98b466b00ec951fedf2452f101c12"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-49",
+    "width": 390,
+    "concept": "facet",
+    "lockup": "symbol",
+    "tone": "light",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-49.png",
+      "sha256": "5702767a19748cedcbb2989ed5f5c4e233928a4fb007dd8bb2b397bc2d3e1cc2"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-50",
+    "width": 390,
+    "concept": "facet",
+    "lockup": "symbol",
+    "tone": "dark",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-50.png",
+      "sha256": "8f6c83a6b17429dec769afd7dfebc5f7e7c55e6050437c5521f78ef158a1abc1"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-51",
+    "width": 390,
+    "concept": "facet",
+    "lockup": "symbol",
+    "tone": "dark",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-51.png",
+      "sha256": "864bea2e3f36dc37c9d57e6a68d053351dd7a8be65766af0c1af849a3bb904bc"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-52",
+    "width": 390,
+    "concept": "facet",
+    "lockup": "symbol",
+    "tone": "mono",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-52.png",
+      "sha256": "bf3addb21c5c9db4d7597e55c26cb3b5ecb2e428b0138bdfcede9d34e3162bd2"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-53",
+    "width": 390,
+    "concept": "facet",
+    "lockup": "symbol",
+    "tone": "mono",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-53.png",
+      "sha256": "f61a69a43c1bf8adc73bf419d8c8f79ffaec797698dc517f46032fc95fd50912"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-54",
+    "width": 390,
+    "concept": "bloom",
+    "lockup": "horizontal",
+    "tone": "light",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-54.png",
+      "sha256": "49d413e09f3d89d7cc8aeb214a7bdf464301f388a0bf308b45e6fa894bb4bd8d"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-55",
+    "width": 390,
+    "concept": "bloom",
+    "lockup": "horizontal",
+    "tone": "light",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-55.png",
+      "sha256": "3008792842f408d76b951417f85ea3b8121cd2241677397d6a5b455beb862f68"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-56",
+    "width": 390,
+    "concept": "bloom",
+    "lockup": "horizontal",
+    "tone": "dark",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-56.png",
+      "sha256": "7ba54c5961394dc8b6533f311b67c4571b654cb643741df890acf41385c56c52"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-57",
+    "width": 390,
+    "concept": "bloom",
+    "lockup": "horizontal",
+    "tone": "dark",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-57.png",
+      "sha256": "4a3be9c454bd34fc165c5cbef5d7221acf1047f4221e1e3bf79c4825c2604b51"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-58",
+    "width": 390,
+    "concept": "bloom",
+    "lockup": "horizontal",
+    "tone": "mono",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-58.png",
+      "sha256": "4a5b96b378e20b34c0c1c1154e2a6e94499bb8030901d22018e190a031e27afa"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-59",
+    "width": 390,
+    "concept": "bloom",
+    "lockup": "horizontal",
+    "tone": "mono",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-59.png",
+      "sha256": "4363e2b6d829b2d3c6653bdcbbaf17912a21ee30eb1add131796ef37b25476b3"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-60",
+    "width": 390,
+    "concept": "bloom",
+    "lockup": "stacked",
+    "tone": "light",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-60.png",
+      "sha256": "087008512e59509e98bb737d1dcdfc427199ebeba29c72382ce767b1e76401d2"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-61",
+    "width": 390,
+    "concept": "bloom",
+    "lockup": "stacked",
+    "tone": "light",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-61.png",
+      "sha256": "343ba9d7f7edbfc5100ed9c508c8443892e2ba1eb843c090cd173f37a590bf19"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-62",
+    "width": 390,
+    "concept": "bloom",
+    "lockup": "stacked",
+    "tone": "dark",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-62.png",
+      "sha256": "ff5839ec031e9028f77ec0d88462335437bee1476d3e36b195070503820f1a37"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-63",
+    "width": 390,
+    "concept": "bloom",
+    "lockup": "stacked",
+    "tone": "dark",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-63.png",
+      "sha256": "7db6ad170a14052f142c980ae8cb05a95daf52bd09ae30a36b3e6c7b025ddd9f"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-64",
+    "width": 390,
+    "concept": "bloom",
+    "lockup": "stacked",
+    "tone": "mono",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-64.png",
+      "sha256": "9e584ad2f7e9e1166bc40f25a54bc6c8c99efbc5dca36d3838993c1347c71f5e"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-65",
+    "width": 390,
+    "concept": "bloom",
+    "lockup": "stacked",
+    "tone": "mono",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-65.png",
+      "sha256": "5760b19af7eb35cf9d7cd85e1a1f2819175b6987c432b996ed66ea2d5fc331e8"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-66",
+    "width": 390,
+    "concept": "bloom",
+    "lockup": "symbol",
+    "tone": "light",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-66.png",
+      "sha256": "19962d6b0580ee36fda3e5087af34acf47ebea6d49655b7c0933cb6fe2ad267a"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-67",
+    "width": 390,
+    "concept": "bloom",
+    "lockup": "symbol",
+    "tone": "light",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-67.png",
+      "sha256": "ef9db977d38cea8baceb00b184a2f2f46d64b1e930012842c6ee13d0d9ed60ee"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-68",
+    "width": 390,
+    "concept": "bloom",
+    "lockup": "symbol",
+    "tone": "dark",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-68.png",
+      "sha256": "6ad9c6dc916123afd87d23dc2c94b4c4735302f3647865312a09266124b707e8"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-69",
+    "width": 390,
+    "concept": "bloom",
+    "lockup": "symbol",
+    "tone": "dark",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-69.png",
+      "sha256": "9f4c0b65a1b722ad9c8cc105a043f6ca9af5d6b9e10ebc7f8b9178f6292eb0bd"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-70",
+    "width": 390,
+    "concept": "bloom",
+    "lockup": "symbol",
+    "tone": "mono",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-70.png",
+      "sha256": "c0919a0d30dabec35d354d87a417debc2f265f0324022b91aff0e892b52405e9"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-71",
+    "width": 390,
+    "concept": "bloom",
+    "lockup": "symbol",
+    "tone": "mono",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-71.png",
+      "sha256": "300a07a59a83a97616d12c7018b4229d9eaac02ad85af0267ccfb6e29a48e421"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-72",
+    "width": 390,
+    "concept": "route",
+    "lockup": "horizontal",
+    "tone": "light",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-72.png",
+      "sha256": "b41bef7cedf2685b2d5ab680473d3ca3f14fdbb0df0e2528ae875bc07b1f99f4"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-73",
+    "width": 390,
+    "concept": "route",
+    "lockup": "horizontal",
+    "tone": "light",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-73.png",
+      "sha256": "232f6690f415de5b1de91cf1bf38d14ebcfafe3f7021a60f215fb32f4c56b13b"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-74",
+    "width": 390,
+    "concept": "route",
+    "lockup": "horizontal",
+    "tone": "dark",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-74.png",
+      "sha256": "cce1c7dff00a9e9b0cab314c1601cfcf6ded4a1c3d46467d5ac153012cfae790"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-75",
+    "width": 390,
+    "concept": "route",
+    "lockup": "horizontal",
+    "tone": "dark",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-75.png",
+      "sha256": "0fc2d57f38d0941078e1558d73efc21e10cd2ed29aff55ad051ca462d67ae7bc"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-76",
+    "width": 390,
+    "concept": "route",
+    "lockup": "horizontal",
+    "tone": "mono",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-76.png",
+      "sha256": "1a5f532a58000f3c9912b3af8efbcbeab98a30e608f8723e1cbbe11bddc3e67d"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-77",
+    "width": 390,
+    "concept": "route",
+    "lockup": "horizontal",
+    "tone": "mono",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-77.png",
+      "sha256": "4f6c3e5b9d9bbd1c33c793099af7a944633d61335c2f4fc313fdc2446c3b4f53"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-78",
+    "width": 390,
+    "concept": "route",
+    "lockup": "stacked",
+    "tone": "light",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-78.png",
+      "sha256": "296c55c3db77776fa1df67f047900bbce15d198969a941ce6de9eeddc09983f1"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-79",
+    "width": 390,
+    "concept": "route",
+    "lockup": "stacked",
+    "tone": "light",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-79.png",
+      "sha256": "4b82a8ceb17766fba880ce1de7fb06ad9ce5a06a88e926aac70fb531b06d8ce2"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-80",
+    "width": 390,
+    "concept": "route",
+    "lockup": "stacked",
+    "tone": "dark",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-80.png",
+      "sha256": "5fc2497fb5804117cfd9b217c980c29e30afff13ab6741ca5ef26c8e7a06b2b5"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-81",
+    "width": 390,
+    "concept": "route",
+    "lockup": "stacked",
+    "tone": "dark",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-81.png",
+      "sha256": "8f8dee3b4259e86907d3b861dcc3c3e21536023664cf0188a2594d6d1979c0a5"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-82",
+    "width": 390,
+    "concept": "route",
+    "lockup": "stacked",
+    "tone": "mono",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-82.png",
+      "sha256": "794fb890f4f1b3370ef1e4fd1667b9b402333c145afbf145e1d391a937bc38cd"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-83",
+    "width": 390,
+    "concept": "route",
+    "lockup": "stacked",
+    "tone": "mono",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-83.png",
+      "sha256": "6cc5c7e77851501100c0cbc9182020f77702b20835df32dc1ba8a571c8d4341f"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-84",
+    "width": 390,
+    "concept": "route",
+    "lockup": "symbol",
+    "tone": "light",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-84.png",
+      "sha256": "e944164a16eea349b10798962b6391306e3a768b305399ddfef9cf33d597f0e7"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-85",
+    "width": 390,
+    "concept": "route",
+    "lockup": "symbol",
+    "tone": "light",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-85.png",
+      "sha256": "11f1de9861eb9a57afda22d3a07e65c7bd51fc136d0c6c6909533ffe90e88057"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-86",
+    "width": 390,
+    "concept": "route",
+    "lockup": "symbol",
+    "tone": "dark",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-86.png",
+      "sha256": "7f3cd956aa626028a3ae0c13a6631f8f0c50a14ed1d9fc0f465040e7508f6ebf"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-87",
+    "width": 390,
+    "concept": "route",
+    "lockup": "symbol",
+    "tone": "dark",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-87.png",
+      "sha256": "ee13e87d05864a41459482321c38ff5f6e7e4bf0c8bc705676f35a262663ea8f"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-88",
+    "width": 390,
+    "concept": "route",
+    "lockup": "symbol",
+    "tone": "mono",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-88.png",
+      "sha256": "d5e54ad839acae7f9f890f23b3c83d09ec03b8850b3cdbe3f882241a6554e1eb"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-89",
+    "width": 390,
+    "concept": "route",
+    "lockup": "symbol",
+    "tone": "mono",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-89.png",
+      "sha256": "52df86a665dc68006f7e36ae6a707b88572f33a4a296035e295ab41909d58148"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-90",
+    "width": 390,
+    "concept": "signal",
+    "lockup": "horizontal",
+    "tone": "light",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-90.png",
+      "sha256": "ba90ba705af0204a3b2e22168a58617b0c14a8b49aee47085bb309d9d9482eef"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-91",
+    "width": 390,
+    "concept": "signal",
+    "lockup": "horizontal",
+    "tone": "light",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-91.png",
+      "sha256": "d9ed654aff7b1cef04311e3e6e99b577082d9fa951670e6db62a7579c8cf782f"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-92",
+    "width": 390,
+    "concept": "signal",
+    "lockup": "horizontal",
+    "tone": "dark",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-92.png",
+      "sha256": "6e6c9e8c5a31624b0ea991d3a2ce1ec52055984b84bb93b6882e545457944903"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-93",
+    "width": 390,
+    "concept": "signal",
+    "lockup": "horizontal",
+    "tone": "dark",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-93.png",
+      "sha256": "292b8004e6b09ea6add258ce36c9f4ce5e03e655743ad3a6aa899f157e423037"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-94",
+    "width": 390,
+    "concept": "signal",
+    "lockup": "horizontal",
+    "tone": "mono",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-94.png",
+      "sha256": "96d870b4303d71c60f31cec74550b000be9d261fe56dcc6e14713bcd2ff01c3c"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-95",
+    "width": 390,
+    "concept": "signal",
+    "lockup": "horizontal",
+    "tone": "mono",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-95.png",
+      "sha256": "5aecff37642d69b4841881b2dd5c17a3ade34e0f0de16b22b2cf0551065faa8e"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-96",
+    "width": 390,
+    "concept": "signal",
+    "lockup": "stacked",
+    "tone": "light",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-96.png",
+      "sha256": "a61b79656a0a666842606c9fedd3efe8d3a8f0275612f4a8cbe1853d92306f9e"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-97",
+    "width": 390,
+    "concept": "signal",
+    "lockup": "stacked",
+    "tone": "light",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-97.png",
+      "sha256": "5b46caa13eb6016d234f4f57f769ebba0202208268479a0c13985d3bdcd4a2fe"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-98",
+    "width": 390,
+    "concept": "signal",
+    "lockup": "stacked",
+    "tone": "dark",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-98.png",
+      "sha256": "626c77bfa6bef2f5064454abed15b5f944d27f4ab00a534c32ca2a5b9e88f502"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-99",
+    "width": 390,
+    "concept": "signal",
+    "lockup": "stacked",
+    "tone": "dark",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-99.png",
+      "sha256": "cdcc090a79f9d39e58c323b4ba6e1c2564a1569d428ae58b22e12b583b5bd3b9"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-100",
+    "width": 390,
+    "concept": "signal",
+    "lockup": "stacked",
+    "tone": "mono",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-100.png",
+      "sha256": "ef3335f1300e5dc97115286f808b49128a8e604825bae114609336deb0a68db6"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-101",
+    "width": 390,
+    "concept": "signal",
+    "lockup": "stacked",
+    "tone": "mono",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-101.png",
+      "sha256": "ff83fc7457fad03119d54c73d1d8966e7ae6ddfe14c3501b33b3dcce4c1aeda6"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-102",
+    "width": 390,
+    "concept": "signal",
+    "lockup": "symbol",
+    "tone": "light",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-102.png",
+      "sha256": "7ec2f07d448d3307d2b3215224878591e67fd15cd15e694d383bb2329438d73c"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-103",
+    "width": 390,
+    "concept": "signal",
+    "lockup": "symbol",
+    "tone": "light",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-103.png",
+      "sha256": "8d3f637001aaf0fcc3a1f8b771565afaa371b224f3aa9d80d8ef90e2ee3fc0b8"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-104",
+    "width": 390,
+    "concept": "signal",
+    "lockup": "symbol",
+    "tone": "dark",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-104.png",
+      "sha256": "b95b79977efe75f9aba7af1caeb46af478d6d70313eee572f16074063aed393b"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-105",
+    "width": 390,
+    "concept": "signal",
+    "lockup": "symbol",
+    "tone": "dark",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-105.png",
+      "sha256": "0c81eabca0752c6df06585a80c50efc7ecc7d2840a7a39dfb3e18f3e9e65be72"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-106",
+    "width": 390,
+    "concept": "signal",
+    "lockup": "symbol",
+    "tone": "mono",
+    "layout": "company",
+    "screenshot": {
+      "path": "case-106.png",
+      "sha256": "1b55c968ffec00852e0bf70c920582b016357f022d7a87242e7850a5ef108ae7"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "case-107",
+    "width": 390,
+    "concept": "signal",
+    "lockup": "symbol",
+    "tone": "mono",
+    "layout": "personal",
+    "screenshot": {
+      "path": "case-107.png",
+      "sha256": "53f772ab3ecca221f5ce69363e6cabfa322e5e308cefb65c39854b3cba500fc4"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "boundary-360",
+    "width": 360,
+    "concept": "horizon",
+    "lockup": "horizontal",
+    "tone": "light",
+    "layout": "company",
+    "screenshot": {
+      "path": "boundary-360.png",
+      "sha256": "e2fd70e2a158e5d588917337ddd59c1ba6597f87c1bf2e06fa4d47cab9e3469d"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "boundary-768",
+    "width": 768,
+    "concept": "horizon",
+    "lockup": "horizontal",
+    "tone": "light",
+    "layout": "company",
+    "screenshot": {
+      "path": "boundary-768.png",
+      "sha256": "689c69a60d15a94278fbc0b7fbeae9f6289050815daa0c32acd80ddd2ee3a489"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "boundary-1440",
+    "width": 1440,
+    "concept": "horizon",
+    "lockup": "horizontal",
+    "tone": "light",
+    "layout": "company",
+    "screenshot": {
+      "path": "boundary-1440.png",
+      "sha256": "3936530e1775e582653f1ff114b06c395b169f81e634331fc25f2587eb77b523"
+    },
+    "automated_problems": []
+  },
+  {
+    "id": "white-on-white",
+    "width": 390,
+    "concept": "horizon",
+    "lockup": "horizontal",
+    "tone": "light",
+    "layout": "company",
+    "screenshot": {
+      "path": "white-on-white.png",
+      "sha256": "cf9eeee4150f0d02e0b934ebfc0a58777bdcbdd03e084bb2ba8c1ef3c0f16882"
+    },
+    "automated_problems": []
+  }
+]
