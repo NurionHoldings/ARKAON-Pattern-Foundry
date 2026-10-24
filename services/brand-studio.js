@@ -2,7 +2,9 @@
 (() => {
 'use strict';
 const creative = typeof module !== 'undefined' ? require('./brand-concepts.js') : window.APFBrandConcepts;
+const editing=typeof module!=='undefined'?require('./brand-editing.js'):window.APFBrandEditing;
 const fields = [
+  'symbolSize','logoGap','letterSpacing','logoAlign',
   'conceptId', 'conceptRound', 'conceptRotation', 'conceptWeight', 'logoLockup', 'logoTone',
   'industry',
   'audience',
@@ -57,6 +59,7 @@ function normalize(raw) {
   b.cardLayout = b.cardLayout === 'personal' ? 'personal' : 'company';
   const initialSource = clip(raw.initials, 20) || b.businessName;
   b.initials = Array.from(initialSource).slice(0, 4).join('') || 'AB';
+  Object.assign(b,editing.normalize(raw));
   b.sample = raw.sample === true;
   return b;
 }
@@ -110,8 +113,9 @@ function logo(raw) {
       : b.style === 'frame'
         ? '<rect x="7" y="7" width="66" height="66" rx="12" fill="none" stroke="currentColor" stroke-width="4"/>'
         : '<circle cx="40" cy="40" r="32" fill="none" stroke="currentColor" stroke-width="4"/><circle cx="66" cy="20" r="7" fill="currentColor"/>';
-  const nameLen = Array.from(b.businessName).length;
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 100" role="img" aria-label="${esc(b.businessName || '브랜드')} 로고 초안"><g style="color:${b.accent}">${mark ? `<g transform="translate(0 10)">${mark}<text x="40" y="46" text-anchor="middle" font-family="system-ui,sans-serif" font-size="19" font-weight="700" fill="currentColor">${esc(b.initials)}</text></g>` : ''}<text x="${mark ? 95 : 10}" y="57" font-family="system-ui,sans-serif" font-size="${nameLen > 16 ? 16 : 27}" font-weight="700" fill="currentColor">${esc(b.businessName || '브랜드 이름')}</text></g></svg>`;
+  const initialMark=mark?`<g fill="none" stroke="currentColor" stroke-width="4">${mark}</g><text x="40" y="46" text-anchor="middle" font-family="system-ui,sans-serif" font-size="19" font-weight="700" fill="currentColor">${esc(b.initials)}</text>`:'';
+  // Legacy symbols occupy 80 units; scale them into the shared 100-unit model.
+  return editing.compose(b,initialMark?`<g transform="translate(10 10) scale(1)">${initialMark}</g>`:'','기본');
 }
 
 function introParagraph(b, maxLen) {
@@ -172,12 +176,15 @@ if (typeof document === 'undefined') return;
 
 let id = new URLSearchParams(location.search).get('project');
 let url;
+let editHistory;
+function syncHistory(){document.getElementById('undo').disabled=!editHistory?.canUndo;document.getElementById('redo').disabled=!editHistory?.canRedo;}
 const values = () => ({
   ...Object.fromEntries(fields.map((k) => [k, document.getElementById(k)?.value || ''])),
   sample: document.getElementById('brand')?.dataset.sample === 'true',
 });
 
-function apply(b) {
+function apply(raw) {
+  const b={...raw,...editing.normalize(raw)};
   fields.forEach((k) => {
     if (b[k] != null && document.getElementById(k)) document.getElementById(k).value = b[k];
   });
@@ -185,7 +192,9 @@ function apply(b) {
   if (form) form.dataset.sample = b.sample === true ? 'true' : 'false';
 }
 
-function update() {
+function update({record=true}={}) {
+  if(record&&editHistory)editHistory.push(normalize(values()));
+  syncHistory();
   if (url) URL.revokeObjectURL(url);
   const v = values();
   url = URL.createObjectURL(new Blob([render(v)], { type: 'text/html;charset=utf-8' }));
@@ -222,6 +231,9 @@ document.getElementById('vary-concepts').addEventListener('click',()=>{document.
 const item = APFHomeServices.readProjects().find((p) => p.id === id && p.type === 'logo-card');
 if (item?.brief) apply(item.brief);
 else id = null;
+editHistory=editing.history(normalize(values()),10);
+document.getElementById('undo').addEventListener('click',()=>{apply(editHistory.undo());update({record:false});});
+document.getElementById('redo').addEventListener('click',()=>{apply(editHistory.redo());update({record:false});});
 
 fields.forEach((k) => {
   const el = document.getElementById(k);

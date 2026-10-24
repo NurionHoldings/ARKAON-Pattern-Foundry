@@ -128,3 +128,44 @@ test('procedural SVG escapes names and rejects uncontrolled geometry',()=>{
  assert.equal(creative.svg({conceptId:'unknown'}),null);
  assert.throws(()=>creative.applyConcept({}, {id:'unknown'}));
 });
+
+const editing=require('../services/brand-editing.js');
+test('old drafts receive compatible controls and malicious numeric values are bounded',()=>{
+ assert.deepEqual(editing.normalize({}),{elementModelVersion:1,symbolSize:80,logoGap:16,letterSpacing:0,logoAlign:'left'});
+ assert.deepEqual(editing.normalize({symbolSize:Infinity,logoGap:999,letterSpacing:-5,logoAlign:'right onclick=x'}),{elementModelVersion:1,symbolSize:80,logoGap:64,letterSpacing:0,logoAlign:'left'});
+});
+test('ten undo and redo steps exactly restore element model and SVG digest',()=>{
+ const {createHash}=require('node:crypto');const sha=x=>createHash('sha256').update(x).digest('hex');
+ const initial=normalize({businessName:'시험 브랜드',conceptId:'horizon',tagline:'문구 보존',person:'김예시'});
+ const h=editing.history(initial,10);let state=initial;
+ for(let i=1;i<=10;i++){state=normalize({...initial,symbolSize:40+i*5,logoGap:8+i*4,letterSpacing:i/3,logoAlign:i%2?'center':'right'});h.push(state);}
+ const final=state, expected=sha(logo(final));
+ for(let i=0;i<10;i++)state=h.undo();assert.deepEqual(state,initial);assert.equal(h.canUndo,false);
+ assert.equal(sha(logo(state)),sha(logo(initial)));
+ for(let i=0;i<10;i++)state=h.redo();assert.deepEqual(state,final);assert.equal(sha(logo(state)),expected);assert.equal(h.canRedo,false);
+ h.undo();h.push({...state,tagline:'새 분기'});assert.equal(h.canRedo,false);
+});
+test('history snapshots are immutable and bounded',()=>{
+ const h=editing.history({x:0},10);for(let i=1;i<=15;i++)h.push({x:i});
+ let state;for(let i=0;i<12;i++)state=h.undo();assert.equal(state.x,5);
+ state.x=999;assert.equal(h.undo().x,5);
+});
+test('all concepts and legacy marks respond to controls without dropping 60 Korean characters',()=>{
+ const name='가나다라마바사아자차카타파하'.repeat(5).slice(0,60);
+ for(const concept of creative.concepts({businessName:name})){
+  const b=normalize({...creative.applyConcept({businessName:name},concept),symbolSize:100,logoGap:64,letterSpacing:4,logoAlign:'right'});
+  for(const mode of ['horizontal','stacked']){
+   const out=logo({...b,logoLockup:mode});
+   const text=[...out.matchAll(/<text[^>]*>(.*?)<\/text>/g)].map(x=>x[1]).join('');
+   assert.equal(text,name);assert.ok(out.includes('data-symbol-size="100"'));
+   assert.ok(out.includes('data-logo-gap="64"'));assert.ok(out.includes('text-anchor="end"'));
+  }
+ }
+ assert.notEqual(logo({style:'orbit',symbolSize:40}),logo({style:'orbit',symbolSize:100}));
+ assert.ok(logo({style:'wordmark',logoLockup:'symbol',businessName:'브랜드'}).includes('<text'));
+});
+test('saved brief JSON restores both copy and element controls',()=>{
+ const b=normalize({businessName:'온유',tagline:'사용자 문구',symbolSize:55,logoGap:30,letterSpacing:2,logoAlign:'center',conceptId:'bridge',sample:true});
+ const restored=normalize(JSON.parse(JSON.stringify(b)));
+ assert.deepEqual(restored,b);assert.equal(logo(restored),logo(b));assert.ok(render(restored).includes('사용자 문구'));
+});
