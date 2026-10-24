@@ -1,0 +1,53 @@
+{
+  "schema_version": "apf.brand-audit-remediation-review/v1",
+  "source_patch_sha256": "d1c0ceb6345cd6cbdcb9f68301df24ac75ac7f40c2e588a2156ac4a95f17ad13",
+  "base_commit": "ff20cd8d1db85ecae3d0309eafe838c14099eaf4",
+  "tested_head": "a106b651bf791914c82b03bd61b5edaa1ad4f87e",
+  "reviewer": "ETERNIAN",
+  "scope": "Review and Chromium regression of owner-approved ARKAON patch; not whole-product approval",
+  "ci": {
+    "general_run_id": 40071699020,
+    "browser_run_id": 40071698947,
+    "test": "success",
+    "postgres-integration": "success",
+    "windows-audit-controls": "success",
+    "browser": "success"
+  },
+  "artifact": {
+    "id": 12551308601,
+    "name": "brand-browser-evidence-a106b651bf791914c82b03bd61b5edaa1ad4f87e",
+    "size_in_bytes": 8170826,
+    "digest": "sha256:01f11853c81cb14da54178d3eec181a9a90defae66eca16de7cc01d19936a2d5",
+    "run_url": "https://github.com/NurionHoldings/ARKAON-Pattern-Foundry/actions/runs/40071698947",
+    "retention_days": 14
+  },
+  "results": {
+    "approved_patch_files_checked": 18,
+    "source_mismatches": 0,
+    "local_node_pass": 32,
+    "local_browser_skip": 1,
+    "ci_browser_executed": true,
+    "render_rows": 24,
+    "candidate_conditions": 12,
+    "candidate_failed_conditions": 0,
+    "concept_ab_distinct": true,
+    "undo_restores_a": true,
+    "redo_restores_b": true,
+    "default_empty_selection": "PASS",
+    "ten_step_undo_redo": "PASS",
+    "save_reopen_all_controls_and_sample": "PASS",
+    "reopen_candidate_panel_selection": "PASS",
+    "verified_artifact_file_hashes": 96,
+    "hash_mismatches": 0,
+    "runtime_errors": 0
+  },
+  "unresolved": [
+    "Full visual review across all logo concepts, backgrounds and card layouts",
+    "Physical mobile device and full accessibility checks",
+    "Netlify PR123 preview remains separately BLOCKED",
+    "Whole-product improvement recognition and deployment approval"
+  ],
+  "improvement_accepted": false,
+  "merge_approved": false,
+  "production_apply_approved": false
+}
