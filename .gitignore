@@ -28,5 +28,9 @@ reports/**/*.json
 logs/*.log
 state/orchestrator-state.json
 state/orchestrator.run.lock
+state/learning-memory.sqlite3
+state/learning-memory.sqlite3-journal
+state/learning-memory.sqlite3-wal
+state/learning-memory.sqlite3-shm
 quarantine/*.json
 knowledge/reflective-lessons/*.json

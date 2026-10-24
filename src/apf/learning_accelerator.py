@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, replace
 from enum import StrEnum
+from pathlib import Path
 
 from apf.learning_curriculum import CurriculumItem
 from apf.learning_evaluator import (
@@ -44,6 +45,13 @@ class AccelerationRecord:
 
 class LearningAccelerator:
     """Turns curriculum work into verified memory without promoting an asset."""
+
+    @classmethod
+    def from_foundry(
+        cls, *, foundry_root: Path, verification_service: EthernianVerificationService,
+    ) -> LearningAccelerator:
+        """Explicit persistent entry point; existing review gates remain mandatory."""
+        return cls(verification_service, memory=LearningMemory.from_foundry(foundry_root))
 
     def __init__(
         self,
