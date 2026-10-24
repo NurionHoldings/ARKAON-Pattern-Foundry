@@ -175,7 +175,7 @@ def test_unknown_receipt_schema_and_non_object_entries_cannot_archive(tmp_path):
         assert packet.exists()
 
 
-def test_reconcile_closes_pending_when_payload_archived(tmp_path):
+def test_reconcile_preserves_pending_when_only_transport_was_archived(tmp_path):
     inbox = tmp_path / "inbox" / "research"
     inbox.mkdir(parents=True)
     archived_name = "done-research.json"
@@ -201,7 +201,7 @@ def test_reconcile_closes_pending_when_payload_archived(tmp_path):
     report = reconcile_mailbox_index(foundry_root=tmp_path, now=NOW)
 
     ghost = json.loads((items / "ghost123456789abc.json").read_text(encoding="utf-8"))
-    assert ghost["status"] == "FULFILLED"
+    assert ghost["status"] == "PENDING"
     assert ghost["reconcile_reason"] == "payload_archived"
     assert report["counts"]["payload_archived"] == 1
     assert report["counts"]["still_pending"] == 0
@@ -216,3 +216,49 @@ def test_plan_keeps_all_pending_while_selecting_batch(tmp_path):
 
     assert len(plan.pending) == 5
     assert len(plan.deliver) == 2
+
+
+def test_missing_payload_is_not_fulfillment(tmp_path):
+    item = tmp_path / "state/mailbox/items/missing.json"
+    write_packet(item, item_id="missing", status="PENDING",
+                 payload_path="inbox/research/lost.json")
+    report = reconcile_mailbox_index(foundry_root=tmp_path, now=NOW)
+    document = json.loads(item.read_text())
+    assert document["status"] == "PENDING"
+    assert document["reconcile_reason"] == "payload_missing"
+    assert report["counts"]["payload_missing"] == 1
+    assert report["counts"]["fulfillment_completed"] == 0
+
+
+def test_same_named_archive_in_another_stage_is_not_evidence(tmp_path):
+    item = tmp_path / "state/mailbox/items/same.json"
+    write_packet(item, item_id="same", status="PENDING",
+                 payload_path="inbox/research/same.json")
+    write_packet(tmp_path / "archive/mailbox/2026-10-24/operator-decision/same.json",
+                 status="PENDING")
+    report = reconcile_mailbox_index(foundry_root=tmp_path, now=NOW)
+    assert report["counts"]["payload_archived"] == 0
+    document = json.loads(item.read_text())
+    assert document["status"] == "PENDING"
+    assert "archived_payload_path" not in document
+
+
+def test_completed_fulfillment_can_close_pending(tmp_path):
+    item = tmp_path / "state/mailbox/items/done.json"
+    write_packet(item, item_id="done", status="PENDING",
+                 payload_path="inbox/research/done.json")
+    write_packet(tmp_path / "state/mailbox/fulfillment-queue/task.json",
+                 item_id="done", status="COMPLETED")
+    report = reconcile_mailbox_index(foundry_root=tmp_path, now=NOW)
+    assert json.loads(item.read_text())["status"] == "FULFILLED"
+    assert report["counts"]["fulfillment_completed"] == 1
+
+
+def test_reconcile_rejects_paths_outside_inbox(tmp_path):
+    for index, path in enumerate(("../outside.json", "/tmp/outside.json",
+                                 "inbox/research/../../outside.json", "", "C:\\outside.json")):
+        write_packet(tmp_path / f"state/mailbox/items/{index}.json",
+                     status="PENDING", payload_path=path)
+    report = reconcile_mailbox_index(foundry_root=tmp_path, now=NOW)
+    assert report["counts"]["invalid_payload_path"] == 5
+    assert report["counts"]["fulfillment_completed"] == 0

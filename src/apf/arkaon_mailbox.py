@@ -174,7 +174,9 @@ class ArkaonMailbox:
             for path in sorted(stage_dir.glob("*.json")):
                 try:
                     document = json.loads(path.read_text(encoding="utf-8"))
-                except (json.JSONDecodeError, OSError):
+                except (json.JSONDecodeError, UnicodeError, OSError):
+                    continue
+                if not isinstance(document, dict):
                     continue
                 packet_id = str(document.get("packet_id", path.stem))
                 item_id = _item_id_for_packet(packet_id)

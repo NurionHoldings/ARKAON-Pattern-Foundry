@@ -8,7 +8,7 @@ import shutil
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from hashlib import sha256
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any
 
 
@@ -219,6 +219,7 @@ def reconcile_mailbox_index(*, foundry_root: Path, now: datetime | None = None) 
         "payload_missing": 0,
         "still_pending": 0,
         "active_inbox_pending": 0,
+        "invalid_payload_path": 0,
     }
     for path in sorted(items_root.glob("*.json")) if items_root.is_dir() else ():
         document = _load(path)
@@ -228,7 +229,18 @@ def reconcile_mailbox_index(*, foundry_root: Path, now: datetime | None = None) 
             continue
         item_id = str(document.get("item_id", path.stem))
         payload_rel = str(document.get("payload_path", ""))
-        payload_path = root.joinpath(*payload_rel.split("/")) if payload_rel else None
+        relative = PurePosixPath(payload_rel)
+        if (
+            not payload_rel or relative.is_absolute() or "\\" in payload_rel
+            or ".." in relative.parts or len(relative.parts) < 3
+            or relative.parts[0] != "inbox"
+        ):
+            counts["invalid_payload_path"] += 1
+            continue
+        payload_path = root.joinpath(*relative.parts)
+        if not payload_path.resolve().is_relative_to(root / "inbox"):
+            counts["invalid_payload_path"] += 1
+            continue
 
         if item_id in fulfilled_item_ids:
             document["status"] = "FULFILLED"
@@ -247,14 +259,19 @@ def reconcile_mailbox_index(*, foundry_root: Path, now: datetime | None = None) 
                 pass
             continue
 
-        payload_name = Path(payload_rel).name if payload_rel else ""
-        archived = (
-            list(archive_root.rglob(payload_name))
-            if payload_name and archive_root.is_dir()
-            else []
-        )
-        document["status"] = "FULFILLED"
+        # The archive mirrors inbox-relative paths under a dated directory.
+        # A same-named file in another stage is not evidence for this packet.
+        inbox_relative = Path(*relative.parts[1:])
+        archived = []
+        for day_dir in sorted(archive_root.iterdir()) if archive_root.is_dir() else ():
+            candidate = day_dir / inbox_relative
+            if (day_dir.is_dir() and candidate.is_file()
+                    and candidate.resolve().is_relative_to(archive_root.resolve())):
+                archived.append(candidate)
+        # Transport archival/missing payload is not proof that work was done.
+        # Only the explicit completed fulfillment branch above may close it.
         document["reconciled_at"] = stamp.isoformat()
+        document.pop("archived_payload_path", None)
         if archived:
             document["reconcile_reason"] = "payload_archived"
             document["archived_payload_path"] = archived[0].relative_to(root).as_posix()

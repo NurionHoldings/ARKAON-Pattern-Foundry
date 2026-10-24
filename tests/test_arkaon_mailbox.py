@@ -12,6 +12,20 @@ from apf.arkaon_mailbox import (
 NOW = datetime(2031, 1, 1, tzinfo=UTC)
 
 
+def test_sync_skips_non_utf8_and_non_object_without_losing_valid_packet(tmp_path):
+    folder = tmp_path / "inbox/research"
+    folder.mkdir(parents=True)
+    (folder / "000-invalid.json").write_bytes(b"\xff\xfe")
+    (folder / "001-array.json").write_text("[]", encoding="utf-8")
+    _inbox_packet(tmp_path, "research", "valid", "정상 학습 결과")
+    mailbox = ArkaonMailbox(foundry_root=tmp_path)
+    synced = mailbox.sync_from_inbox(now=NOW)
+    assert len(synced) == 1
+    assert synced[0].summary == "정상 학습 결과"
+    assert (folder / "000-invalid.json").read_bytes() == b"\xff\xfe"
+    assert (folder / "001-array.json").read_text() == "[]"
+
+
 def _inbox_packet(tmp_path, stage: str, packet_id: str, summary: str) -> None:
     folder = tmp_path / "inbox" / stage
     folder.mkdir(parents=True, exist_ok=True)
