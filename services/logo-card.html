@@ -1,40 +1,71 @@
 <!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>로고·명함 만들기 · 아르카온</title>
-  <link rel="stylesheet" href="/services/services.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>브랜드 스튜디오 · 아르카온</title>
+<link rel="stylesheet" href="/services/brand-studio.css">
 </head>
 <body>
-  <div class="shell">
-    <div class="svc-top"><h1>로고·명함 만들기</h1><a class="svc-home" href="/">← 홈</a></div>
-    <p class="muted">브랜드 이름과 연락처로 명함 HTML을 만들고, 진입·로고 모션은 스튜디오에서 다듬을 수 있습니다.</p>
-    <form class="panel" id="form">
-      <h2>브랜드 정보</h2>
-      <label>상호·이름<input id="businessName" required maxlength="80" value="ARKAON"></label>
-      <label>한 줄 소개<input id="role" maxlength="120" value="디지털 제작 공간"></label>
-      <label>이메일<input id="email" type="email" maxlength="120"></label>
-      <label>전화<input id="phone" maxlength="40"></label>
-      <label>강조색<input id="accent" type="color" value="#75d8f9"></label>
-      <div class="btn-row">
-        <button type="submit">명함 HTML 저장</button>
-        <a class="btn" href="/examples/entry-effects-studio.html">진입 효과 스튜디오</a>
-        <a class="btn" href="/examples/arirang-text-effects.html">텍스트 효과 예제</a>
-      </div>
-    </form>
-    <div class="panel preview"><iframe id="preview" title="명함 미리보기"></iframe></div>
-  </div>
-  <script src="/services/services.js"></script>
-  <script>
-    const {businessCardHtml,downloadText,saveProject}=APFHomeServices;
-    const fields=['businessName','role','email','phone','accent'];
-    function values(){return Object.fromEntries(fields.map(id=>[id,document.getElementById(id).value]));}
-    function render(){document.getElementById('preview').srcdoc=businessCardHtml(values());}
-    fields.forEach(id=>document.getElementById(id).addEventListener('input',render));
-    document.getElementById('form').addEventListener('submit',e=>{e.preventDefault();const v=values();const html=businessCardHtml(v);
-      saveProject({type:'logo-card',title:v.businessName,html});downloadText(`${v.businessName}-card.html`,html);});
-    render();
-  </script>
+<header><a href="/">ARKAON / BRAND STUDIO</a><a href="/services/account.html">내 작업</a></header>
+<main>
+<section class="editor">
+<p class="eyebrow">작은 시작에도, 분명한 인상.</p>
+<h1>로고와 명함을<br>함께 다듬으세요.</h1>
+<p>사업 정보를 바탕으로 문구를 제안하고 직접 다듬을 수 있습니다. 확인되지 않은 실적·인증·가격은 채우지 않습니다.</p>
+<form id="brand">
+<fieldset>
+<legend>1. 사업 정보</legend>
+<label>업종<input id="industry" maxlength="80" placeholder="예: 카페 · 브랜드 디자인"></label>
+<label>주요 고객<input id="audience" maxlength="120" placeholder="예: 동네 주민 · 1인 창업자"></label>
+<label>제공 서비스 (줄마다 하나)<textarea id="services" maxlength="400" rows="3" placeholder="예: 원두 판매&#10;브런치"></textarea></label>
+<label>강점<textarea id="strengths" maxlength="300" rows="2" placeholder="예: 직접 로스팅 · 당일 배송"></textarea></label>
+<button type="button" id="suggest-copy">사업 정보로 문구 제안 (빈 칸만)</button>
+</fieldset>
+<fieldset>
+<legend>2. 브랜드·명함 문구</legend>
+<label>상호·브랜드 이름<input id="businessName" required maxlength="60"></label>
+<label>로고 약자<input id="initials" maxlength="4" placeholder="예: ON"></label>
+<label>한 줄 소개 (명함 앞면)<input id="tagline" maxlength="100"></label>
+<label>브랜드 소개 (입력한 사실만 · 직접 수정)<textarea id="brandIntro" maxlength="400" rows="4"></textarea></label>
+<label>명함 구성<select id="cardLayout"><option value="company">회사용 · 앞면 로고·소개</option><option value="personal">개인용 · 앞면 이름·직책</option></select></label>
+<label>담당자 이름<input id="person" maxlength="40"></label>
+<label>직책<input id="role" maxlength="60"></label>
+</fieldset>
+<fieldset>
+<legend>3. 연락처</legend>
+<label>이메일<input id="email" type="email" maxlength="120"></label>
+<label>전화<input id="phone" maxlength="40"></label>
+<label>웹사이트<input id="website" type="url" maxlength="240" placeholder="https://"></label>
+<label>주소<input id="address" maxlength="160"></label>
+</fieldset>
+<fieldset>
+<legend>4. 사업을 표현하는 디자인 방향</legend>
+<p>입력한 사업 정보를 기준으로 순서·각도·선 두께를 달리한 6개 구조를 제안합니다. 의미는 디자인 제안이며 업종별 독창성을 보증하지 않습니다.</p>
+<button type="button" id="generate-concepts">사업 정보로 디자인 방향 6개 비교</button>
+<button type="button" id="vary-concepts">다른 변주 보기 (현재 작업 유지)</button>
+<div id="concept-options" aria-label="디자인 방향 후보"></div>
+<input type="hidden" id="conceptId"><input type="hidden" id="conceptRound" value="0"><input type="hidden" id="conceptRotation"><input type="hidden" id="conceptWeight">
+<label>로고 활용 형태<select id="logoLockup"><option value="horizontal">가로형</option><option value="stacked">세로형</option><option value="symbol">심벌만</option></select></label>
+<label>로고 배경 비교<select id="logoTone"><option value="light">밝은 배경 · 브랜드색</option><option value="dark">어두운 배경 · 흰색</option><option value="mono">단색 검정</option></select></label>
+<label>로고 시안<select id="style"><option value="orbit">연결 · 원형 심벌</option><option value="frame">신뢰 · 프레임 심벌</option><option value="wordmark">간결 · 워드마크</option></select></label>
+<label>브랜드 색상<input id="accent" type="color" value="#31594c"></label>
+</fieldset>
+<button type="button" id="example">가상 예시로 살펴보기</button>
+<button type="submit">초안 저장 · 이어서 편집</button>
+<p id="status" role="status"></p>
+</form>
+</section>
+<section class="results" aria-label="브랜드 미리보기">
+<p class="eyebrow">YOUR BRAND, IN CONTEXT</p>
+<h2>로고와 명함 앞뒷면</h2>
+<iframe id="preview" title="로고와 명함 앞뒷면 미리보기" sandbox=""></iframe>
+<ul id="missing"></ul>
+<p>이 브라우저에 저장되는 초안입니다. 상표 유사성·폰트 이용 조건·연락처 확인이 필요합니다. 인쇄용 PDF·QR·도련·색상 교정·공개 게시·AI 이미지 생성은 포함되지 않습니다.</p>
+</section>
+</main>
+<script src="/services/services.js"></script>
+<script src="/services/brand-concepts.js"></script>
+<script src="/services/brand-studio.js"></script>
 </body>
 </html>
