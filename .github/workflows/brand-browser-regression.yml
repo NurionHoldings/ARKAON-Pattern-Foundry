@@ -1,0 +1,48 @@
+name: Brand browser regression
+on:
+  pull_request:
+    branches: [main, feat/brand-studio-quality]
+    paths:
+      - 'services/brand-*.js'
+      - 'services/brand-*.css'
+      - 'services/logo-card.html'
+      - 'services/services.js'
+      - 'tools/test-brand-browser.cjs'
+      - '.github/workflows/brand-browser-regression.yml'
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: candidate
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: ab3a2a9e7f6fe7b473403786b84b66270eff664c
+          path: baseline
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install isolated browser test dependencies
+        run: |
+          npm install --prefix "$RUNNER_TEMP/brand-browser" --no-package-lock --ignore-scripts playwright@1.62.1
+          "$RUNNER_TEMP/brand-browser/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Compare twelve viewport conditions and edit roundtrip
+        env:
+          CANDIDATE_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          NODE_PATH="$RUNNER_TEMP/brand-browser/node_modules" node candidate/tools/test-brand-browser.cjs --baseline-dir baseline --candidate-dir candidate --baseline-sha ab3a2a9e7f6fe7b473403786b84b66270eff664c --candidate-sha "$CANDIDATE_SHA" --out browser-evidence
+      - name: Retain manifests, DOM and screenshots even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: brand-browser-evidence-${{ github.event.pull_request.head.sha }}
+          path: browser-evidence/
+          retention-days: 14
+          if-no-files-found: warn
