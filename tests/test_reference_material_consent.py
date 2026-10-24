@@ -12,8 +12,10 @@ from apf.reference_material_consent import (
     ReferenceUseMode,
     ReferenceUseRequest,
     RightsBasis,
+    consent_return_url_allowed,
     decide_reference_use,
     digest,
+    normalize_consent_return_url,
 )
 
 
@@ -125,3 +127,13 @@ def test_previous_notice_requires_new_acknowledgement():
     item = request()
     with pytest.raises(ReferenceConsentError, match="INCOMPLETE"):
         decide_reference_use(item, consent(item, notice_version="apf.reference-material-notice/1.0"))
+
+
+def test_consent_return_url_allowlist():
+    assert consent_return_url_allowed(
+        "https://deploy-preview-120--arkaonfoundry.netlify.app/services/site-builder.html?session=x"
+    )
+    assert not consent_return_url_allowed("https://evil.example/phish")
+    assert normalize_consent_return_url(
+        "https://arkaonfoundry.netlify.app/services/co-create.html"
+    ).startswith("https://arkaonfoundry.netlify.app")

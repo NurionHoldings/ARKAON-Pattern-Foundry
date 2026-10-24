@@ -226,6 +226,7 @@ def save_studio_draft(
     brief: StudioBrief,
     now: datetime,
     local_project_id: str | None = None,
+    reference_consent_request_id: str | None = None,
 ) -> dict[str, object]:
     if now.tzinfo is None:
         raise CoCreationStudioRejected("TIMESTAMP", "timezone-aware timestamp required")
@@ -243,6 +244,8 @@ def save_studio_draft(
         "updated_at": now.isoformat(),
         "local_project_id": local_project_id,
     }
+    if reference_consent_request_id is not None:
+        body["reference_consent_request_id"] = reference_consent_request_id
     body["draft_digest"] = _draft_digest({k: v for k, v in body.items() if k != "draft_digest"})
     path = studio_draft_path(foundry_root, session_id)
     path.parent.mkdir(parents=True, exist_ok=True)

@@ -39,6 +39,7 @@
   const params=new URLSearchParams(location.search);
   const linkSession=params.get('session')||'';
   const linkProposal=params.get('proposal')||'';
+  let linkConsentId=params.get('reference_consent_request_id')||'';
   let activeProjectId=params.get('project')||null;
   let theme='editorial',step=0,sample=false,previewUrl=null;
   const fields=['industry','title','audience','story','offerings','difference','process','contact'];
@@ -62,7 +63,8 @@
       if(briefFromStash){
         applyBrief(briefFromStash);
         const sid=stash.session_id||linkSession;
-        if(sid)window.APFHomeServices.saveCoCreationStudioDraft?.(sid,{brief:briefFromStash,proposal_id:stash.proposal_id||linkProposal,project_id:activeProjectId});
+        if(sid)window.APFHomeServices.saveCoCreationStudioDraft?.(sid,{brief:briefFromStash,proposal_id:stash.proposal_id||linkProposal,project_id:activeProjectId,reference_consent_request_id:stash.reference_consent_request_id||linkConsentId||null});
+        if(stash.reference_consent_request_id)linkConsentId=stash.reference_consent_request_id;
       }
     }
     if(activeProjectId){
@@ -79,7 +81,8 @@
         if(remote?.brief){
           applyBrief(remote.brief);
           if(remote.local_project_id)activeProjectId=remote.local_project_id;
-          window.APFHomeServices.saveCoCreationStudioDraft?.(sessionForLoad,{brief:remote.brief,proposal_id:remote.proposal_id,project_id:activeProjectId});
+          if(remote.reference_consent_request_id)linkConsentId=remote.reference_consent_request_id;
+          window.APFHomeServices.saveCoCreationStudioDraft?.(sessionForLoad,{brief:remote.brief,proposal_id:remote.proposal_id,project_id:activeProjectId,reference_consent_request_id:remote.reference_consent_request_id||linkConsentId||null});
         }
       }catch{
         if(msg)msg.textContent='서버 초안을 불러오지 못했습니다. 이 브라우저에 저장된 내용을 사용합니다.';
@@ -94,6 +97,52 @@
   document.getElementById('next').addEventListener('click',()=>{go(Math.min(step+1,2));document.querySelector(`[data-panel="${step}"]`).querySelector('input,button,textarea')?.focus();});
   document.getElementById('example').addEventListener('click',()=>{const v={industry:'service',title:'온유 스튜디오',audience:'브랜드를 처음 시작하는 작은 가게를 위해',story:'복잡한 생각을 정리하고 가게의 이야기를 전달하는 디자인을 함께 만듭니다.',offerings:'브랜드 방향 정리\n시각 디자인\n소개 홈페이지',difference:'이해하기 쉬운 설명과 작은 화면에서도 읽기 편한 구성을 중요하게 생각합니다.',process:'목적과 고민 나누기\n구성과 디자인 방향 확인\n초안을 보고 함께 다듬기',contact:''};fields.forEach(id=>document.getElementById(id).value=v[id]);sample=true;update();});
   ['desktop','mobile'].forEach(id=>document.getElementById(id).addEventListener('click',()=>{document.querySelector('.frame').classList.toggle('phone',id==='mobile');['desktop','mobile'].forEach(k=>document.getElementById(k).setAttribute('aria-pressed',String(k===id)));}));
-  document.getElementById('brief').addEventListener('submit',async e=>{e.preventDefault();const msgEl=document.getElementById('message');try{const v=values();if(!v.title.trim()){go(0);document.getElementById('title').focus();msgEl.textContent='이름을 입력해 주세요.';return;}const html=render(v);const sessionForSave=linkSession||params.get('session')||null;const proposalForSave=linkProposal||params.get('proposal')||null;const saved=window.APFHomeServices.saveProject({id:activeProjectId||undefined,type:'site',title:v.title,html,brief:v,creation_mode:'rule_based_studio',publish_ready:false,co_creation_session_id:sessionForSave,co_creation_proposal_id:proposalForSave});activeProjectId=saved.id;if(sessionForSave){window.APFHomeServices.saveCoCreationStudioDraft(sessionForSave,{brief:v,proposal_id:proposalForSave,project_id:saved.id});if(proposalForSave&&window.APFHomeServices.consoleApiFetch){const put=await window.APFHomeServices.consoleApiFetch(`/v1/console/co-creation/studio/${encodeURIComponent(sessionForSave)}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({proposal_id:proposalForSave,brief:v,local_project_id:saved.id})});if(!put.ok){const detail=await put.json().catch(()=>({}));msgEl.textContent=`브라우저에는 저장됐지만 서버 동기화 실패 (${put.status}${detail.detail?`: ${detail.detail}`:''}). API 로그인·CSRF 쿠키를 확인해 주세요.`;}else{msgEl.textContent='초안을 저장했습니다. 브라우저와 서버 초안이 갱신됐습니다.';}}}else{msgEl.textContent='초안을 저장했습니다. 이 브라우저에서 다시 열면 내용이 유지됩니다.';}const q=new URLSearchParams(location.search);q.set('project',saved.id);if(sessionForSave)q.set('session',sessionForSave);if(proposalForSave)q.set('proposal',proposalForSave);history.replaceState(null,'',`${location.pathname}?${q}`);}catch{msgEl.textContent='저장하지 못했습니다. 브라우저 저장 공간·권한을 확인해 주세요.';}});
+  document.getElementById('brief').addEventListener('submit',async e=>{
+    e.preventDefault();
+    const msgEl=document.getElementById('message');
+    const v=values();
+    if(!v.title.trim()){go(0);document.getElementById('title').focus();msgEl.textContent='이름을 입력해 주세요.';return;}
+    let saved;
+    try{
+      const html=render(v);
+      const sessionForSave=linkSession||params.get('session')||null;
+      const proposalForSave=linkProposal||params.get('proposal')||null;
+      const consentForSave=linkConsentId||params.get('reference_consent_request_id')||null;
+      saved=window.APFHomeServices.saveProject({id:activeProjectId||undefined,type:'site',title:v.title,html,brief:v,creation_mode:'rule_based_studio',publish_ready:false,co_creation_session_id:sessionForSave,co_creation_proposal_id:proposalForSave,reference_consent_request_id:consentForSave});
+      activeProjectId=saved.id;
+    }catch{
+      msgEl.textContent='저장하지 못했습니다. 브라우저 저장 공간·권한을 확인해 주세요.';
+      return;
+    }
+    const sessionForSave=linkSession||params.get('session')||null;
+    const proposalForSave=linkProposal||params.get('proposal')||null;
+    const consentForSave=linkConsentId||params.get('reference_consent_request_id')||null;
+    if(sessionForSave){
+      window.APFHomeServices.saveCoCreationStudioDraft(sessionForSave,{brief:v,proposal_id:proposalForSave,project_id:saved.id,reference_consent_request_id:consentForSave});
+    }
+    let syncNote='초안을 저장했습니다. 이 브라우저에서 다시 열면 내용이 유지됩니다.';
+    if(sessionForSave&&proposalForSave&&window.APFHomeServices.canConsoleApiSync?.()){
+      try{
+        const put=await window.APFHomeServices.consoleApiFetch(`/v1/console/co-creation/studio/${encodeURIComponent(sessionForSave)}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({proposal_id:proposalForSave,brief:v,local_project_id:saved.id,reference_consent_request_id:consentForSave})});
+        if(!put.ok){
+          const detail=await put.json().catch(()=>({}));
+          syncNote=`브라우저에는 저장됐지만 서버 동기화 실패 (${put.status}${detail.detail?`: ${detail.detail}`:''}). API와 같은 도메인에서 로그인했는지 확인해 주세요.`;
+        }else syncNote='초안을 저장했습니다. 브라우저와 서버 초안이 갱신됐습니다.';
+      }catch(err){
+        syncNote=err?.message==='CSRF_TOKEN_MISSING'||err?.message==='API_CROSS_ORIGIN'
+          ? '브라우저에 저장됐습니다. API가 다른 사이트면 서버 동기화는 API 도메인에서 로그인·설정 후 가능합니다.'
+          : '브라우저에 저장됐습니다. 서버 동기화는 나중에 다시 시도할 수 있습니다.';
+      }
+    }else if(sessionForSave&&proposalForSave&&window.APFHomeServices.getApiBase?.()){
+      syncNote='브라우저에 저장됐습니다. API 주소가 다른 사이트면 CSRF 쿠키를 공유할 수 없어 서버 동기화를 건너뜁니다.';
+    }
+    msgEl.textContent=syncNote;
+    const q=new URLSearchParams(location.search);
+    q.set('project',saved.id);
+    if(sessionForSave)q.set('session',sessionForSave);
+    if(proposalForSave)q.set('proposal',proposalForSave);
+    if(consentForSave)q.set('reference_consent_request_id',consentForSave);
+    history.replaceState(null,'',`${location.pathname}?${q}`);
+  });
   loadLinkedDraft().then(()=>update()).catch(()=>update());
 })();

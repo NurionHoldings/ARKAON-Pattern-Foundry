@@ -192,6 +192,40 @@ def _allowed(
     )
 
 
+ALLOWED_CONSENT_RETURN_PATHS = frozenset(
+    {
+        "/services/site-builder.html",
+        "/services/co-create.html",
+    }
+)
+
+
+def consent_return_url_allowed(return_url: str) -> bool:
+    from urllib.parse import urlparse
+
+    try:
+        parsed = urlparse(return_url.strip())
+    except ValueError:
+        return False
+    if parsed.scheme not in {"http", "https"}:
+        return False
+    if parsed.path not in ALLOWED_CONSENT_RETURN_PATHS:
+        return False
+    host = (parsed.hostname or "").lower()
+    if host in {"localhost", "127.0.0.1"}:
+        return True
+    if host == "arkaonfoundry.netlify.app":
+        return True
+    return host.endswith("--arkaonfoundry.netlify.app")
+
+
+def normalize_consent_return_url(return_url: str) -> str | None:
+    cleaned = return_url.strip()
+    if not cleaned or not consent_return_url_allowed(cleaned):
+        return None
+    return cleaned
+
+
 def _exclusive_json(path: Path, value: dict[str, object]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     try:

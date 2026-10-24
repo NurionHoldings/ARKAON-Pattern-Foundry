@@ -27,8 +27,8 @@
     "external_material_included": false
   },
   "evidence_hashes": {
-    "src/apf/approval_tokens.py": "4e8a2ee1144cdecb6b18ce22825f60b1636cb04679f1a2ff5a496276bbdac05a",
-    "tests/test_approval_tokens.py": "1fa15da4476d70d220a22376b9e8cf87c325201169f6fa833a1bd6cc9ac5e0ad"
+    "src/apf/approval_tokens.py": "8537f8f4f0ede75b0051ace5e663a50a69feab6616e44c8b809e11ebc4885e51",
+    "tests/test_approval_tokens.py": "0e4515bfc373938ff3a345be65bdb2abc32629deeb335070d2a61e442ddf4b3b"
   },
   "source_refs": [
     "src/apf/approval_tokens.py"
@@ -53,5 +53,5 @@
   "status": "ETHERNIAN_REVIEW_REQUIRED",
   "owned_asset": false,
   "semantic_fingerprint": "d66069fc5b619e6ea2f18e5e916d81240677fd209c26873b82206415db8fc2c9",
-  "package_hash": "a3ca31d939baee3fc5f703288dfef876918195c30a5ad74a274b5625dfd45b94"
+  "package_hash": "8a9a9aba885f125ba08ffc3940f038965f728c000d1b3955d783e55bc2579ce8"
 }

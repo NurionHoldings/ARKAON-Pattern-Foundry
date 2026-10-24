@@ -146,26 +146,51 @@
     return match ? decodeURIComponent(match.split('=').slice(1).join('=')) : '';
   }
 
+  function getApiOrigin() {
+    const base = getApiBase();
+    if (!base) return null;
+    try {
+      return new URL(base).origin;
+    } catch {
+      return null;
+    }
+  }
+
+  function canConsoleApiSync() {
+    const apiOrigin = getApiOrigin();
+    if (!apiOrigin) return false;
+    return apiOrigin === window.location.origin;
+  }
+
   async function consoleApiFetch(path, options = {}) {
     const base = getApiBase();
     if (!base) throw new Error('API_NOT_CONFIGURED');
     const method = (options.method || 'GET').toUpperCase();
     const headers = { ...(options.headers || {}) };
     if (method !== 'GET' && method !== 'HEAD') {
-      headers['X-CSRF-Token'] = readCsrfToken();
+      if (!canConsoleApiSync()) {
+        throw new Error('API_CROSS_ORIGIN');
+      }
+      const token = readCsrfToken();
+      if (!token) throw new Error('CSRF_TOKEN_MISSING');
+      headers['X-CSRF-Token'] = token;
     }
     return fetch(`${base}${path}`, { ...options, credentials: 'include', headers });
   }
 
   async function fetchCoCreationStudioDraft(sessionId) {
-    if (!sessionId) return null;
-    const response = await consoleApiFetch(
-      `/v1/console/co-creation/studio/${encodeURIComponent(sessionId)}`,
-      { method: 'GET' },
-    );
-    if (!response.ok) return null;
-    const body = await response.json();
-    return body.draft || null;
+    if (!sessionId || !canConsoleApiSync()) return null;
+    try {
+      const response = await consoleApiFetch(
+        `/v1/console/co-creation/studio/${encodeURIComponent(sessionId)}`,
+        { method: 'GET' },
+      );
+      if (!response.ok) return null;
+      const body = await response.json();
+      return body.draft || null;
+    } catch {
+      return null;
+    }
   }
 
   function saveProject(entry) {
@@ -296,6 +321,8 @@
     popReferenceConsentStash,
     resumeCoCreationStash,
     readCsrfToken,
+    getApiOrigin,
+    canConsoleApiSync,
     consoleApiFetch,
     fetchCoCreationStudioDraft,
     MAX_VIDEO_STORE_BYTES,

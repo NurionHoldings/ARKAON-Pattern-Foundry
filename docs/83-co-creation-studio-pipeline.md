@@ -42,3 +42,10 @@ Foundry API `POST /v1/console/co-creation/chat`도 채팅 후 동일 세션에 s
 - receipt: `receipt_digest`·`notice_version`·co-creation 허용 decision 재검증
 
 **판정:** 개별 기능·자동시험 통과 ≠ 브라우저 완주·교차 사용자·독립 감사 완료.
+
+## 재검토 후속 (86d689a 이후)
+
+- 저장 UX: 로컬 저장 성공과 API 동기화 실패 분리. cross-origin API는 `canConsoleApiSync()` false 시 서버 PUT 생략.
+- return URL: Netlify preview·production·localhost + `/services/site-builder.html|co-create.html` 만 허용.
+- `reference_consent_request_id`: URL·local draft·서버 studio draft·PUT payload에 연결.
+- pattern catalog: `evidence_hashes` / `package_hash` 일괄 갱신 (CI `EVIDENCE_HASH_MISMATCH`).

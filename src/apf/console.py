@@ -111,6 +111,7 @@ class CoCreationStudioUpdateRequest(BaseModel):
     proposal_id: str = Field(min_length=8, max_length=64)
     brief: CoCreationStudioBriefPayload
     local_project_id: str | None = Field(default=None, max_length=64)
+    reference_consent_request_id: str | None = Field(default=None, max_length=128)
 
 
 class CoCreationProductImprovementRequest(BaseModel):
@@ -797,6 +798,9 @@ def install_console(
             contact=payload.brief.contact,
             theme=payload.brief.theme,
         )
+        consent_request_id = payload.reference_consent_request_id or existing.get(
+            "reference_consent_request_id"
+        )
         try:
             draft = save_studio_draft(
                 foundry_root=foundry_root(),
@@ -807,6 +811,9 @@ def install_console(
                 brief=brief,
                 now=datetime.now().astimezone(),
                 local_project_id=payload.local_project_id or existing.get("local_project_id"),
+                reference_consent_request_id=(
+                    str(consent_request_id) if consent_request_id else None
+                ),
             )
         except CoCreationStudioRejected as error:
             raise HTTPException(status_code=422, detail=error.code) from None
@@ -1710,12 +1717,17 @@ def install_console(
     ) -> dict[str, object]:
         if actor.role != "owner":
             raise HTTPException(status_code=403, detail="owner role required")
+        from .reference_material_consent import ALLOWED_CONSENT_RETURN_PATHS
+
         return {
             "notice_version": NOTICE_VERSION,
             "notice_text": NOTICE_TEXT,
             "modification_proposals": list(MODIFICATION_PROPOSALS),
             "notice_digest": reference_digest(NOTICE_TEXT),
             "required_acknowledgements": sorted(REQUIRED_ACKNOWLEDGEMENTS),
+            "allowed_return_paths": sorted(ALLOWED_CONSENT_RETURN_PATHS),
+            "allowed_return_origin_suffixes": ["--arkaonfoundry.netlify.app"],
+            "allowed_return_hosts": ["arkaonfoundry.netlify.app", "localhost", "127.0.0.1"],
             "automatic_merge_allowed": False,
             "deployment_allowed": False,
         }
