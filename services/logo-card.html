@@ -40,7 +40,14 @@
 <label>주소<input id="address" maxlength="160"></label>
 </fieldset>
 <fieldset>
-<legend>4. 표현 방식</legend>
+<legend>4. 사업을 표현하는 디자인 방향</legend>
+<p>입력한 사업 정보를 기준으로 순서·각도·선 두께를 달리한 6개 구조를 제안합니다. 의미는 디자인 제안이며 업종별 독창성을 보증하지 않습니다.</p>
+<button type="button" id="generate-concepts">사업 정보로 디자인 방향 6개 비교</button>
+<button type="button" id="vary-concepts">다른 변주 보기 (현재 작업 유지)</button>
+<div id="concept-options" aria-label="디자인 방향 후보"></div>
+<input type="hidden" id="conceptId"><input type="hidden" id="conceptRound" value="0"><input type="hidden" id="conceptRotation"><input type="hidden" id="conceptWeight">
+<label>로고 활용 형태<select id="logoLockup"><option value="horizontal">가로형</option><option value="stacked">세로형</option><option value="symbol">심벌만</option></select></label>
+<label>로고 배경 비교<select id="logoTone"><option value="light">밝은 배경 · 브랜드색</option><option value="dark">어두운 배경 · 흰색</option><option value="mono">단색 검정</option></select></label>
 <label>로고 시안<select id="style"><option value="orbit">연결 · 원형 심벌</option><option value="frame">신뢰 · 프레임 심벌</option><option value="wordmark">간결 · 워드마크</option></select></label>
 <label>브랜드 색상<input id="accent" type="color" value="#31594c"></label>
 </fieldset>
@@ -58,6 +65,7 @@
 </section>
 </main>
 <script src="/services/services.js"></script>
+<script src="/services/brand-concepts.js"></script>
 <script src="/services/brand-studio.js"></script>
 </body>
 </html>

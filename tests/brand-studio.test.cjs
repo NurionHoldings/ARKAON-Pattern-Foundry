@@ -100,3 +100,31 @@ test('collectGaps flags missing business and invalid email', () => {
   assert.ok(gaps.some((g) => g.includes('업종')));
   assert.ok(gaps.some((g) => g.includes('이메일')));
 });
+
+const creative = require('../services/brand-concepts.js');
+test('six concepts have structurally different marks with reproducible variation',()=>{
+ const brief={businessName:'햇살',industry:'태양광',services:'설계\n점검',strengths:'쉬운 설명'};
+ const a=creative.concepts(brief);assert.equal(new Set(a.map(c=>c.id)).size,6);
+ assert.deepEqual(a,creative.concepts(brief));
+ const marks=a.map(c=>creative.svg({...creative.applyConcept(brief,c),logoLockup:'symbol',accent:'#123456'}));
+ assert.equal(new Set(marks).size,6);
+ assert.notDeepEqual(a,creative.concepts({...brief,conceptRound:'1'}));
+ assert.notDeepEqual(a,creative.concepts({...brief,services:'다른 서비스'}));
+});
+test('concept selection preserves edited copy and supports all lockups',()=>{
+ const raw={businessName:'긴상호'.repeat(15),tagline:'직접 다듬은 문구',brandIntro:'보존할 소개'};
+ const picked=creative.applyConcept(raw,creative.concepts(raw)[0]);
+ assert.equal(picked.tagline,raw.tagline);assert.equal(picked.brandIntro,raw.brandIntro);
+ for(const logoLockup of ['horizontal','stacked','symbol']){
+  const svg=creative.svg({...picked,logoLockup});assert.ok(svg.includes('<svg'));
+  if(logoLockup==='symbol')assert.ok(!svg.includes('<text'));
+ }
+ assert.ok(logo({...picked,logoTone:'dark'}).includes('#ffffff'));
+});
+test('procedural SVG escapes names and rejects uncontrolled geometry',()=>{
+ const c=creative.concepts({})[0];
+ const svg=creative.svg({...creative.applyConcept({},c),businessName:'<script>x</script>',conceptRotation:'999 onclick=x',conceptWeight:'999'});
+ assert.ok(!svg.includes('<script>'));assert.ok(!svg.includes('999'));
+ assert.equal(creative.svg({conceptId:'unknown'}),null);
+ assert.throws(()=>creative.applyConcept({}, {id:'unknown'}));
+});
