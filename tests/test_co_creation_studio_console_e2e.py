@@ -14,8 +14,8 @@ from apf.api import create_app
 from apf.co_creation_reference_gate import extract_reference_urls, reference_scope_digest
 from apf.console import ConsoleSecurity
 from apf.reference_material_consent import NOTICE_TEXT, NOTICE_VERSION
-from apf.reference_url_style import ReferenceStyleProfile
 from apf.reference_material_consent import digest as reference_digest
+from apf.reference_url_style import ReferenceStyleProfile
 from apf.repository import MemoryRepository
 
 ROOT = Path(__file__).resolve().parents[1]
