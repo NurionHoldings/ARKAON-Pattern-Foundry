@@ -42,12 +42,23 @@ REQUIRED_ACKNOWLEDGEMENTS = frozenset(
     }
 )
 
-NOTICE_VERSION = "apf.reference-material-notice/1.0"
+NOTICE_VERSION = "apf.reference-material-notice/1.1"
 NOTICE_TEXT = (
     "사용자가 지정·제공한 참고자료와 권리 주장에 관한 귀책사유가 있으면 사용자가 그 책임을 "
-    "부담할 수 있습니다. 이 확인은 무단 이용을 적법하게 만들거나 플랫폼의 책임을 전부 "
+    "민사상 책임을 부담할 수 있고, 고의 등 법정 요건에 따라 형사책임이 문제될 수 있습니다. "
+    "책임의 성립과 범위는 구체적 행위와 법령에 따라 판단됩니다. 이 확인은 무단 이용을 적법하게 만들거나 플랫폼의 책임을 전부 "
     "사용자에게 이전하지 않습니다. 권리가 불명확하거나 침해 가능성이 높으면 구현을 거절하거나 "
     "격리할 수 있으며, 이 확인은 병합·배포 승인이 아닙니다."
+)
+
+MODIFICATION_PROPOSALS = (
+    "로고·상호·고유 아이콘은 직접 만든 브랜드 자산으로 교체합니다.",
+    "사진·영상·삽화는 사용 권한이 확인된 자료로 교체하고 조건과 출처를 기록합니다.",
+    "소개문·홍보문·후기·상품 설명은 실제 사용자 자료를 근거로 새로 작성합니다.",
+    "페이지 순서·정보 구조·카드 구성·타이포그래피를 목적에 맞게 독립 설계합니다.",
+    "예약 단계를 줄이거나 업종별 입력·접근성 기능을 추가하는 등 이용 흐름을 보강합니다.",
+    "원본 코드·폰트·라이브러리의 허가 범위와 출처표시·변경·배포 조건을 따로 확인합니다.",
+    "색상·글꼴·애니메이션 변경만으로 침해가 해소되거나 일정 변경 비율이면 적법하다고 보장하지 않습니다.",
 )
 
 _DIGEST = re.compile(r"^sha256:[0-9a-f]{64}$")
@@ -70,7 +81,7 @@ class ReferenceUseRequest(BaseModel):
 
 class ReferenceUseConsent(BaseModel):
     request_digest: str = Field(pattern=r"^sha256:[0-9a-f]{64}$")
-    notice_version: str = Field(pattern=r"^apf\.reference-material-notice/1\.0$")
+    notice_version: str = Field(pattern=r"^apf\.reference-material-notice/1\.[01]$")
     acknowledged_items: set[str]
     principal_id: UUID
     nonce: UUID
@@ -85,6 +96,7 @@ class ReferenceUseDecision(BaseModel):
     consent_digest: str
     direct_expression_reuse_allowed: bool
     implementation_allowed: bool
+    modification_proposals: list[str] = Field(default_factory=lambda: list(MODIFICATION_PROPOSALS))
     merge_allowed: bool = False
     deployment_allowed: bool = False
 
@@ -174,7 +186,7 @@ def _allowed(
 ) -> ReferenceUseDecision:
     return ReferenceUseDecision(
         decision="SANDBOX_IMPLEMENTATION_ALLOWED",
-        reason="RIGHTS_EVIDENCE_VERIFIED" if direct else "USER_REQUESTED_CLEAN_ROOM_IMPLEMENTATION",
+        reason="RIGHTS_BASIS_AND_EVIDENCE_RECORDED" if direct else "USER_REQUESTED_CLEAN_ROOM_IMPLEMENTATION",
         allowed_mode=request.mode, request_digest=request_digest, consent_digest=consent_digest,
         direct_expression_reuse_allowed=direct, implementation_allowed=True,
     )
