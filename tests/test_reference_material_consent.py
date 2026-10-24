@@ -13,6 +13,7 @@ from apf.reference_material_consent import (
     ReferenceUseRequest,
     RightsBasis,
     consent_return_url_allowed,
+    consent_return_url_with_request_id,
     decide_reference_use,
     digest,
     normalize_consent_return_url,
@@ -137,3 +138,12 @@ def test_consent_return_url_allowlist():
     assert normalize_consent_return_url(
         "https://arkaonfoundry.netlify.app/services/co-create.html"
     ).startswith("https://arkaonfoundry.netlify.app")
+
+
+def test_consent_return_url_appends_reference_request_id():
+    base = "https://localhost/services/site-builder.html?session=abc&proposal=p1"
+    enriched = consent_return_url_with_request_id(base, "consent-req-99")
+    assert enriched is not None
+    assert "reference_consent_request_id=consent-req-99" in enriched
+    assert "session=abc" in enriched
+    assert consent_return_url_with_request_id("https://evil.example/x", "id") is None

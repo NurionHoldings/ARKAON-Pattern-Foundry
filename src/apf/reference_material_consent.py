@@ -226,6 +226,22 @@ def normalize_consent_return_url(return_url: str) -> str | None:
     return cleaned
 
 
+def consent_return_url_with_request_id(return_url: str, request_id: str) -> str | None:
+    """Append reference_consent_request_id to an allowlisted return URL (consent UI redirect)."""
+    from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
+
+    normalized = normalize_consent_return_url(return_url)
+    if normalized is None:
+        return None
+    cleaned_id = request_id.strip()
+    if not cleaned_id:
+        return normalized
+    parsed = urlparse(normalized)
+    pairs = [(key, value) for key, value in parse_qsl(parsed.query, keep_blank_values=True) if key != "reference_consent_request_id"]
+    pairs.append(("reference_consent_request_id", cleaned_id))
+    return urlunparse(parsed._replace(query=urlencode(pairs)))
+
+
 def _exclusive_json(path: Path, value: dict[str, object]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     try:

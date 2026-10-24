@@ -50,15 +50,17 @@ Foundry API `POST /v1/console/co-creation/chat`도 채팅 후 동일 세션에 s
 - `reference_consent_request_id`: URL·local draft·서버 studio draft·PUT payload에 연결.
 - pattern catalog (`3a1d9a8`): 텍스트 근거 CRLF→LF 정규화 후 `evidence_file_digest` — 생성기·검증기 동일 규칙 (`docs/30-public-pattern-catalog.md`). 에테르니언 독립 확인: 후보 30·근거 60건 JSON = norm(Git HEAD) = norm(작업공간), 카탈로그·승격 16 PASS, GitHub test·PostgreSQL·Windows·boot 성공. **줄바꿈 CI 실패는 해소.** (전체 기능 최종 감사 완료 아님.)
 
-## 병합 보류 중 남은 검증 (브라우저·E2E) — **미완료**
+## 병합 보류 중 E2E 검증 (순서·판정)
 
 검증 순서: (1) 동의 후 복귀 → (2) API 저장·재조회 → (3) 교차 사용자 차단 → (4) 모바일 화면.
 
-| # | 항목 | 상태 |
-|---|------|------|
-| 1 | 동의 후 복귀 URL·`reference_consent_request_id` 연속성 | 미완료 |
-| 2 | 실제 API 서버 저장·재조회 (same-origin PUT·CSRF) | 미완료 |
-| 3 | 교차 사용자·tenant studio API 접근 차단 | 미완료 |
-| 4 | 모바일 화면 비교 | 미완료 |
+| # | 항목 | 자동 시험 (API·계약) | 브라우저·시각 (미완) |
+|---|------|----------------------|----------------------|
+| 1 | 동의 후 복귀·`reference_consent_request_id` 연속성 | `test_co_creation_studio_console_e2e` (428→receipt→chat→PUT/GET), `consent_return_url_with_request_id`, `test_reference_material_consent` | 동의 UI redirect·stash 복원·co-create↔studio URL 완주 |
+| 2 | API 저장·재조회 (same-origin PUT·CSRF) | PUT/GET 라운드트립, CSRF 403, `canConsoleApiSync` / `API_CROSS_ORIGIN` 계약 | Netlify+API same-origin에서 저장 후 새 탭 재오픈 |
+| 3 | 교차 tenant·principal studio API | 타 tenant/principal GET·PUT → 404 | 두 브라우저 프로필·세션 쿠키 교차 시나리오 |
+| 4 | 모바일 화면 | viewport·`@media`·휴대폰 프레임·`#mobile` 토글 존재 | 실기기·DevTools 레이아웃 스크린샷 비교 |
 
-**확인 기준 커밋:** `3a1d9a8` (코드·CI·패턴 카탈로그 독립 확인). 위 E2E 네 항목은 해당 커밋 범위에 포함되지 않음.
+**확인 기준 커밋:** `3a1d9a8` (패턴 카탈로그·CI). E2E 자동 시험은 이후 커밋에 추가. **병합·운영 반영 HOLD** 유지.
+
+**별도 Draft PR #121** (명함·로고): Python·Node 렌더 시험 통과. 브라우저·모바일·상표·인쇄용 파일은 #121 범위에서 동일하게 미완.
