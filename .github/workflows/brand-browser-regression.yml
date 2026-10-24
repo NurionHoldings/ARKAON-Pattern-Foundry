@@ -1,13 +1,16 @@
 name: Brand browser regression
 on:
   pull_request:
-    branches: [main, feat/brand-studio-quality]
+    branches: [main, feat/brand-studio-quality, sandbox/design-element-editing]
     paths:
       - 'services/brand-*.js'
       - 'services/brand-*.css'
       - 'services/logo-card.html'
       - 'services/services.js'
       - 'tools/test-brand-browser.cjs'
+      - 'tools/test-brand-concept-selection.cjs'
+      - 'tools/brand-*.cjs'
+      - 'tests/brand-*.test.cjs'
       - '.github/workflows/brand-browser-regression.yml'
 permissions:
   contents: read
@@ -33,6 +36,15 @@ jobs:
         run: |
           npm install --prefix "$RUNNER_TEMP/brand-browser" --no-package-lock --ignore-scripts playwright@1.62.1
           "$RUNNER_TEMP/brand-browser/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Brand audit node tests (checkout, restore fields, concept rules)
+        run: |
+          cd candidate
+          node --test tests/brand-checkout-verify.test.cjs tests/brand-save-restore-fields.test.cjs tests/brand-concept-selection-wiring.test.cjs tests/brand-concept-selection-logic.test.cjs tests/brand-harness-path.test.cjs
+      - name: Concept selection browser regression
+        env:
+          CANDIDATE_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          NODE_PATH="$RUNNER_TEMP/brand-browser/node_modules" node candidate/tools/test-brand-concept-selection.cjs --candidate-dir candidate --candidate-sha "$CANDIDATE_SHA"
       - name: Compare twelve viewport conditions and edit roundtrip
         env:
           CANDIDATE_SHA: ${{ github.event.pull_request.head.sha }}

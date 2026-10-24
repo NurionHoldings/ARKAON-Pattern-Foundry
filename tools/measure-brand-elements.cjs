@@ -1,8 +1,10 @@
 /* Reproducible render-only measurement; does not claim browser usability. */
 const fs=require('node:fs'),path=require('node:path'),{performance}=require('node:perf_hooks'),{createHash}=require('node:crypto');
+const {guardMeasureHarness}=require('./brand-browser-harness-guard.cjs');
 const args=Object.fromEntries(process.argv.slice(2).reduce((a,v,i,s)=>i%2?a:[...a,[v.replace(/^--/,''),s[i+1]]],[]));
 for(const key of ['baseline-dir','candidate-dir','baseline-sha','candidate-sha','out'])if(!args[key])throw Error(`Missing --${key}`);
 for(const key of ['baseline-sha','candidate-sha'])if(!/^[0-9a-f]{40}$/.test(args[key]))throw Error('Full SHA required');
+guardMeasureHarness(args,process.argv[1]);
 const baseline=require(path.resolve(args['baseline-dir'],'services/brand-studio.js'));
 const candidate=require(path.resolve(args['candidate-dir'],'services/brand-studio.js'));
 const out=path.resolve(args.out);fs.mkdirSync(out,{recursive:true});
