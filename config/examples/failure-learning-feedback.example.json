@@ -1,0 +1,8 @@
+{
+  "schema_version": "apf.failure-learning-feedback/v1",
+  "_comment": "Full chain required for stage-5 READY_FOR_REVIEW. Keyword-only inbox text is CANDIDATE_EVIDENCE at most.",
+  "failure_source_ref": "state/hourly-learning/2026-09-18.jsonl#line-3",
+  "root_cause_code": "HOURLY_COLLECTOR_ZERO_YIELD",
+  "derived_learning_task_id": "learning-task-20260918-collector-recovery",
+  "independent_review_ref": "inbox/eternian-review/example-learning-task-review.json"
+}
