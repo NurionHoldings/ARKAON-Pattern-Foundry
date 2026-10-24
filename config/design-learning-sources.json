@@ -1,0 +1,11 @@
+{
+  "schema_version": "apf.design-learning-sources/v1",
+  "sources": [
+    "https://www.miricanvas.com/en/features/logo-maker",
+    "https://help.miricanvas.com/hc/ko/articles/4411396671769"
+  ],
+  "purpose": "Observe public feature documentation; create evidence-bound implementation candidates",
+  "content_is_untrusted_data": true,
+  "copy_assets_or_code": false,
+  "automatic_merge_or_deploy": false
+}
