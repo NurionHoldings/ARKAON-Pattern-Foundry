@@ -31,6 +31,7 @@ from .plain_language_approval import (
     PlainLanguageApprovalStore,
 )
 from .reference_material_consent import (
+    MODIFICATION_PROPOSALS,
     NOTICE_TEXT,
     NOTICE_VERSION,
     REQUIRED_ACKNOWLEDGEMENTS,
@@ -1514,6 +1515,7 @@ def install_console(
         return {
             "notice_version": NOTICE_VERSION,
             "notice_text": NOTICE_TEXT,
+            "modification_proposals": list(MODIFICATION_PROPOSALS),
             "notice_digest": reference_digest(NOTICE_TEXT),
             "required_acknowledgements": sorted(REQUIRED_ACKNOWLEDGEMENTS),
             "automatic_merge_allowed": False,

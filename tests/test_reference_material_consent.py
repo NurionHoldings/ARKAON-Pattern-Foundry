@@ -110,3 +110,18 @@ def test_receipt_is_durable_digest_bound_and_exclusive(tmp_path):
     assert receipt["notice_digest"].startswith("sha256:")
     with pytest.raises(ReferenceConsentError, match="ALREADY_RECORDED"):
         store.record(item, agreement)
+
+
+def test_both_reuse_and_blocked_requests_receive_concrete_modification_proposals():
+    for item in (request(mode=ReferenceUseMode.DIRECT_REUSE), request()):
+        result = decide_reference_use(item, consent(item))
+        assert len(result.modification_proposals) >= 6
+        assert any("정보 구조" in value for value in result.modification_proposals)
+        assert any("보장하지" in value for value in result.modification_proposals)
+        assert result.deployment_allowed is False
+
+
+def test_previous_notice_requires_new_acknowledgement():
+    item = request()
+    with pytest.raises(ReferenceConsentError, match="INCOMPLETE"):
+        decide_reference_use(item, consent(item, notice_version="apf.reference-material-notice/1.0"))
