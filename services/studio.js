@@ -36,10 +36,10 @@
   if(typeof window==='undefined')return;
   window.APFStudio={compose,render};
   if(!document.getElementById('brief'))return;
-  let theme='editorial',step=0,sample=false;
+  let theme='editorial',step=0,sample=false,previewUrl=null;
   const fields=['industry','title','audience','story','offerings','difference','process','contact'];
   const values=()=>({...Object.fromEntries(fields.map(id=>[id,document.getElementById(id).value])),theme,sample});
-  function update(){const b=compose(values());document.getElementById('preview').srcdoc=render(values());const list=document.getElementById('missing');list.replaceChildren();(b.needs.length?b.needs.map(x=>`${x}: 입력 필요`):['기본 입력 완료 · 실제 내용 확인 필요']).forEach(text=>{const li=document.createElement('li');li.textContent=text;list.append(li);});}
+  function update(){const b=compose(values());if(previewUrl)URL.revokeObjectURL(previewUrl);previewUrl=URL.createObjectURL(new Blob([render(values())],{type:'text/html;charset=utf-8'}));document.getElementById('preview').src=previewUrl;const list=document.getElementById('missing');list.replaceChildren();(b.needs.length?b.needs.map(x=>`${x}: 입력 필요`):['기본 입력 완료 · 실제 내용 확인 필요']).forEach(text=>{const li=document.createElement('li');li.textContent=text;list.append(li);});}
   function go(n){step=n;document.querySelectorAll('[data-panel]').forEach(x=>x.hidden=Number(x.dataset.panel)!==step);document.querySelectorAll('[data-step]').forEach(x=>{if(Number(x.dataset.step)===step)x.setAttribute('aria-current','step');else x.removeAttribute('aria-current');});document.getElementById('next').hidden=step===2;document.getElementById('save').hidden=step!==2;document.getElementById('next').textContent=step===0?'분위기 고르기 →':'내용 다듬기 →';}
   fields.forEach(id=>document.getElementById(id).addEventListener('input',update));
   document.querySelectorAll('[data-step]').forEach(x=>x.addEventListener('click',()=>go(Number(x.dataset.step))));
