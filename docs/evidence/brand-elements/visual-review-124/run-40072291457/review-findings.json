@@ -1,0 +1,92 @@
+{
+  "schema_version": "apf.brand-visual-review-findings/v1",
+  "target_commit": "1b2c86b0aadc42453022cb9eec2435b177d56808",
+  "collector_commit": "dba483b56bc7cc9ca51ddd14d8e4c56211cf4290",
+  "ci_run_id": 40072291457,
+  "artifact_id": 12551916632,
+  "artifact_archive_sha256": "1951d330367084258224080b0df348e94300c6f4fc8d385bcda9dc10e60d33ec",
+  "artifact_retention_days": 14,
+  "collected_manifest_sha256": "d3d4fbee4e8b1f19702c37de08918195c489938499040cadc5e8b7a2adb85191",
+  "executed_scope": {
+    "matrix_390px_combinations": 108,
+    "boundary_cases": 4,
+    "collected_screenshots": 114,
+    "verified_screenshot_hashes": 114,
+    "hash_mismatches": 0,
+    "automated_overflow_or_svg_bounds_issues": 0,
+    "visual_inspection": "Overview review of 108 configurations in six contact sheets; detailed originals: white-on-white and journey result/editor. Not pixel-detail review of all 114 originals.",
+    "matrix_render_method": "studio.render(raw) from immutable target; not 108 separate UI editing sessions"
+  },
+  "findings": [
+    {
+      "id": "VIS-01",
+      "severity": "HIGH",
+      "title": "밝은 배경에 흰색 로고가 보이지 않음",
+      "reproduction": "conceptId=horizon, logoTone=light, accent=#ffffff, cardLayout=company",
+      "evidence": "white-on-white.png",
+      "observation": "Logo background and SVG text both rgb(255,255,255); logo preview and company card logo invisible. Overflow checks still report no issue.",
+      "acceptance": "브랜드색 원본을 보존하면서 대비가 확보되는 배경/단색 대안을 제시하고 로고와 명함 각 면에서 보이는지 확인한다."
+    },
+    {
+      "id": "UX-01",
+      "severity": "MEDIUM",
+      "title": "자동 사업 소개문에 미완성 조사 표현",
+      "reproduction": "첫 방문: 상호 햇살 에너지, 업종 태양광 시공 입력 후 문구 제안",
+      "observation": "햇살 에너지은(는) 태양광 시공 분야에서 활동합니다. 주요 고객은 건물주입니다. 제공: 설치 조건 상담 · 시공 범위 안내. 강점: 조건을 쉽게 설명.",
+      "acceptance": "은(는)/을(를) 같은 편집용 표기를 출력하지 않고 입력 사실만 자연스러운 한국어로 표현한다."
+    },
+    {
+      "id": "UX-02",
+      "severity": "LOW",
+      "title": "빈 약자가 저장 후 재오픈에서 자동 입력됨",
+      "reproduction": "initials를 비워 두고 저장→새 탭 재오픈",
+      "observation": {
+        "before": "",
+        "after": "햇살 에",
+        "other_content_loss_observed": false
+      },
+      "acceptance": "원본 빈 입력과 파생 약자를 분리하거나, 자동 생성한 값을 저장 전에 화면에 명시해 재오픈 시 설명 없는 변경이 없게 한다."
+    },
+    {
+      "id": "UX-03",
+      "severity": "MEDIUM",
+      "title": "모바일에서 긴 폼 뒤에 미리보기가 위치",
+      "evidence": "journey-editor.png",
+      "observation": "390px full-page capture is 6460px tall; result preview is after long form and six candidates, preventing simultaneous edit/result comparison.",
+      "acceptance": "단계별 입력 또는 미리보기 이동/고정 기능으로 현재 수정 결과를 즉시 확인하고 편집 위치로 돌아올 수 있게 한다."
+    },
+    {
+      "id": "UX-04",
+      "severity": "LOW",
+      "title": "저장 실패 원인/복구 안내가 포괄적",
+      "observation": {
+        "message": "저장하지 못했습니다. 브라우저 저장 공간과 권한을 확인해 주세요.",
+        "input_preserved": true
+      },
+      "acceptance": "저장 공간 부족과 권한 오류를 구분해 쉬운 안내와 재시도 동작을 제공한다. 입력 보존과 현재 재시도 성공은 유지한다."
+    }
+  ],
+  "positive_results": {
+    "keyboard_concept_selection": "horizon",
+    "keyboard_number_change": {
+      "before": "80",
+      "after": "81"
+    },
+    "save_failure_preserves_input": true,
+    "retry_message": "이 브라우저에 초안을 저장했습니다. 현재 주소로 다시 열어 편집할 수 있습니다.",
+    "offline_local_save_message": "이 브라우저에 초안을 저장했습니다. 현재 주소로 다시 열어 편집할 수 있습니다.",
+    "runtime_errors": []
+  },
+  "non_regression_note": "These findings concern existing brand UI/content behavior. Previously verified #124 concept transition and checkout/restore harness fixes remain accepted within their prior test scope. Blank-to-derived initials is a boundary case outside the previous populated-initials fixture, not demonstrated loss of user content.",
+  "unverified": [
+    "physical mobile devices",
+    "full keyboard tab order and complete accessibility",
+    "all 114 full-resolution images pixel-detail inspection",
+    "real users completing the flow without assistance",
+    "natural-language partial edit and external-learning runtime connection"
+  ],
+  "overall_product_status": "HOLD_ADDITIONAL_USABILITY_REMEDIATION_REQUIRED",
+  "improvement_accepted": false,
+  "merge_approved": false,
+  "production_apply_approved": false
+}
