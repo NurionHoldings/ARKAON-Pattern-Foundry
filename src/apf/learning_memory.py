@@ -98,7 +98,12 @@ class LearningMemory:
 
         policy = AccumulationPolicy.load(foundry_root / "config" / "arkaon-accumulation-policy.json")
         failure_family_limit = None if policy.learning_memory_unbounded else policy.failure_family_limit
-        return cls(failure_family_limit=failure_family_limit)
+        from .durable_learning_memory import DurableLearningMemory
+
+        return DurableLearningMemory(
+            path=foundry_root / "state" / "learning-memory.sqlite3",
+            failure_family_limit=failure_family_limit,
+        )
 
     def __init__(
         self,
