@@ -68,11 +68,14 @@ async function svg(page){await settle(page);return page.frameLocator('#preview')
    await page.goto(site.url,{waitUntil:'load'});await fill(page,fixtures[i]);
    const formValues=await page.locator('#brand').evaluate(form=>Object.fromEntries([...form.querySelectorAll('input,textarea,select')].filter(e=>e.id).map(e=>[e.id,e.value])));
    const measurement=await inspect(page),prefix=`brief-${i+1}-${width}-${name}`;
+   await page.locator('#preview').scrollIntoViewIfNeeded();
+   await page.frameLocator('#preview').locator('svg').first().evaluate(async el=>{await el.ownerDocument.fonts.ready;});
+   const resultScreenshot=await page.locator('#preview').screenshot();fs.writeFileSync(path.join(out,prefix+'-result.png'),resultScreenshot);
    const screenshot=await page.screenshot({fullPage:true});fs.writeFileSync(path.join(out,prefix+'.png'),screenshot);
    const dom=await page.content();fs.writeFileSync(path.join(out,prefix+'.html'),dom);
    const rendered=await page.frameLocator('#preview').locator('html').evaluate(el=>el.outerHTML);fs.writeFileSync(path.join(out,prefix+'-result.html'),rendered);
    const {text,...inner}=measurement.inner;
-   manifest.measurements.push({brief:i+1,brief_digest:sha(JSON.stringify(fixtures[i])),width,variant:name,form_values:formValues,outer:measurement.outer,inner,issues:inner.issues,status:inner.issues.length?'FAIL':'PASS',screenshot:{path:prefix+'.png',sha256:sha(screenshot)},dom:{path:prefix+'.html',sha256:sha(dom)},rendered_html:{path:prefix+'-result.html',sha256:sha(rendered)}});
+   manifest.measurements.push({brief:i+1,brief_digest:sha(JSON.stringify(fixtures[i])),width,variant:name,form_values:formValues,outer:measurement.outer,inner,issues:inner.issues,status:inner.issues.length?'FAIL':'PASS',screenshot:{path:prefix+'.png',sha256:sha(screenshot)},result_screenshot:{path:prefix+'-result.png',sha256:sha(resultScreenshot)},dom:{path:prefix+'.html',sha256:sha(dom)},rendered_html:{path:prefix+'-result.html',sha256:sha(rendered)}});
    await context.close();
   }
   const context=await browser.newContext({viewport:{width:390,height:900}}),page=await context.newPage();
