@@ -14,6 +14,7 @@ from apf.api import create_app
 from apf.co_creation_reference_gate import extract_reference_urls, reference_scope_digest
 from apf.console import ConsoleSecurity
 from apf.reference_material_consent import NOTICE_TEXT, NOTICE_VERSION
+from apf.reference_url_style import ReferenceStyleProfile
 from apf.reference_material_consent import digest as reference_digest
 from apf.repository import MemoryRepository
 
@@ -162,11 +163,19 @@ def _chat(client: TestClient, csrf: str, tenant_id, principal_id, **extra: objec
     return client.post("/v1/console/co-creation/chat", headers={"X-CSRF-Token": csrf}, json=payload)
 
 
-def test_reference_chat_requires_consent_then_studio_carries_request_id(tmp_path, monkeypatch):
-    monkeypatch.setattr(
-        "apf.cross_platform_learning.fetch_public_payload",
-        lambda _url: b"<html><h1>Step 1</h1><h2>Step 2</h2><p>CTA</p></html>",
+def _fake_reference_style(*, url: str, now, fetch_payload=None) -> ReferenceStyleProfile:
+    del now, fetch_payload
+    return ReferenceStyleProfile(
+        source_url=url.strip(),
+        observation_digest="a" * 64,
+        policy_route_refs=("surface/hero-primary-cta",),
+        style_tags=("hero-forward",),
+        structural_signals={"heading_count_bin": "4-5"},
     )
+
+
+def test_reference_chat_requires_consent_then_studio_carries_request_id(tmp_path, monkeypatch):
+    monkeypatch.setattr("apf.reference_url_style.observe_reference_style", _fake_reference_style)
     tenant_id, principal_id = uuid4(), uuid4()
     client, csrf = _session_client(tmp_path, monkeypatch, tenant_id, principal_id)
     request_id = "consent-return-flow"
