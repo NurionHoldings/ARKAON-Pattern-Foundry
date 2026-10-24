@@ -2,9 +2,13 @@
 const fs=require('node:fs'),http=require('node:http'),path=require('node:path');
 const {createHash}=require('node:crypto');
 const {chromium}=require('playwright');
+const {guardBrandBrowserHarness}=require('./brand-browser-harness-guard.cjs');
+const {RESTORE_FIELD_IDS}=require('./brand-browser-restore-fields.cjs');
+const {readConceptSelection,runConceptInteractionChecks}=require('./brand-concept-interaction.cjs');
 const args=Object.fromEntries(process.argv.slice(2).reduce((a,v,i,s)=>i%2?a:[...a,[v.replace(/^--/,''),s[i+1]]],[]));
 for(const key of ['baseline-dir','candidate-dir','baseline-sha','candidate-sha','out'])if(!args[key])throw Error(`Missing --${key}`);
 for(const key of ['baseline-sha','candidate-sha'])if(!/^[0-9a-f]{40}$/.test(args[key]))throw Error('Full SHA required');
+guardBrandBrowserHarness(args,process.argv[1]);
 const out=path.resolve(args.out);fs.mkdirSync(out,{recursive:true});
 const sha=v=>createHash('sha256').update(v).digest('hex');
 const fixtures=[
@@ -53,10 +57,22 @@ async function fill(page,brief){
  await page.locator('.concept').filter({hasText:'지평선'}).click();
  await settle(page);
 }
-async function controls(page){return page.evaluate(()=>Object.fromEntries(['symbolSize','logoGap','letterSpacing','logoAlign','businessName','tagline','person'].map(k=>[k,document.getElementById(k).value])));}
+async function controls(page){
+ const values=await page.evaluate((ids)=>{
+  const form=document.getElementById('brand');
+  const out=Object.fromEntries(ids.map(k=>[k,document.getElementById(k)?.value??'']));
+  out.sample=form?.dataset.sample==='true';
+  return out;
+ },RESTORE_FIELD_IDS);
+ const sel=await readConceptSelection(page);
+ values.concept_selection_status=sel.eval.status;
+ values.concept_selection_ok=sel.eval.ok;
+ return values;
+}
+function selectionCheckPass(sel){return sel.eval.status==='PASS'&&sel.eval.ok===true;}
 async function svg(page){await settle(page);return page.frameLocator('#preview').locator('svg').first().evaluate(el=>el.outerHTML);}
 (async()=>{
- const manifest={schema_version:'apf.brand-browser-regression/v1',created_at:new Date().toISOString(),baseline_commit:args['baseline-sha'],candidate_commit:args['candidate-sha'],contributor:'ETERNIAN_TEST_HARNESS',arkaon_first_verification:'NOT_RUN',independent_audit_status:'NOT_RUN',visual_human_review:'NOT_RUN',improvement_accepted:false,measurements:[],browser_undo_redo:'NOT_RUN',browser_save_reopen:'NOT_RUN',ci_run_id:process.env.GITHUB_RUN_ID||null,limits:['Chromium desktop viewport emulation; no physical mobile device','DOM overflow/text bounds checks do not establish design quality or all possible overlaps']};
+ const manifest={schema_version:'apf.brand-browser-regression/v1',created_at:new Date().toISOString(),baseline_commit:args['baseline-sha'],candidate_commit:args['candidate-sha'],contributor:'ETERNIAN_TEST_HARNESS',arkaon_first_verification:'NOT_RUN',independent_audit_status:'NOT_RUN',visual_human_review:'NOT_RUN',improvement_accepted:false,measurements:[],browser_undo_redo:'NOT_RUN',browser_save_reopen:'NOT_RUN',browser_concept_interaction:'NOT_RUN',ci_run_id:process.env.GITHUB_RUN_ID||null,limits:['Chromium desktop viewport emulation; no physical mobile device','DOM overflow/text bounds checks do not establish design quality or all possible overlaps']};
  const servers=[],errors=[];let browser;
  try{
   const base=await serve(args['baseline-dir']),candidate=await serve(args['candidate-dir']);servers.push(base.server,candidate.server);
@@ -80,23 +96,35 @@ async function svg(page){await settle(page);return page.frameLocator('#preview')
   }
   const context=await browser.newContext({viewport:{width:390,height:900}}),page=await context.newPage();
   await page.goto(candidate.url);await fill(page,fixtures[0]);
+  const conceptInteraction=await runConceptInteractionChecks(page);
+  manifest.browser_concept_interaction=conceptInteraction.status;
+  manifest.concept_interaction_evidence=conceptInteraction.evidence;
+  await fill(page,fixtures[0]);
   await page.locator('#logoGap').fill('30');await page.locator('#letterSpacing').fill('2');await page.locator('#logoAlign').selectOption('right');
   const initial=await controls(page),initialSvg=sha(await svg(page));
   for(let i=0;i<10;i++)await page.locator('#symbolSize').fill(String(41+i*5));
   const final=await controls(page),finalSvg=sha(await svg(page));
   for(let i=0;i<10;i++)await page.getByRole('button',{name:'실행 취소',exact:true}).click();
+  const selAfterUndo=await readConceptSelection(page);
   const undone=await controls(page),undoneSvg=sha(await svg(page));
   for(let i=0;i<10;i++)await page.getByRole('button',{name:'다시 실행',exact:true}).click();
+  const selAfterRedo=await readConceptSelection(page);
   const redone=await controls(page),redoneSvg=sha(await svg(page));
-  const undoPass=JSON.stringify(initial)===JSON.stringify(undone)&&initialSvg===undoneSvg;
-  const redoPass=JSON.stringify(final)===JSON.stringify(redone)&&finalSvg===redoneSvg;
+  const selectionAfterUndo=selectionCheckPass(selAfterUndo);
+  const selectionAfterRedo=selectionCheckPass(selAfterRedo);
+  const undoPass=JSON.stringify(initial)===JSON.stringify(undone)&&initialSvg===undoneSvg&&selectionAfterUndo;
+  const redoPass=JSON.stringify(final)===JSON.stringify(redone)&&finalSvg===redoneSvg&&selectionAfterRedo;
   manifest.browser_undo_redo=undoPass&&redoPass?'PASS':'FAIL';
-  manifest.undo_redo_evidence={initial,final,undone,redone,initialSvg,finalSvg,undoneSvg,redoneSvg};
+  manifest.undo_redo_evidence={initial,final,undone,redone,initialSvg,finalSvg,undoneSvg,redoneSvg,selectionAfterUndo,selectionAfterRedo,selAfterUndo,selAfterRedo};
   await page.getByRole('button',{name:'초안 저장 · 이어서 편집',exact:true}).click();
   await page.getByRole('status').filter({hasText:'이 브라우저에 초안을 저장했습니다'}).waitFor();
-  const saved=page.url(),second=await context.newPage();await second.goto(saved);const restored=await controls(second),restoredSvg=sha(await svg(second));
-  manifest.browser_save_reopen=JSON.stringify(restored)===JSON.stringify(final)&&restoredSvg===finalSvg?'PASS':'FAIL';
-  manifest.save_reopen_evidence={url:saved,restored,restoredSvg};
+  const saved=page.url(),second=await context.newPage();await second.goto(saved);
+  const reopenSel=await readConceptSelection(second);
+  const restored=await controls(second),restoredSvg=sha(await svg(second));
+  const reopenSelectionPass=selectionCheckPass(reopenSel);
+  const fieldsMatch=JSON.stringify(restored)===JSON.stringify(final)&&restoredSvg===finalSvg;
+  manifest.browser_save_reopen=fieldsMatch&&reopenSelectionPass?'PASS':'FAIL';
+  manifest.save_reopen_evidence={url:saved,restored,restoredSvg,reopenSel,reopenSelectionPass};
   await context.close();
  }catch(error){manifest.execution_error=String(error.stack||error);}
  finally{
@@ -104,7 +132,7 @@ async function svg(page){await settle(page);return page.frameLocator('#preview')
   manifest.runtime_errors=errors;
   const candidateRows=manifest.measurements.filter(x=>x.variant==='candidate');
   manifest.browser_12_condition_comparison=candidateRows.length===12&&candidateRows.every(x=>x.status==='PASS')?'PASS':'FAIL';
-  const passed=!manifest.execution_error&&!errors.length&&manifest.browser_12_condition_comparison==='PASS'&&manifest.browser_undo_redo==='PASS'&&manifest.browser_save_reopen==='PASS';
+  const passed=!manifest.execution_error&&!errors.length&&manifest.browser_12_condition_comparison==='PASS'&&manifest.browser_concept_interaction==='PASS'&&manifest.browser_undo_redo==='PASS'&&manifest.browser_save_reopen==='PASS';
   manifest.status=passed?'PASS':'FAIL';
   fs.writeFileSync(path.join(out,'browser-manifest.json'),JSON.stringify(manifest,null,2)+'\n');
   console.log(JSON.stringify({status:manifest.status,conditions:manifest.measurements.length,undo_redo:manifest.browser_undo_redo,save_reopen:manifest.browser_save_reopen,error:manifest.execution_error}));

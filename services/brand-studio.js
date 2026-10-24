@@ -208,14 +208,25 @@ function update({record=true}={}) {
     li.textContent = t;
     root.append(li);
   });
+  syncConceptSelection();
 }
 
+
+function syncConceptSelection() {
+  const root = document.getElementById('concept-options');
+  if (!root?.childElementCount) return;
+  const activeId = values().conceptId;
+  root.querySelectorAll('.concept').forEach((button) => {
+    button.setAttribute('aria-pressed', String(button.dataset.conceptId === activeId));
+  });
+}
 
 function showConcepts() {
   const root=document.getElementById('concept-options');
   root.replaceChildren();
   creative.concepts(values()).forEach(c=>{
     const button=document.createElement('button');button.type='button';button.className='concept';
+    button.dataset.conceptId=c.id;
     const title=document.createElement('strong');title.textContent=c.name;
     const detail=document.createElement('span');detail.textContent=c.rationale;
     const image=document.createElement('img');image.alt=`${c.name} 로고`;image.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(creative.svg({...creative.applyConcept(values(),c),logoTone:'light'}));
@@ -229,8 +240,10 @@ document.getElementById('generate-concepts').addEventListener('click',()=>{showC
 document.getElementById('vary-concepts').addEventListener('click',()=>{document.getElementById('conceptRound').value=String((Number(values().conceptRound)||0)+1);showConcepts();});
 
 const item = APFHomeServices.readProjects().find((p) => p.id === id && p.type === 'logo-card');
-if (item?.brief) apply(item.brief);
-else id = null;
+if (item?.brief) {
+  apply(item.brief);
+  if (item.brief.conceptId) showConcepts();
+} else id = null;
 editHistory=editing.history(normalize(values()),10);
 document.getElementById('undo').addEventListener('click',()=>{apply(editHistory.undo());update({record:false});});
 document.getElementById('redo').addEventListener('click',()=>{apply(editHistory.redo());update({record:false});});
