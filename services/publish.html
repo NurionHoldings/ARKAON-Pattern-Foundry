@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>홈페이지 게시하기 · 아르카온</title>
+  <link rel="stylesheet" href="/services/services.css">
+</head>
+<body>
+  <div class="shell">
+    <div class="svc-top"><h1>홈페이지 게시하기</h1><a class="svc-home" href="/">← 홈</a></div>
+    <div class="panel">
+      <h2>저장된 페이지 내보내기</h2>
+      <p class="muted">홈페이지·개인 페이지·명함 만들기에서 저장한 HTML을 다시 받을 수 있습니다.</p>
+      <ul class="list" id="projects"></ul>
+    </div>
+    <div class="panel">
+      <h2>게시 절차</h2>
+      <ol class="muted">
+        <li>HTML 파일을 Netlify·GitHub Pages 등 정적 호스트에 업로드합니다.</li>
+        <li>도메인·HTTPS를 연결한 뒤 검색 등록(사이트맵·메타 설명)을 준비합니다.</li>
+        <li>운영 Foundry API와 연동 시 <a href="/services/admin.html">관리자 콘솔</a>에서 배포 승인 흐름을 따릅니다.</li>
+      </ol>
+    </div>
+  </div>
+  <script src="/services/services.js"></script>
+  <script>
+    const {readProjects,downloadText}=APFHomeServices;
+    const root=document.getElementById('projects');
+    const items=readProjects().filter(p=>p.html);
+    if(!items.length){root.innerHTML='<li class="muted">내보낼 작업이 없습니다. <a href="/services/site-builder.html">홈페이지 만들기</a>부터 시작하세요.</li>';}
+    else for(const item of items){
+      const li=document.createElement('li');
+      const label=document.createElement('span');label.textContent=`${item.title} (${item.type})`;
+      const btn=document.createElement('button');btn.textContent='HTML 다시 받기';
+      btn.addEventListener('click',()=>downloadText(`${item.title||'page'}.html`,item.html));
+      li.append(label,btn);root.append(li);
+    }
+  </script>
+</body>
+</html>

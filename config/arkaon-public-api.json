@@ -1,0 +1,11 @@
+{
+  "schema_version": "apf.public-api-hints/v1",
+  "console_path": "/console",
+  "platform_dialogue_path": "/console/platform-dialogues",
+  "co_creation_chat_path": "/v1/console/co-creation/chat",
+  "platform_self_heal_path": "/v1/public/platform-self-heal",
+  "platform_self_heal_console_path": "/v1/console/platform-self-heal/surface-report",
+  "health_path": "/health",
+  "default_api_base": "same_origin",
+  "note": "Netlify에 foundry-proxy와 APF_API_ORIGIN이 설정되면 /health·/console은 사이트와 동일 출처로 연결됩니다. 별도 API 호스트만 쓸 때 account에서 URL을 저장하세요."
+}

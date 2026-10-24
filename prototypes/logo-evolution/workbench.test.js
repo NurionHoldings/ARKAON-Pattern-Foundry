@@ -1,0 +1,15 @@
+import {generateEditableLogo,buildLogoSvg} from "./editable-logo-generator.js";
+import {locateEditPoint} from "./generator-visual-dna-adapter.js";
+const out=document.querySelector("#results");
+const cases=[];
+const test=async(name,fn)=>{try{await fn();cases.push({name,ok:true});}catch(e){cases.push({name,ok:false,error:e.message});}};
+const check=(x,m)=>{if(!x)throw Error(m)};
+await test("Escaped brand string",()=>{const s=buildLogoSvg({brand:"A&B<Logo>"}).svg;check(s.includes("A&amp;B&lt;Logo&gt;"),"SVG escaping failed");});
+await test("Reject invalid color",()=>{let rejected=false;try{buildLogoSvg({accent:"red;url()"});}catch{rejected=true;}check(rejected,"Invalid color accepted");});
+let result;
+await test("Generate with native editable layers",async()=>{result=await generateEditableLogo({brand:"TEST"});check(result.manifest.layers.length===2,"Expected two layers");check(result.sourceHash.length===64,"Hash missing");check(result.manifest.reviewState==="DRAFT","Unexpected approval");});
+await test("CORE protected",()=>{const decision=locateEditPoint(result.manifest,"brandText01","motion");check(decision.status==="HOLD","CORE should be held");});
+await test("Draft edit held",()=>{const decision=locateEditPoint(result.manifest,"symbol01","motion");check(decision.status==="HOLD","Draft should be held");});
+await test("Symbol edit routed only after review",()=>{const reviewed=structuredClone(result.manifest);reviewed.reviewState="APPROVED";const decision=locateEditPoint(reviewed,"symbol01","motion");check(decision.status==="READY_FOR_AUTHORIZATION","Expected authorization gate");});
+out.textContent=cases.map(x=>(x.ok?"PASS ":"FAIL ")+x.name+(x.error?" — "+x.error:"")).join("\n");
+out.style.color=cases.every(x=>x.ok)?"#8fe3af":"#ff9e9e";

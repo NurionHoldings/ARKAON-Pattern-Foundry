@@ -142,6 +142,22 @@ def _durable_schema_smoke(engine: Engine) -> None:
             raise PostgresLiveProofRejected("DURABLE_SMOKE", "durable_jobs round-trip failed")
 
 
+def _durable_review_adapter_smoke(engine: Engine, *, foundry_root: Path) -> None:
+    from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+
+    from .postgres_durable_review import PostgresDurableReviewRepository
+    from .review_store_config import load_ethernian_review_public_key
+
+    public_key = load_ethernian_review_public_key(foundry_root=foundry_root)
+    if public_key is None:
+        public_key = Ed25519PrivateKey.generate().public_key()
+    store = PostgresDurableReviewRepository(engine, ethernian_public_key=public_key)
+    missing_tenant = "00000000-0000-0000-0000-000000000099"
+    missing_principal = "00000000-0000-0000-0000-000000000088"
+    if store.count_reviews_for_principal(missing_tenant, missing_principal) != 0:
+        raise PostgresLiveProofRejected("DURABLE_REVIEW_ADAPTER", "review count smoke failed")
+
+
 class PostgresLiveProofHarness:
     def __init__(self, *, foundry_root: Path) -> None:
         self.foundry_root = foundry_root.resolve()
@@ -182,6 +198,14 @@ class PostgresLiveProofHarness:
             _durable_schema_smoke(engine)
             results.append(
                 ProofCheckResult("DURABLE_SCHEMA", ProofStatus.PASS, "durable_jobs insert/select passed")
+            )
+            _durable_review_adapter_smoke(engine, foundry_root=self.foundry_root)
+            results.append(
+                ProofCheckResult(
+                    "DURABLE_REVIEW_ADAPTER",
+                    ProofStatus.PASS,
+                    "PostgreSQL durable review adapter read path passed",
+                )
             )
         except (SQLAlchemyError, OSError, RuntimeError, PostgresLiveProofRejected) as error:
             results.append(

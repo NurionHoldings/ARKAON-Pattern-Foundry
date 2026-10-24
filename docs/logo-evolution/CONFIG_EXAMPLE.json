@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "logoId": "<server-issued-logo-id>",
+  "sourceVersion": "approved-v0",
+  "level": 3,
+  "intensity": "balanced",
+  "enabledEffects": [
+    "color_shift",
+    "text_stagger",
+    "specular_sweep"
+  ],
+  "preview": {
+    "quality": "low",
+    "watermark": true
+  },
+  "output": {
+    "format": "mp4",
+    "durationSeconds": 8,
+    "aspectRatio": "source"
+  }
+}
