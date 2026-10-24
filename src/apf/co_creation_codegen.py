@@ -9,6 +9,7 @@ from datetime import datetime
 from hashlib import sha256
 from pathlib import Path, PurePosixPath
 
+from .co_creation_studio import StudioBrief, load_studio_draft, render_filled_section_html
 from .entry_effect_presets import is_entry_effect_token
 from .entry_effects import render_entry_effect
 from .learning_safety import scan_learning_text
@@ -200,6 +201,27 @@ class CoCreationCodegenEngine:
         style_tags = tuple(reference_bundle.get("style_tags") or ())
         tenant_id = str(proposal.get("tenant_id", ""))
         platform_id = str(proposal.get("platform_id", ""))
+        session_id = str(proposal.get("session_id", ""))
+        studio_brief: StudioBrief | None = None
+        if session_id:
+            draft = load_studio_draft(self.foundry_root, session_id)
+            if (
+                isinstance(draft, dict)
+                and str(draft.get("proposal_id", "")) == proposal_id
+                and isinstance(draft.get("brief"), dict)
+            ):
+                raw = draft["brief"]
+                studio_brief = StudioBrief(
+                    industry=str(raw.get("industry", "service")),
+                    title=str(raw.get("title", "")),
+                    audience=str(raw.get("audience", "")),
+                    story=str(raw.get("story", "")),
+                    offerings=str(raw.get("offerings", "")),
+                    difference=str(raw.get("difference", "")),
+                    process=str(raw.get("process", "")),
+                    contact=str(raw.get("contact", "")),
+                    theme=str(raw.get("theme", "editorial")),
+                )
 
         pending_files: list[tuple[str, str, str]] = []
         scan_values: list[str] = []
@@ -238,6 +260,12 @@ class CoCreationCodegenEngine:
                     )
                 except ValueError as exc:
                     raise CoCreationCodegenRejected("EFFECT_OPTIONS", str(exc)) from exc
+            elif studio_brief is not None:
+                content = render_filled_section_html(
+                    section_id=section_id,
+                    purpose=purpose,
+                    brief=studio_brief,
+                )
             else:
                 content = _render_section_stub(
                     section_id=section_id,
@@ -245,7 +273,8 @@ class CoCreationCodegenEngine:
                     pattern_token=str(pattern_token),
                     style_tags=style_tags,
                 )
-            pending_files.append((relative_path, content, "section_stub"))
+            kind = "section_filled" if studio_brief is not None else "section_stub"
+            pending_files.append((relative_path, content, kind))
             scan_values.extend([section_id, purpose, str(pattern_token), content])
 
         route_entries = []

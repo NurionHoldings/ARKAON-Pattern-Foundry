@@ -1,7 +1,10 @@
 (() => {
   const STORAGE_KEY = 'apf.home.projects.v1';
   const API_KEY = 'apf.home.apiBase.v1';
+  const STUDIO_DRAFT_KEY = 'apf.co-creation.studio-drafts.v1';
+  const REFERENCE_STASH_KEY = 'apf.reference-consent.stash.v1';
   const MAX_VIDEO_STORE_BYTES = 2.5 * 1024 * 1024;
+  const URL_IN_TEXT = /https?:\/\/[^\s<>"']+/gi;
 
   function escapeHtml(value) {
     return String(value)
@@ -22,6 +25,108 @@
 
   function writeProjects(items) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+  }
+
+  function readStudioDrafts() {
+    try {
+      const raw = localStorage.getItem(STUDIO_DRAFT_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch {
+      return {};
+    }
+  }
+
+  function writeStudioDrafts(map) {
+    localStorage.setItem(STUDIO_DRAFT_KEY, JSON.stringify(map));
+  }
+
+  function loadCoCreationStudioDraft(sessionId) {
+    if (!sessionId) return null;
+    return readStudioDrafts()[sessionId] || null;
+  }
+
+  function saveCoCreationStudioDraft(sessionId, payload) {
+    const map = readStudioDrafts();
+    map[sessionId] = { ...payload, session_id: sessionId, updated_at: new Date().toISOString() };
+    writeStudioDrafts(map);
+    return map[sessionId];
+  }
+
+  function extractReferenceUrls(text) {
+    const urls = String(text || '').match(URL_IN_TEXT) || [];
+    return [...new Set(urls.map((u) => u.replace(/[.,)]+$/, '')))];
+  }
+
+  function buildStudioBriefFromWorkRequest({ title, message, scope }) {
+    const combined = String(message || '');
+    const fields = {
+      title: String(title || '').trim(),
+      audience: '',
+      story: '',
+      difference: '',
+      contact: '',
+    };
+    const labelRules = [
+      [/^(?:고객|대상\s*고객)[:：]\s*(.+)$/im, 'audience'],
+      [/^(?:목적|서비스|하는\s*일)[:：]\s*(.+)$/im, 'story'],
+      [/^(?:차별점|강점)[:：]\s*(.+)$/im, 'difference'],
+      [/^(?:이름|브랜드|상호)[:：]\s*(.+)$/im, 'title'],
+      [/^(?:연락|문의)[:：]\s*(.+)$/im, 'contact'],
+    ];
+    for (const line of combined.split('\n')) {
+      for (const [pattern, key] of labelRules) {
+        const match = line.trim().match(pattern);
+        if (match && !fields[key]) fields[key] = match[1].trim();
+      }
+    }
+    if (!fields.title) {
+      const first = combined.split('\n').map((l) => l.trim()).find(Boolean);
+      fields.title = first ? first.slice(0, 80) : '새 홈페이지';
+    }
+    if (!fields.audience) fields.audience = `${fields.title}를 찾는 방문자`;
+    if (!fields.story) fields.story = combined.trim().slice(0, 2000) || fields.title;
+    if (!fields.difference) {
+      fields.difference = `${fields.title}는 ${fields.audience}에게 맞춘 읽기 쉬운 구성을 우선합니다.`;
+    }
+    if (!fields.contact) {
+      fields.contact = '공개 전에 스튜디오 화면에서 이메일·전화·상담 채널을 확인·수정할 수 있습니다.';
+    }
+    let industry = 'service';
+    if (/포트폴리오|프리랜|작업\s*소개/i.test(combined)) industry = 'portfolio';
+    else if (/가게|매장|카페|메뉴|상품/i.test(combined)) industry = 'shop';
+    else if (scope === 'PLATFORM') industry = 'service';
+    const offerings = [
+      `핵심 ${industry === 'shop' ? '메뉴' : '서비스'} | ${fields.story.slice(0, 80)}`,
+      `맞춤 구성 | ${fields.audience}에 맞춘 설명과 화면 구조`,
+      `확인·수정 | 초안을 보고 함께 다듬는 단계`,
+    ].join('\n');
+    const process = ['목적과 범위 확인', '구성·디자인 방향 협의', '초안 공유 후 수정·확정'].join('\n');
+    return {
+      industry,
+      title: fields.title,
+      audience: fields.audience,
+      story: fields.story,
+      offerings,
+      difference: fields.difference,
+      process,
+      contact: fields.contact,
+      theme: 'editorial',
+    };
+  }
+
+  function stashReferenceConsentResume(payload) {
+    sessionStorage.setItem(REFERENCE_STASH_KEY, JSON.stringify({ ...payload, saved_at: new Date().toISOString() }));
+  }
+
+  function popReferenceConsentStash() {
+    try {
+      const raw = sessionStorage.getItem(REFERENCE_STASH_KEY);
+      if (!raw) return null;
+      sessionStorage.removeItem(REFERENCE_STASH_KEY);
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
   }
 
   function saveProject(entry) {
@@ -144,6 +249,12 @@
     setApiBase,
     probeApi,
     saveVideoUpload,
+    loadCoCreationStudioDraft,
+    saveCoCreationStudioDraft,
+    buildStudioBriefFromWorkRequest,
+    extractReferenceUrls,
+    stashReferenceConsentResume,
+    popReferenceConsentStash,
     MAX_VIDEO_STORE_BYTES,
   };
 })();
