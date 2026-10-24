@@ -48,4 +48,17 @@ Foundry API `POST /v1/console/co-creation/chat`도 채팅 후 동일 세션에 s
 - 저장 UX: 로컬 저장 성공과 API 동기화 실패 분리. cross-origin API는 `canConsoleApiSync()` false 시 서버 PUT 생략.
 - return URL: Netlify preview·production·localhost + `/services/site-builder.html|co-create.html` 만 허용.
 - `reference_consent_request_id`: URL·local draft·서버 studio draft·PUT payload에 연결.
-- pattern catalog: `evidence_hashes` / `package_hash` 일괄 갱신 (CI `EVIDENCE_HASH_MISMATCH`).
+- pattern catalog (`3a1d9a8`): 텍스트 근거 CRLF→LF 정규화 후 `evidence_file_digest` — 생성기·검증기 동일 규칙 (`docs/30-public-pattern-catalog.md`). 에테르니언 독립 확인: 후보 30·근거 60건 JSON = norm(Git HEAD) = norm(작업공간), 카탈로그·승격 16 PASS, GitHub test·PostgreSQL·Windows·boot 성공. **줄바꿈 CI 실패는 해소.** (전체 기능 최종 감사 완료 아님.)
+
+## 병합 보류 중 남은 검증 (브라우저·E2E) — **미완료**
+
+검증 순서: (1) 동의 후 복귀 → (2) API 저장·재조회 → (3) 교차 사용자 차단 → (4) 모바일 화면.
+
+| # | 항목 | 상태 |
+|---|------|------|
+| 1 | 동의 후 복귀 URL·`reference_consent_request_id` 연속성 | 미완료 |
+| 2 | 실제 API 서버 저장·재조회 (same-origin PUT·CSRF) | 미완료 |
+| 3 | 교차 사용자·tenant studio API 접근 차단 | 미완료 |
+| 4 | 모바일 화면 비교 | 미완료 |
+
+**확인 기준 커밋:** `3a1d9a8` (코드·CI·패턴 카탈로그 독립 확인). 위 E2E 네 항목은 해당 커밋 범위에 포함되지 않음.
