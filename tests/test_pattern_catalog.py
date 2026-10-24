@@ -108,6 +108,45 @@ def test_evidence_tamper_is_rejected() -> None:
         validate_catalog(packages, ROOT)
 
 
+def test_evidence_hash_normalizes_text_line_endings() -> None:
+    from apf.pattern_catalog import evidence_file_digest
+
+    lf = b"alpha\nbeta\n"
+    crlf = b"alpha\r\nbeta\r\n"
+    assert evidence_file_digest("src/apf/module.py", lf) == evidence_file_digest(
+        "src/apf/module.py", crlf
+    )
+
+
+def test_evidence_hash_detects_text_content_change() -> None:
+    from apf.pattern_catalog import evidence_file_digest
+
+    base = b"same\r\n"
+    changed = b"diff\r\n"
+    assert evidence_file_digest("tests/test_x.py", base) != evidence_file_digest(
+        "tests/test_x.py", changed
+    )
+
+
+def test_evidence_hash_preserves_binary_raw_bytes() -> None:
+    from apf.pattern_catalog import evidence_bytes_for_hash, evidence_file_digest
+
+    raw = b"\x00payload\r\n"
+    assert evidence_bytes_for_hash("evidence/blob.bin", raw) == raw
+    assert evidence_file_digest("evidence/blob.bin", raw) != evidence_file_digest(
+        "evidence/blob.bin", b"\x00payload\n"
+    )
+
+
+def test_catalog_evidence_hashes_match_shared_digest() -> None:
+    from apf.pattern_catalog import evidence_file_digest
+
+    package = candidates()[0]
+    for ref in package["source_refs"] + package["test_refs"]:
+        raw = (ROOT / ref).read_bytes()
+        assert package["evidence_hashes"][ref] == evidence_file_digest(ref, raw)
+
+
 def test_candidate_reuse_fails_closed_before_promotion() -> None:
     with pytest.raises(PatternCatalogError, match="CANDIDATE_REUSE_FORBIDDEN"):
         build_reuse_proof(candidates()[:3], project_id="pre-promotion-negative-proof")

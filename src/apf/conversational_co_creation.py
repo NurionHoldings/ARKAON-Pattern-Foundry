@@ -593,4 +593,16 @@ class ConversationalCoCreationEngine:
             json.dumps(proposal.to_document(), ensure_ascii=False, indent=2, sort_keys=True),
             encoding="utf-8",
         )
+        from .co_creation_studio import CoCreationStudioRejected, sync_studio_draft_from_proposal
+
+        try:
+            sync_studio_draft_from_proposal(
+                foundry_root=self.foundry_root,
+                proposal=proposal,
+                user_message=message,
+                turns=updated_session.turns,
+                now=now,
+            )
+        except CoCreationStudioRejected:
+            pass
         return proposal

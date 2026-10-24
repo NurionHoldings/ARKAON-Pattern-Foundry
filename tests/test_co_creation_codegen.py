@@ -171,7 +171,7 @@ def test_codegen_effect_pages_with_configuration(tmp_path, effect_id):
     scaffold_path.write_text(json.dumps(scaffold))
     manifest = CoCreationCodegenEngine(foundry_root=tmp_path).run_codegen(
         proposal_id=proposal_id, operator_approval_digest=APPROVAL, now=NOW)
-    page = (tmp_path / manifest.output_root / 'sections/hero.html').read_text()
+    page = (tmp_path / manifest.output_root / 'sections/hero.html').read_text(encoding='utf-8')
     assert f'data-effect="{effect_id}"' in page
     assert '--apf-accent:#ffaabb' in page
     assert '--apf-duration:2s' in page
@@ -201,6 +201,6 @@ def test_codegen_applies_text_effects_and_font_selection(tmp_path):
     path.write_text(json.dumps(scaffold))
     manifest = CoCreationCodegenEngine(foundry_root=tmp_path).run_codegen(
         proposal_id=proposal_id, operator_approval_digest=APPROVAL, now=NOW)
-    page = (tmp_path/manifest.output_root/'sections/hero.html').read_text()
+    page = (tmp_path/manifest.output_root/'sections/hero.html').read_text(encoding='utf-8')
     assert 'Pretendard' in page and 'data-glow="shine"' in page
     assert 'apf-custom-title' in page

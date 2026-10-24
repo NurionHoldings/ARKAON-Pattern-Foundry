@@ -12,8 +12,11 @@ from apf.reference_material_consent import (
     ReferenceUseMode,
     ReferenceUseRequest,
     RightsBasis,
+    consent_return_url_allowed,
+    consent_return_url_with_request_id,
     decide_reference_use,
     digest,
+    normalize_consent_return_url,
 )
 
 
@@ -110,3 +113,37 @@ def test_receipt_is_durable_digest_bound_and_exclusive(tmp_path):
     assert receipt["notice_digest"].startswith("sha256:")
     with pytest.raises(ReferenceConsentError, match="ALREADY_RECORDED"):
         store.record(item, agreement)
+
+
+def test_both_reuse_and_blocked_requests_receive_concrete_modification_proposals():
+    for item in (request(mode=ReferenceUseMode.DIRECT_REUSE), request()):
+        result = decide_reference_use(item, consent(item))
+        assert len(result.modification_proposals) >= 6
+        assert any("정보 구조" in value for value in result.modification_proposals)
+        assert any("보장하지" in value for value in result.modification_proposals)
+        assert result.deployment_allowed is False
+
+
+def test_previous_notice_requires_new_acknowledgement():
+    item = request()
+    with pytest.raises(ReferenceConsentError, match="INCOMPLETE"):
+        decide_reference_use(item, consent(item, notice_version="apf.reference-material-notice/1.0"))
+
+
+def test_consent_return_url_allowlist():
+    assert consent_return_url_allowed(
+        "https://deploy-preview-120--arkaonfoundry.netlify.app/services/site-builder.html?session=x"
+    )
+    assert not consent_return_url_allowed("https://evil.example/phish")
+    assert normalize_consent_return_url(
+        "https://arkaonfoundry.netlify.app/services/co-create.html"
+    ).startswith("https://arkaonfoundry.netlify.app")
+
+
+def test_consent_return_url_appends_reference_request_id():
+    base = "https://localhost/services/site-builder.html?session=abc&proposal=p1"
+    enriched = consent_return_url_with_request_id(base, "consent-req-99")
+    assert enriched is not None
+    assert "reference_consent_request_id=consent-req-99" in enriched
+    assert "session=abc" in enriched
+    assert consent_return_url_with_request_id("https://evil.example/x", "id") is None

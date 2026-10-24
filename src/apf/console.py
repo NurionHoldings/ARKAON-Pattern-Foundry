@@ -31,6 +31,7 @@ from .plain_language_approval import (
     PlainLanguageApprovalStore,
 )
 from .reference_material_consent import (
+    MODIFICATION_PROPOSALS,
     NOTICE_TEXT,
     NOTICE_VERSION,
     REQUIRED_ACKNOWLEDGEMENTS,
@@ -91,6 +92,32 @@ class CoCreationChatRequest(BaseModel):
     payment_entitlement_digest: str = Field(pattern=r"^[0-9a-f]{64}$")
     reference_site_url: str | None = Field(default=None, max_length=512)
     feature_reference_urls: dict[str, str] | None = None
+    reference_consent_request_id: str | None = Field(default=None, max_length=128)
+
+
+class CoCreationStudioBriefPayload(BaseModel):
+    industry: Literal["service", "shop", "portfolio"] = "service"
+    title: str = Field(min_length=1, max_length=80)
+    audience: str = Field(min_length=1, max_length=160)
+    story: str = Field(min_length=1, max_length=2000)
+    offerings: str = Field(min_length=1, max_length=1200)
+    difference: str = Field(min_length=1, max_length=1200)
+    process: str = Field(min_length=1, max_length=1200)
+    contact: str = Field(min_length=1, max_length=200)
+    theme: Literal["editorial", "night", "minimal"] = "editorial"
+
+
+class CoCreationStudioUpdateRequest(BaseModel):
+    proposal_id: str = Field(min_length=8, max_length=64)
+    brief: CoCreationStudioBriefPayload
+    local_project_id: str | None = Field(default=None, max_length=64)
+    reference_consent_request_id: str | None = Field(default=None, max_length=128)
+
+
+class CoCreationProductImprovementRequest(BaseModel):
+    proposal_id: str = Field(min_length=8, max_length=64)
+    candidate_html: str = Field(min_length=32, max_length=500_000)
+    mobile_issue_notes: list[str] = Field(default_factory=list, max_length=12)
 
 
 class CoCreationBuildRequest(BaseModel):
@@ -618,6 +645,10 @@ def install_console(
         csrf_verified: Annotated[None, Depends(csrf_guard)],
     ) -> dict[str, object]:
         del csrf_verified
+        from .co_creation_reference_gate import (
+            ReferenceGateRejected,
+            assert_reference_consent_or_raise,
+        )
         from .conversational_co_creation import (
             CoCreationRejected,
             CoCreationScope,
@@ -625,8 +656,27 @@ def install_console(
         )
         from .conversational_co_creation_bridge import bridge_co_creation_proposal
 
-        engine = ConversationalCoCreationEngine(foundry_root=foundry_root())
+        root = foundry_root()
         now = datetime.now().astimezone()
+        try:
+            assert_reference_consent_or_raise(
+                foundry_root=root,
+                principal_id=str(actor.principal_id),
+                message=payload.message,
+                reference_site_url=payload.reference_site_url,
+                feature_reference_urls=payload.feature_reference_urls,
+                reference_consent_request_id=payload.reference_consent_request_id,
+                intended_use=payload.message[:500],
+            )
+        except ReferenceGateRejected as error:
+            raise HTTPException(
+                status_code=428,
+                detail={
+                    "code": error.code,
+                    "consent_path": error.consent_path,
+                },
+            ) from None
+        engine = ConversationalCoCreationEngine(foundry_root=root)
         try:
             proposal = engine.chat(
                 tenant_id=str(actor.tenant_id),
@@ -653,7 +703,11 @@ def install_console(
             now=now,
             dry_run=False,
         )
+        from .co_creation_studio import load_studio_draft, studio_open_query
+
         document = proposal.to_document()
+        studio_draft = load_studio_draft(root, proposal.session_id)
+        studio_brief = studio_draft.get("brief") if isinstance(studio_draft, dict) else None
         return {
             "session_id": proposal.session_id,
             "proposal_id": proposal.proposal_id,
@@ -671,7 +725,159 @@ def install_console(
             "proposal_quality_replenished": proposal.proposal_quality_replenished,
             "proposal_quality_replenish_trigger": proposal.proposal_quality_replenish_trigger,
             "proposal_quality_replenish_digest": proposal.proposal_quality_replenish_digest,
+            "studio_brief": studio_brief,
+            "studio_open_path": studio_open_query(proposal.session_id, proposal.proposal_id),
         }
+
+    @application.get("/v1/console/co-creation/studio/{session_id}")
+    def co_creation_studio_draft(
+        session_id: str,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+    ) -> dict[str, object]:
+        from .co_creation_studio import (
+            CoCreationStudioRejected,
+            assert_valid_session_id,
+            load_studio_draft,
+            studio_open_query,
+        )
+
+        try:
+            safe_session_id = assert_valid_session_id(session_id)
+        except CoCreationStudioRejected as error:
+            raise HTTPException(status_code=422, detail=error.code) from None
+        draft = load_studio_draft(foundry_root(), safe_session_id)
+        if draft is None:
+            raise HTTPException(status_code=404, detail="studio draft not found")
+        if draft.get("tenant_id") != str(actor.tenant_id) or draft.get("principal_id") != str(
+            actor.principal_id
+        ):
+            raise HTTPException(status_code=404, detail="studio draft not found")
+        proposal_id = str(draft.get("proposal_id", ""))
+        return {
+            "draft": draft,
+            "studio_open_path": studio_open_query(safe_session_id, proposal_id, draft.get("local_project_id")),
+        }
+
+    @application.put("/v1/console/co-creation/studio/{session_id}")
+    def co_creation_studio_update(
+        session_id: str,
+        payload: CoCreationStudioUpdateRequest,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        from .co_creation_studio import (
+            CoCreationStudioRejected,
+            StudioBrief,
+            assert_valid_session_id,
+            load_studio_draft,
+            save_studio_draft,
+        )
+
+        try:
+            safe_session_id = assert_valid_session_id(session_id)
+        except CoCreationStudioRejected as error:
+            raise HTTPException(status_code=422, detail=error.code) from None
+        existing = load_studio_draft(foundry_root(), safe_session_id)
+        if existing is None:
+            raise HTTPException(status_code=404, detail="studio draft not found")
+        if existing.get("tenant_id") != str(actor.tenant_id) or existing.get("principal_id") != str(
+            actor.principal_id
+        ):
+            raise HTTPException(status_code=404, detail="studio draft not found")
+        if str(existing.get("proposal_id", "")) != payload.proposal_id:
+            raise HTTPException(status_code=409, detail="proposal mismatch")
+        brief = StudioBrief(
+            industry=payload.brief.industry,
+            title=payload.brief.title,
+            audience=payload.brief.audience,
+            story=payload.brief.story,
+            offerings=payload.brief.offerings,
+            difference=payload.brief.difference,
+            process=payload.brief.process,
+            contact=payload.brief.contact,
+            theme=payload.brief.theme,
+        )
+        consent_request_id = payload.reference_consent_request_id or existing.get(
+            "reference_consent_request_id"
+        )
+        try:
+            draft = save_studio_draft(
+                foundry_root=foundry_root(),
+                session_id=safe_session_id,
+                proposal_id=payload.proposal_id,
+                tenant_id=str(existing["tenant_id"]),
+                principal_id=str(existing["principal_id"]),
+                brief=brief,
+                now=datetime.now().astimezone(),
+                local_project_id=payload.local_project_id or existing.get("local_project_id"),
+                reference_consent_request_id=(
+                    str(consent_request_id) if consent_request_id else None
+                ),
+            )
+        except CoCreationStudioRejected as error:
+            raise HTTPException(status_code=422, detail=error.code) from None
+        return {"draft": draft}
+
+    @application.post("/v1/console/co-creation/product-improvement/evaluate")
+    def co_creation_product_improvement_evaluate(
+        payload: CoCreationProductImprovementRequest,
+        actor: Annotated[ConsolePrincipal, Depends(principal)],
+        csrf_verified: Annotated[None, Depends(csrf_guard)],
+        session_id: Annotated[str, Query(min_length=8, max_length=64)],
+    ) -> dict[str, object]:
+        del csrf_verified
+        from .co_creation_product_improvement import (
+            CoCreationProductImprovementEngine,
+            ProductImprovementRejected,
+        )
+        from .co_creation_studio import (
+            CoCreationStudioRejected,
+            StudioBrief,
+            assert_valid_session_id,
+            load_studio_draft,
+        )
+
+        try:
+            safe_session_id = assert_valid_session_id(session_id)
+        except CoCreationStudioRejected as error:
+            raise HTTPException(status_code=422, detail=error.code) from None
+        draft = load_studio_draft(foundry_root(), safe_session_id)
+        if draft is None:
+            raise HTTPException(status_code=404, detail="studio draft not found")
+        if draft.get("tenant_id") != str(actor.tenant_id) or draft.get("principal_id") != str(
+            actor.principal_id
+        ):
+            raise HTTPException(status_code=404, detail="studio draft not found")
+        if str(draft.get("proposal_id", "")) != payload.proposal_id:
+            raise HTTPException(status_code=409, detail="proposal mismatch")
+        raw = draft.get("brief")
+        if not isinstance(raw, dict):
+            raise HTTPException(status_code=422, detail="brief missing")
+        brief = StudioBrief(
+            industry=str(raw.get("industry", "service")),
+            title=str(raw.get("title", "")),
+            audience=str(raw.get("audience", "")),
+            story=str(raw.get("story", "")),
+            offerings=str(raw.get("offerings", "")),
+            difference=str(raw.get("difference", "")),
+            process=str(raw.get("process", "")),
+            contact=str(raw.get("contact", "")),
+            theme=str(raw.get("theme", "editorial")),
+        )
+        engine = CoCreationProductImprovementEngine(foundry_root=foundry_root())
+        try:
+            evaluation = engine.evaluate(
+                session_id=safe_session_id,
+                proposal_id=payload.proposal_id,
+                brief=brief,
+                candidate_html=payload.candidate_html,
+                mobile_issue_notes=tuple(payload.mobile_issue_notes),
+                now=datetime.now().astimezone(),
+            )
+        except ProductImprovementRejected as error:
+            raise HTTPException(status_code=422, detail=error.code) from None
+        return evaluation.to_document()
 
     @application.post("/v1/console/co-creation/build")
     def co_creation_build_after_approval(
@@ -1511,11 +1717,17 @@ def install_console(
     ) -> dict[str, object]:
         if actor.role != "owner":
             raise HTTPException(status_code=403, detail="owner role required")
+        from .reference_material_consent import ALLOWED_CONSENT_RETURN_PATHS
+
         return {
             "notice_version": NOTICE_VERSION,
             "notice_text": NOTICE_TEXT,
+            "modification_proposals": list(MODIFICATION_PROPOSALS),
             "notice_digest": reference_digest(NOTICE_TEXT),
             "required_acknowledgements": sorted(REQUIRED_ACKNOWLEDGEMENTS),
+            "allowed_return_paths": sorted(ALLOWED_CONSENT_RETURN_PATHS),
+            "allowed_return_origin_suffixes": ["--arkaonfoundry.netlify.app"],
+            "allowed_return_hosts": ["arkaonfoundry.netlify.app", "localhost", "127.0.0.1"],
             "automatic_merge_allowed": False,
             "deployment_allowed": False,
         }

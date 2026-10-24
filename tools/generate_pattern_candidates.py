@@ -3,9 +3,13 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
+
+from apf.pattern_catalog import evidence_file_digest  # noqa: E402
 OUT = ROOT / "knowledge" / "patterns" / "candidates"
 
 
@@ -511,7 +515,9 @@ def main() -> None:
         path.unlink()
     for slug, title, intent, source, test in SPECS:
         mechanism, invariant_a, invariant_b, failure_a, failure_b, applies, not_when = DETAILS[slug]
-        hashes = {ref: digest((ROOT / ref).read_bytes()) for ref in (source, test)}
+        hashes = {
+            ref: evidence_file_digest(ref, (ROOT / ref).read_bytes()) for ref in (source, test)
+        }
         source_names = re.findall(
             r"^(?:class|def) ([a-zA-Z_][a-zA-Z0-9_]*)",
             (ROOT / source).read_text(encoding="utf-8"),
