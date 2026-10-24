@@ -59,6 +59,46 @@ def _sha256(value: bytes) -> str:
     return hashlib.sha256(value).hexdigest()
 
 
+_TEXT_EVIDENCE_SUFFIXES = frozenset(
+    {
+        ".py",
+        ".json",
+        ".md",
+        ".yaml",
+        ".yml",
+        ".toml",
+        ".html",
+        ".css",
+        ".js",
+        ".ts",
+        ".tsx",
+        ".sql",
+        ".sh",
+        ".bat",
+        ".ps1",
+        ".txt",
+    }
+)
+
+
+def evidence_is_text(ref: str, raw: bytes) -> bool:
+    """True when catalog evidence should use text line-ending normalization."""
+    if b"\0" in raw:
+        return False
+    return Path(ref).suffix.lower() in _TEXT_EVIDENCE_SUFFIXES
+
+
+def evidence_bytes_for_hash(ref: str, raw: bytes) -> bytes:
+    """Bytes digested for evidence_hashes (see docs/30-public-pattern-catalog.md)."""
+    if evidence_is_text(ref, raw):
+        return raw.replace(b"\r\n", b"\n")
+    return raw
+
+
+def evidence_file_digest(ref: str, raw: bytes) -> str:
+    return _sha256(evidence_bytes_for_hash(ref, raw))
+
+
 def package_hash(package: dict[str, Any]) -> str:
     return _sha256(_canonical({k: v for k, v in package.items() if k != "package_hash"}))
 
@@ -131,7 +171,8 @@ def validate_catalog(packages: list[dict[str, Any]], root: Path) -> str:
         for ref in refs:
             if ref.startswith("/") or ".." in Path(ref).parts or not (root / ref).is_file():
                 raise PatternCatalogError("EVIDENCE_REFERENCE_INVALID")
-            expected = _sha256((root / ref).read_bytes())
+            raw = (root / ref).read_bytes()
+            expected = evidence_file_digest(ref, raw)
             if package["evidence_hashes"].get(ref) != expected:
                 raise PatternCatalogError("EVIDENCE_HASH_MISMATCH")
         if set(package["evidence_hashes"]) != set(refs):
