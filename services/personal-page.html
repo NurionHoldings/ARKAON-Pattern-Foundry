@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>이름@ 개인 페이지 · 아르카온</title>
+  <link rel="stylesheet" href="/services/services.css">
+</head>
+<body>
+  <div class="shell">
+    <div class="svc-top"><h1>이름@ 개인 페이지</h1><a class="svc-home" href="/">← 홈</a></div>
+    <form class="panel" id="form">
+      <h2>@ 핸들 페이지</h2>
+      <label>핸들 (영문·숫자)<input id="handle" required maxlength="32" pattern="[A-Za-z0-9._-]+" value="creator"></label>
+      <label>표시 이름<input id="displayName" maxlength="80" value="크리에이터"></label>
+      <label>소개<textarea id="bio" maxlength="800">만드는 것을 좋아합니다.</textarea></label>
+      <label>링크 (한 줄에 하나, 선택: 제목|URL)<textarea id="linksText" placeholder="포트폴리오|https://example.com">아르카온|https://arkaonfoundry.netlify.app</textarea></label>
+      <label>강조색<input id="accent" type="color" value="#ad79ff"></label>
+      <div class="btn-row"><button type="submit">HTML 저장 · 내 작업에 추가</button></div>
+    </form>
+    <div class="panel preview"><iframe id="preview" title="개인 페이지 미리보기"></iframe></div>
+  </div>
+  <script src="/services/services.js"></script>
+  <script>
+    const {personalPageHtml,downloadText,saveProject}=APFHomeServices;
+    const fields=['handle','displayName','bio','linksText','accent'];
+    function values(){return Object.fromEntries(fields.map(id=>[id,document.getElementById(id).value]));}
+    function render(){document.getElementById('preview').srcdoc=personalPageHtml(values());}
+    fields.forEach(id=>document.getElementById(id).addEventListener('input',render));
+    document.getElementById('form').addEventListener('submit',e=>{e.preventDefault();const v=values();const html=personalPageHtml(v);
+      saveProject({type:'personal',title:`@${v.handle}`,html});downloadText(`${v.handle}-page.html`,html);});
+    render();
+  </script>
+</body>
+</html>

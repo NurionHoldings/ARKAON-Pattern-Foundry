@@ -46,14 +46,15 @@ def test_console_review_store_production_requires_database_url(tmp_path: Path, m
         console_review_store_from_config(foundry_root=tmp_path, database_url=None)
 
 
-def test_create_app_production_requires_review_store(monkeypatch):
+def test_console_review_store_production_requires_ethernian_key(monkeypatch, tmp_path: Path):
     monkeypatch.setenv("APF_ENV", "production")
-    monkeypatch.setenv("DATABASE_URL", "postgresql://user:pass@localhost/db")
     monkeypatch.delenv("APF_ETERNIAN_REVIEW_PUBLIC_KEY_B64", raising=False)
-    from apf import api
-
     with pytest.raises(RuntimeError, match="ethernian"):
-        api.create_app()
+        console_review_store_from_config(
+            foundry_root=tmp_path,
+            database_url="postgresql://user:pass@localhost/db",
+            environment="production",
+        )
 
 
 def test_is_production_environment():

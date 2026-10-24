@@ -102,14 +102,13 @@ variables are unavailable to function runtime. Do not set it until the API
 origin exists and the direct-origin route gates above are verified:
 https://docs.netlify.com/build/functions/environment-variables/
 
-## Remaining site integration
+## Site integration
 
-The current `main` frontend has a separate connectivity probe that reports
-`not_configured` when its saved API base is blank. Before the production site
-can show the API as connected, update that frontend to use same-origin
-`/health` by default and treat a protected-route 401 as reachable. This change
-belongs with the current frontend files on `main`; they are not present on the
-older design work branch.
+`services/services.js` defaults to same-origin `/health` and `/console` when
+`localStorage` override is blank. `probeApi` treats `/console` 302/401 as
+reachable when `/health` is not yet 200 (for example before `APF_API_ORIGIN`
+is set, `/health` may return 503). Rollout order: `docs/70-operational-connect-rollout.md`.
+Render blueprint draft: `render.yaml`.
 
 ## Preproduction verification
 

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>로고·명함 만들기 · 아르카온</title>
+  <link rel="stylesheet" href="/services/services.css">
+</head>
+<body>
+  <div class="shell">
+    <div class="svc-top"><h1>로고·명함 만들기</h1><a class="svc-home" href="/">← 홈</a></div>
+    <p class="muted">브랜드 이름과 연락처로 명함 HTML을 만들고, 진입·로고 모션은 스튜디오에서 다듬을 수 있습니다.</p>
+    <form class="panel" id="form">
+      <h2>브랜드 정보</h2>
+      <label>상호·이름<input id="businessName" required maxlength="80" value="ARKAON"></label>
+      <label>한 줄 소개<input id="role" maxlength="120" value="디지털 제작 공간"></label>
+      <label>이메일<input id="email" type="email" maxlength="120"></label>
+      <label>전화<input id="phone" maxlength="40"></label>
+      <label>강조색<input id="accent" type="color" value="#75d8f9"></label>
+      <div class="btn-row">
+        <button type="submit">명함 HTML 저장</button>
+        <a class="btn" href="/examples/entry-effects-studio.html">진입 효과 스튜디오</a>
+        <a class="btn" href="/examples/arirang-text-effects.html">텍스트 효과 예제</a>
+      </div>
+    </form>
+    <div class="panel preview"><iframe id="preview" title="명함 미리보기"></iframe></div>
+  </div>
+  <script src="/services/services.js"></script>
+  <script>
+    const {businessCardHtml,downloadText,saveProject}=APFHomeServices;
+    const fields=['businessName','role','email','phone','accent'];
+    function values(){return Object.fromEntries(fields.map(id=>[id,document.getElementById(id).value]));}
+    function render(){document.getElementById('preview').srcdoc=businessCardHtml(values());}
+    fields.forEach(id=>document.getElementById(id).addEventListener('input',render));
+    document.getElementById('form').addEventListener('submit',e=>{e.preventDefault();const v=values();const html=businessCardHtml(v);
+      saveProject({type:'logo-card',title:v.businessName,html});downloadText(`${v.businessName}-card.html`,html);});
+    render();
+  </script>
+</body>
+</html>

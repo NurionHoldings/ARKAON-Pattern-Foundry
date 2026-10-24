@@ -1,0 +1,15 @@
+{
+  "schema_version": "apf.google-iam-principal-map/v1",
+  "_comment": "Copy shape into Render secret APF_IAM_PRINCIPAL_MAP_JSON. Replace example.org and UUIDs. Never commit real credentials.",
+  "operator@example.org": {
+    "tenant_id": "00000000-0000-4000-8000-000000000001",
+    "principal_id": "00000000-0000-4000-8000-000000000002",
+    "role": "operator",
+    "google_sub": "optional-stable-google-subject-id"
+  },
+  "reviewer@example.org": {
+    "tenant_id": "00000000-0000-4000-8000-000000000001",
+    "principal_id": "00000000-0000-4000-8000-000000000003",
+    "role": "reviewer"
+  }
+}

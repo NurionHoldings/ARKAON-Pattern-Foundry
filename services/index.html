@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>아르카온 서비스</title>
+  <link rel="stylesheet" href="/services/services.css">
+</head>
+<body>
+  <div class="shell">
+    <div class="svc-top">
+      <h1>아르카온 서비스</h1>
+      <a class="svc-home" href="/">← 홈으로</a>
+    </div>
+    <p class="muted">브랜드·영상·홈페이지·작업 요청을 브라우저에서 바로 시작할 수 있습니다.</p>
+    <ul class="list" id="serviceList"></ul>
+  </div>
+  <script>
+    fetch('/config/arkaon-home-services.json').then(r=>r.json()).then(data=>{
+      const root=document.getElementById('serviceList');
+      for(const s of data.services){
+        const li=document.createElement('li');
+        const a=document.createElement('a');a.href=s.href;a.textContent=s.title;
+        const chip=document.createElement('span');chip.className='chip';chip.textContent=s.status==='restricted'?'관리자':'이용 가능';
+        li.append(a,chip);
+        root.append(li);
+      }
+    }).catch(()=>{document.getElementById('serviceList').innerHTML='<li class="warn">서비스 목록을 불러오지 못했습니다.</li>';});
+  </script>
+</body>
+</html>

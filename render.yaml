@@ -1,0 +1,47 @@
+# Render Blueprint (draft) — PRODUCT_IMPLEMENT_HOLD: apply only after review.
+# Set secrets in the Render dashboard; do not commit credentials.
+# Docs: docs/netlify-fastapi-proxy.md, docs/70-operational-connect-rollout.md
+
+services:
+  - type: web
+    name: arkaon-foundry-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter
+    healthCheckPath: /health
+    autoDeploy: false
+    disk:
+      name: foundry-data
+      mountPath: /var/data
+      sizeGB: 10
+    envVars:
+      - key: APF_ENV
+        value: production
+      - key: APF_ENABLE_DEV_SESSION
+        value: "false"
+      - key: APF_FOUNDRY_ROOT
+        value: /var/data
+      - key: APF_CONSOLE_PUBLIC_ORIGIN
+        value: https://arkaonfoundry.netlify.app
+      - key: DATABASE_URL
+        fromDatabase:
+          name: arkaon-foundry-db
+          property: connectionString
+      - key: APF_CONSOLE_SESSION_SECRET
+        sync: false
+      - key: APF_ETERNIAN_REVIEW_PUBLIC_KEY_B64
+        sync: false
+      - key: APF_GOOGLE_OIDC_CLIENT_ID
+        sync: false
+      - key: APF_GOOGLE_OIDC_CLIENT_SECRET
+        sync: false
+      - key: APF_GOOGLE_WORKSPACE_DOMAINS
+        sync: false
+      - key: APF_IAM_PRINCIPAL_MAP_JSON
+        sync: false
+
+databases:
+  - name: arkaon-foundry-db
+    plan: basic-256mb
+    databaseName: arkaon_foundry
+    user: arkaon_foundry

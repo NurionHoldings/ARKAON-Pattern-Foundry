@@ -1,0 +1,12 @@
+{
+  "schema_version": "apf.held-out-evaluation/v1",
+  "_comment": "Copy to state/held-out-evaluation/tasks.json when running held-out benchmarks. Tasks must not overlap training corpora.",
+  "tasks": [
+    {
+      "task_id": "held-out-001",
+      "description": "example: console durable review idempotency",
+      "baseline_recorded": false,
+      "post_learning_recorded": false
+    }
+  ]
+}

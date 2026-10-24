@@ -1,0 +1,68 @@
+{
+  "schema_version": "apf.home-services/v1",
+  "services": [
+    {
+      "id": "logo-card",
+      "title": "로고·명함 만들기",
+      "status": "available",
+      "href": "/services/logo-card.html",
+      "summary": "브랜드에 어울리는 로고와 명함을 디자인합니다."
+    },
+    {
+      "id": "ai-video",
+      "title": "AI 영상 만들기",
+      "status": "available",
+      "href": "/services/ai-video.html",
+      "summary": "진입·브랜드 영상을 미리 보고 진입 효과 스튜디오로 제작합니다."
+    },
+    {
+      "id": "site-builder",
+      "title": "홈페이지 만들기",
+      "status": "available",
+      "href": "/services/site-builder.html",
+      "summary": "업종과 목적에 맞는 한 페이지 홈페이지 초안을 만듭니다."
+    },
+    {
+      "id": "personal-page",
+      "title": "이름@ 개인 페이지",
+      "status": "available",
+      "href": "/services/personal-page.html",
+      "summary": "나만의 소개 페이지를 만들고 HTML로 저장합니다."
+    },
+    {
+      "id": "co-create",
+      "title": "아르카온과 함께 작업하기",
+      "status": "available",
+      "href": "/services/co-create.html",
+      "summary": "작업 요청을 남기고 Foundry API 연결 시 공동 창작 세션으로 이어갑니다."
+    },
+    {
+      "id": "publish",
+      "title": "홈페이지 게시하기",
+      "status": "available",
+      "href": "/services/publish.html",
+      "summary": "저장한 페이지를 내보내고 게시 절차를 안내합니다."
+    },
+    {
+      "id": "account",
+      "title": "내 계정과 결제",
+      "status": "available",
+      "href": "/services/account.html",
+      "summary": "이 브라우저에 저장된 작업물과 API 연결 설정을 관리합니다."
+    },
+    {
+      "id": "admin",
+      "title": "관리자 메뉴",
+      "status": "restricted",
+      "href": "/services/admin.html",
+      "summary": "운영·승인 콘솔로 이동합니다. 권한이 있는 계정만 이용할 수 있습니다."
+    },
+    {
+      "id": "platform-self-heal",
+      "title": "아르카온 자가치유",
+      "status": "available",
+      "href": "/services/self-heal.html",
+      "summary": "미비점을 스스로 진단하고 범·에테르니언·관리자에게 필요사항을 요청합니다."
+    }
+  ]
+}
