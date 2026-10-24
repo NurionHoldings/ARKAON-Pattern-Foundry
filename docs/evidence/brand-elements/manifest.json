@@ -80,6 +80,22 @@
   "browser_12_condition_comparison": "NOT_RUN",
   "browser_undo_redo": "NOT_RUN",
   "browser_save_reopen": "NOT_RUN",
-  "ci_run_id": null,
-  "rollback": "Revert sandbox PR; preserve existing project data"
+  "ci_run_id": 40062577184,
+  "rollback": "Revert sandbox PR; preserve existing project data",
+  "ci_evidence": {
+    "tested_head": "bd7cd99a69c39393cddf23f88d2c79bc00194281",
+    "run_url": "https://github.com/NurionHoldings/ARKAON-Pattern-Foundry/actions/runs/40062577184",
+    "checks": {
+      "test": "success",
+      "postgres-integration": "success",
+      "windows-audit-controls": "success"
+    }
+  },
+  "browser_environment": {
+    "attempted_url": "https://deploy-preview-123--arkaonfoundry.netlify.app/services/logo-card.html",
+    "observed_page_title": "Site not found",
+    "blocker": "PR #123 preview URL returns Netlify Site not found; no candidate UI available at this address",
+    "status": "BLOCKED",
+    "viewport_control": "Current cloud browser API does not expose viewport resizing; 12-condition comparison remains NOT_RUN"
+  }
 }
