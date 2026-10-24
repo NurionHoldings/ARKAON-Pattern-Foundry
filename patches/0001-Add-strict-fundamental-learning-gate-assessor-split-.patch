@@ -1,0 +1,1145 @@
+From 0d3a63f08a142e6156a28bc821e8934f2fb20e85 Mon Sep 17 00:00:00 2001
+From: NEW <new@example.com>
+Date: Sat, 24 Oct 2026 11:50:35 +0900
+Subject: [PATCH] Add strict fundamental learning gate assessor (split from PR
+ #105)
+
+Learning-only branch: five-stage gate policy, strict evidence parsers, lesson-work trace store, CLI, docs/71-72, and tests. Excludes Render, Netlify, IAM, logo, and services rollout. Based on design branch 33e14c9.
+
+Co-authored-by: Cursor <cursoragent@cursor.com>
+---
+ config/arkaon-fundamental-learning-gates.json |  48 +++
+ .../failure-learning-feedback.example.json    |   8 +
+ .../held-out-evaluation-tasks.example.json    |  27 ++
+ ...provement-recognition-metrics.example.json |  12 +
+ docs/50-v0.1-gates-progress.md                |   5 +
+ ...-fundamental-learning-improvement-gates.md |  50 +++
+ docs/72-fundamental-learning-pr-split.md      |  26 ++
+ .../arkaon-fundamental-learning-gates.py      |  28 ++
+ src/apf/fundamental_learning_evidence.py      | 195 +++++++++
+ src/apf/fundamental_learning_gates.py         | 384 ++++++++++++++++++
+ src/apf/lesson_work_trace.py                  |  84 ++++
+ tests/test_fundamental_learning_evidence.py   |  84 ++++
+ tests/test_fundamental_learning_gates.py      |  71 ++++
+ 13 files changed, 1022 insertions(+)
+ create mode 100644 config/arkaon-fundamental-learning-gates.json
+ create mode 100644 config/examples/failure-learning-feedback.example.json
+ create mode 100644 config/examples/held-out-evaluation-tasks.example.json
+ create mode 100644 config/examples/improvement-recognition-metrics.example.json
+ create mode 100644 docs/71-fundamental-learning-improvement-gates.md
+ create mode 100644 docs/72-fundamental-learning-pr-split.md
+ create mode 100644 orchestrator/arkaon-fundamental-learning-gates.py
+ create mode 100644 src/apf/fundamental_learning_evidence.py
+ create mode 100644 src/apf/fundamental_learning_gates.py
+ create mode 100644 src/apf/lesson_work_trace.py
+ create mode 100644 tests/test_fundamental_learning_evidence.py
+ create mode 100644 tests/test_fundamental_learning_gates.py
+
+diff --git a/config/arkaon-fundamental-learning-gates.json b/config/arkaon-fundamental-learning-gates.json
+new file mode 100644
+index 0000000..1e53fe2
+--- /dev/null
++++ b/config/arkaon-fundamental-learning-gates.json
+@@ -0,0 +1,48 @@
++{
++  "schema_version": "apf.fundamental-learning-gates/v1",
++  "overall_status": "MEMORY_FOUNDATION_ONLY",
++  "efficacy_validation": "NEEDS_HARDENING",
++  "operational_apply_complete": false,
++  "unmerged_pr_note": "PR #105 및 관련 학습·연결 PR은 미병합. 운영 적용 완료로 표시하지 않음.",
++  "stages": {
++    "execution_24h": {
++      "title": "실제 학습 실행 확인",
++      "completion_criterion": "24시간 실행 기록에서 누락·오류 원인 확인",
++      "lookback_hours": 24,
++      "evidence_paths": [
++        "state/hourly-learning/",
++        "state/hourly-learning-current.json",
++        "state/collector-daemon.json",
++        "state/startup-last-run.json"
++      ]
++    },
++    "lesson_work_linkage": {
++      "title": "교훈을 작업에 연결",
++      "completion_criterion": "실제 작업이 사용한 교훈과 결과를 추적",
++      "min_traced_links": 1,
++      "store_path": "knowledge/lesson-work-traces.jsonl"
++    },
++    "held_out_comparison": {
++      "title": "학습 효과 비교",
++      "completion_criterion": "학습자료와 분리한 과제 20개 이상 전후 비교",
++      "min_held_out_tasks": 20,
++      "registry_path": "state/held-out-evaluation/tasks.json"
++    },
++    "improvement_recognition": {
++      "title": "개선 인정",
++      "completion_criterion": "안전 실패·기존 기능 회귀 없이 목표 실패 감소",
++      "requires_ci_green": true,
++      "requires_regression_suite": true,
++      "metrics_path": "state/held-out-evaluation/metrics.json"
++    },
++    "failure_feedback_loop": {
++      "title": "실패 환류",
++      "completion_criterion": "실패 원인을 다음 학습과제로 만들고 독립 검토",
++      "inbox_paths": [
++        "inbox/eternian-review",
++        "inbox/research"
++      ],
++      "min_failure_derived_packets": 1
++    }
++  }
++}
+diff --git a/config/examples/failure-learning-feedback.example.json b/config/examples/failure-learning-feedback.example.json
+new file mode 100644
+index 0000000..5a39c0e
+--- /dev/null
++++ b/config/examples/failure-learning-feedback.example.json
+@@ -0,0 +1,8 @@
++{
++  "schema_version": "apf.failure-learning-feedback/v1",
++  "_comment": "Full chain required for stage-5 READY_FOR_REVIEW. Keyword-only inbox text is CANDIDATE_EVIDENCE at most.",
++  "failure_source_ref": "state/hourly-learning/2026-09-18.jsonl#line-3",
++  "root_cause_code": "HOURLY_COLLECTOR_ZERO_YIELD",
++  "derived_learning_task_id": "learning-task-20260918-collector-recovery",
++  "independent_review_ref": "inbox/eternian-review/example-learning-task-review.json"
++}
+diff --git a/config/examples/held-out-evaluation-tasks.example.json b/config/examples/held-out-evaluation-tasks.example.json
+new file mode 100644
+index 0000000..8ae45d6
+--- /dev/null
++++ b/config/examples/held-out-evaluation-tasks.example.json
+@@ -0,0 +1,27 @@
++{
++  "schema_version": "apf.held-out-evaluation/v1",
++  "training_corpus_fingerprint": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
++  "_comment": "Copy to state/held-out-evaluation/tasks.json. Booleans alone are not accepted.",
++  "tasks": [
++    {
++      "task_id": "held-out-console-durable-idempotency",
++      "description": "Console durable review idempotency under PostgreSQL",
++      "separated_from_training": true,
++      "training_corpus_refs": [],
++      "training_corpus_fingerprint": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
++      "baseline": {
++        "executed_at": "2026-10-24T00:00:00+00:00",
++        "evidence_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
++        "failed": true,
++        "scoring_artifact_ref": "tests/test_postgres_durable_review.py"
++      },
++      "post_learning": {
++        "executed_at": "2026-10-24T01:00:00+00:00",
++        "evidence_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
++        "failed": false,
++        "score": 1.0,
++        "scoring_artifact_ref": "tests/test_postgres_durable_review.py"
++      }
++    }
++  ]
++}
+diff --git a/config/examples/improvement-recognition-metrics.example.json b/config/examples/improvement-recognition-metrics.example.json
+new file mode 100644
+index 0000000..d0935d7
+--- /dev/null
++++ b/config/examples/improvement-recognition-metrics.example.json
+@@ -0,0 +1,12 @@
++{
++  "schema_version": "apf.improvement-recognition-metrics/v1",
++  "_comment": "Human signoff still required. ci_commit_sha must match the commit used for baseline and post held-out runs.",
++  "baseline_failure_count": 25,
++  "post_failure_count": 18,
++  "target_failure_delta": -7,
++  "safe_failure_count": 0,
++  "regression_count": 0,
++  "ci_commit_sha": "0000000000000000000000000000000000000000",
++  "ci_verified_green": true,
++  "ci_run_id": "https://github.com/org/repo/actions/runs/0"
++}
+diff --git a/docs/50-v0.1-gates-progress.md b/docs/50-v0.1-gates-progress.md
+index 1d2afa5..7406a19 100644
+--- a/docs/50-v0.1-gates-progress.md
++++ b/docs/50-v0.1-gates-progress.md
+@@ -28,6 +28,11 @@ py -3.11 orchestrator/arkaon-reuse-proof-measurement.py --dry-run
+ - M6 reuse measurement는 synthetic baseline만 검증. 부업장터 실측·운영 승격은 외부.
+ - 30개 Pattern 외부 eternian 서명 승격은 Foundry 밖.
+ 
++## 근본 학습 5단계 (별도 게이트)
++
++- 정책·평가: `config/arkaon-fundamental-learning-gates.json`, `docs/71-fundamental-learning-improvement-gates.md`
++- `efficacy_validation: NEEDS_HARDENING` — 작업 연결·held-out 20+·개선 인정은 미완
++
+ ## 여전히 외부/미완
+ 
+ - `pattern-30-promotion`: 개별 eternian 서명·운영 승격
+diff --git a/docs/71-fundamental-learning-improvement-gates.md b/docs/71-fundamental-learning-improvement-gates.md
+new file mode 100644
+index 0000000..fb59633
+--- /dev/null
++++ b/docs/71-fundamental-learning-improvement-gates.md
+@@ -0,0 +1,50 @@
++# 71. 근본 학습 개선 5단계 게이트
++
++상태: **MEMORY_FOUNDATION_ONLY** / **efficacy_validation: NEEDS_HARDENING** / **PRODUCT_IMPLEMENT_HOLD**  
++운영 적용 완료로 표시하지 않음. **PR #105 · #115 · #116** CI Green, **미병합**. PR 분리: `docs/72-fundamental-learning-pr-split.md`.
++
++## 현재 판정 (인석형 검토 반영)
++
++**기억 누적 기반 + 평가 틀 구현**은 있으나, **실효성 검증 로직을 강화 중**이다.  
++Stage 5 **`CANDIDATE_EVIDENCE`** = 키워드·후보 패킷 수준일 뿐, **실패 환류 완료가 아님**.
++
++## 단계별 완료 판단 vs 평가기 검증
++
++| 단계 | 완료 판단 기준 | 평가기가 요구하는 증거 |
++|------|----------------|------------------------|
++| 1 실행 확인 | 24h 기록에서 누락·오류 원인 확인 | `state/hourly-learning/*.jsonl` **`topic.observed_at`** 창, **`cycle.failed`** 및 `failure_reason`, 예정 시간대(slot) 누락 (mtime·`*.json` 사용 안 함) |
++| 2 교훈↔작업 | 교훈·작업·결과 추적 | `lesson-work-traces.jsonl` **digest 재검증**, `work_outcome_digest`, 교훈 파일 **ACCEPT** + `evidence_digest` |
++| 3 held-out | 학습자료와 분리 20+ 전후 비교 | **고유 `task_id`**, `separated_from_training`, baseline/post **`executed_at`·`evidence_digest`·채점**, boolean만으로 불가 |
++| 4 개선 인정 | 안전 실패 0·회귀 0·실패 감소 | `metrics.json` v1: **delta&lt;0**, `safe_failure_count=0`, `regression_count=0`, **동일 `ci_commit_sha`·Green `ci_run_id`** + **인간 서명** |
++| 5 실패 환류 | 실패→원인→학습과제→독립 검토 | `apf.failure-learning-feedback/v1` 전链 또는 4필드 inline; 키워드만 → **`CANDIDATE_EVIDENCE`** |
++
++## 상태값
++
++| `GateStatus` | 의미 |
++|--------------|------|
++| `NOT_STARTED` | 필수 증거 없음 |
++| `PARTIAL` | 일부 증거·미해결 blocker |
++| `CANDIDATE_EVIDENCE` | 후보 패킷만 (주로 5단계) |
++| `READY_FOR_REVIEW` | strict 증거 충족 → **사람 검토 대기** (자동 승인 아님) |
++
++## CLI
++
++```bash
++py -3.11 orchestrator/arkaon-fundamental-learning-gates.py --dry-run
++```
++
++산출: `state/fundamental-learning-gates/` (`apf.fundamental-learning-gate-report/v2`)
++
++## 예시 스키마
++
++- `config/examples/failure-learning-feedback.example.json`
++- `config/examples/held-out-evaluation-tasks.example.json`
++- `config/examples/improvement-recognition-metrics.example.json`
++
++## 정책
++
++`config/arkaon-fundamental-learning-gates.json`
++
++## 운영 연결
++
++Render·Netlify·Workspace: `docs/70-operational-connect-rollout.md` (학습 HOLD와 **분리**).
+diff --git a/docs/72-fundamental-learning-pr-split.md b/docs/72-fundamental-learning-pr-split.md
+new file mode 100644
+index 0000000..7547b4a
+--- /dev/null
++++ b/docs/72-fundamental-learning-pr-split.md
+@@ -0,0 +1,26 @@
++# 72. 학습 게이트 PR 분리 (HOLD)
++
++## 배경
++
++- **PR #105** · **#115** · **#116**: CI Green, **미병합**
++- #105에는 로고·Google IAM·Render/Netlify 연결 준비와 학습 평가기가 **한 브랜치**에 공존
++- **전체 HOLD 해제·일괄 병합 금지** — 학습 평가기만 검증하려고 배포 연결 HOLD를 풀면 안 됨
++
++## 권장 분리
++
++| PR 범위 | 포함 예 | 제외 |
++|---------|---------|------|
++| **학습·게이트 only** (main 대상 신규 PR) | `fundamental_learning_*`, `lesson_work_trace`, `config/arkaon-fundamental-learning-gates.json`, `docs/71`, `docs/72`, `orchestrator/arkaon-fundamental-learning-gates.py`, tests | `render.yaml`, `netlify/*`, `google_workspace_iam`, 로고 prototype |
++| **연결·배포 prep** (#105 등) | Render/Netlify/IAM, `docs/70`, `services/*` | 학습 게이트 (선택: 머지 순서는 학습 PR 먼저 검토 가능) |
++
++## cherry-pick 예시 (운영자)
++
++```bash
++git checkout -b feat/fundamental-learning-gates-strict main
++git cherry-pick <commits touching learning gates only>
++```
++
++## 판정 (인석형 검토 반영)
++
++**「기억 누적 기반 + 평가 틀 구현, 실효성 검증은 보갔 필요」** — `efficacy_validation: NEEDS_HARDENING`  
++Stage 5 `CANDIDATE_EVIDENCE` ≠ 실패 환류 완료.
+diff --git a/orchestrator/arkaon-fundamental-learning-gates.py b/orchestrator/arkaon-fundamental-learning-gates.py
+new file mode 100644
+index 0000000..20fd554
+--- /dev/null
++++ b/orchestrator/arkaon-fundamental-learning-gates.py
+@@ -0,0 +1,28 @@
++#!/usr/bin/env python3
++"""Assess fundamental learning improvement gates (read-only report)."""
++from __future__ import annotations
++
++import argparse
++import json
++import sys
++from pathlib import Path
++
++ROOT = Path(__file__).resolve().parents[1]
++sys.path.insert(0, str(ROOT / "src"))
++
++from apf.fundamental_learning_gates import FundamentalLearningGateAssessor  # noqa: E402
++
++
++def main() -> int:
++    parser = argparse.ArgumentParser()
++    parser.add_argument("--foundry-root", type=Path, default=ROOT)
++    parser.add_argument("--dry-run", action="store_true")
++    args = parser.parse_args()
++    assessor = FundamentalLearningGateAssessor(foundry_root=args.foundry_root)
++    report = assessor.assess_and_persist(dry_run=args.dry_run)
++    print(json.dumps(report.to_document(), ensure_ascii=False, indent=2))
++    return 0
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+diff --git a/src/apf/fundamental_learning_evidence.py b/src/apf/fundamental_learning_evidence.py
+new file mode 100644
+index 0000000..a7bedd2
+--- /dev/null
++++ b/src/apf/fundamental_learning_evidence.py
+@@ -0,0 +1,195 @@
++"""Strict evidence parsers for fundamental learning gate assessment."""
++
++from __future__ import annotations
++
++import json
++from datetime import UTC, datetime
++from hashlib import sha256
++from pathlib import Path
++from typing import Any
++from zoneinfo import ZoneInfo
++
++from .reflective_learning import Decision
++
++
++def parse_iso_datetime(value: object) -> datetime | None:
++    if not isinstance(value, str) or not value.strip():
++        return None
++    try:
++        parsed = datetime.fromisoformat(value)
++    except ValueError:
++        return None
++    if parsed.tzinfo is None:
++        parsed = parsed.replace(tzinfo=UTC)
++    return parsed.astimezone(UTC)
++
++
++def load_jsonl(path: Path) -> tuple[dict[str, Any], ...]:
++    if not path.is_file():
++        return ()
++    rows: list[dict[str, Any]] = []
++    for line_no, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
++        if not line.strip():
++            continue
++        try:
++            document = json.loads(line)
++        except json.JSONDecodeError as exc:
++            raise ValueError(f"{path.name}:{line_no} invalid json") from exc
++        if isinstance(document, dict):
++            rows.append(document)
++    return tuple(rows)
++
++
++def iter_hourly_learning_records(foundry_root: Path) -> tuple[dict[str, Any], ...]:
++    directory = foundry_root / "state" / "hourly-learning"
++    if not directory.is_dir():
++        return ()
++    records: list[dict[str, Any]] = []
++    for path in sorted(directory.glob("*.jsonl")):
++        records.extend(load_jsonl(path))
++    return tuple(records)
++
++
++def hourly_record_observed_at(record: dict[str, Any]) -> datetime | None:
++    topic = record.get("topic")
++    if not isinstance(topic, dict):
++        return None
++    return parse_iso_datetime(topic.get("observed_at"))
++
++
++def expected_schedule_hours(schedule_path: Path, *, window_start: datetime, window_end: datetime) -> set[tuple[str, int]]:
++    if not schedule_path.is_file():
++        return set()
++    document = json.loads(schedule_path.read_text(encoding="utf-8"))
++    timezone = str(document.get("timezone", "UTC"))
++    if document.get("enabled") is False:
++        return set()
++    tz = ZoneInfo(timezone)
++    from datetime import timedelta
++
++    expected: set[tuple[str, int]] = set()
++    cursor = window_start.astimezone(tz).replace(minute=0, second=0, microsecond=0)
++    end_local = window_end.astimezone(tz)
++    while cursor <= end_local:
++        expected.add((cursor.strftime("%Y-%m-%d"), cursor.hour))
++        cursor += timedelta(hours=1)
++    return expected
++
++
++def compute_trace_digest(payload: dict[str, object]) -> str:
++    body = {key: value for key, value in payload.items() if key != "trace_digest"}
++    return sha256(json.dumps(body, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
++
++
++def verify_lesson_work_trace(document: dict[str, Any]) -> tuple[bool, str]:
++    if document.get("schema_version") != "apf.lesson-work-trace/v1":
++        return False, "schema"
++    stored = document.get("trace_digest")
++    if not isinstance(stored, str):
++        return False, "missing_digest"
++    expected = compute_trace_digest(document)
++    if stored != expected:
++        return False, "digest_mismatch"
++    outcome = document.get("outcome")
++    outcome_digest = document.get("work_outcome_digest")
++    if isinstance(outcome, str) and isinstance(outcome_digest, str):
++        if sha256(outcome.encode()).hexdigest() != outcome_digest:
++            return False, "outcome_digest_mismatch"
++    elif outcome_digest is not None:
++        return False, "outcome_digest_without_outcome"
++    return True, "ok"
++
++
++def load_reflective_lesson(foundry_root: Path, lesson_id: str) -> dict[str, Any] | None:
++    path = foundry_root / "knowledge" / "reflective-lessons" / f"{lesson_id}.json"
++    if not path.is_file():
++        return None
++    return json.loads(path.read_text(encoding="utf-8"))
++
++
++def lesson_is_verified_for_linkage(lesson: dict[str, Any]) -> bool:
++    outcome = lesson.get("outcome")
++    if outcome != Decision.ACCEPT.value:
++        return False
++    if not isinstance(lesson.get("evidence_digest"), str):
++        return False
++    return bool(lesson.get("immutable", True))
++
++
++def held_out_task_valid(item: dict[str, Any], *, training_fingerprint: str | None) -> tuple[bool, str]:
++    task_id = item.get("task_id")
++    if not isinstance(task_id, str) or not task_id.strip():
++        return False, "missing_task_id"
++    if item.get("separated_from_training") is not True:
++        return False, "not_separated_from_training"
++    training_refs = item.get("training_corpus_refs", [])
++    if isinstance(training_refs, list) and training_refs:
++        return False, "training_corpus_refs_must_be_empty"
++    if training_fingerprint and item.get("training_corpus_fingerprint") == training_fingerprint:
++        return False, "matches_training_fingerprint"
++    for phase in ("baseline", "post_learning"):
++        block = item.get(phase)
++        if not isinstance(block, dict):
++            return False, f"missing_{phase}"
++        if not parse_iso_datetime(block.get("executed_at")):
++            return False, f"{phase}_executed_at"
++        if not isinstance(block.get("evidence_digest"), str) or len(block["evidence_digest"]) != 64:
++            return False, f"{phase}_evidence_digest"
++        if block.get("scoring_artifact_ref") is None and block.get("score") is None and block.get("failed") is None:
++            return False, f"{phase}_scoring"
++    return True, "ok"
++
++
++def improvement_metrics_valid(document: dict[str, Any]) -> tuple[bool, list[str]]:
++    blockers: list[str] = []
++    if document.get("schema_version") != "apf.improvement-recognition-metrics/v1":
++        return False, ["schema_version"]
++    delta = document.get("target_failure_delta")
++    if not isinstance(delta, (int, float)) or delta >= 0:
++        blockers.append("target_failure_delta_must_be_negative")
++    if document.get("safe_failure_count", -1) != 0:
++        blockers.append("safe_failure_count_must_be_zero")
++    if document.get("regression_count", -1) != 0:
++        blockers.append("regression_count_must_be_zero")
++    baseline = document.get("baseline_failure_count")
++    post = document.get("post_failure_count")
++    if (
++        isinstance(baseline, (int, float))
++        and isinstance(post, (int, float))
++        and isinstance(delta, (int, float))
++        and int(baseline) + int(delta) != int(post)
++    ):
++        blockers.append("failure_counts_inconsistent_with_delta")
++    ci_sha = document.get("ci_commit_sha")
++    if not isinstance(ci_sha, str) or len(ci_sha) < 7:
++        blockers.append("ci_commit_sha_required")
++    if document.get("ci_verified_green") is not True:
++        blockers.append("ci_verified_green_required")
++    if not isinstance(document.get("ci_run_id"), str):
++        blockers.append("ci_run_id_required")
++    return len(blockers) == 0, blockers
++
++
++def failure_feedback_chain_valid(document: dict[str, Any]) -> tuple[bool, str]:
++    schema = document.get("schema_version", "")
++    if schema == "apf.failure-learning-feedback/v1":
++        required = (
++            "failure_source_ref",
++            "root_cause_code",
++            "derived_learning_task_id",
++            "independent_review_ref",
++        )
++        for key in required:
++            if not isinstance(document.get(key), str) or not str(document[key]).strip():
++                return False, f"missing_{key}"
++        review = str(document["independent_review_ref"])
++        if "eternian-review" not in review and "operator-decision" not in review:
++            return False, "independent_review_ref_path"
++        return True, "ok"
++    failure_source = document.get("failure_source_ref") or document.get("source_failure_ref")
++    root_cause = document.get("root_cause_code") or document.get("root_cause_summary")
++    task_id = document.get("derived_learning_task_id") or document.get("learning_task_id")
++    review_ref = document.get("independent_review_ref") or document.get("eternian_review_ref")
++    if all(isinstance(value, str) and value.strip() for value in (failure_source, root_cause, task_id, review_ref)):
++        return True, "inline_chain"
++    return False, "incomplete_chain"
+diff --git a/src/apf/fundamental_learning_gates.py b/src/apf/fundamental_learning_gates.py
+new file mode 100644
+index 0000000..2eb94fe
+--- /dev/null
++++ b/src/apf/fundamental_learning_gates.py
+@@ -0,0 +1,384 @@
++"""Assess fundamental learning improvement gates (strict evidence; no auto-apply)."""
++
++from __future__ import annotations
++
++import json
++from dataclasses import dataclass
++from datetime import UTC, datetime, timedelta
++from enum import StrEnum
++from hashlib import sha256
++from pathlib import Path
++from zoneinfo import ZoneInfo
++
++from .fundamental_learning_evidence import (
++    expected_schedule_hours,
++    failure_feedback_chain_valid,
++    held_out_task_valid,
++    hourly_record_observed_at,
++    improvement_metrics_valid,
++    iter_hourly_learning_records,
++    lesson_is_verified_for_linkage,
++    load_reflective_lesson,
++    verify_lesson_work_trace,
++)
++from .lesson_work_trace import LessonWorkTraceStore
++
++
++class GateStatus(StrEnum):
++    NOT_STARTED = "NOT_STARTED"
++    PARTIAL = "PARTIAL"
++    CANDIDATE_EVIDENCE = "CANDIDATE_EVIDENCE"
++    READY_FOR_REVIEW = "READY_FOR_REVIEW"
++
++
++@dataclass(frozen=True)
++class StageAssessment:
++    stage_id: str
++    title: str
++    status: GateStatus
++    completion_criterion: str
++    evidence: tuple[str, ...]
++    blockers: tuple[str, ...]
++
++
++@dataclass(frozen=True)
++class FundamentalLearningGateReport:
++    evaluated_at: datetime
++    overall_status: str
++    operational_apply_complete: bool
++    efficacy_validation: str
++    stages: tuple[StageAssessment, ...]
++    report_digest: str
++
++    def to_document(self) -> dict[str, object]:
++        return {
++            "schema_version": "apf.fundamental-learning-gate-report/v2",
++            "evaluated_at": self.evaluated_at.isoformat(),
++            "overall_status": self.overall_status,
++            "operational_apply_complete": self.operational_apply_complete,
++            "efficacy_validation": self.efficacy_validation,
++            "report_digest": self.report_digest,
++            "stages": [
++                {
++                    "stage_id": stage.stage_id,
++                    "title": stage.title,
++                    "status": stage.status.value,
++                    "completion_criterion": stage.completion_criterion,
++                    "evidence": list(stage.evidence),
++                    "blockers": list(stage.blockers),
++                }
++                for stage in self.stages
++            ],
++        }
++
++
++class FundamentalLearningGateAssessor:
++    def __init__(self, *, foundry_root: Path) -> None:
++        self.foundry_root = foundry_root.resolve()
++        self.policy_path = self.foundry_root / "config" / "arkaon-fundamental-learning-gates.json"
++        self.store_root = self.foundry_root / "state" / "fundamental-learning-gates"
++
++    def load_policy(self) -> dict[str, object]:
++        if not self.policy_path.is_file():
++            raise FileNotFoundError("config/arkaon-fundamental-learning-gates.json is missing")
++        document = json.loads(self.policy_path.read_text(encoding="utf-8"))
++        if document.get("schema_version") != "apf.fundamental-learning-gates/v1":
++            raise ValueError("unsupported fundamental learning gates schema")
++        return document
++
++    def assess(self, *, now: datetime | None = None) -> FundamentalLearningGateReport:
++        evaluated_at = now or datetime.now(tz=UTC)
++        if evaluated_at.tzinfo is None:
++            raise ValueError("timezone-aware timestamp required")
++        policy = self.load_policy()
++        stages_cfg = policy.get("stages", {})
++        if not isinstance(stages_cfg, dict):
++            raise TypeError("stages must be an object")
++        assessments = (
++            self._assess_execution_24h(stages_cfg.get("execution_24h", {}), evaluated_at),
++            self._assess_lesson_work_linkage(stages_cfg.get("lesson_work_linkage", {})),
++            self._assess_held_out_comparison(stages_cfg.get("held_out_comparison", {})),
++            self._assess_improvement_recognition(stages_cfg.get("improvement_recognition", {})),
++            self._assess_failure_feedback(stages_cfg.get("failure_feedback_loop", {})),
++        )
++        digest = sha256(
++            json.dumps(
++                {
++                    "evaluated_at": evaluated_at.isoformat(),
++                    "stages": [s.status.value for s in assessments],
++                },
++                sort_keys=True,
++            ).encode()
++        ).hexdigest()
++        return FundamentalLearningGateReport(
++            evaluated_at=evaluated_at,
++            overall_status=str(policy.get("overall_status", "MEMORY_FOUNDATION_ONLY")),
++            operational_apply_complete=bool(policy.get("operational_apply_complete", False)),
++            efficacy_validation=str(policy.get("efficacy_validation", "NEEDS_HARDENING")),
++            stages=assessments,
++            report_digest=digest,
++        )
++
++    def assess_and_persist(self, *, now: datetime | None = None, dry_run: bool = False) -> FundamentalLearningGateReport:
++        report = self.assess(now=now)
++        if not dry_run:
++            self.store_root.mkdir(parents=True, exist_ok=True)
++            target = self.store_root / f"{report.evaluated_at.strftime('%Y-%m-%d')}-{report.report_digest[:16]}.json"
++            target.write_text(
++                json.dumps(report.to_document(), ensure_ascii=False, indent=2, sort_keys=True),
++                encoding="utf-8",
++            )
++        return report
++
++    def _assess_execution_24h(self, cfg: object, evaluated_at: datetime) -> StageAssessment:
++        title = "실제 학습 실행 확인"
++        criterion = "24시간 실행 기록에서 누락·오류 원인 확인"
++        lookback = 24
++        if isinstance(cfg, dict):
++            title = str(cfg.get("title", title))
++            criterion = str(cfg.get("completion_criterion", criterion))
++            lookback = int(cfg.get("lookback_hours", 24))
++        window_start = evaluated_at - timedelta(hours=lookback)
++        evidence: list[str] = []
++        blockers: list[str] = []
++
++        records = iter_hourly_learning_records(self.foundry_root)
++        in_window: list[dict] = []
++        failed_runs = 0
++        observed_slots: set[tuple[str, int]] = set()
++        for record in records:
++            observed = hourly_record_observed_at(record)
++            if observed is None or observed < window_start or observed > evaluated_at:
++                continue
++            in_window.append(record)
++            topic = record.get("topic", {})
++            if isinstance(topic, dict):
++                tz = str(topic.get("timezone", "UTC"))
++                try:
++                    local = observed.astimezone(ZoneInfo(tz))
++                except (ValueError, KeyError):
++                    local = observed
++                observed_slots.add((local.strftime("%Y-%m-%d"), int(topic.get("local_hour", local.hour))))
++            cycle = record.get("cycle", {})
++            if isinstance(cycle, dict) and int(cycle.get("failed", 0)) > 0:
++                failed_runs += int(cycle["failed"])
++                if not cycle.get("failure_reason"):
++                    blockers.append("hourly cycle failed without failure_reason")
++
++        schedule_path = self.foundry_root / "config" / "arkaon-hourly-learning-schedule.json"
++        expected = expected_schedule_hours(schedule_path, window_start=window_start, window_end=evaluated_at)
++        missing_slots = len(expected - observed_slots) if expected else 0
++
++        evidence.append(f"jsonl records in window (observed_at): {len(in_window)}")
++        evidence.append(f"distinct scheduled slots observed: {len(observed_slots)}")
++        if expected:
++            evidence.append(f"expected hourly slots in window: {len(expected)}; missing: {missing_slots}")
++        evidence.append(f"failed cycle rows: {failed_runs}")
++
++        if not in_window:
++            blockers.append("no hourly-learning jsonl rows with observed_at in lookback window")
++        if missing_slots and expected:
++            blockers.append(f"missing {missing_slots} scheduled hour slot(s) in window")
++        if failed_runs:
++            blockers.append("unresolved failed hourly cycles in window")
++
++        status = GateStatus.NOT_STARTED
++        if in_window and not blockers:
++            status = GateStatus.READY_FOR_REVIEW
++        elif in_window:
++            status = GateStatus.PARTIAL
++        return StageAssessment("execution_24h", title, status, criterion, tuple(evidence), tuple(blockers))
++
++    def _assess_lesson_work_linkage(self, cfg: object) -> StageAssessment:
++        title = "교훈을 작업에 연결"
++        criterion = "실제 작업이 사용한 교훈과 결과를 추적"
++        min_valid = 1
++        store_rel = "knowledge/lesson-work-traces.jsonl"
++        if isinstance(cfg, dict):
++            title = str(cfg.get("title", title))
++            criterion = str(cfg.get("completion_criterion", criterion))
++            min_valid = max(1, int(cfg.get("min_valid_traced_links", 1)))
++            store_rel = str(cfg.get("store_path", store_rel))
++
++        store = LessonWorkTraceStore(self.foundry_root / store_rel)
++        traces = store.list_traces()
++        valid = 0
++        digest_failures = 0
++        lesson_missing = 0
++        lesson_unverified = 0
++        for trace in traces:
++            ok, _reason = verify_lesson_work_trace(trace)
++            if not ok:
++                digest_failures += 1
++                continue
++            lesson_id = str(trace.get("lesson_id", ""))
++            lesson = load_reflective_lesson(self.foundry_root, lesson_id)
++            if lesson is None:
++                lesson_missing += 1
++                continue
++            if not lesson_is_verified_for_linkage(lesson):
++                lesson_unverified += 1
++                continue
++            lesson_digest = lesson.get("evidence_digest")
++            if trace.get("lesson_evidence_digest") and trace["lesson_evidence_digest"] != lesson_digest:
++                digest_failures += 1
++                continue
++            valid += 1
++
++        evidence = (
++            f"traces total={len(traces)} valid={valid} (min {min_valid})",
++            f"digest_invalid={digest_failures} lesson_missing={lesson_missing} lesson_unverified={lesson_unverified}",
++        )
++        blockers: list[str] = []
++        if valid < min_valid:
++            blockers.append("insufficient verified lesson-work links")
++        if digest_failures:
++            blockers.append("trace digest or outcome digest mismatch")
++        if lesson_missing or lesson_unverified:
++            blockers.append("lesson missing or not ACCEPT with evidence_digest")
++
++        status = GateStatus.NOT_STARTED
++        if valid >= min_valid:
++            status = GateStatus.READY_FOR_REVIEW
++        elif traces:
++            status = GateStatus.PARTIAL
++        return StageAssessment("lesson_work_linkage", title, status, criterion, evidence, tuple(blockers))
++
++    def _assess_held_out_comparison(self, cfg: object) -> StageAssessment:
++        title = "학습 효과 비교"
++        criterion = "학습자료와 분리한 과제 20개 이상 전후 비교"
++        min_tasks = 20
++        registry = "state/held-out-evaluation/tasks.json"
++        training_fp_path = "config/training-corpus-fingerprint.txt"
++        if isinstance(cfg, dict):
++            title = str(cfg.get("title", title))
++            criterion = str(cfg.get("completion_criterion", criterion))
++            min_tasks = max(1, int(cfg.get("min_held_out_tasks", 20)))
++            registry = str(cfg.get("registry_path", registry))
++            training_fp_path = str(cfg.get("training_corpus_fingerprint_path", training_fp_path))
++
++        training_fp = None
++        fp_file = self.foundry_root / training_fp_path
++        if fp_file.is_file():
++            training_fp = fp_file.read_text(encoding="utf-8").strip() or None
++
++        path = self.foundry_root / registry
++        blockers: list[str] = []
++        evidence: list[str] = []
++        valid_tasks = 0
++        seen_ids: set[str] = set()
++        if path.is_file():
++            document = json.loads(path.read_text(encoding="utf-8"))
++            tasks = document.get("tasks", [])
++            if not isinstance(tasks, list):
++                blockers.append("held-out registry tasks must be a list")
++            else:
++                for item in tasks:
++                    if not isinstance(item, dict):
++                        continue
++                    task_id = str(item.get("task_id", ""))
++                    if task_id in seen_ids:
++                        blockers.append(f"duplicate task_id {task_id}")
++                        continue
++                    if task_id:
++                        seen_ids.add(task_id)
++                    ok, reason = held_out_task_valid(item, training_fingerprint=training_fp)
++                    if ok:
++                        valid_tasks += 1
++                    else:
++                        blockers.append(f"task {task_id or '?'}: {reason}")
++                evidence.append(f"held-out tasks valid={valid_tasks}/{len(tasks)}")
++        else:
++            blockers.append(f"{registry} not created")
++        if valid_tasks < min_tasks:
++            blockers.append(f"need at least {min_tasks} fully evidenced held-out tasks")
++
++        status = GateStatus.NOT_STARTED
++        if valid_tasks >= min_tasks and not any("duplicate" in b for b in blockers):
++            status = GateStatus.READY_FOR_REVIEW
++        elif valid_tasks or path.is_file():
++            status = GateStatus.PARTIAL
++        return StageAssessment("held_out_comparison", title, status, criterion, tuple(evidence), tuple(blockers))
++
++    def _assess_improvement_recognition(self, cfg: object) -> StageAssessment:
++        title = "개선 인정"
++        criterion = "안전 실패·기존 기능 회귀 없이 목표 실패 감소"
++        metrics_path = "state/held-out-evaluation/metrics.json"
++        if isinstance(cfg, dict):
++            title = str(cfg.get("title", title))
++            criterion = str(cfg.get("completion_criterion", criterion))
++            metrics_path = str(cfg.get("metrics_path", metrics_path))
++
++        path = self.foundry_root / metrics_path
++        evidence: list[str] = []
++        blockers = ["human_signoff_required; automated assessor never grants improvement recognition"]
++        status = GateStatus.NOT_STARTED
++        if path.is_file():
++            document = json.loads(path.read_text(encoding="utf-8"))
++            ok, metric_blockers = improvement_metrics_valid(document)
++            evidence.append(f"metrics.json strict validation: {ok}")
++            if not ok:
++                blockers.extend(metric_blockers)
++                status = GateStatus.PARTIAL
++            else:
++                status = GateStatus.READY_FOR_REVIEW
++        else:
++            evidence.append("metrics.json not recorded")
++            blockers.append("metrics.json missing")
++        return StageAssessment("improvement_recognition", title, status, criterion, tuple(evidence), tuple(blockers))
++
++    def _assess_failure_feedback(self, cfg: object) -> StageAssessment:
++        title = "실패 환류"
++        criterion = "실패 원인을 다음 학습과제로 만들고 독립 검토"
++        inbox_dirs = ("inbox/eternian-review", "inbox/research", "inbox/operator-decision")
++        if isinstance(cfg, dict):
++            title = str(cfg.get("title", title))
++            criterion = str(cfg.get("completion_criterion", criterion))
++            raw = cfg.get("inbox_paths")
++            if isinstance(raw, list) and raw:
++                inbox_dirs = tuple(str(item) for item in raw)
++
++        chain_valid = 0
++        keyword_candidates = 0
++        evidence: list[str] = []
++        blockers: list[str] = []
++
++        for rel in inbox_dirs:
++            directory = self.foundry_root / rel
++            if not directory.is_dir():
++                continue
++            for path in directory.glob("*.json"):
++                try:
++                    document = json.loads(path.read_text(encoding="utf-8"))
++                except (OSError, json.JSONDecodeError):
++                    continue
++                ok, _ = failure_feedback_chain_valid(document)
++                if ok:
++                    chain_valid += 1
++                    continue
++                schema = str(document.get("schema_version", ""))
++                summary = str(document.get("summary", "")).lower()
++                if (
++                    "learning" in schema
++                    or "impediment" in schema
++                    or "lesson" in schema
++                    or "failure" in summary
++                    or "learning" in summary
++                ):
++                    keyword_candidates += 1
++
++        evidence.append(f"complete failure→learning→review chains: {chain_valid}")
++        evidence.append(f"keyword-only candidate packets: {keyword_candidates}")
++
++        if chain_valid >= 1:
++            status = GateStatus.READY_FOR_REVIEW
++        elif keyword_candidates >= 1:
++            status = GateStatus.CANDIDATE_EVIDENCE
++            blockers.append(
++                "candidate packets only; not evidence of failure reflux (need failure_source_ref, "
++                "root_cause_code, derived_learning_task_id, independent_review_ref)"
++            )
++        else:
++            status = GateStatus.NOT_STARTED
++            blockers.append("no failure feedback chain or candidate packets")
++        return StageAssessment("failure_feedback_loop", title, status, criterion, tuple(evidence), tuple(blockers))
+diff --git a/src/apf/lesson_work_trace.py b/src/apf/lesson_work_trace.py
+new file mode 100644
+index 0000000..ccb8723
+--- /dev/null
++++ b/src/apf/lesson_work_trace.py
+@@ -0,0 +1,84 @@
++"""Append-only traces linking reflective lessons to concrete work outcomes."""
++
++from __future__ import annotations
++
++import json
++from dataclasses import dataclass
++from datetime import UTC, datetime
++from hashlib import sha256
++from pathlib import Path
++
++
++class LessonWorkTraceRejected(ValueError):
++    def __init__(self, code: str) -> None:
++        super().__init__(code)
++        self.code = code
++
++
++@dataclass(frozen=True)
++class LessonWorkTrace:
++    trace_id: str
++    lesson_id: str
++    work_ref: str
++    outcome: str
++    recorded_at: datetime
++    trace_digest: str
++
++    def to_line(self) -> str:
++        document = {
++            "schema_version": "apf.lesson-work-trace/v1",
++            "trace_id": self.trace_id,
++            "lesson_id": self.lesson_id,
++            "work_ref": self.work_ref,
++            "outcome": self.outcome,
++            "recorded_at": self.recorded_at.isoformat(),
++            "trace_digest": self.trace_digest,
++        }
++        return json.dumps(document, ensure_ascii=False, sort_keys=True)
++
++
++class LessonWorkTraceStore:
++    def __init__(self, path: Path) -> None:
++        self.path = path.resolve()
++        self.path.parent.mkdir(parents=True, exist_ok=True)
++
++    def append(self, *, lesson_id: str, work_ref: str, outcome: str, now: datetime | None = None) -> LessonWorkTrace:
++        lesson_id = lesson_id.strip()
++        work_ref = work_ref.strip()
++        outcome = outcome.strip()
++        if not lesson_id or not work_ref or not outcome:
++            raise LessonWorkTraceRejected("INVALID_FIELDS")
++        if len(work_ref) > 512 or len(outcome) > 2000:
++            raise LessonWorkTraceRejected("FIELD_TOO_LONG")
++        recorded_at = now or datetime.now(tz=UTC)
++        if recorded_at.tzinfo is None:
++            raise LessonWorkTraceRejected("NAIVE_TIMESTAMP")
++        trace_id = sha256(f"{lesson_id}:{work_ref}:{recorded_at.isoformat()}".encode()).hexdigest()[:24]
++        work_outcome_digest = sha256(outcome.encode()).hexdigest()
++        payload = {
++            "schema_version": "apf.lesson-work-trace/v1",
++            "trace_id": trace_id,
++            "lesson_id": lesson_id,
++            "work_ref": work_ref,
++            "outcome": outcome,
++            "work_outcome_digest": work_outcome_digest,
++            "recorded_at": recorded_at.isoformat(),
++        }
++        from .fundamental_learning_evidence import compute_trace_digest
++
++        trace_digest = compute_trace_digest(payload)
++        document = {**payload, "trace_digest": trace_digest}
++        with self.path.open("a", encoding="utf-8") as handle:
++            handle.write(json.dumps(document, ensure_ascii=False, sort_keys=True) + "\n")
++        trace = LessonWorkTrace(trace_id, lesson_id, work_ref, outcome, recorded_at, trace_digest)
++        return trace
++
++    def list_traces(self) -> tuple[dict[str, object], ...]:
++        if not self.path.is_file():
++            return ()
++        rows: list[dict[str, object]] = []
++        for line in self.path.read_text(encoding="utf-8").splitlines():
++            if not line.strip():
++                continue
++            rows.append(json.loads(line))
++        return tuple(rows)
+diff --git a/tests/test_fundamental_learning_evidence.py b/tests/test_fundamental_learning_evidence.py
+new file mode 100644
+index 0000000..f7b3f7c
+--- /dev/null
++++ b/tests/test_fundamental_learning_evidence.py
+@@ -0,0 +1,84 @@
++from hashlib import sha256
++
++from apf.fundamental_learning_evidence import (
++    compute_trace_digest,
++    failure_feedback_chain_valid,
++    held_out_task_valid,
++    improvement_metrics_valid,
++    verify_lesson_work_trace,
++)
++
++
++def test_verify_lesson_work_trace_digest():
++    outcome = "pass"
++    payload = {
++        "schema_version": "apf.lesson-work-trace/v1",
++        "trace_id": "t1",
++        "lesson_id": "l1",
++        "work_ref": "pr-1",
++        "outcome": outcome,
++        "work_outcome_digest": sha256(outcome.encode()).hexdigest(),
++        "recorded_at": "2026-01-01T00:00:00+00:00",
++    }
++    document = {**payload, "trace_digest": compute_trace_digest(payload)}
++    ok, reason = verify_lesson_work_trace(document)
++    assert ok and reason == "ok"
++
++
++def test_failure_feedback_chain_requires_fields():
++    ok, _ = failure_feedback_chain_valid(
++        {
++            "schema_version": "apf.failure-learning-feedback/v1",
++            "failure_source_ref": "state/x.jsonl#line-1",
++            "root_cause_code": "X",
++            "derived_learning_task_id": "task-1",
++            "independent_review_ref": "inbox/eternian-review/x.json",
++        }
++    )
++    assert ok
++    ok2, reason = failure_feedback_chain_valid({"summary": "learning failure"})
++    assert not ok2 and reason == "incomplete_chain"
++
++
++def test_improvement_metrics_strict():
++    ok, blockers = improvement_metrics_valid(
++        {
++            "schema_version": "apf.improvement-recognition-metrics/v1",
++            "baseline_failure_count": 10,
++            "post_failure_count": 7,
++            "target_failure_delta": -3,
++            "safe_failure_count": 0,
++            "regression_count": 0,
++            "ci_commit_sha": "abc1234",
++            "ci_verified_green": True,
++            "ci_run_id": "run-1",
++        }
++    )
++    assert ok and not blockers
++    ok2, blockers2 = improvement_metrics_valid(
++        {"schema_version": "apf.improvement-recognition-metrics/v1", "target_failure_delta": 1}
++    )
++    assert not ok2 and "target_failure_delta_must_be_negative" in blockers2
++
++
++def test_held_out_task_requires_execution_evidence():
++    ok, reason = held_out_task_valid(
++        {
++            "task_id": "t1",
++            "separated_from_training": True,
++            "training_corpus_refs": [],
++            "baseline": {"executed_at": "2026-01-01T00:00:00+00:00", "evidence_digest": "a" * 64, "failed": True},
++            "post_learning": {
++                "executed_at": "2026-01-02T00:00:00+00:00",
++                "evidence_digest": "b" * 64,
++                "score": 1.0,
++            },
++        },
++        training_fingerprint=None,
++    )
++    assert ok and reason == "ok"
++    bad, reason2 = held_out_task_valid(
++        {"task_id": "t2", "baseline_recorded": True, "post_learning_recorded": True},
++        training_fingerprint=None,
++    )
++    assert not bad and reason2 == "not_separated_from_training"
+diff --git a/tests/test_fundamental_learning_gates.py b/tests/test_fundamental_learning_gates.py
+new file mode 100644
+index 0000000..fae02bc
+--- /dev/null
++++ b/tests/test_fundamental_learning_gates.py
+@@ -0,0 +1,71 @@
++import json
++from datetime import UTC, datetime
++from pathlib import Path
++
++from apf.fundamental_learning_gates import FundamentalLearningGateAssessor, GateStatus
++from apf.lesson_work_trace import LessonWorkTraceStore
++
++
++def test_lesson_work_trace_append_and_list(tmp_path: Path):
++    store = LessonWorkTraceStore(tmp_path / "knowledge" / "lesson-work-traces.jsonl")
++    store.append(lesson_id="lesson-1", work_ref="pr-105-ci", outcome="postgres-integration pass")
++    rows = store.list_traces()
++    assert len(rows) == 1
++    assert rows[0]["lesson_id"] == "lesson-1"
++
++
++def test_gate_assessor_memory_foundation_defaults(tmp_path: Path):
++    policy = tmp_path / "config" / "arkaon-fundamental-learning-gates.json"
++    policy.parent.mkdir(parents=True)
++    policy.write_text(
++        json.dumps(
++            {
++                "schema_version": "apf.fundamental-learning-gates/v1",
++                "overall_status": "MEMORY_FOUNDATION_ONLY",
++                "operational_apply_complete": False,
++                "stages": {},
++            }
++        ),
++        encoding="utf-8",
++    )
++    hourly = tmp_path / "state" / "hourly-learning"
++    hourly.mkdir(parents=True)
++    (hourly / "cycle.json").write_text("{}", encoding="utf-8")
++    (tmp_path / "state" / "hourly-learning-current.json").write_text(
++        json.dumps({"cycle": {"failed": 0, "collected": 1}}),
++        encoding="utf-8",
++    )
++    assessor = FundamentalLearningGateAssessor(foundry_root=tmp_path)
++    jsonl = tmp_path / "state" / "hourly-learning" / "2031-06-01.jsonl"
++    jsonl.parent.mkdir(parents=True, exist_ok=True)
++    now = datetime.now(tz=UTC)
++    line = {
++        "schema_version": "apf.hourly-learning-cycle/v1",
++        "topic": {
++            "local_hour": now.hour,
++            "observed_at": now.isoformat(),
++            "timezone": "UTC",
++            "domain_id": "TEST",
++            "topic_title": "test",
++            "collect_all_domains": False,
++        },
++        "cycle": {"collected": 1, "failed": 0, "considered": 1, "denied": 0, "duplicate": 0, "skipped_out_of_topic": 0},
++    }
++    jsonl.write_text(json.dumps(line) + "\n", encoding="utf-8")
++    schedule = tmp_path / "config" / "arkaon-hourly-learning-schedule.json"
++    schedule.write_text(
++        json.dumps({"schema_version": "apf.hourly-learning-schedule/v1", "enabled": True, "timezone": "UTC", "hours": []}),
++        encoding="utf-8",
++    )
++    report = assessor.assess(now=now)
++    by_id = {stage.stage_id: stage for stage in report.stages}
++    assert report.overall_status == "MEMORY_FOUNDATION_ONLY"
++    assert report.efficacy_validation == "NEEDS_HARDENING"
++    assert report.operational_apply_complete is False
++    assert by_id["execution_24h"].status in {GateStatus.PARTIAL, GateStatus.READY_FOR_REVIEW}
++    assert by_id["lesson_work_linkage"].status is GateStatus.NOT_STARTED
++    assert by_id["failure_feedback_loop"].status in {
++        GateStatus.NOT_STARTED,
++        GateStatus.CANDIDATE_EVIDENCE,
++        GateStatus.READY_FOR_REVIEW,
++    }
+-- 
+2.53.0.windows.3
+
