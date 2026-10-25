@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "apf.asia-cinema-input-bundle/v1",
+  "title": "ASIA HOLDINGS cinema input bundle",
+  "type": "object",
+  "required": ["schema", "run_id", "company_name_literal", "assets", "slogan_ko"],
+  "additionalProperties": true,
+  "properties": {
+    "schema": { "const": "apf.asia-cinema-input-bundle/v1" },
+    "run_id": { "type": "string", "minLength": 8, "maxLength": 128 },
+    "company_name_literal": { "const": "ASIA HOLDINGS" },
+    "assets": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["id", "path", "sha256"],
+        "additionalProperties": true,
+        "properties": {
+          "id": {
+            "type": "string",
+            "enum": ["asia_holdings_reference", "asia_a_symbol_mask"]
+          },
+          "path": { "type": "string", "minLength": 1 },
+          "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "role": { "type": "string" }
+        }
+      }
+    },
+    "slogan_ko": {
+      "type": "object",
+      "required": ["path", "sha256", "registration_path"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "registration_path": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

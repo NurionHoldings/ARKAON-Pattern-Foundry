@@ -1,0 +1,31 @@
+{
+  "schema": "apf.asia-holdings-slogan-ko-registration/v1",
+  "brand": "ASIA HOLDINGS",
+  "status": "approved",
+  "policy": {
+    "no_inference": true,
+    "no_draft_text_in_repo": true,
+    "implementation_blocked_until": null,
+    "binding_requires_pr_a_start": true
+  },
+  "approved_text": "세상을 연결하는 가치, 더 큰 내일을 만듭니다",
+  "approved_text_sha256": "e9cc11036d72e2b6216b118d1dce41e3abcf345be7d98cdcffd1b05e16bc19a8",
+  "approved_at": "2026-10-25T09:17:00+00:00",
+  "approved_by": "operator",
+  "approval_channel": "cursor_chat_explicit_approval_20261025",
+  "source_file_path": "inbox/eternian-review/asia-cinema-formal-input-registration-20261025-01/asia_holdings_slogan_ko.approved.utf8.txt",
+  "observed_candidate": {
+    "status": "superseded_by_operator_approval",
+    "text_literal": "세상을 연결하는 가치, 더 큰 내일을 만듭니다",
+    "observed_from": "D:\\보관자료\\Clearance-sale\\asia_logo_engine_v3_windows\\asia_logo_engine_v3\\config.json",
+    "observed_from_sha256": "5824e58d32e1991ade37f57affa4dbf0a59d6ffc28f19d69cefd493f8290fe8d",
+    "also_visible_on": "input/asia_holdings_reference.png",
+    "step6_run_id": "asia-cinema-step6-asset-registration-prep-20261025-01"
+  },
+  "notes": "공식 영상 슬로건으로 운영자 최종 승인. PR-A/B/C 구현 착수는 별도 지시 전 HOLD.",
+  "links": {
+    "design_run_id": "asia-cinema-design-20261025-01",
+    "review_supplement": "inbox/eternian-review/asia-cinema-design-20261025-01-review-supplement.md",
+    "approval_evidence_run_id": "asia-cinema-slogan-operator-approval-20261025-01"
+  }
+}

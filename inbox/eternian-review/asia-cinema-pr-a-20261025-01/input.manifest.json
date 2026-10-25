@@ -1,0 +1,24 @@
+{
+  "schema": "apf.asia-cinema-input-bundle/v1",
+  "run_id": "asia-cinema-pr-a-20261025-01",
+  "company_name_literal": "ASIA HOLDINGS",
+  "assets": [
+    {
+      "id": "asia_holdings_reference",
+      "role": "composite_reference_poster",
+      "path": "D:\\보관자료\\Clearance-sale\\asia_logo_engine_v3_windows\\asia_logo_engine_v3\\input\\asia_holdings_reference.png",
+      "sha256": "7f558d7a25680a459692446661d0b337ebe8a0fa3e22b55b8fb50086f426b900"
+    },
+    {
+      "id": "asia_a_symbol_mask",
+      "role": "a_symbol_mask_trial",
+      "path": "D:\\보관자료\\Clearance-sale\\asia_logo_engine_v3_windows\\asia_logo_engine_v3\\input\\asia_holdings_A_symbol_mask.png",
+      "sha256": "05b4c6ebb25b6391f112f330e4b2e9f09553d8dc967a4f956f67010911cb0b1d"
+    }
+  ],
+  "slogan_ko": {
+    "path": "inbox/eternian-review/asia-cinema-formal-input-registration-20261025-01/asia_holdings_slogan_ko.approved.utf8.txt",
+    "sha256": "e9cc11036d72e2b6216b118d1dce41e3abcf345be7d98cdcffd1b05e16bc19a8",
+    "registration_path": "inbox/eternian-review/asia-holdings-slogan-ko-operator-registration.json"
+  }
+}
