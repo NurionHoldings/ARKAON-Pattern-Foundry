@@ -1,6 +1,7 @@
 /* Original rule-based renderer; it does not call or train an AI model. */
 (() => {
   'use strict';
+  const foundations=typeof module!=='undefined'?require('./platform-presets.js'):window.APFPlatformPresets;
   const escape = value => String(value || '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const lines=value=>String(value||'').split('\n').map(s=>s.trim()).filter(Boolean).slice(0,8);
   const packs={
@@ -19,7 +20,7 @@
       if(!detail)needs.push(`대표 항목 ${i+1} 상세 설명`);
       return {title:title||'항목 이름 입력 필요',detail:detail||packs[industry].details[i%3],needs_detail:!detail};
     });
-    return {industry,pack:packs[industry],needs,offerings,theme:['editorial','night','minimal'].includes(raw.theme)?raw.theme:'editorial',
+    return {industry,pack:packs[industry],needs,offerings,theme:foundations.validTheme(raw.theme)?raw.theme:'editorial',
       title:String(raw.title||'').trim()||'당신의 브랜드',audience:String(raw.audience||'').trim()||'대상 고객을 입력해 주세요',
       story:String(raw.story||'').trim()||'하는 일과 누구에게 도움이 되는지 당신의 이야기를 적어 주세요.',
       difference:String(raw.difference||'').trim()||'실제로 설명할 수 있는 강점과 차별점을 입력해 주세요.',
@@ -30,25 +31,25 @@
     const cards=b.offerings.map((x,i)=>`<article class="offer"><span>0${i+1}${x.needs_detail?' · 설명 입력 필요':''}</span><h3>${escape(x.title)}</h3><p>${escape(x.detail)}</p></article>`).join('');
     return `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(b.title)}</title><style>
     *{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,sans-serif;line-height:1.8;background:var(--bg);color:var(--ink);--bg:#f5f0e6;--ink:#243c2d;--muted:#52664f;--panel:#e4e9d8;--line:#c5cfbb;--accent:#34533b}.wrap{max-width:1160px;margin:auto;padding:0 6%}a{color:inherit;text-decoration:none}:focus-visible{outline:3px solid currentColor;outline-offset:4px}.draft{font-size:11px;background:var(--ink);color:var(--bg);padding:8px 6%}.nav{padding:22px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:20px;font-size:11px}.nav strong{font-size:17px}.links{display:flex;gap:20px}.hero{display:grid;grid-template-columns:1.2fr .8fr;align-items:center;gap:8%;padding:65px 0}.eyebrow{font-size:10px;letter-spacing:.14em;color:var(--muted)}h1{font-size:clamp(35px,5vw,65px);letter-spacing:-.065em;line-height:1.2;margin:20px 0;overflow-wrap:anywhere}h2{font-size:clamp(25px,3vw,36px);line-height:1.35;letter-spacing:-.05em;margin:0 0 20px}h3{font-size:20px;line-height:1.4;letter-spacing:-.04em}p{font-size:13px;color:var(--muted);white-space:pre-line;overflow-wrap:anywhere}.cta{display:inline-block;background:var(--accent);color:white;padding:12px 22px;font-size:12px;border-radius:5px;margin-top:16px}.visual{aspect-ratio:4/5;border-radius:140px 140px 10px 10px;background:var(--panel);position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:end;padding:30px}.visual:before{content:'';position:absolute;width:155px;height:155px;left:20%;top:15%;border:25px solid var(--accent);border-radius:50%;opacity:.25}.visual:after{content:'';position:absolute;width:130%;height:80px;left:-10%;top:55%;transform:rotate(-30deg);background:var(--accent);opacity:.12}.visual b{font-family:Georgia,serif;font-size:65px;line-height:1;z-index:1}.visual small{font-size:10px;letter-spacing:.12em;margin-top:16px}.section{padding:48px 0;border-top:1px solid var(--line)}.offers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.offer{padding:24px 20px;background:var(--panel);border-radius:8px}.offer span{font-size:11px;color:var(--muted)}.offer p{font-size:12px}.about{display:grid;grid-template-columns:1fr 1fr;gap:8%}.process{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}.process li{border-top:2px solid var(--line);padding-top:18px}.process span{font-size:11px}details{border-bottom:1px solid var(--line);padding:18px 0;font-size:13px}summary{cursor:pointer}.contact{background:var(--panel);padding:32px;border-radius:10px}small{color:var(--muted);font-size:10px}footer{padding:25px 0 35px;font-size:10px;color:var(--muted)}.night{--bg:#132334;--ink:#edf5ee;--muted:#b2c9c4;--panel:#21394a;--line:#3d5664;--accent:#315e54}.night .hero{grid-template-columns:1fr;text-align:center;padding:65px 5%}.night .visual{aspect-ratio:auto;height:150px;border-radius:10px;text-align:left}.night .visual:before{left:65%;top:-25%}.night .visual b{font-size:45px}.night .offers{grid-template-columns:1fr}.night .offer{display:grid;grid-template-columns:35px 1fr 1fr;gap:15px;align-items:center}.minimal{--bg:#fff;--ink:#20343a;--muted:#526870;--panel:#f1f5f5;--line:#d1dedf;--accent:#264b5b}.minimal .hero{grid-template-columns:1fr}.minimal .visual{display:none}.minimal .offer{background:none;border:1px solid var(--line);border-radius:0}.minimal .contact{border-radius:0}@media(max-width:650px){.wrap{padding:0 7%}.hero{grid-template-columns:1fr;gap:25px;padding:38px 0}h1{font-size:39px}.visual{aspect-ratio:2/1;border-radius:80px 80px 8px 8px}.visual b{font-size:42px}.visual:before{width:110px;height:110px;top:-20%;left:60%}.offers,.process,.about{grid-template-columns:1fr}.section{padding:34px 0}.night .offer{display:block}.night .hero{padding:38px 0}.links{gap:12px}.contact{padding:23px}}
-    </style></head><body class="${b.theme}"><div class="draft">${b.sample?'가상 예시 · 실제 사업 정보가 아닙니다':'작성 중인 초안'} · 확인 필요 ${b.needs.length}개 · 아직 공개되지 않았습니다</div><div class="wrap"><nav class="nav"><strong>${escape(b.title)}</strong><div class="links"><a href="#offer">${b.industry==='portfolio'?'작업':'서비스'}</a><a href="#about">소개</a><a href="#contact">연락 안내</a></div></nav><main><section class="hero"><div><span class="eyebrow">${escape(p.label)} / YOUR NEXT CHAPTER</span><h1>${escape(b.title)}<br>당신의 이야기를<br>만나는 곳.</h1><p>${escape(b.audience)}</p><p>${escape(b.story)}</p><a class="cta" href="#contact">${escape(p.action)} ↗</a></div><div class="visual" aria-hidden="true"><b>${escape(b.title.slice(0,2))}.</b><small>IDEAS, MADE TANGIBLE.</small></div></section><section class="section" id="offer"><h2>${escape(p.offer)}</h2><p>상세 설명은 작성 가이드입니다. 실제 내용으로 다듬어 주세요.</p><div class="offers">${cards}</div></section><section class="section about" id="about"><h2>우리가 중요하게<br>생각하는 것.</h2><p>${escape(b.difference)}</p></section><section class="section"><h2>${escape(p.process)}</h2><ol class="process">${b.process.map((s,i)=>`<li><span>0${i+1}</span><p>${escape(s)}</p></li>`).join('')}</ol></section><section class="section"><h2>궁금한 점을 먼저.</h2><p>공개 전 실제 운영 기준으로 확인해 주세요.</p>${p.questions.map((q,i)=>`<details><summary>${escape(q)}</summary><p>${escape(p.answers[i])}</p></details>`).join('')}</section><section class="section" id="contact"><div class="contact"><h2>다음 이야기를<br>함께 시작해요.</h2><p>${escape(b.contact)}</p><small>상담·예약 접수 기능은 연결되지 않았습니다.</small></div></section></main><footer>${escape(b.title)} · ARKAON 초안 · 작성 가이드와 실제 정보 확인 필요</footer></div></body></html>`;
+    ${foundations.styles(b.theme)}</style></head><body class="${b.theme}"><div class="draft">${b.sample?'가상 예시 · 실제 사업 정보가 아닙니다':'작성 중인 초안'} · 확인 필요 ${b.needs.length}개 · 아직 공개되지 않았습니다</div><div class="wrap"><nav class="nav"><strong>${escape(b.title)}</strong><div class="links"><a href="#offer">${b.industry==='portfolio'?'작업':'서비스'}</a><a href="#about">소개</a><a href="#contact">연락 안내</a></div></nav><main><section class="hero"><div><span class="eyebrow">${escape(p.label)} / YOUR NEXT CHAPTER</span><h1>${escape(b.title)}<br>당신의 이야기를<br>만나는 곳.</h1><p>${escape(b.audience)}</p><p>${escape(b.story)}</p><a class="cta" href="#contact">${escape(p.action)} ↗</a></div><div class="visual" aria-hidden="true"><b>${escape(b.title.slice(0,2))}.</b><small>IDEAS, MADE TANGIBLE.</small></div></section><section class="section" id="offer"><h2>${escape(p.offer)}</h2><p>상세 설명은 작성 가이드입니다. 실제 내용으로 다듬어 주세요.</p><div class="offers">${cards}</div></section><section class="section about" id="about"><h2>우리가 중요하게<br>생각하는 것.</h2><p>${escape(b.difference)}</p></section><section class="section"><h2>${escape(p.process)}</h2><ol class="process">${b.process.map((s,i)=>`<li><span>0${i+1}</span><p>${escape(s)}</p></li>`).join('')}</ol></section><section class="section"><h2>궁금한 점을 먼저.</h2><p>공개 전 실제 운영 기준으로 확인해 주세요.</p>${p.questions.map((q,i)=>`<details><summary>${escape(q)}</summary><p>${escape(p.answers[i])}</p></details>`).join('')}</section><section class="section" id="contact"><div class="contact"><h2>다음 이야기를<br>함께 시작해요.</h2><p>${escape(b.contact)}</p><small>상담·예약 접수 기능은 연결되지 않았습니다.</small></div></section></main><footer>${escape(b.title)} · ARKAON 초안 · 작성 가이드와 실제 정보 확인 필요</footer></div></body></html>`;
   }
-  if(typeof module!=='undefined'&&module.exports)module.exports={compose,render};
+  if(typeof module!=='undefined'&&module.exports)module.exports={compose,render,foundationPresets:foundations.presets};
   if(typeof window==='undefined')return;
-  window.APFStudio={compose,render};
+  window.APFStudio={compose,render,foundationPresets:foundations.presets};
   if(!document.getElementById('brief'))return;
   const params=new URLSearchParams(location.search);
   const linkSession=params.get('session')||'';
   const linkProposal=params.get('proposal')||'';
   let linkConsentId=params.get('reference_consent_request_id')||'';
   let activeProjectId=params.get('project')||null;
-  let theme='editorial',step=0,sample=false,previewUrl=null;
+  let theme=foundations.validTheme(params.get('foundation'))?params.get('foundation'):'editorial',step=0,sample=false,previewUrl=null;
   const fields=['industry','title','audience','story','offerings','difference','process','contact'];
   const values=()=>({...Object.fromEntries(fields.map(id=>[id,document.getElementById(id).value])),theme,sample});
   function applyBrief(brief){
     if(!brief)return;
     if(brief.industry)document.getElementById('industry').value=brief.industry;
     fields.forEach(id=>{if(brief[id]!=null)document.getElementById(id).value=String(brief[id]);});
-    if(brief.theme&&['editorial','night','minimal'].includes(brief.theme)){theme=brief.theme;document.querySelectorAll('[data-theme]').forEach(t=>t.setAttribute('aria-pressed',String(t.dataset.theme===theme)));}
+    if(brief.theme&&foundations.validTheme(brief.theme)){theme=brief.theme;document.querySelectorAll('[data-theme]').forEach(t=>t.setAttribute('aria-pressed',String(t.dataset.theme===theme)));}
     sample=false;
   }
   async function loadLinkedDraft(){
@@ -144,5 +145,6 @@
     if(consentForSave)q.set('reference_consent_request_id',consentForSave);
     history.replaceState(null,'',`${location.pathname}?${q}`);
   });
+  document.querySelectorAll('[data-theme]').forEach(t=>t.setAttribute('aria-pressed',String(t.dataset.theme===theme)));
   loadLinkedDraft().then(()=>update()).catch(()=>update());
 })();
