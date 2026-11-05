@@ -4,10 +4,25 @@
   const escape=v=>String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   function number(value,fallback,min,max){const n=value===''||value==null?fallback:Number(value);return Number.isFinite(n)?Math.max(min,Math.min(max,n)):fallback;}
   function normalize(raw){return {elementModelVersion:1,symbolSize:number(raw.symbolSize,80,40,100),logoGap:number(raw.logoGap,16,8,64),letterSpacing:number(raw.letterSpacing,0,0,4),logoAlign:['left','center','right'].includes(raw.logoAlign)?raw.logoAlign:'left'};}
+  // Readability policy for our previews; not a trademark/accessibility certification.
+  function logoColor(raw){return raw.logoTone==='dark'?'#ffffff':raw.logoTone==='mono'?'#172b24':/^#[0-9a-f]{6}$/i.test(raw.accent||'')?raw.accent:'#31594c';}
+  function luminance(hex){
+    const rgb=hex.slice(1).match(/../g).map(x=>parseInt(x,16)/255).map(x=>x<=0.04045?x/12.92:((x+0.055)/1.055)**2.4);
+    return rgb[0]*0.2126+rgb[1]*0.7152+rgb[2]*0.0722;
+  }
+  function contrastRatio(a,b){const x=luminance(a),y=luminance(b);return (Math.max(x,y)+0.05)/(Math.min(x,y)+0.05);}
+  function presentation(raw){
+    const foreground=logoColor(raw),requested=raw.logoTone==='dark'?'#172b24':'#ffffff';
+    let background=requested;
+    if(contrastRatio(foreground,background)<4.5){
+      background=['#172b24','#ffffff','#000000'].filter(c=>contrastRatio(foreground,c)>=4.5)[0];
+    }
+    return {foreground,background,contrast:contrastRatio(foreground,background),adapted:background!==requested};
+  }
   function compose(raw,mark,label){
     const e=normalize(raw);let mode=['horizontal','stacked','symbol'].includes(raw.logoLockup)?raw.logoLockup:'horizontal';
     if(!mark&&mode==='symbol')mode='horizontal';
-    const color=raw.logoTone==='dark'?'#ffffff':raw.logoTone==='mono'?'#172b24':/^#[0-9a-f]{6}$/i.test(raw.accent||'')?raw.accent:'#31594c';
+    const color=logoColor(raw);
     const name=Array.from(String(raw.businessName||'브랜드 이름')).slice(0,60);
     const width=mode==='horizontal'?480:mode==='stacked'?320:120;
     const textStart=mode==='horizontal'&&mark?24+e.symbolSize+e.logoGap:24;
@@ -34,6 +49,6 @@
       get canUndo(){return index>0;},get canRedo(){return index<states.length-1;},
     };
   }
-  const api={normalize,compose,history};if(typeof module!=='undefined')module.exports=api;
+  const api={normalize,compose,history,logoColor,contrastRatio,presentation};if(typeof module!=='undefined')module.exports=api;
   if(typeof window!=='undefined')window.APFBrandEditing=api;
 })();
