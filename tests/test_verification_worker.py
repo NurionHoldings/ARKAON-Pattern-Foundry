@@ -45,7 +45,7 @@ def job(tmp_path):
     candidate = git(repo, "rev-parse", "HEAD")
     plan = {"schema_version": "apf.verification-plan/v1", "request_id": "verify-fixture",
             "kind": "VERIFY", "base_sha": base, "candidate_sha": candidate,
-            "profiles": ["learning"], "allowed_paths": ["src", "tests"],
+            "profiles": ["isolation", "learning"], "allowed_paths": ["src", "tests"],
             "allowed_operations": worker.OPERATIONS, "timeout_seconds": 60,
             "merge_allowed": False, "deployment_allowed": False}
     plan["profile_digests"] = {p: worker.digest(list(worker.PROFILES[p])) for p in plan["profiles"]}
@@ -70,11 +70,18 @@ class TestExecutor:
     def __init__(self, worktree, run_dir, image, plan):
         self.run_dir = run_dir
         self.plan = plan
-        self.results = [{"profile": "fixture", "returncode": 0}]
+        self.results = []
 
     def execute(self, task, **kwargs):
         self.calls.append(task)
-        write(self.run_dir / "profile-results.json", {"fixture_only": True})
+        from hashlib import sha256
+        log = b"TEST DOUBLE ONLY, NOT AN EXECUTION RESULT\n"
+        self.results = []
+        for profile in self.plan["profiles"]:
+            (self.run_dir / f"{profile}.log").write_bytes(log)
+            self.results.append({"profile": profile, "returncode": 0, "reason": None,
+                                 "fixture_only": True, "log_sha256": sha256(log).hexdigest()})
+        write(self.run_dir / "profile-results.json", self.results)
         return WorkerExecution(TaskResult(("profile-results.json",), ("FIXTURE_ONLY",), "PASS"), ())
 
 
@@ -305,6 +312,7 @@ def test_unavailable_executor_records_failure_and_does_not_retry(job, monkeypatc
     again = worker.process_verification_queue(foundry_root=root, repository_root=repo, image=IMAGE)
     assert again['already_completed'] == ['verify-fixture']
     assert not again['passed']
+    assert again['failed'] == ['verify-fixture']
 
 
 def test_candidate_diff_outside_approved_paths_is_blocked(job, tmp_path):
@@ -366,3 +374,83 @@ def test_preflight_checks_scope_without_claiming_execution(job, monkeypatch, cap
     result = json.loads(capsys.readouterr().out)
     assert result['status'] == 'PASS' and result['execution_started'] is False
     assert not (state/'state/verification-worker/runs').exists()
+
+
+def test_completed_log_corruption_blocks_reuse(job):
+    run(job)
+    result_path = job[1]/'state/verification-worker/completed/verify-fixture.json'
+    done = worker._read(result_path)
+    log = result_path.parent.parent/'runs'/done['execution_id']/'learning.log'
+    log.write_bytes(b'corrupted bytes')
+    assert run(job)['blocked'][0]['reason'] == 'COMPLETED_LOG_HASH_MISMATCH'
+    assert not TestExecutor.calls
+
+
+def test_completed_job_is_not_respawned_by_relay_launcher(job, monkeypatch):
+    run(job)
+    original = worker.subprocess.Popen
+    def popen(command, **kwargs):
+        if '-m' in command and 'apf.verification_worker' in command:
+            pytest.fail('must not spawn completed task')
+        return original(command, **kwargs)
+    monkeypatch.setattr(worker.subprocess, 'Popen', popen)
+    assert worker.start_verification_worker(foundry_root=job[1], repository_root=job[0],
+                                           image=IMAGE, request_id='verify-fixture') is False
+    status = worker._read(job[1]/'state/verification-worker/launcher-status.json')
+    assert status['status'] == 'ALREADY_COMPLETED' and status['result_status'] == 'PASS'
+
+
+def test_explicit_approval_source_change_conflicts_with_existing_ledger(job):
+    repo, root, _, _ = job
+    (repo/'note.txt').write_text('unrelated change')
+    git(repo, 'add', '.')
+    git(repo, 'commit', '-qm', 'new head is not the approval change commit')
+    with pytest.raises(worker.WorkerBlocked, match='APPROVAL_SOURCE_CONFLICT'):
+        worker.seed_approved_request(root, repo, 'verify-fixture', git(repo, 'rev-parse', 'HEAD'))
+
+
+def test_isolation_is_mandatory_before_candidate_tests(job):
+    plan = {**job[2], 'profiles': ['learning']}
+    with pytest.raises(worker.WorkerBlocked, match='ISOLATION_MUST_RUN_FIRST'):
+        worker.parse_plan(plan)
+
+
+@pytest.mark.parametrize('scenario,exit_code,expected', [
+    ('probe_failure', 1, None), ('cleanup_failure', 0, 'CLEANUP_REQUIRED'),
+    ('timeout', -9, 'TIMEOUT'),
+])
+def test_isolation_or_safety_failure_stops_later_profiles(job, tmp_path, monkeypatch,
+                                                       scenario, exit_code, expected):
+    calls = []
+    monkeypatch.setattr(worker.shutil, 'which', lambda name: '/usr/bin/docker')
+    def docker_run(command, **kwargs):
+        if command[1] == 'rm' and scenario == 'cleanup_failure':
+            return subprocess.CompletedProcess(command, 1, stderr='daemon unavailable')
+        return subprocess.CompletedProcess(command, 0)
+    monkeypatch.setattr(worker.subprocess, 'run', docker_run)
+    class Process:
+        def __init__(self, command, **kwargs):
+            calls.append(command)
+        def poll(self):
+            return None if scenario == 'timeout' else exit_code
+        def kill(self):
+            pass
+        def wait(self, **kwargs):
+            return exit_code
+    monkeypatch.setattr(worker.subprocess, 'Popen', Process)
+    if scenario == 'timeout':
+        clock = iter([0, 1000])
+        monkeypatch.setattr(worker.time, 'monotonic', lambda: next(clock))
+    executor = worker.DockerVerificationExecutor(job[0], tmp_path, IMAGE, job[2])
+    from uuid import uuid4
+
+    from apf.development_orchestrator import TaskContract, TaskKind
+    task = TaskContract(uuid4(), TaskKind.VERIFY, job[2]['scope_digest'], 'fixture', ('tests',), ())
+    result = executor.execute(task, sandbox_policy=None, attestation=None)
+    assert result.result.outcome == 'FAIL' and len(calls) == 1
+    assert executor.results[0]['profile'] == 'isolation'
+    assert executor.results[0]['reason'] == expected
+    assert executor.not_run_profiles == ['learning']
+    record = worker._read(tmp_path/'isolation-container.json')
+    assert record['container_name'].startswith('apf-verify-')
+    assert record['status'] == ('CLEANUP_REQUIRED' if scenario == 'cleanup_failure' else 'REMOVED')

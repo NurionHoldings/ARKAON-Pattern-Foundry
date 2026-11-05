@@ -84,3 +84,15 @@ relay 비동기 호출을 확인한다. 실제 컨테이너 검증은 별도 wor
 CANDIDATE_OUTSIDE_SCOPE로 실행 전에 차단되었다(run41969994301). 이를 성공으로 표기하지 않는다.
 v2 요청은 같은 후보·같은 프로필에 기존 도구 경로만 반영한다. 원본 요청/승인은 보존하고 새 ID를 사용한다.
 새 preflight가 승인/원장/후보 전체 범위를 image 준비 전에 확인하며 preflight PASS는 실행 ACK가 아니다.
+
+## 실행 후 보완
+
+- isolation은 반드시 첫 프로필이다. 격리 검사·시간·출력 제한·컨테이너 정리 실패 시 뒤 시험을 실행하지 않는다.
+- container name/image/profile/정리 상태를 프로필별 JSON에 미리 기록해 중단 작업을 추적한다.
+- 완료 판단 때 결과 JSON·프로필 JSON·각 로그 hash를 다시 확인한다. 손상 증거는 완료로 재사용하지 않는다.
+- 과거 FAIL은 재소비해도 failed에 남으며 CLI 성공코드로 바꾸지 않는다. 완료 작업은 relay가 재호출하지 않는다.
+- intake는 worker HEAD가 아닌 승인 파일의 마지막 변경 commit을 사용한다. 같은 ID의 승인 source 변경은 충돌이다.
+- PC의 변경 commit 탐색에는 전체 Git 이력이 필요하다. shallow history에서 임의 HEAD를 승인 출처로 쓰지 않는다.
+- PC/영속 foundry_root에서 중복 방지는 재시작 후에도 유지된다. GitHub Actions runner는 run마다 임시 저장소이므로
+  CI 반복 재현은 서로 다른 검증 실행이다. 이를 클라우드 운영용 영속 원장·전역 exactly-once 보장으로 주장하지 않는다.
+- workflow concurrency는 같은 PR의 검증을 직렬화하며 진행 중인 실행을 자동 취소하지 않는다.

@@ -10,6 +10,9 @@ on:
       - 'approvals/self-improvement/main-integration-20261105-verify-v2.json'
       - 'tests/test_verification_worker.py'
       - '.github/workflows/arkaon-verification-worker.yml'
+concurrency:
+  group: arkaon-verifier-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
 permissions:
   contents: read
 jobs:
@@ -34,7 +37,8 @@ jobs:
         env:
           WORKER_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          PYTHONPATH=src python -m apf.verification_worker --foundry-root "$RUNNER_TEMP/arkaon-verification" --repository-root "$GITHUB_WORKSPACE" --worker-id arkaon-ci-verifier --seed-request main-integration-20261105-verify-v2 --approval-source-sha "$WORKER_SHA" --preflight
+          approval_sha=$(git log -1 --format=%H -- approvals/self-improvement/main-integration-20261105-verify-v2.json)
+          PYTHONPATH=src python -m apf.verification_worker --foundry-root "$RUNNER_TEMP/arkaon-verification" --repository-root "$GITHUB_WORKSPACE" --worker-id arkaon-ci-verifier --seed-request main-integration-20261105-verify-v2 --approval-source-sha "$approval_sha" --preflight
       - name: Prepare isolated verification image (execution remains offline)
         env:
           WORKER_SHA: ${{ github.event.pull_request.head.sha }}
@@ -45,7 +49,8 @@ jobs:
           APF_WORKER_HOST_MARKER: must-not-enter-container
         run: |
           image_id=$(docker image inspect "apf-verifier:$WORKER_SHA" --format '{{.Id}}')
-          PYTHONPATH=src python -m apf.verification_worker --foundry-root "$RUNNER_TEMP/arkaon-verification" --repository-root "$GITHUB_WORKSPACE" --image "$image_id" --worker-id arkaon-ci-verifier --seed-request main-integration-20261105-verify-v2 --approval-source-sha "$WORKER_SHA"
+          approval_sha=$(git log -1 --format=%H -- approvals/self-improvement/main-integration-20261105-verify-v2.json)
+          PYTHONPATH=src python -m apf.verification_worker --foundry-root "$RUNNER_TEMP/arkaon-verification" --repository-root "$GITHUB_WORKSPACE" --image "$image_id" --worker-id arkaon-ci-verifier --seed-request main-integration-20261105-verify-v2 --approval-source-sha "$approval_sha"
       - name: Check actual receipt and duplicate suppression
         env:
           WORKER_SHA: ${{ github.event.pull_request.head.sha }}

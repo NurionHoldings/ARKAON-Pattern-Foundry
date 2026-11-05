@@ -9,6 +9,7 @@ $ErrorActionPreference = "Stop"
 Set-Location -LiteralPath $FoundryRoot
 if (-not (Get-Command docker -ErrorAction SilentlyContinue)) { throw "Docker with Linux containers is required; no host execution fallback." }
 if ($RequestId -notmatch '^[a-zA-Z0-9][a-zA-Z0-9._-]{0,127}$') { throw "Invalid request id" }
+if ((git rev-parse --is-shallow-repository) -eq "true") { throw "Full repository history is required to resolve the approval change commit." }
 $Python = Join-Path $FoundryRoot ".venv\Scripts\python.exe"
 if (-not (Test-Path -LiteralPath $Python)) { $Python = (Get-Command python -ErrorAction Stop).Source }
 if ($BuildImage) {

@@ -133,6 +133,8 @@ def parse_plan(document: dict) -> dict:
             or any(not isinstance(p, str) or p not in PROFILES for p in profiles)
             or len(set(profiles)) != len(profiles)):
         raise WorkerBlocked("PROFILE_NOT_ALLOWLISTED")
+    if profiles[0] != "isolation":
+        raise WorkerBlocked("ISOLATION_MUST_RUN_FIRST")
     if document.get("profile_digests") != {p: digest(list(PROFILES[p])) for p in profiles}:
         raise WorkerBlocked("PROFILE_COMMAND_DIGEST_MISMATCH")
     paths = document.get("allowed_paths")
@@ -173,6 +175,9 @@ def seed_approved_request(root: Path, repository: Path, request_id: str, source_
                 raise WorkerBlocked("REQUEST_MISMATCH")
             return approval, source_sha
 
+    queue_path = root / "state" / "self-improvement-execution-queue" / f"{request_id}.json"
+    if queue_path.exists() and _read(queue_path).get("source_commit_sha") != source_sha:
+        raise WorkerBlocked("APPROVAL_SOURCE_CONFLICT")
     result = sync_approval_receipts(foundry_root=root, source=Source(),
                                     requests={request_id: plan["scope_digest"]})
     if result.blocked or result.pending:
@@ -233,6 +238,45 @@ def _bound_plan(root: Path, repository: Path, queue_path: Path) -> tuple[dict, d
     return plan, queue
 
 
+def _completed_receipt(path: Path, plan: dict, queue: dict) -> dict:
+    done = _read(path)
+    if (done.get("evidence_digest") != digest({k: v for k, v in done.items() if k != "evidence_digest"})
+            or done.get("binding_digest") != digest({"plan": plan, "queue": queue})
+            or done.get("status") not in {"PASS", "FAIL"}
+            or done.get("tested_head") != plan["candidate_sha"]
+            or done.get("request_id") != plan["request_id"]
+            or any(done.get(k) is not False for k in
+                   ("first_verification_complete", "improvement_accepted", "merge_allowed", "deployment_allowed"))):
+        raise WorkerBlocked("COMPLETED_JOB_CONFLICT")
+    execution_id = done.get("execution_id")
+    if not isinstance(execution_id, str) or not re.fullmatch(r"[0-9a-f]{32}", execution_id):
+        raise WorkerBlocked("COMPLETED_EXECUTION_ID_INVALID")
+    run_dir = path.parent.parent / "runs" / execution_id
+    if run_dir.is_symlink() or _read(run_dir / "result.json") != done:
+        raise WorkerBlocked("COMPLETED_RESULT_MISMATCH")
+    profiles = done.get("profiles")
+    if not isinstance(profiles, list) or any(not isinstance(p, dict) for p in profiles):
+        raise WorkerBlocked("COMPLETED_PROFILES_INVALID")
+    if done["status"] == "PASS" and [p.get("profile") for p in profiles] != plan["profiles"]:
+        raise WorkerBlocked("COMPLETED_PROFILE_COVERAGE_INVALID")
+    summary = run_dir / "profile-results.json"
+    if done.get("profile_results_sha256") is not None:
+        if (summary.is_symlink() or sha256(summary.read_bytes()).hexdigest() != done["profile_results_sha256"]
+                or json.loads(summary.read_text(encoding="utf-8")) != profiles):
+            raise WorkerBlocked("COMPLETED_PROFILE_ARTIFACT_MISMATCH")
+    elif profiles or done["status"] == "PASS":
+        raise WorkerBlocked("COMPLETED_PROFILE_ARTIFACT_MISSING")
+    for profile in profiles:
+        name = profile.get("profile")
+        if name not in plan["profiles"]:
+            raise WorkerBlocked("COMPLETED_PROFILE_NOT_APPROVED")
+        log = run_dir / f"{name}.log"
+        if (log.is_symlink() or log.stat().st_size > 4 * 1024 * 1024
+                or sha256(log.read_bytes()).hexdigest() != profile.get("log_sha256")):
+            raise WorkerBlocked("COMPLETED_LOG_HASH_MISMATCH")
+    return done
+
+
 class DockerVerificationExecutor:
     def __init__(self, worktree: Path, run_dir: Path, image: str, plan: dict):
         if not IMAGE.fullmatch(image):
@@ -262,6 +306,10 @@ class DockerVerificationExecutor:
                        "--workdir=/work", "--env=PYTHONPATH=/work/src",
                        "--env=PYTHONDONTWRITEBYTECODE=1", "--env=HOME=/tmp",
                        self.image, *PROFILES[profile]]
+            container_record = self.run_dir / f"{profile}-container.json"
+            container_info = {"profile": profile, "container_name": name, "image_id": self.image,
+                              "status": "LAUNCHING", "started_at": datetime.now(UTC).isoformat()}
+            _write(container_record, container_info)
             log = self.run_dir / f"{profile}.log"
             started = time.monotonic()
             returncode, reason = -1, None
@@ -280,8 +328,17 @@ class DockerVerificationExecutor:
                         process.kill()
                     returncode = process.wait(timeout=10)
                 finally:
-                    subprocess.run(("docker", "rm", "-f", name), stdout=subprocess.DEVNULL,
-                                   stderr=subprocess.DEVNULL, timeout=20, check=False)
+                    try:
+                        cleanup = subprocess.run(("docker", "rm", "-f", name),
+                                       capture_output=True, text=True, timeout=20, check=False)
+                        missing = "No such" in (cleanup.stderr or "")
+                        if cleanup.returncode != 0 and not missing:
+                            reason = "CLEANUP_REQUIRED"
+                    except subprocess.SubprocessError:
+                        reason = "CLEANUP_REQUIRED"
+                    _write(container_record, {**container_info,
+                           "status": "CLEANUP_REQUIRED" if reason == "CLEANUP_REQUIRED" else "REMOVED",
+                           "finished_at": datetime.now(UTC).isoformat()})
             if log.stat().st_size > 4 * 1024 * 1024:
                 with log.open("r+b") as stream:
                     stream.truncate(4 * 1024 * 1024)
@@ -292,7 +349,12 @@ class DockerVerificationExecutor:
                       "isolation": {"network": "none", "read_only": True,
                                     "cap_drop": "ALL", "no_new_privileges": True}}
             self.results.append(result)
-        passed = all(r["returncode"] == 0 and not r["reason"] for r in self.results)
+            if (profile == "isolation" and (returncode != 0 or reason)) or reason in {
+                    "TIMEOUT", "OUTPUT_LIMIT", "CLEANUP_REQUIRED"}:
+                break
+        self.not_run_profiles = [p for p in self.plan["profiles"]
+                                 if p not in {r["profile"] for r in self.results}]
+        passed = len(self.results) == len(self.plan["profiles"]) and all(r["returncode"] == 0 and not r["reason"] for r in self.results)
         _write(self.run_dir / "profile-results.json", self.results)
         return WorkerExecution(TaskResult(("profile-results.json",),
                                tuple(f"{r['profile']}:{r['returncode']}" for r in self.results),
@@ -329,12 +391,10 @@ def process_verification_queue(*, foundry_root: Path, repository_root: Path, ima
                 handled += 1
                 done_path = state / "completed" / f"{plan['request_id']}.json"
                 if done_path.exists():
-                    done = _read(done_path)
-                    recorded = done.get("evidence_digest")
-                    if (recorded != digest({k: v for k, v in done.items() if k != "evidence_digest"})
-                            or done.get("binding_digest") != digest({"plan": plan, "queue": queue})):
-                        raise WorkerBlocked("COMPLETED_JOB_CONFLICT")
+                    done = _completed_receipt(done_path, plan, queue)
                     summary["already_completed"].append(plan["request_id"])
+                    if done["status"] == "FAIL":
+                        summary["failed"].append(plan["request_id"])
                     continue
                 execution_id = uuid4().hex
                 claim_path = state / "claims" / f"{plan['request_id']}.json"
@@ -385,7 +445,8 @@ def process_verification_queue(*, foundry_root: Path, repository_root: Path, ima
                 result = {**ack, "status": "PASS" if passed else "FAIL",
                           "finished_at": datetime.now(UTC).isoformat(),
                           "runtime_receipt": asdict(receipt) if receipt else None,
-                          "profiles": getattr(executor, "results", [])}
+                          "profiles": getattr(executor, "results", []),
+                          "profiles_not_run": getattr(executor, "not_run_profiles", [])}
                 # UUID and enum values in the runtime receipt are serialized explicitly.
                 if result["runtime_receipt"]:
                     result["runtime_receipt"]["task_id"] = str(receipt.task_id)
@@ -424,11 +485,23 @@ def start_verification_worker(*, foundry_root: Path, repository_root: Path, imag
     if request_id:
         if not ID.fullmatch(request_id):
             raise WorkerBlocked("REQUEST_ID_INVALID")
+        if _git(repository_root, "rev-parse", "--is-shallow-repository") == "true":
+            raise WorkerBlocked("APPROVAL_HISTORY_REQUIRED")
         source_sha = _git(repository_root, "log", "-1", "--format=%H", "--",
                           f"approvals/self-improvement/{request_id}.json")
         if not SHA.fullmatch(source_sha):
             raise WorkerBlocked("APPROVAL_SOURCE_NOT_AVAILABLE")
         intake = ("--seed-request", request_id, "--approval-source-sha", source_sha)
+        completed = state / "completed" / f"{request_id}.json"
+        if completed.exists():
+            plan, queue = _bound_plan(foundry_root.resolve(), repository_root.resolve(),
+                          foundry_root.resolve() / "state" / "self-improvement-execution-queue" / f"{request_id}.json")
+            if queue["source_commit_sha"] != source_sha:
+                raise WorkerBlocked("APPROVAL_SOURCE_CONFLICT")
+            result = _completed_receipt(completed, plan, queue)
+            _write(state / "launcher-status.json", {"status": "ALREADY_COMPLETED" if result["status"] == "PASS" else "FAILED_PREVIOUSLY",
+                   "result_status": result["status"], "request_id": request_id})
+            return False
     with (state / "launcher.log").open("ab") as log:
         subprocess.Popen((sys.executable, "-m", "apf.verification_worker",
                           "--foundry-root", str(foundry_root.resolve()),
