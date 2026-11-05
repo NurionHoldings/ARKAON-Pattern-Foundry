@@ -75,16 +75,16 @@ function suggestCopy(raw) {
   let tagline = '';
   if (strengths) tagline = firstLine(strengths);
   else if (services) tagline = firstLine(services);
-  else if (industry && audience) tagline = `${audience}을(를) 위한 ${industry}`;
+  else if (industry && audience) tagline = `${audience} 대상 ${industry}`;
   else if (industry) tagline = `${industry} 브랜드`;
   tagline = tagline.slice(0, limits.tagline);
 
   const intro = [];
-  if (name && industry) intro.push(`${name}은(는) ${industry} 분야에서 활동합니다.`);
+  if (name && industry) intro.push(`${industry} 분야의 ${name}입니다.`);
   if (audience) intro.push(`주요 고객은 ${audience}입니다.`);
   if (services) {
     const flat = services.replace(/\s*\n\s*/g, ' · ').slice(0, 200);
-    intro.push(`제공: ${flat}.`);
+    intro.push(`제공 서비스: ${flat}.`);
   }
   if (strengths) {
     const flat = strengths.replace(/\s*\n\s*/g, ' · ').slice(0, 160);
@@ -129,7 +129,8 @@ function cardFront(b) {
   if (b.cardLayout === 'personal') {
     return `<article class="card front"><div class="person">${esc(b.person || '담당자 이름 입력 필요')}</div><p>${esc(b.role)}</p><p class="tagline">${esc(b.tagline || '소개 문구 입력 필요')}</p>${introParagraph(b, 120)}</article>`;
   }
-  return `<article class="card front">${logo({...b,logoTone:"light"})}<p class="tagline">${esc(b.tagline || '소개 문구 입력 필요')}</p>${introParagraph(b, 200)}</article>`;
+  const surface=editing.presentation({...b,logoTone:"light"});
+  return `<article class="card front"><div class="card-logo" style="background:${surface.background}">${logo({...b,logoTone:"light"})}</div><p class="tagline">${esc(b.tagline || '소개 문구 입력 필요')}</p>${introParagraph(b, 200)}</article>`;
 }
 
 function cardBack(b) {
@@ -150,7 +151,11 @@ function cardBack(b) {
 
 function render(raw) {
   const b = normalize(raw);
-  return `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>*{box-sizing:border-box}body{margin:0;padding:24px;font-family:system-ui,sans-serif;color:#253d35;background:#e6eadd}h2{font-size:12px;margin:24px 0 12px}.logo{background:${b.logoTone === 'dark' ? '#172b24' : '#fff'};padding:24px;border-radius:12px}svg{width:100%;max-width:500px;height:auto}.card{min-height:240px;border-radius:12px;padding:30px;background:#fff;display:flex;flex-direction:column;justify-content:space-between;overflow-wrap:anywhere;word-break:keep-all}.front{border-top:6px solid ${b.accent}}.back{background:#253d35;color:#fff}.back a{color:#c8e8d8}.person{font-size:23px;font-weight:700}.tagline{font-size:15px;font-weight:600}.intro{font-size:13px;line-height:1.6;opacity:.92}.details{display:grid;gap:8px;font-size:13px}p{font-size:13px;line-height:1.6}@media(max-width:450px){body{padding:14px}.card{padding:22px}.person{font-size:20px}}</style><p>${b.sample ? '가상 예시 · 실제 사업 정보 아님' : '작성 중인 브랜드 초안'} · 공개·인쇄 전 확인 필요 · 실적·인증·가격은 입력하지 않은 항목을 만들지 않습니다</p><h2>01 / LOGO</h2><div class="logo">${logo(b)}</div><h2>02 / 명함 앞면 (${b.cardLayout === 'personal' ? '개인' : '회사'})</h2>${cardFront(b)}<h2>03 / 명함 뒷면</h2>${cardBack(b)}</html>`;
+  const surface=editing.presentation(b);
+  const cardSurface=editing.presentation({...b,logoTone:'light'});
+  const guidance=surface.adapted||cardSurface.adapted
+    ? '<p class="contrast-note">밝은 브랜드색이 잘 보이도록 로고 영역에 어두운 배경을 적용했습니다. 브랜드색은 그대로입니다. 배경 비교에서 흰색·단색 로고도 살펴보세요.</p>' : '';
+  return `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>*{box-sizing:border-box}body{margin:0;padding:24px;font-family:system-ui,sans-serif;color:#253d35;background:#e6eadd}h2{font-size:12px;margin:24px 0 12px}.logo{background:${surface.background};padding:24px;border-radius:12px}svg{width:100%;max-width:500px;height:auto}.card-logo{padding:12px;border-radius:8px}.contrast-note{font-size:13px;line-height:1.6;background:#fff;padding:12px;border-radius:8px}.card{min-height:240px;border-radius:12px;padding:30px;background:#fff;display:flex;flex-direction:column;justify-content:space-between;overflow-wrap:anywhere;word-break:keep-all}.front{border-top:6px solid ${b.accent}}.back{background:#253d35;color:#fff}.back a{color:#c8e8d8}.person{font-size:23px;font-weight:700}.tagline{font-size:15px;font-weight:600}.intro{font-size:13px;line-height:1.6;opacity:.92}.details{display:grid;gap:8px;font-size:13px}p{font-size:13px;line-height:1.6}@media(max-width:450px){body{padding:14px}.card{padding:22px}.person{font-size:20px}}</style><p>${b.sample ? '가상 예시 · 실제 사업 정보 아님' : '작성 중인 브랜드 초안'} · 공개·인쇄 전 확인 필요 · 실적·인증·가격은 입력하지 않은 항목을 만들지 않습니다</p>${guidance}<h2>01 / LOGO</h2><div class="logo">${logo(b)}</div><h2>02 / 명함 앞면 (${b.cardLayout === 'personal' ? '개인' : '회사'})</h2>${cardFront(b)}<h2>03 / 명함 뒷면</h2>${cardBack(b)}</html>`;
 }
 
 function collectGaps(b) {
@@ -208,6 +213,13 @@ function update({record=true}={}) {
     li.textContent = t;
     root.append(li);
   });
+  const guidance=document.getElementById('contrast-guidance');
+  if(guidance){
+    const adapted=editing.presentation(b).adapted||editing.presentation({...b,logoTone:'light'}).adapted;
+    guidance.textContent=adapted
+      ? '브랜드색은 유지하고 로고 영역에 어두운 배경을 적용했습니다. 배경 비교에서 흰색·단색 로고를 선택할 수도 있습니다.'
+      : '브랜드색은 그대로 유지됩니다. 로고 배경 비교에서 흰색·단색 대안도 확인하세요.';
+  }
   syncConceptSelection();
 }
 
@@ -230,6 +242,7 @@ function showConcepts() {
     const title=document.createElement('strong');title.textContent=c.name;
     const detail=document.createElement('span');detail.textContent=c.rationale;
     const image=document.createElement('img');image.alt=`${c.name} 로고`;image.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(creative.svg({...creative.applyConcept(values(),c),logoTone:'light'}));
+    image.style.backgroundColor=editing.presentation({...values(),logoTone:'light'}).background;
     button.append(image,title,detail);
     button.setAttribute('aria-pressed',String(values().conceptId===c.id));
     button.addEventListener('click',()=>{apply(creative.applyConcept(values(),c));update();showConcepts();document.getElementById('status').textContent=`선택: ${c.name}. 기존 문구는 유지합니다. 표현 의도는 제안이며 사업 실적을 뜻하지 않습니다.`;});
