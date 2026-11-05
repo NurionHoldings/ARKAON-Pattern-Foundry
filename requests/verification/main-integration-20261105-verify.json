@@ -1,0 +1,37 @@
+{
+  "schema_version": "apf.verification-plan/v1",
+  "request_id": "main-integration-20261105-verify",
+  "kind": "VERIFY",
+  "base_sha": "a26baa71e93f1971151c4bb93e537444e95850a1",
+  "candidate_sha": "2f9f4694e2e3f1ffaf36db96c1e932da8a401c5a",
+  "profiles": [
+    "isolation",
+    "learning",
+    "brand",
+    "platform"
+  ],
+  "allowed_paths": [
+    ".github/workflows",
+    "config",
+    "docs/integration/main-20261105",
+    "orchestrator",
+    "services",
+    "src/apf",
+    "tests"
+  ],
+  "allowed_operations": [
+    "READ_WORKTREE",
+    "RUN_TESTS",
+    "GENERATE_ARTIFACT"
+  ],
+  "timeout_seconds": 180,
+  "merge_allowed": false,
+  "deployment_allowed": false,
+  "scope_digest": "4ed95c88c5775d7fa10a6bcb5cbf39aaf9761c1454b0a01ab6b7c5d80b749bd2",
+  "profile_digests": {
+    "isolation": "9cf8bb3c594b1132cfa206baadba7150358067176a6a79858e82db1ef5be3d47",
+    "learning": "fb9cfb7b98ae115e9c594fbbd66414b15e48c31207bbae921b1b09c940c4282b",
+    "brand": "24ef96a418f1eff394bfd6485e0a2821f339a161fe0b47a3b13981b9ed35bea4",
+    "platform": "bc17db5d0c5be7c0fd88f547fb93ea4efed93fc1f29f75066a6f7e0f229ddc3c"
+  }
+}

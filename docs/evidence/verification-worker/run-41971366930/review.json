@@ -1,0 +1,40 @@
+{
+  "schema_version": "apf.worker-observed-review/v1",
+  "tested_executor_sha": "b0c72f0e5057421f1b9cdb1967f616659e0649e6",
+  "tested_candidate_sha": "2f9f4694e2e3f1ffaf36db96c1e932da8a401c5a",
+  "approval_source_sha": "3f34d309e2227e8d2b189c3e44646989cec9eae0",
+  "run_id": 41971366930,
+  "artifact_id": 13389568493,
+  "execution_id": "ee7e746b85ef49b9ab4799a60c8e2079",
+  "artifact_sha256": "640b28315086b394cab8f948e724afc3ef8614b66538e2893dde1a97409299a2",
+  "checks": {
+    "artifact_api_digest": "PASS",
+    "result_canonical_digest": "PASS",
+    "profile_results_hash": "PASS",
+    "four_log_hashes": "PASS",
+    "four_container_cleanup_records": "PASS",
+    "runtime": "SUCCEEDED"
+  },
+  "evidence_digest": "9e26069fa369e6178ba492490f00a912dfa2f43d0ab32b4d4e9370f6c3f1bd2e",
+  "local_tests": {
+    "new_worker_tests_passed": 43,
+    "python_passed": 972,
+    "python_skipped": 13
+  },
+  "cloud_profiles": {
+    "isolation": "PASS",
+    "learning_tests": 31,
+    "brand_tests": 41,
+    "platform_tests": 10
+  },
+  "first_verification_complete": false,
+  "independent_audit_status": "NOT_RUN",
+  "merge_approved": false,
+  "production_apply_approved": false,
+  "remaining": [
+    "Windows PC installation and relay restart not performed",
+    "Autonomous code implementation not provided by fixed-test worker",
+    "Full independent product audit pending",
+    "GitHub Actions ledger is per-run ephemeral; persistent PC root required for cross-run durable state"
+  ]
+}
