@@ -1,0 +1,12 @@
+{
+  "schema_version": "apf.improvement-recognition-metrics/v1",
+  "_comment": "Human signoff still required. ci_commit_sha must match the commit used for baseline and post held-out runs.",
+  "baseline_failure_count": 25,
+  "post_failure_count": 18,
+  "target_failure_delta": -7,
+  "safe_failure_count": 0,
+  "regression_count": 0,
+  "ci_commit_sha": "0000000000000000000000000000000000000000",
+  "ci_verified_green": true,
+  "ci_run_id": "https://github.com/org/repo/actions/runs/0"
+}

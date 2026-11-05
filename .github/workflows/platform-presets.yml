@@ -1,0 +1,41 @@
+name: Platform foundation presets
+on:
+  pull_request:
+    paths:
+      - 'services/account.html'
+      - 'services/platform-presets.js'
+      - 'services/studio.js'
+      - 'services/studio.css'
+      - 'services/site-builder.html'
+      - 'tests/platform-presets.test.cjs'
+      - 'tools/test-platform-presets.cjs'
+      - '.github/workflows/platform-presets.yml'
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test tests/studio.test.cjs tests/platform-presets.test.cjs
+      - run: |
+          npm install --prefix "$RUNNER_TEMP/platform-browser" --no-package-lock --ignore-scripts playwright@1.62.1
+          "$RUNNER_TEMP/platform-browser/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Select, save, reopen and inspect both foundations
+        env:
+          CANDIDATE_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          NODE_PATH="$RUNNER_TEMP/platform-browser/node_modules" EVIDENCE_OUT="$RUNNER_TEMP/platform-preset-evidence" node tools/test-platform-presets.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: platform-presets-${{ github.event.pull_request.head.sha }}
+          path: ${{ runner.temp }}/platform-preset-evidence/
+          retention-days: 14
