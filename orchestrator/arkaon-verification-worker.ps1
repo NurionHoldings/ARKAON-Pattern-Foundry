@@ -1,6 +1,6 @@
 param(
     [string]$FoundryRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path,
-    [string]$RequestId = "main-integration-20261105-verify",
+    [string]$RequestId = "main-integration-20261105-verify-v2",
     [switch]$BuildImage,
     [switch]$ConnectRelay,
     [int]$WatchSeconds = 0

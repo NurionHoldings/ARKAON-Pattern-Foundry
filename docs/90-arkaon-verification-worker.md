@@ -77,3 +77,10 @@ relay 비동기 호출을 확인한다. 실제 컨테이너 검증은 별도 wor
 본 변경은 #132 위 별도 PR이다. 아직 main 병합·운영 반영·전체 독립 감사는 하지 않는다.
 롤백은 연결 설정 제거 후 기존 relay/consumer를 정상 종료하고 feature revert한다.
 결과/원장/미완료 claim과 고객 초안은 삭제하지 않는다. 임의 오래된 잠금 제거로 실행을 재개하지 않는다.
+
+## 첫 실제 실행 보완
+
+초기 request `main-integration-20261105-verify`는 #132에 이미 포함된 tools 경로를 빠뜨려
+CANDIDATE_OUTSIDE_SCOPE로 실행 전에 차단되었다(run41969994301). 이를 성공으로 표기하지 않는다.
+v2 요청은 같은 후보·같은 프로필에 기존 도구 경로만 반영한다. 원본 요청/승인은 보존하고 새 ID를 사용한다.
+새 preflight가 승인/원장/후보 전체 범위를 image 준비 전에 확인하며 preflight PASS는 실행 ACK가 아니다.

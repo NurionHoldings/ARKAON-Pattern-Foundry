@@ -1,0 +1,24 @@
+{
+  "schema_version": "apf.owner-approval-receipt/1.0",
+  "state": "OWNER_APPROVED",
+  "request_id": "main-integration-20261105-verify-v2",
+  "scope_digest": "ba4962cc9a995b7dae0c226b59f0a0ee6eda008017d3245de45830c5c3aae152",
+  "approver": "최인석",
+  "approved_at": "2026-11-05T04:41:24.037720+00:00",
+  "allowed_paths": [
+    ".github/workflows",
+    "config",
+    "docs/integration/main-20261105",
+    "orchestrator",
+    "services",
+    "src/apf",
+    "tests",
+    "tools"
+  ],
+  "allowed_operations": [
+    "READ_WORKTREE",
+    "RUN_TESTS",
+    "GENERATE_ARTIFACT"
+  ],
+  "approval_basis": "사용자의 실행 연결부 추가 구현·연결 지시에 따른 고정 프로필 검증. 병합·배포 승인이 아니며 암호학적 사용자 서명을 주장하지 않음. v2는 기존 #132 도구 경로 누락 정정이며 임의 명령·추가 기능을 승인하지 않음."
+}

@@ -344,3 +344,25 @@ def test_profile_command_changes_invalidate_old_approval(job, monkeypatch):
     monkeypatch.setitem(worker.PROFILES, 'learning', ('python', '-c', 'changed command'))
     with pytest.raises(worker.WorkerBlocked, match='PROFILE_COMMAND_DIGEST_MISMATCH'):
         worker.parse_plan(old_plan)
+
+
+def test_operational_plan_covers_all_selected_candidate_paths():
+    from pathlib import Path
+    root = Path(__file__).resolve().parents[1]
+    plan = worker.parse_plan(worker._read(root/'requests/verification/main-integration-20261105-verify-v2.json'))
+    selection = worker._read(root/'docs/integration/main-20261105/source-selection.json')
+    outside = [r['path'] for r in selection['files']
+               if not any(r['path'] == p or r['path'].startswith(p+'/') for p in plan['allowed_paths'])]
+    assert outside == []
+
+
+def test_preflight_checks_scope_without_claiming_execution(job, monkeypatch, capsys):
+    repo, state, _, source = job
+    monkeypatch.setattr(worker, '__file__', str(repo/'src/apf/verification_worker.py'))
+    monkeypatch.setattr(worker.sys, 'argv', ['worker', '--repository-root', str(repo),
+                       '--foundry-root', str(state), '--seed-request', 'verify-fixture',
+                       '--approval-source-sha', source, '--preflight'])
+    assert worker.main() == 0
+    result = json.loads(capsys.readouterr().out)
+    assert result['status'] == 'PASS' and result['execution_started'] is False
+    assert not (state/'state/verification-worker/runs').exists()

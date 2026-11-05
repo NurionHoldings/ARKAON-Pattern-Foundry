@@ -455,7 +455,8 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--foundry-root", required=True, type=Path)
     parser.add_argument("--repository-root", required=True, type=Path)
-    parser.add_argument("--image", required=True)
+    parser.add_argument("--image")
+    parser.add_argument("--preflight", action="store_true")
     parser.add_argument("--worker-id", default="arkaon-verification-worker")
     parser.add_argument("--seed-request")
     parser.add_argument("--approval-source-sha")
@@ -470,6 +471,19 @@ def main() -> int:
             parser.error("--approval-source-sha required for explicit intake")
         seed_approved_request(args.foundry_root, args.repository_root,
                               args.seed_request, args.approval_source_sha)
+    if args.preflight:
+        if not args.seed_request:
+            parser.error("--preflight requires --seed-request")
+        plan, _ = _bound_plan(args.foundry_root, args.repository_root,
+                   args.foundry_root / "state" / "self-improvement-execution-queue" / f"{args.seed_request}.json")
+        report = {"schema_version": "apf.verification-preflight/v1", "status": "PASS",
+                  "request_id": plan["request_id"], "tested_head": plan["candidate_sha"],
+                  "scope_digest": plan["scope_digest"], "execution_started": False}
+        _write(args.foundry_root / "state" / "verification-worker" / "preflight.json", report)
+        print(json.dumps(report))
+        return 0
+    if not args.image:
+        parser.error("--image is required for actual execution")
     result = process_verification_queue(foundry_root=args.foundry_root,
                 repository_root=args.repository_root, image=args.image, worker_id=args.worker_id)
     print(json.dumps(result, ensure_ascii=False))
