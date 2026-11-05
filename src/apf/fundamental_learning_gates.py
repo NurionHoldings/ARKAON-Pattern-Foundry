@@ -337,6 +337,7 @@ class FundamentalLearningGateAssessor:
             if isinstance(raw, list) and raw:
                 inbox_dirs = tuple(str(item) for item in raw)
 
+        invalid_packets: list[str] = []
         chain_valid = 0
         keyword_candidates = 0
         evidence: list[str] = []
@@ -346,10 +347,20 @@ class FundamentalLearningGateAssessor:
             directory = self.foundry_root / rel
             if not directory.is_dir():
                 continue
-            for path in directory.glob("*.json"):
+            for path in sorted(directory.glob("*.json")):
                 try:
                     document = json.loads(path.read_text(encoding="utf-8"))
-                except (OSError, json.JSONDecodeError):
+                except UnicodeError:
+                    invalid_packets.append("INVALID_UTF8")
+                    continue
+                except json.JSONDecodeError:
+                    invalid_packets.append("INVALID_JSON")
+                    continue
+                except OSError:
+                    invalid_packets.append("UNREADABLE_FILE")
+                    continue
+                if not isinstance(document, dict):
+                    invalid_packets.append("NON_OBJECT_JSON")
                     continue
                 ok, _ = failure_feedback_chain_valid(document)
                 if ok:
@@ -369,7 +380,17 @@ class FundamentalLearningGateAssessor:
         evidence.append(f"complete failure→learning→review chains: {chain_valid}")
         evidence.append(f"keyword-only candidate packets: {keyword_candidates}")
 
-        if chain_valid >= 1:
+        evidence.append(f"invalid feedback packets: {len(invalid_packets)}")
+        if invalid_packets:
+            blockers.append(
+                "invalid feedback packets require review: " + ", ".join(
+                    f"{code}={invalid_packets.count(code)}" for code in sorted(set(invalid_packets))
+                )
+            )
+
+        if invalid_packets:
+            status = GateStatus.PARTIAL
+        elif chain_valid >= 1:
             status = GateStatus.READY_FOR_REVIEW
         elif keyword_candidates >= 1:
             status = GateStatus.CANDIDATE_EVIDENCE
