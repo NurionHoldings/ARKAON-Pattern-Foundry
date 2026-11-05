@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import UTC, datetime, timedelta
 from enum import StrEnum
 from hashlib import sha256
@@ -58,6 +58,7 @@ class FundamentalLearningGateReport:
             "operational_apply_complete": self.operational_apply_complete,
             "efficacy_validation": self.efficacy_validation,
             "report_digest": self.report_digest,
+            "report_digest_algorithm": "apf.learning-report-canonical-json/v1",
             "stages": [
                 {
                     "stage_id": stage.stage_id,
@@ -101,23 +102,21 @@ class FundamentalLearningGateAssessor:
             self._assess_improvement_recognition(stages_cfg.get("improvement_recognition", {})),
             self._assess_failure_feedback(stages_cfg.get("failure_feedback_loop", {})),
         )
-        digest = sha256(
-            json.dumps(
-                {
-                    "evaluated_at": evaluated_at.isoformat(),
-                    "stages": [s.status.value for s in assessments],
-                },
-                sort_keys=True,
-            ).encode()
-        ).hexdigest()
-        return FundamentalLearningGateReport(
+        report = FundamentalLearningGateReport(
             evaluated_at=evaluated_at,
             overall_status=str(policy.get("overall_status", "MEMORY_FOUNDATION_ONLY")),
             operational_apply_complete=bool(policy.get("operational_apply_complete", False)),
             efficacy_validation=str(policy.get("efficacy_validation", "NEEDS_HARDENING")),
             stages=assessments,
-            report_digest=digest,
+            report_digest="",
         )
+        body = report.to_document()
+        body.pop("report_digest")
+        digest = sha256(
+            json.dumps(body, sort_keys=True, ensure_ascii=False,
+                       separators=(",", ":"), allow_nan=False).encode("utf-8")
+        ).hexdigest()
+        return replace(report, report_digest=digest)
 
     def assess_and_persist(self, *, now: datetime | None = None, dry_run: bool = False) -> FundamentalLearningGateReport:
         report = self.assess(now=now)

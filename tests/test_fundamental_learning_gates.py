@@ -69,3 +69,38 @@ def test_gate_assessor_memory_foundation_defaults(tmp_path: Path):
         GateStatus.CANDIDATE_EVIDENCE,
         GateStatus.READY_FOR_REVIEW,
     }
+
+
+def test_report_digest_binds_evidence_even_when_statuses_are_unchanged(tmp_path: Path):
+    """Different observed evidence must not share a report identity or filename."""
+    from hashlib import sha256
+
+    policy = tmp_path / "config" / "arkaon-fundamental-learning-gates.json"
+    policy.parent.mkdir(parents=True)
+    policy.write_text(json.dumps({
+        "schema_version": "apf.fundamental-learning-gates/v1", "stages": {},
+    }), encoding="utf-8")
+    hourly = tmp_path / "state" / "hourly-learning" / "cycles.jsonl"
+    hourly.parent.mkdir(parents=True)
+    now = datetime(2026, 11, 5, 0, tzinfo=UTC)
+    row = {"topic": {"observed_at": now.isoformat(), "timezone": "UTC",
+                     "local_hour": 0}, "cycle": {"failed": 0}}
+    hourly.write_text(json.dumps(row) + "\n", encoding="utf-8")
+    assessor = FundamentalLearningGateAssessor(foundry_root=tmp_path)
+    before = assessor.assess_and_persist(now=now)
+    assert assessor.assess(now=now).report_digest == before.report_digest
+    hourly.write_text((json.dumps(row) + "\n") * 2, encoding="utf-8")
+    after = assessor.assess_and_persist(now=now)
+    assert [s.status for s in before.stages] == [s.status for s in after.stages]
+    assert before.stages[0].evidence != after.stages[0].evidence
+    assert before.report_digest != after.report_digest
+    assert len(list(assessor.store_root.glob("*.json"))) == 2
+    body = after.to_document()
+    observed = body.pop("report_digest")
+    assert observed == sha256(json.dumps(
+        body, sort_keys=True, ensure_ascii=False, separators=(",", ":"), allow_nan=False,
+    ).encode("utf-8")).hexdigest()
+    body["stages"][0]["blockers"].append("changed failure reason")
+    assert observed != sha256(json.dumps(
+        body, sort_keys=True, ensure_ascii=False, separators=(",", ":"), allow_nan=False,
+    ).encode("utf-8")).hexdigest()
