@@ -30,3 +30,8 @@ state/orchestrator-state.json
 state/orchestrator.run.lock
 quarantine/*.json
 knowledge/reflective-lessons/*.json
+
+# Local verification worker receipts, locks, image connection and detached worktrees
+state/verification-worker/
+state/verification-worker-connection.json
+state/verification-worker-connection.json.tmp

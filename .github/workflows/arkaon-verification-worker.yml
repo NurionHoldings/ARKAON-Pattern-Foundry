@@ -1,0 +1,75 @@
+name: ARKAON verification worker
+on:
+  pull_request:
+    paths:
+      - 'src/apf/verification_worker.py'
+      - 'src/apf/self_improvement_relay.py'
+      - 'Dockerfile.verification-worker'
+      - 'Dockerfile.verification-worker.dockerignore'
+      - 'requests/verification/**'
+      - 'approvals/self-improvement/main-integration-20261105-verify.json'
+      - 'tests/test_verification_worker.py'
+      - '.github/workflows/arkaon-verification-worker.yml'
+permissions:
+  contents: read
+jobs:
+  execute-approved-verification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Install host queue consumer
+        run: pip install -e '.[dev]'
+      - name: Worker and approval regression tests
+        run: pytest -q tests/test_verification_worker.py tests/test_worker_runtime.py tests/test_self_improvement_execution.py tests/test_self_improvement_relay.py
+      - name: Prepare isolated verification image (execution remains offline)
+        env:
+          WORKER_SHA: ${{ github.event.pull_request.head.sha }}
+        run: docker build -f Dockerfile.verification-worker -t "apf-verifier:$WORKER_SHA" .
+      - name: Consume immutable approval and run actual ARKAON runtime
+        env:
+          WORKER_SHA: ${{ github.event.pull_request.head.sha }}
+          APF_WORKER_HOST_MARKER: must-not-enter-container
+        run: |
+          image_id=$(docker image inspect "apf-verifier:$WORKER_SHA" --format '{{.Id}}')
+          PYTHONPATH=src python -m apf.verification_worker --foundry-root "$RUNNER_TEMP/arkaon-verification" --repository-root "$GITHUB_WORKSPACE" --image "$image_id" --worker-id arkaon-ci-verifier --seed-request main-integration-20261105-verify --approval-source-sha "$WORKER_SHA"
+      - name: Check actual receipt and duplicate suppression
+        env:
+          WORKER_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          image_id=$(docker image inspect "apf-verifier:$WORKER_SHA" --format '{{.Id}}')
+          PYTHONPATH=src python -m apf.verification_worker --foundry-root "$RUNNER_TEMP/arkaon-verification" --repository-root "$GITHUB_WORKSPACE" --image "$image_id" --worker-id arkaon-ci-verifier
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'arkaon-verification/state/verification-worker'
+          latest = json.loads((root/'latest.json').read_text())
+          assert latest['already_completed'] == ['main-integration-20261105-verify']
+          result = json.loads((root/'completed/main-integration-20261105-verify.json').read_text())
+          assert result['status'] == 'PASS'
+          assert result['runtime_receipt']['status'] == 'SUCCEEDED'
+          assert result['worker_kind'] == 'FIXED_TEST_AUTOMATION'
+          assert len(result['profiles']) == 4
+          assert result['first_verification_complete'] is False
+          assert result['merge_allowed'] is result['deployment_allowed'] is False
+          print(json.dumps({'worker_id': result['worker_id'], 'execution_id': result['execution_id'], 'tested_head': result['tested_head'], 'evidence_digest': result['evidence_digest']}))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: arkaon-worker-receipts-${{ github.event.pull_request.head.sha }}
+          path: |
+            ${{ runner.temp }}/arkaon-verification/state/verification-worker/runs/
+            ${{ runner.temp }}/arkaon-verification/state/verification-worker/completed/
+            ${{ runner.temp }}/arkaon-verification/state/verification-worker/latest.json
+            ${{ runner.temp }}/arkaon-verification/state/owner-approvals.json
+            ${{ runner.temp }}/arkaon-verification/state/self-improvement-execution-queue/
+          retention-days: 14

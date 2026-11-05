@@ -1,0 +1,23 @@
+{
+  "schema_version": "apf.owner-approval-receipt/1.0",
+  "state": "OWNER_APPROVED",
+  "request_id": "main-integration-20261105-verify",
+  "scope_digest": "4ed95c88c5775d7fa10a6bcb5cbf39aaf9761c1454b0a01ab6b7c5d80b749bd2",
+  "approver": "최인석",
+  "approved_at": "2026-11-05T04:41:24.037720+00:00",
+  "allowed_paths": [
+    ".github/workflows",
+    "config",
+    "docs/integration/main-20261105",
+    "orchestrator",
+    "services",
+    "src/apf",
+    "tests"
+  ],
+  "allowed_operations": [
+    "READ_WORKTREE",
+    "RUN_TESTS",
+    "GENERATE_ARTIFACT"
+  ],
+  "approval_basis": "사용자의 실행 연결부 추가 구현·연결 지시에 따른 고정 프로필 검증. 병합·배포 승인이 아니며 암호학적 사용자 서명을 주장하지 않음."
+}

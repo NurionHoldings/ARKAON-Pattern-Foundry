@@ -23,6 +23,7 @@ from .self_improvement_execution import (
     GhApprovalSource,
     sync_approval_receipts,
 )
+from .verification_worker import load_verification_connection, start_verification_worker
 
 
 class RelayError(RuntimeError):
@@ -56,6 +57,7 @@ class RelayCycle:
     audits: AuditQueueResult | None
     internal_audit: InternalAuditResult | None
     mailbox: dict[str, object]
+    verification_worker_launched: bool | None = None
 
 
 def _canonical_scope(document: dict[str, object]) -> dict[str, object]:
@@ -232,6 +234,8 @@ def relay_cycle(
     audit_repository_root: Path | None = None,
     audit_policy_path: Path | None = None,
     deployment_baseline_path: Path | None = None,
+    verification_image: str | None = None,
+    verification_request: str | None = None,
 ) -> RelayCycle:
     delivered, blocked = relay_once(foundry_root=foundry_root, publisher=publisher)
     approvals = None
@@ -246,6 +250,19 @@ def relay_cycle(
                 if isinstance(receipt.get("scope_digest"), str)
             },
         )
+    worker_launched = None
+    if verification_image is not None:
+        try:
+            worker_launched = start_verification_worker(
+                foundry_root=foundry_root, repository_root=foundry_root,
+                image=verification_image, request_id=verification_request,
+            )
+        except (ValueError, OSError, subprocess.SubprocessError) as exc:
+            worker_launched = False
+            state_path = foundry_root / "state" / "verification-worker" / "launcher-status.json"
+            state_path.parent.mkdir(parents=True, exist_ok=True)
+            state_path.write_text(json.dumps({"status": "BLOCKED",
+                                  "reason": type(exc).__name__}), encoding="utf-8")
     audits = None
     if audit_repository_root is not None or audit_policy_path is not None:
         if audit_repository_root is None or audit_policy_path is None:
@@ -291,6 +308,7 @@ def relay_cycle(
         audits=audits,
         internal_audit=internal_audit,
         mailbox=mailbox,
+        verification_worker_launched=worker_launched,
     )
 
 
@@ -401,6 +419,8 @@ def main() -> int:
     parser.add_argument("--mailbox-batch-size", type=int, default=30)
     parser.add_argument("--audit-policy", type=Path)
     parser.add_argument("--deployment-baseline", type=Path)
+    parser.add_argument("--verification-image", default=os.environ.get("APF_VERIFICATION_IMAGE"))
+    parser.add_argument("--verification-request", default=os.environ.get("APF_VERIFICATION_REQUEST"))
     arguments = parser.parse_args()
     publisher = GhPublisher(arguments.repository)
     approval_source = GhApprovalSource(arguments.repository)
@@ -411,6 +431,14 @@ def main() -> int:
         arguments.foundry_root / "state" / "audit-bot-deployment-baseline.json"
     )
     while True:
+        verification_image, verification_request = arguments.verification_image, arguments.verification_request
+        if verification_image is None:
+            try:
+                verification_image, verification_request = load_verification_connection(arguments.foundry_root)
+            except (ValueError, OSError):
+                status_path = arguments.foundry_root / "state" / "verification-worker" / "launcher-status.json"
+                status_path.parent.mkdir(parents=True, exist_ok=True)
+                status_path.write_text(json.dumps({"status": "BLOCKED", "reason": "CONNECTION_CONFIG_INVALID"}), encoding="utf-8")
         relay_cycle(
             foundry_root=arguments.foundry_root.resolve(),
             publisher=publisher,
@@ -419,6 +447,8 @@ def main() -> int:
             audit_repository_root=arguments.foundry_root.resolve(),
             audit_policy_path=audit_policy.resolve(),
             deployment_baseline_path=deployment_baseline.resolve(),
+            verification_image=verification_image,
+            verification_request=verification_request,
         )
         if arguments.watch_seconds <= 0:
             return 0

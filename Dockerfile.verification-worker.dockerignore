@@ -1,0 +1,8 @@
+**
+!pyproject.toml
+!src/
+!src/apf/
+!src/apf/**
+!db/
+!db/migrations/
+!db/migrations/**
