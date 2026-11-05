@@ -44,7 +44,15 @@
     if(!items.length) root.innerHTML='<li class="muted">저장된 작업이 없습니다.</li>';
     else for(const item of items){
       const li=document.createElement('li');
-      li.innerHTML=`<span>${item.title} <span class="chip">${item.type}</span></span><span class="muted">${item.updated_at?.slice(0,19)||''}</span>`;
+      const label=document.createElement('span');label.textContent=String(item.title||'제목 없는 초안');
+      const chip=document.createElement('span');chip.className='chip';chip.textContent=String(item.type||'');
+      label.append(' ',chip);li.append(label);
+      const date=document.createElement('span');date.className='muted';date.textContent=String(item.updated_at||'').slice(0,19);li.append(date);
+      const editors={site:'site-builder.html','logo-card':'logo-card.html'};
+      const editor=Object.hasOwn(editors,item.type)?editors[item.type]:null;
+      if(editor&&item.brief&&typeof item.id==='string'){
+        const link=document.createElement('a');link.textContent='이어서 편집';link.href=`/services/${editor}?project=${encodeURIComponent(item.id)}`;li.append(link);
+      }
       root.append(li);
     }
   </script>

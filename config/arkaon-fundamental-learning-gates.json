@@ -1,0 +1,48 @@
+{
+  "schema_version": "apf.fundamental-learning-gates/v1",
+  "overall_status": "MEMORY_FOUNDATION_ONLY",
+  "efficacy_validation": "NEEDS_HARDENING",
+  "operational_apply_complete": false,
+  "unmerged_pr_note": "PR #105 및 관련 학습·연결 PR은 미병합. 운영 적용 완료로 표시하지 않음.",
+  "stages": {
+    "execution_24h": {
+      "title": "실제 학습 실행 확인",
+      "completion_criterion": "24시간 실행 기록에서 누락·오류 원인 확인",
+      "lookback_hours": 24,
+      "evidence_paths": [
+        "state/hourly-learning/",
+        "state/hourly-learning-current.json",
+        "state/collector-daemon.json",
+        "state/startup-last-run.json"
+      ]
+    },
+    "lesson_work_linkage": {
+      "title": "교훈을 작업에 연결",
+      "completion_criterion": "실제 작업이 사용한 교훈과 결과를 추적",
+      "min_traced_links": 1,
+      "store_path": "knowledge/lesson-work-traces.jsonl"
+    },
+    "held_out_comparison": {
+      "title": "학습 효과 비교",
+      "completion_criterion": "학습자료와 분리한 과제 20개 이상 전후 비교",
+      "min_held_out_tasks": 20,
+      "registry_path": "state/held-out-evaluation/tasks.json"
+    },
+    "improvement_recognition": {
+      "title": "개선 인정",
+      "completion_criterion": "안전 실패·기존 기능 회귀 없이 목표 실패 감소",
+      "requires_ci_green": true,
+      "requires_regression_suite": true,
+      "metrics_path": "state/held-out-evaluation/metrics.json"
+    },
+    "failure_feedback_loop": {
+      "title": "실패 환류",
+      "completion_criterion": "실패 원인을 다음 학습과제로 만들고 독립 검토",
+      "inbox_paths": [
+        "inbox/eternian-review",
+        "inbox/research"
+      ],
+      "min_failure_derived_packets": 1
+    }
+  }
+}

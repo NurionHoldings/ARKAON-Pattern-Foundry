@@ -1,0 +1,2053 @@
+{
+  "schema_version": "apf.brand-quality-comparison/v1",
+  "run_id": "41952497887",
+  "baseline_sha": "1b2c86b0aadc42453022cb9eec2435b177d56808",
+  "candidate_sha": "daadc407c6588a4668ef72d0b5dd5cba06125a4d",
+  "rows": [
+    {
+      "variant": "baseline",
+      "width": 360,
+      "accent": "#ffffff",
+      "logoTone": "light",
+      "brief_sha256": "24bbd3cd8ac44d9c0e775178c3de3dbc13396fd970e186909b9fef832283caae",
+      "render_sha256": "d71bb54900ec648057c403cf9786ffe004c71f0a880177313297aaebae7fd552",
+      "copy": {
+        "tagline": "건물주을(를) 위한 태양광 시공",
+        "brandIntro": "햇살 에너지은(는) 태양광 시공 분야에서 활동합니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 1
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 1
+        }
+      ],
+      "overflow": false,
+      "pass": false
+    },
+    {
+      "variant": "baseline",
+      "width": 360,
+      "accent": "#ffffff",
+      "logoTone": "dark",
+      "brief_sha256": "f3a80721e629640f780761c000d36c45af69ac14e8fa3abe51872e236de45978",
+      "render_sha256": "413c8130961c908256eff9c302e4d015dd2fe9f2af06b7c06f4693202fca36b0",
+      "copy": {
+        "tagline": "건물주을(를) 위한 태양광 시공",
+        "brandIntro": "햇살 에너지은(는) 태양광 시공 분야에서 활동합니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 1
+        }
+      ],
+      "overflow": false,
+      "pass": false
+    },
+    {
+      "variant": "baseline",
+      "width": 360,
+      "accent": "#ffffff",
+      "logoTone": "mono",
+      "brief_sha256": "6b183755c4851994edd07ffe9de56775b4b35ca1f24c2cf3ca298bae5a756a36",
+      "render_sha256": "8770effbe9b8b18b158c1722d6ac0916a0458fd2d6d0ff404aa428632b7af164",
+      "copy": {
+        "tagline": "건물주을(를) 위한 태양광 시공",
+        "brandIntro": "햇살 에너지은(는) 태양광 시공 분야에서 활동합니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(23, 43, 36)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 1
+        }
+      ],
+      "overflow": false,
+      "pass": false
+    },
+    {
+      "variant": "baseline",
+      "width": 360,
+      "accent": "#fffffe",
+      "logoTone": "light",
+      "brief_sha256": "d0eb99b693aadeba93df366e51f935861be919938c08ca31c74c0e7779f32623",
+      "render_sha256": "2f98e6c07cd909b04553ad90c21d95183038b9ddacad882fba4faeafd29bf8d3",
+      "copy": {
+        "tagline": "건물주을(를) 위한 태양광 시공",
+        "brandIntro": "햇살 에너지은(는) 태양광 시공 분야에서 활동합니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(255, 255, 254)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 1.0006122113242268
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(255, 255, 254)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 1.0006122113242268
+        }
+      ],
+      "overflow": false,
+      "pass": false
+    },
+    {
+      "variant": "baseline",
+      "width": 360,
+      "accent": "#fffffe",
+      "logoTone": "dark",
+      "brief_sha256": "4f66e6c817b63cd75c05bd0c7f7173fd7130dccd8db012a1f3d09bacb0707932",
+      "render_sha256": "819d0bc24cfbab9dcec23400cf7140d0edd08ee25b8c56da190ccdba688a9b56",
+      "copy": {
+        "tagline": "건물주을(를) 위한 태양광 시공",
+        "brandIntro": "햇살 에너지은(는) 태양광 시공 분야에서 활동합니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(255, 255, 254)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 1.0006122113242268
+        }
+      ],
+      "overflow": false,
+      "pass": false
+    },
+    {
+      "variant": "baseline",
+      "width": 360,
+      "accent": "#fffffe",
+      "logoTone": "mono",
+      "brief_sha256": "f2309d1eddb40ac368e3f8e33d95956f55de103c0861164c6ca6f21b885222a5",
+      "render_sha256": "935ca1ba8a99d1a9e80dfe102d7a83473b81d16855a561efe918b1c01d64410a",
+      "copy": {
+        "tagline": "건물주을(를) 위한 태양광 시공",
+        "brandIntro": "햇살 에너지은(는) 태양광 시공 분야에서 활동합니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(23, 43, 36)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(255, 255, 254)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 1.0006122113242268
+        }
+      ],
+      "overflow": false,
+      "pass": false
+    },
+    {
+      "variant": "baseline",
+      "width": 360,
+      "accent": "#e3c46d",
+      "logoTone": "light",
+      "brief_sha256": "1e7fa6ed7ac2fb9fcac14e1037a803ce55ca533442e784b0ae6382bcca05d2b4",
+      "render_sha256": "f076e2dc57375e0fa9c4873af7e5bbc2bd4637219f66415b89f48241aae4cb94",
+      "copy": {
+        "tagline": "건물주을(를) 위한 태양광 시공",
+        "brandIntro": "햇살 에너지은(는) 태양광 시공 분야에서 활동합니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(227, 196, 109)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 1.6958767809480404
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(227, 196, 109)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 1.6958767809480404
+        }
+      ],
+      "overflow": false,
+      "pass": false
+    },
+    {
+      "variant": "baseline",
+      "width": 360,
+      "accent": "#e3c46d",
+      "logoTone": "dark",
+      "brief_sha256": "643b3c836c0c0d4fe0dd98688b37b209f980ad5ba890c552492952320552cca3",
+      "render_sha256": "55f47ec2eabc2d469e23b2284a378784131d9f98d126a2752d0d062ee669418d",
+      "copy": {
+        "tagline": "건물주을(를) 위한 태양광 시공",
+        "brandIntro": "햇살 에너지은(는) 태양광 시공 분야에서 활동합니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(227, 196, 109)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 1.6958767809480404
+        }
+      ],
+      "overflow": false,
+      "pass": false
+    },
+    {
+      "variant": "baseline",
+      "width": 360,
+      "accent": "#e3c46d",
+      "logoTone": "mono",
+      "brief_sha256": "14ab6f5a3fd435fdc9e8385b496ff7dbea85b2b6f4d347df9cda397e5b077f8f",
+      "render_sha256": "224d06a2562bbe0710a0f91466b845c057e541c1850ffdc5b1c44c25c27939d9",
+      "copy": {
+        "tagline": "건물주을(를) 위한 태양광 시공",
+        "brandIntro": "햇살 에너지은(는) 태양광 시공 분야에서 활동합니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(23, 43, 36)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(227, 196, 109)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 1.6958767809480404
+        }
+      ],
+      "overflow": false,
+      "pass": false
+    },
+    {
+      "variant": "baseline",
+      "width": 360,
+      "accent": "#888888",
+      "logoTone": "light",
+      "brief_sha256": "7079daa39cf689203454c78bce9affa81c4f03985dbfba191e55946c47b60a76",
+      "render_sha256": "244ff675d36fa0803e5c9155f0fe4fc205f495ad2b630c7409206b6b237e7f66",
+      "copy": {
+        "tagline": "건물주을(를) 위한 태양광 시공",
+        "brandIntro": "햇살 에너지은(는) 태양광 시공 분야에서 활동합니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(136, 136, 136)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 3.5448862152994005
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(136, 136, 136)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 3.5448862152994005
+        }
+      ],
+      "overflow": false,
+      "pass": false
+    },
+    {
+      "variant": "baseline",
+      "width": 360,
+      "accent": "#888888",
+      "logoTone": "dark",
+      "brief_sha256": "f3ea4ac8e9c4b982ed0974e28c7b71248be88989ae349bacaf9417f63a98af03",
+      "render_sha256": "0ebfc3ae7036392d5447e62f945962c127d0961c0013370eaa8f49566fc28309",
+      "copy": {
+        "tagline": "건물주을(를) 위한 태양광 시공",
+        "brandIntro": "햇살 에너지은(는) 태양광 시공 분야에서 활동합니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(136, 136, 136)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 3.5448862152994005
+        }
+      ],
+      "overflow": false,
+      "pass": false
+    },
+    {
+      "variant": "baseline",
+      "width": 360,
+      "accent": "#888888",
+      "logoTone": "mono",
+      "brief_sha256": "ed92d8fa11a03b6d87cbf12750b5498866d5a5e2918962483a35094ed4b2d558",
+      "render_sha256": "908a2706ecb90e9caee219643a1e02bf6f9738ab749b9e296afde1547d23cb0b",
+      "copy": {
+        "tagline": "건물주을(를) 위한 태양광 시공",
+        "brandIntro": "햇살 에너지은(는) 태양광 시공 분야에서 활동합니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(23, 43, 36)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(136, 136, 136)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 3.5448862152994005
+        }
+      ],
+      "overflow": false,
+      "pass": false
+    },
+    {
+      "variant": "baseline",
+      "width": 360,
+      "accent": "#31594c",
+      "logoTone": "light",
+      "brief_sha256": "5fe6bab9ee33df90886403078364d7816dae0bbb1b8f892c84ac286ac5563122",
+      "render_sha256": "6da8435342ee3cad71c9b7d94b44430f92ab0e71d54680efd729030f3d154f29",
+      "copy": {
+        "tagline": "건물주을(를) 위한 태양광 시공",
+        "brandIntro": "햇살 에너지은(는) 태양광 시공 분야에서 활동합니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(49, 89, 76)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 7.88316245111733
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(49, 89, 76)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 7.88316245111733
+        }
+      ],
+      "overflow": false,
+      "pass": false
+    },
+    {
+      "variant": "baseline",
+      "width": 360,
+      "accent": "#31594c",
+      "logoTone": "dark",
+      "brief_sha256": "f0b4dc4b38ce763d3c0768b28ef97dcf7591446516f83cee59fbac014389baaa",
+      "render_sha256": "f96141b5f2db827cf4c6cb02b32ff67416639e57108d7c0ee5c2b6d903b7a538",
+      "copy": {
+        "tagline": "건물주을(를) 위한 태양광 시공",
+        "brandIntro": "햇살 에너지은(는) 태양광 시공 분야에서 활동합니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(49, 89, 76)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 7.88316245111733
+        }
+      ],
+      "overflow": false,
+      "pass": false
+    },
+    {
+      "variant": "baseline",
+      "width": 360,
+      "accent": "#31594c",
+      "logoTone": "mono",
+      "brief_sha256": "932d7708e52517bed34e539fa5383b857464a19973396e943cd4fb02e0a1b893",
+      "render_sha256": "832e92acb54ed881d003f907437b49fa3559c58c4fb7a222cbe9ccabbdee1e5d",
+      "copy": {
+        "tagline": "건물주을(를) 위한 태양광 시공",
+        "brandIntro": "햇살 에너지은(는) 태양광 시공 분야에서 활동합니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(23, 43, 36)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(49, 89, 76)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 7.88316245111733
+        }
+      ],
+      "overflow": false,
+      "pass": false
+    },
+    {
+      "variant": "baseline",
+      "width": 360,
+      "accent": "#000000",
+      "logoTone": "light",
+      "brief_sha256": "b3d40529b8d33f88b58c9e0fe7ad3a84a4be11667d4d4e87d1d857d4d52ecbf3",
+      "render_sha256": "e9f296d3a4291229df054dbad0792261d236b8743e917d5460aa1de88e2c0786",
+      "copy": {
+        "tagline": "건물주을(를) 위한 태양광 시공",
+        "brandIntro": "햇살 에너지은(는) 태양광 시공 분야에서 활동합니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(0, 0, 0)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 21
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(0, 0, 0)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 21
+        }
+      ],
+      "overflow": false,
+      "pass": false
+    },
+    {
+      "variant": "baseline",
+      "width": 360,
+      "accent": "#000000",
+      "logoTone": "dark",
+      "brief_sha256": "3abb3f5de08f425ec157a400f0306496f2fa7be449a8a2ec2a816b978a36af03",
+      "render_sha256": "e8e759296939c911892a6f1e4637670dc81491ec9bc54463925d4e76ade99b8c",
+      "copy": {
+        "tagline": "건물주을(를) 위한 태양광 시공",
+        "brandIntro": "햇살 에너지은(는) 태양광 시공 분야에서 활동합니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(0, 0, 0)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 21
+        }
+      ],
+      "overflow": false,
+      "pass": false
+    },
+    {
+      "variant": "baseline",
+      "width": 360,
+      "accent": "#000000",
+      "logoTone": "mono",
+      "brief_sha256": "6374196c8ad1c46c83621fd67aa691db12e8681c4ba0b6469e40c085b05c2dce",
+      "render_sha256": "084c2d801517f3fa669cb62e9c18ed89be18cc99f16b7ffa15a804f0e3ac8813",
+      "copy": {
+        "tagline": "건물주을(를) 위한 태양광 시공",
+        "brandIntro": "햇살 에너지은(는) 태양광 시공 분야에서 활동합니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(23, 43, 36)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(0, 0, 0)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 21
+        }
+      ],
+      "overflow": false,
+      "pass": false
+    },
+    {
+      "variant": "baseline",
+      "width": 390,
+      "accent": "#ffffff",
+      "logoTone": "light",
+      "brief_sha256": "24bbd3cd8ac44d9c0e775178c3de3dbc13396fd970e186909b9fef832283caae",
+      "render_sha256": "d71bb54900ec648057c403cf9786ffe004c71f0a880177313297aaebae7fd552",
+      "copy": {
+        "tagline": "건물주을(를) 위한 태양광 시공",
+        "brandIntro": "햇살 에너지은(는) 태양광 시공 분야에서 활동합니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 1
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 1
+        }
+      ],
+      "overflow": false,
+      "pass": false
+    },
+    {
+      "variant": "baseline",
+      "width": 390,
+      "accent": "#ffffff",
+      "logoTone": "dark",
+      "brief_sha256": "f3a80721e629640f780761c000d36c45af69ac14e8fa3abe51872e236de45978",
+      "render_sha256": "413c8130961c908256eff9c302e4d015dd2fe9f2af06b7c06f4693202fca36b0",
+      "copy": {
+        "tagline": "건물주을(를) 위한 태양광 시공",
+        "brandIntro": "햇살 에너지은(는) 태양광 시공 분야에서 활동합니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 1
+        }
+      ],
+      "overflow": false,
+      "pass": false
+    },
+    {
+      "variant": "baseline",
+      "width": 390,
+      "accent": "#ffffff",
+      "logoTone": "mono",
+      "brief_sha256": "6b183755c4851994edd07ffe9de56775b4b35ca1f24c2cf3ca298bae5a756a36",
+      "render_sha256": "8770effbe9b8b18b158c1722d6ac0916a0458fd2d6d0ff404aa428632b7af164",
+      "copy": {
+        "tagline": "건물주을(를) 위한 태양광 시공",
+        "brandIntro": "햇살 에너지은(는) 태양광 시공 분야에서 활동합니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(23, 43, 36)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 1
+        }
+      ],
+      "overflow": false,
+      "pass": false
+    },
+    {
+      "variant": "baseline",
+      "width": 390,
+      "accent": "#fffffe",
+      "logoTone": "light",
+      "brief_sha256": "d0eb99b693aadeba93df366e51f935861be919938c08ca31c74c0e7779f32623",
+      "render_sha256": "2f98e6c07cd909b04553ad90c21d95183038b9ddacad882fba4faeafd29bf8d3",
+      "copy": {
+        "tagline": "건물주을(를) 위한 태양광 시공",
+        "brandIntro": "햇살 에너지은(는) 태양광 시공 분야에서 활동합니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(255, 255, 254)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 1.0006122113242268
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(255, 255, 254)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 1.0006122113242268
+        }
+      ],
+      "overflow": false,
+      "pass": false
+    },
+    {
+      "variant": "baseline",
+      "width": 390,
+      "accent": "#fffffe",
+      "logoTone": "dark",
+      "brief_sha256": "4f66e6c817b63cd75c05bd0c7f7173fd7130dccd8db012a1f3d09bacb0707932",
+      "render_sha256": "819d0bc24cfbab9dcec23400cf7140d0edd08ee25b8c56da190ccdba688a9b56",
+      "copy": {
+        "tagline": "건물주을(를) 위한 태양광 시공",
+        "brandIntro": "햇살 에너지은(는) 태양광 시공 분야에서 활동합니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(255, 255, 254)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 1.0006122113242268
+        }
+      ],
+      "overflow": false,
+      "pass": false
+    },
+    {
+      "variant": "baseline",
+      "width": 390,
+      "accent": "#fffffe",
+      "logoTone": "mono",
+      "brief_sha256": "f2309d1eddb40ac368e3f8e33d95956f55de103c0861164c6ca6f21b885222a5",
+      "render_sha256": "935ca1ba8a99d1a9e80dfe102d7a83473b81d16855a561efe918b1c01d64410a",
+      "copy": {
+        "tagline": "건물주을(를) 위한 태양광 시공",
+        "brandIntro": "햇살 에너지은(는) 태양광 시공 분야에서 활동합니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(23, 43, 36)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(255, 255, 254)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 1.0006122113242268
+        }
+      ],
+      "overflow": false,
+      "pass": false
+    },
+    {
+      "variant": "baseline",
+      "width": 390,
+      "accent": "#e3c46d",
+      "logoTone": "light",
+      "brief_sha256": "1e7fa6ed7ac2fb9fcac14e1037a803ce55ca533442e784b0ae6382bcca05d2b4",
+      "render_sha256": "f076e2dc57375e0fa9c4873af7e5bbc2bd4637219f66415b89f48241aae4cb94",
+      "copy": {
+        "tagline": "건물주을(를) 위한 태양광 시공",
+        "brandIntro": "햇살 에너지은(는) 태양광 시공 분야에서 활동합니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(227, 196, 109)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 1.6958767809480404
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(227, 196, 109)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 1.6958767809480404
+        }
+      ],
+      "overflow": false,
+      "pass": false
+    },
+    {
+      "variant": "baseline",
+      "width": 390,
+      "accent": "#e3c46d",
+      "logoTone": "dark",
+      "brief_sha256": "643b3c836c0c0d4fe0dd98688b37b209f980ad5ba890c552492952320552cca3",
+      "render_sha256": "55f47ec2eabc2d469e23b2284a378784131d9f98d126a2752d0d062ee669418d",
+      "copy": {
+        "tagline": "건물주을(를) 위한 태양광 시공",
+        "brandIntro": "햇살 에너지은(는) 태양광 시공 분야에서 활동합니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(227, 196, 109)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 1.6958767809480404
+        }
+      ],
+      "overflow": false,
+      "pass": false
+    },
+    {
+      "variant": "baseline",
+      "width": 390,
+      "accent": "#e3c46d",
+      "logoTone": "mono",
+      "brief_sha256": "14ab6f5a3fd435fdc9e8385b496ff7dbea85b2b6f4d347df9cda397e5b077f8f",
+      "render_sha256": "224d06a2562bbe0710a0f91466b845c057e541c1850ffdc5b1c44c25c27939d9",
+      "copy": {
+        "tagline": "건물주을(를) 위한 태양광 시공",
+        "brandIntro": "햇살 에너지은(는) 태양광 시공 분야에서 활동합니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(23, 43, 36)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(227, 196, 109)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 1.6958767809480404
+        }
+      ],
+      "overflow": false,
+      "pass": false
+    },
+    {
+      "variant": "baseline",
+      "width": 390,
+      "accent": "#888888",
+      "logoTone": "light",
+      "brief_sha256": "7079daa39cf689203454c78bce9affa81c4f03985dbfba191e55946c47b60a76",
+      "render_sha256": "244ff675d36fa0803e5c9155f0fe4fc205f495ad2b630c7409206b6b237e7f66",
+      "copy": {
+        "tagline": "건물주을(를) 위한 태양광 시공",
+        "brandIntro": "햇살 에너지은(는) 태양광 시공 분야에서 활동합니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(136, 136, 136)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 3.5448862152994005
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(136, 136, 136)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 3.5448862152994005
+        }
+      ],
+      "overflow": false,
+      "pass": false
+    },
+    {
+      "variant": "baseline",
+      "width": 390,
+      "accent": "#888888",
+      "logoTone": "dark",
+      "brief_sha256": "f3ea4ac8e9c4b982ed0974e28c7b71248be88989ae349bacaf9417f63a98af03",
+      "render_sha256": "0ebfc3ae7036392d5447e62f945962c127d0961c0013370eaa8f49566fc28309",
+      "copy": {
+        "tagline": "건물주을(를) 위한 태양광 시공",
+        "brandIntro": "햇살 에너지은(는) 태양광 시공 분야에서 활동합니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(136, 136, 136)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 3.5448862152994005
+        }
+      ],
+      "overflow": false,
+      "pass": false
+    },
+    {
+      "variant": "baseline",
+      "width": 390,
+      "accent": "#888888",
+      "logoTone": "mono",
+      "brief_sha256": "ed92d8fa11a03b6d87cbf12750b5498866d5a5e2918962483a35094ed4b2d558",
+      "render_sha256": "908a2706ecb90e9caee219643a1e02bf6f9738ab749b9e296afde1547d23cb0b",
+      "copy": {
+        "tagline": "건물주을(를) 위한 태양광 시공",
+        "brandIntro": "햇살 에너지은(는) 태양광 시공 분야에서 활동합니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(23, 43, 36)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(136, 136, 136)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 3.5448862152994005
+        }
+      ],
+      "overflow": false,
+      "pass": false
+    },
+    {
+      "variant": "baseline",
+      "width": 390,
+      "accent": "#31594c",
+      "logoTone": "light",
+      "brief_sha256": "5fe6bab9ee33df90886403078364d7816dae0bbb1b8f892c84ac286ac5563122",
+      "render_sha256": "6da8435342ee3cad71c9b7d94b44430f92ab0e71d54680efd729030f3d154f29",
+      "copy": {
+        "tagline": "건물주을(를) 위한 태양광 시공",
+        "brandIntro": "햇살 에너지은(는) 태양광 시공 분야에서 활동합니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(49, 89, 76)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 7.88316245111733
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(49, 89, 76)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 7.88316245111733
+        }
+      ],
+      "overflow": false,
+      "pass": false
+    },
+    {
+      "variant": "baseline",
+      "width": 390,
+      "accent": "#31594c",
+      "logoTone": "dark",
+      "brief_sha256": "f0b4dc4b38ce763d3c0768b28ef97dcf7591446516f83cee59fbac014389baaa",
+      "render_sha256": "f96141b5f2db827cf4c6cb02b32ff67416639e57108d7c0ee5c2b6d903b7a538",
+      "copy": {
+        "tagline": "건물주을(를) 위한 태양광 시공",
+        "brandIntro": "햇살 에너지은(는) 태양광 시공 분야에서 활동합니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(49, 89, 76)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 7.88316245111733
+        }
+      ],
+      "overflow": false,
+      "pass": false
+    },
+    {
+      "variant": "baseline",
+      "width": 390,
+      "accent": "#31594c",
+      "logoTone": "mono",
+      "brief_sha256": "932d7708e52517bed34e539fa5383b857464a19973396e943cd4fb02e0a1b893",
+      "render_sha256": "832e92acb54ed881d003f907437b49fa3559c58c4fb7a222cbe9ccabbdee1e5d",
+      "copy": {
+        "tagline": "건물주을(를) 위한 태양광 시공",
+        "brandIntro": "햇살 에너지은(는) 태양광 시공 분야에서 활동합니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(23, 43, 36)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(49, 89, 76)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 7.88316245111733
+        }
+      ],
+      "overflow": false,
+      "pass": false
+    },
+    {
+      "variant": "baseline",
+      "width": 390,
+      "accent": "#000000",
+      "logoTone": "light",
+      "brief_sha256": "b3d40529b8d33f88b58c9e0fe7ad3a84a4be11667d4d4e87d1d857d4d52ecbf3",
+      "render_sha256": "e9f296d3a4291229df054dbad0792261d236b8743e917d5460aa1de88e2c0786",
+      "copy": {
+        "tagline": "건물주을(를) 위한 태양광 시공",
+        "brandIntro": "햇살 에너지은(는) 태양광 시공 분야에서 활동합니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(0, 0, 0)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 21
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(0, 0, 0)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 21
+        }
+      ],
+      "overflow": false,
+      "pass": false
+    },
+    {
+      "variant": "baseline",
+      "width": 390,
+      "accent": "#000000",
+      "logoTone": "dark",
+      "brief_sha256": "3abb3f5de08f425ec157a400f0306496f2fa7be449a8a2ec2a816b978a36af03",
+      "render_sha256": "e8e759296939c911892a6f1e4637670dc81491ec9bc54463925d4e76ade99b8c",
+      "copy": {
+        "tagline": "건물주을(를) 위한 태양광 시공",
+        "brandIntro": "햇살 에너지은(는) 태양광 시공 분야에서 활동합니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(0, 0, 0)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 21
+        }
+      ],
+      "overflow": false,
+      "pass": false
+    },
+    {
+      "variant": "baseline",
+      "width": 390,
+      "accent": "#000000",
+      "logoTone": "mono",
+      "brief_sha256": "6374196c8ad1c46c83621fd67aa691db12e8681c4ba0b6469e40c085b05c2dce",
+      "render_sha256": "084c2d801517f3fa669cb62e9c18ed89be18cc99f16b7ffa15a804f0e3ac8813",
+      "copy": {
+        "tagline": "건물주을(를) 위한 태양광 시공",
+        "brandIntro": "햇살 에너지은(는) 태양광 시공 분야에서 활동합니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(23, 43, 36)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(0, 0, 0)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 21
+        }
+      ],
+      "overflow": false,
+      "pass": false
+    },
+    {
+      "variant": "candidate",
+      "width": 360,
+      "accent": "#ffffff",
+      "logoTone": "light",
+      "brief_sha256": "24bbd3cd8ac44d9c0e775178c3de3dbc13396fd970e186909b9fef832283caae",
+      "render_sha256": "d187c306d79138eabe1e7c6fe67bb11f056f03ee793a96471a14ff4378aa975b",
+      "copy": {
+        "tagline": "건물주 대상 태양광 시공",
+        "brandIntro": "태양광 시공 분야의 햇살 에너지입니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.92052235318248
+        }
+      ],
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "variant": "candidate",
+      "width": 360,
+      "accent": "#ffffff",
+      "logoTone": "dark",
+      "brief_sha256": "f3a80721e629640f780761c000d36c45af69ac14e8fa3abe51872e236de45978",
+      "render_sha256": "d187c306d79138eabe1e7c6fe67bb11f056f03ee793a96471a14ff4378aa975b",
+      "copy": {
+        "tagline": "건물주 대상 태양광 시공",
+        "brandIntro": "태양광 시공 분야의 햇살 에너지입니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.92052235318248
+        }
+      ],
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "variant": "candidate",
+      "width": 360,
+      "accent": "#ffffff",
+      "logoTone": "mono",
+      "brief_sha256": "6b183755c4851994edd07ffe9de56775b4b35ca1f24c2cf3ca298bae5a756a36",
+      "render_sha256": "257751e9aa251eb5043f6daf126380b8b8f91dc8223ac40cee39ce11bc7f03d2",
+      "copy": {
+        "tagline": "건물주 대상 태양광 시공",
+        "brandIntro": "태양광 시공 분야의 햇살 에너지입니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(23, 43, 36)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.92052235318248
+        }
+      ],
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "variant": "candidate",
+      "width": 360,
+      "accent": "#fffffe",
+      "logoTone": "light",
+      "brief_sha256": "d0eb99b693aadeba93df366e51f935861be919938c08ca31c74c0e7779f32623",
+      "render_sha256": "e25258329f6433ac1bea46c9902027fedb8cbf576960123994a4bd082a5aa8ef",
+      "copy": {
+        "tagline": "건물주 대상 태양광 시공",
+        "brandIntro": "태양광 시공 분야의 햇살 에너지입니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(255, 255, 254)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.91139342926508
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(255, 255, 254)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.91139342926508
+        }
+      ],
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "variant": "candidate",
+      "width": 360,
+      "accent": "#fffffe",
+      "logoTone": "dark",
+      "brief_sha256": "4f66e6c817b63cd75c05bd0c7f7173fd7130dccd8db012a1f3d09bacb0707932",
+      "render_sha256": "c9617a3f4602c68130634686c146a20f71153a88cc3ca5a9b7acd9d52aa4bcfa",
+      "copy": {
+        "tagline": "건물주 대상 태양광 시공",
+        "brandIntro": "태양광 시공 분야의 햇살 에너지입니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(255, 255, 254)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.91139342926508
+        }
+      ],
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "variant": "candidate",
+      "width": 360,
+      "accent": "#fffffe",
+      "logoTone": "mono",
+      "brief_sha256": "f2309d1eddb40ac368e3f8e33d95956f55de103c0861164c6ca6f21b885222a5",
+      "render_sha256": "d3b6231246b6d5246c7a3ced9062822cabd8b67f1127cb60aa4fa6efbb1f8ae1",
+      "copy": {
+        "tagline": "건물주 대상 태양광 시공",
+        "brandIntro": "태양광 시공 분야의 햇살 에너지입니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(23, 43, 36)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(255, 255, 254)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.91139342926508
+        }
+      ],
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "variant": "candidate",
+      "width": 360,
+      "accent": "#e3c46d",
+      "logoTone": "light",
+      "brief_sha256": "1e7fa6ed7ac2fb9fcac14e1037a803ce55ca533442e784b0ae6382bcca05d2b4",
+      "render_sha256": "e95d52463543b550e584a71e84bc1cbb982661c3af40e7c79ba519af30310da3",
+      "copy": {
+        "tagline": "건물주 대상 태양광 시공",
+        "brandIntro": "태양광 시공 분야의 햇살 에너지입니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(227, 196, 109)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 8.798117009917142
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(227, 196, 109)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 8.798117009917142
+        }
+      ],
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "variant": "candidate",
+      "width": 360,
+      "accent": "#e3c46d",
+      "logoTone": "dark",
+      "brief_sha256": "643b3c836c0c0d4fe0dd98688b37b209f980ad5ba890c552492952320552cca3",
+      "render_sha256": "d4403718921036a510dbc8f681a2e078b7bc4d9c113984abe2dcd8224a1817c0",
+      "copy": {
+        "tagline": "건물주 대상 태양광 시공",
+        "brandIntro": "태양광 시공 분야의 햇살 에너지입니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(227, 196, 109)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 8.798117009917142
+        }
+      ],
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "variant": "candidate",
+      "width": 360,
+      "accent": "#e3c46d",
+      "logoTone": "mono",
+      "brief_sha256": "14ab6f5a3fd435fdc9e8385b496ff7dbea85b2b6f4d347df9cda397e5b077f8f",
+      "render_sha256": "9423cbabc424ac1583bdb83caa58364c6092f72948be4f889032a5af4f92cebd",
+      "copy": {
+        "tagline": "건물주 대상 태양광 시공",
+        "brandIntro": "태양광 시공 분야의 햇살 에너지입니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(23, 43, 36)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(227, 196, 109)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 8.798117009917142
+        }
+      ],
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "variant": "candidate",
+      "width": 360,
+      "accent": "#888888",
+      "logoTone": "light",
+      "brief_sha256": "7079daa39cf689203454c78bce9affa81c4f03985dbfba191e55946c47b60a76",
+      "render_sha256": "ecd66da85d433ab3043bd0bdc152f98e28d2baee8fd41187d77ff4677ff15110",
+      "copy": {
+        "tagline": "건물주 대상 태양광 시공",
+        "brandIntro": "태양광 시공 분야의 햇살 에너지입니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(136, 136, 136)",
+          "background": "rgb(0, 0, 0)",
+          "ratio": 5.924026534156709
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(136, 136, 136)",
+          "background": "rgb(0, 0, 0)",
+          "ratio": 5.924026534156709
+        }
+      ],
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "variant": "candidate",
+      "width": 360,
+      "accent": "#888888",
+      "logoTone": "dark",
+      "brief_sha256": "f3ea4ac8e9c4b982ed0974e28c7b71248be88989ae349bacaf9417f63a98af03",
+      "render_sha256": "aea316f56c208b34c3b8a0f908c5b3184f208c7b083a871841abe462f824c95a",
+      "copy": {
+        "tagline": "건물주 대상 태양광 시공",
+        "brandIntro": "태양광 시공 분야의 햇살 에너지입니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(136, 136, 136)",
+          "background": "rgb(0, 0, 0)",
+          "ratio": 5.924026534156709
+        }
+      ],
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "variant": "candidate",
+      "width": 360,
+      "accent": "#888888",
+      "logoTone": "mono",
+      "brief_sha256": "ed92d8fa11a03b6d87cbf12750b5498866d5a5e2918962483a35094ed4b2d558",
+      "render_sha256": "fc4f3a67d65b0d194c439aec435a44659f22380176abec70b7f1fa3f33a781d8",
+      "copy": {
+        "tagline": "건물주 대상 태양광 시공",
+        "brandIntro": "태양광 시공 분야의 햇살 에너지입니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(23, 43, 36)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(136, 136, 136)",
+          "background": "rgb(0, 0, 0)",
+          "ratio": 5.924026534156709
+        }
+      ],
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "variant": "candidate",
+      "width": 360,
+      "accent": "#31594c",
+      "logoTone": "light",
+      "brief_sha256": "5fe6bab9ee33df90886403078364d7816dae0bbb1b8f892c84ac286ac5563122",
+      "render_sha256": "0907bc6f2e4e180d64dc037370fb6abeb23039c6913680b8a844d78f8df23baf",
+      "copy": {
+        "tagline": "건물주 대상 태양광 시공",
+        "brandIntro": "태양광 시공 분야의 햇살 에너지입니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(49, 89, 76)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 7.88316245111733
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(49, 89, 76)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 7.88316245111733
+        }
+      ],
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "variant": "candidate",
+      "width": 360,
+      "accent": "#31594c",
+      "logoTone": "dark",
+      "brief_sha256": "f0b4dc4b38ce763d3c0768b28ef97dcf7591446516f83cee59fbac014389baaa",
+      "render_sha256": "c02011276eea0f0184b616c40f59bf7cd958edca787c41265891a1602044b95e",
+      "copy": {
+        "tagline": "건물주 대상 태양광 시공",
+        "brandIntro": "태양광 시공 분야의 햇살 에너지입니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(49, 89, 76)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 7.88316245111733
+        }
+      ],
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "variant": "candidate",
+      "width": 360,
+      "accent": "#31594c",
+      "logoTone": "mono",
+      "brief_sha256": "932d7708e52517bed34e539fa5383b857464a19973396e943cd4fb02e0a1b893",
+      "render_sha256": "515b3e69654517ef4b9f653baa28f5829f386b721a97fd6a797fca8fc0b7ed25",
+      "copy": {
+        "tagline": "건물주 대상 태양광 시공",
+        "brandIntro": "태양광 시공 분야의 햇살 에너지입니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(23, 43, 36)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(49, 89, 76)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 7.88316245111733
+        }
+      ],
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "variant": "candidate",
+      "width": 360,
+      "accent": "#000000",
+      "logoTone": "light",
+      "brief_sha256": "b3d40529b8d33f88b58c9e0fe7ad3a84a4be11667d4d4e87d1d857d4d52ecbf3",
+      "render_sha256": "30f3ad6801a546dad1b9c199bcbb70c62a51d2b60e1818c17b56700339495ff1",
+      "copy": {
+        "tagline": "건물주 대상 태양광 시공",
+        "brandIntro": "태양광 시공 분야의 햇살 에너지입니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(0, 0, 0)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 21
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(0, 0, 0)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 21
+        }
+      ],
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "variant": "candidate",
+      "width": 360,
+      "accent": "#000000",
+      "logoTone": "dark",
+      "brief_sha256": "3abb3f5de08f425ec157a400f0306496f2fa7be449a8a2ec2a816b978a36af03",
+      "render_sha256": "788a38f361f5601f600ea90495e482262c16bde886634f4ba291113431afb83c",
+      "copy": {
+        "tagline": "건물주 대상 태양광 시공",
+        "brandIntro": "태양광 시공 분야의 햇살 에너지입니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(0, 0, 0)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 21
+        }
+      ],
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "variant": "candidate",
+      "width": 360,
+      "accent": "#000000",
+      "logoTone": "mono",
+      "brief_sha256": "6374196c8ad1c46c83621fd67aa691db12e8681c4ba0b6469e40c085b05c2dce",
+      "render_sha256": "98a9bf2ec4a9e1a4a354d5a28eb6187200c606dc111c6afbf1e6bff7302f4487",
+      "copy": {
+        "tagline": "건물주 대상 태양광 시공",
+        "brandIntro": "태양광 시공 분야의 햇살 에너지입니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(23, 43, 36)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(0, 0, 0)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 21
+        }
+      ],
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "variant": "candidate",
+      "width": 390,
+      "accent": "#ffffff",
+      "logoTone": "light",
+      "brief_sha256": "24bbd3cd8ac44d9c0e775178c3de3dbc13396fd970e186909b9fef832283caae",
+      "render_sha256": "d187c306d79138eabe1e7c6fe67bb11f056f03ee793a96471a14ff4378aa975b",
+      "copy": {
+        "tagline": "건물주 대상 태양광 시공",
+        "brandIntro": "태양광 시공 분야의 햇살 에너지입니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.92052235318248
+        }
+      ],
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "variant": "candidate",
+      "width": 390,
+      "accent": "#ffffff",
+      "logoTone": "dark",
+      "brief_sha256": "f3a80721e629640f780761c000d36c45af69ac14e8fa3abe51872e236de45978",
+      "render_sha256": "d187c306d79138eabe1e7c6fe67bb11f056f03ee793a96471a14ff4378aa975b",
+      "copy": {
+        "tagline": "건물주 대상 태양광 시공",
+        "brandIntro": "태양광 시공 분야의 햇살 에너지입니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.92052235318248
+        }
+      ],
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "variant": "candidate",
+      "width": 390,
+      "accent": "#ffffff",
+      "logoTone": "mono",
+      "brief_sha256": "6b183755c4851994edd07ffe9de56775b4b35ca1f24c2cf3ca298bae5a756a36",
+      "render_sha256": "257751e9aa251eb5043f6daf126380b8b8f91dc8223ac40cee39ce11bc7f03d2",
+      "copy": {
+        "tagline": "건물주 대상 태양광 시공",
+        "brandIntro": "태양광 시공 분야의 햇살 에너지입니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(23, 43, 36)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.92052235318248
+        }
+      ],
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "variant": "candidate",
+      "width": 390,
+      "accent": "#fffffe",
+      "logoTone": "light",
+      "brief_sha256": "d0eb99b693aadeba93df366e51f935861be919938c08ca31c74c0e7779f32623",
+      "render_sha256": "e25258329f6433ac1bea46c9902027fedb8cbf576960123994a4bd082a5aa8ef",
+      "copy": {
+        "tagline": "건물주 대상 태양광 시공",
+        "brandIntro": "태양광 시공 분야의 햇살 에너지입니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(255, 255, 254)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.91139342926508
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(255, 255, 254)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.91139342926508
+        }
+      ],
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "variant": "candidate",
+      "width": 390,
+      "accent": "#fffffe",
+      "logoTone": "dark",
+      "brief_sha256": "4f66e6c817b63cd75c05bd0c7f7173fd7130dccd8db012a1f3d09bacb0707932",
+      "render_sha256": "c9617a3f4602c68130634686c146a20f71153a88cc3ca5a9b7acd9d52aa4bcfa",
+      "copy": {
+        "tagline": "건물주 대상 태양광 시공",
+        "brandIntro": "태양광 시공 분야의 햇살 에너지입니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(255, 255, 254)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.91139342926508
+        }
+      ],
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "variant": "candidate",
+      "width": 390,
+      "accent": "#fffffe",
+      "logoTone": "mono",
+      "brief_sha256": "f2309d1eddb40ac368e3f8e33d95956f55de103c0861164c6ca6f21b885222a5",
+      "render_sha256": "d3b6231246b6d5246c7a3ced9062822cabd8b67f1127cb60aa4fa6efbb1f8ae1",
+      "copy": {
+        "tagline": "건물주 대상 태양광 시공",
+        "brandIntro": "태양광 시공 분야의 햇살 에너지입니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(23, 43, 36)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(255, 255, 254)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.91139342926508
+        }
+      ],
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "variant": "candidate",
+      "width": 390,
+      "accent": "#e3c46d",
+      "logoTone": "light",
+      "brief_sha256": "1e7fa6ed7ac2fb9fcac14e1037a803ce55ca533442e784b0ae6382bcca05d2b4",
+      "render_sha256": "e95d52463543b550e584a71e84bc1cbb982661c3af40e7c79ba519af30310da3",
+      "copy": {
+        "tagline": "건물주 대상 태양광 시공",
+        "brandIntro": "태양광 시공 분야의 햇살 에너지입니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(227, 196, 109)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 8.798117009917142
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(227, 196, 109)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 8.798117009917142
+        }
+      ],
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "variant": "candidate",
+      "width": 390,
+      "accent": "#e3c46d",
+      "logoTone": "dark",
+      "brief_sha256": "643b3c836c0c0d4fe0dd98688b37b209f980ad5ba890c552492952320552cca3",
+      "render_sha256": "d4403718921036a510dbc8f681a2e078b7bc4d9c113984abe2dcd8224a1817c0",
+      "copy": {
+        "tagline": "건물주 대상 태양광 시공",
+        "brandIntro": "태양광 시공 분야의 햇살 에너지입니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(227, 196, 109)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 8.798117009917142
+        }
+      ],
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "variant": "candidate",
+      "width": 390,
+      "accent": "#e3c46d",
+      "logoTone": "mono",
+      "brief_sha256": "14ab6f5a3fd435fdc9e8385b496ff7dbea85b2b6f4d347df9cda397e5b077f8f",
+      "render_sha256": "9423cbabc424ac1583bdb83caa58364c6092f72948be4f889032a5af4f92cebd",
+      "copy": {
+        "tagline": "건물주 대상 태양광 시공",
+        "brandIntro": "태양광 시공 분야의 햇살 에너지입니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(23, 43, 36)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(227, 196, 109)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 8.798117009917142
+        }
+      ],
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "variant": "candidate",
+      "width": 390,
+      "accent": "#888888",
+      "logoTone": "light",
+      "brief_sha256": "7079daa39cf689203454c78bce9affa81c4f03985dbfba191e55946c47b60a76",
+      "render_sha256": "ecd66da85d433ab3043bd0bdc152f98e28d2baee8fd41187d77ff4677ff15110",
+      "copy": {
+        "tagline": "건물주 대상 태양광 시공",
+        "brandIntro": "태양광 시공 분야의 햇살 에너지입니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(136, 136, 136)",
+          "background": "rgb(0, 0, 0)",
+          "ratio": 5.924026534156709
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(136, 136, 136)",
+          "background": "rgb(0, 0, 0)",
+          "ratio": 5.924026534156709
+        }
+      ],
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "variant": "candidate",
+      "width": 390,
+      "accent": "#888888",
+      "logoTone": "dark",
+      "brief_sha256": "f3ea4ac8e9c4b982ed0974e28c7b71248be88989ae349bacaf9417f63a98af03",
+      "render_sha256": "aea316f56c208b34c3b8a0f908c5b3184f208c7b083a871841abe462f824c95a",
+      "copy": {
+        "tagline": "건물주 대상 태양광 시공",
+        "brandIntro": "태양광 시공 분야의 햇살 에너지입니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(136, 136, 136)",
+          "background": "rgb(0, 0, 0)",
+          "ratio": 5.924026534156709
+        }
+      ],
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "variant": "candidate",
+      "width": 390,
+      "accent": "#888888",
+      "logoTone": "mono",
+      "brief_sha256": "ed92d8fa11a03b6d87cbf12750b5498866d5a5e2918962483a35094ed4b2d558",
+      "render_sha256": "fc4f3a67d65b0d194c439aec435a44659f22380176abec70b7f1fa3f33a781d8",
+      "copy": {
+        "tagline": "건물주 대상 태양광 시공",
+        "brandIntro": "태양광 시공 분야의 햇살 에너지입니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(23, 43, 36)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(136, 136, 136)",
+          "background": "rgb(0, 0, 0)",
+          "ratio": 5.924026534156709
+        }
+      ],
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "variant": "candidate",
+      "width": 390,
+      "accent": "#31594c",
+      "logoTone": "light",
+      "brief_sha256": "5fe6bab9ee33df90886403078364d7816dae0bbb1b8f892c84ac286ac5563122",
+      "render_sha256": "0907bc6f2e4e180d64dc037370fb6abeb23039c6913680b8a844d78f8df23baf",
+      "copy": {
+        "tagline": "건물주 대상 태양광 시공",
+        "brandIntro": "태양광 시공 분야의 햇살 에너지입니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(49, 89, 76)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 7.88316245111733
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(49, 89, 76)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 7.88316245111733
+        }
+      ],
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "variant": "candidate",
+      "width": 390,
+      "accent": "#31594c",
+      "logoTone": "dark",
+      "brief_sha256": "f0b4dc4b38ce763d3c0768b28ef97dcf7591446516f83cee59fbac014389baaa",
+      "render_sha256": "c02011276eea0f0184b616c40f59bf7cd958edca787c41265891a1602044b95e",
+      "copy": {
+        "tagline": "건물주 대상 태양광 시공",
+        "brandIntro": "태양광 시공 분야의 햇살 에너지입니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(49, 89, 76)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 7.88316245111733
+        }
+      ],
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "variant": "candidate",
+      "width": 390,
+      "accent": "#31594c",
+      "logoTone": "mono",
+      "brief_sha256": "932d7708e52517bed34e539fa5383b857464a19973396e943cd4fb02e0a1b893",
+      "render_sha256": "515b3e69654517ef4b9f653baa28f5829f386b721a97fd6a797fca8fc0b7ed25",
+      "copy": {
+        "tagline": "건물주 대상 태양광 시공",
+        "brandIntro": "태양광 시공 분야의 햇살 에너지입니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(23, 43, 36)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(49, 89, 76)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 7.88316245111733
+        }
+      ],
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "variant": "candidate",
+      "width": 390,
+      "accent": "#000000",
+      "logoTone": "light",
+      "brief_sha256": "b3d40529b8d33f88b58c9e0fe7ad3a84a4be11667d4d4e87d1d857d4d52ecbf3",
+      "render_sha256": "30f3ad6801a546dad1b9c199bcbb70c62a51d2b60e1818c17b56700339495ff1",
+      "copy": {
+        "tagline": "건물주 대상 태양광 시공",
+        "brandIntro": "태양광 시공 분야의 햇살 에너지입니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(0, 0, 0)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 21
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(0, 0, 0)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 21
+        }
+      ],
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "variant": "candidate",
+      "width": 390,
+      "accent": "#000000",
+      "logoTone": "dark",
+      "brief_sha256": "3abb3f5de08f425ec157a400f0306496f2fa7be449a8a2ec2a816b978a36af03",
+      "render_sha256": "788a38f361f5601f600ea90495e482262c16bde886634f4ba291113431afb83c",
+      "copy": {
+        "tagline": "건물주 대상 태양광 시공",
+        "brandIntro": "태양광 시공 분야의 햇살 에너지입니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 43, 36)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(0, 0, 0)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 21
+        }
+      ],
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "variant": "candidate",
+      "width": 390,
+      "accent": "#000000",
+      "logoTone": "mono",
+      "brief_sha256": "6374196c8ad1c46c83621fd67aa691db12e8681c4ba0b6469e40c085b05c2dce",
+      "render_sha256": "98a9bf2ec4a9e1a4a354d5a28eb6187200c606dc111c6afbf1e6bff7302f4487",
+      "copy": {
+        "tagline": "건물주 대상 태양광 시공",
+        "brandIntro": "태양광 시공 분야의 햇살 에너지입니다. 주요 고객은 건물주입니다."
+      },
+      "regions": [
+        {
+          "selector": ".logo",
+          "foreground": "rgb(23, 43, 36)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.92052235318248
+        },
+        {
+          "selector": ".front",
+          "foreground": "rgb(0, 0, 0)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 21
+        }
+      ],
+      "overflow": false,
+      "pass": true
+    }
+  ],
+  "files": [
+    {
+      "path": "baseline-white-360.png",
+      "sha256": "cae9436ca6f3776fffc6b9ba49508f3388429455cb150122fe7a64a1d7898357"
+    },
+    {
+      "path": "baseline-white-390.png",
+      "sha256": "c78c1e902bb89ca0bf3938bc9a1b54fa8dec44d4c43a7e27606c674dfdb879b3"
+    },
+    {
+      "path": "candidate-white-360.png",
+      "sha256": "c82c228dea2a846ad838d1686c24a4ab4fa1e371740c2914ea5b4e073327b679"
+    },
+    {
+      "path": "candidate-white-390.png",
+      "sha256": "6b8df49ea85c95eb02bcad91937f73aa96d1e2baeb5bf22a045bdcd34f25e303"
+    }
+  ],
+  "journey": "PASS",
+  "implementation_actor": "ETERNIAN",
+  "arkaon_first_verification": "NOT_RUN",
+  "independent_audit": "NOT_RUN",
+  "improvement_accepted": false,
+  "merge_approved": false,
+  "production_apply_approved": false,
+  "chromium": "151.0.7922.34",
+  "status": "PASS",
+  "baseline_failed": 36,
+  "candidate_failed": 0
+}

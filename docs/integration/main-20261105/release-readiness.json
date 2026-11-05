@@ -1,0 +1,70 @@
+{
+  "candidate_code_sha": "daadc407c6588a4668ef72d0b5dd5cba06125a4d",
+  "preview_deploy_id": "6aebe3a4a4cb6328df09a833",
+  "preview_url": "https://deploy-preview-132--arkaonfoundry.netlify.app",
+  "production_deploy_id_observed": "6ad5a7ade2234c92d1630a5c",
+  "production_sha_observed": "a26baa71e93f1971151c4bb93e537444e95850a1",
+  "checks": {
+    "dependency_extraction": "PASS",
+    "new_candidate_ci": "PASS",
+    "arkaon_execution": "BLOCKED_EXECUTOR_NOT_CONNECTED",
+    "final_independent_audit": "NOT_RUN",
+    "hosted_static_ui_smoke": "PASS_SCOPED",
+    "production_candidate_deploy": "NOT_RUN",
+    "release_preparation": "PREPARED_NOT_EXECUTED"
+  },
+  "ci_runs": {
+    "general": 41952497858,
+    "container": 41952497841,
+    "brand": 41952497887,
+    "presets": 41952497839
+  },
+  "artifacts": {
+    "brand": {
+      "id": 13380904683,
+      "sha256": "f6984f0bc566d135af62e5b6982fd363ce3bcca6a25cc3f436144b7e15af4b05",
+      "quality_rows": 72,
+      "candidate_failures": 0,
+      "quality_png_hashes_verified": 4
+    },
+    "presets": {
+      "id": 13381756106,
+      "sha256": "a3cf96bd1e0bc477ce11437ded525e65d7448b2ed8a15d0a8d0de69b65beae60",
+      "rows": 6,
+      "png_hashes_verified": 6,
+      "account_reopen": "PASS",
+      "draft_html_export": "PASS"
+    }
+  },
+  "hosted_smoke": {
+    "actor": "ETERNIAN",
+    "synthetic_data_only": true,
+    "website_journey": "input → arirang → content → save → account → edit → theme/content restored",
+    "brand_journey": "input → fact-bound copy → horizon → save → account → edit → selection/copy restored",
+    "limits": [
+      "One cloud browser profile; no physical mobile test",
+      "Hosted smoke did not open native color picker; color matrix is separate CI evidence",
+      "Static UI only; no backend/consent/payment/worker was exercised",
+      "Preview localStorage is separate from production localStorage"
+    ]
+  },
+  "source_archives": {
+    "baseline-a26baa7.zip": {
+      "bytes": 2189698,
+      "sha256": "f84c7ad225ae4f904c383354955f3e80a3a1e79f0d06cc93ef7da63e217a8ede",
+      "format": "git archive --format=zip",
+      "note": "Local prepared source archive; canonical source commit remains in GitHub"
+    },
+    "candidate-daadc407.zip": {
+      "bytes": 2269693,
+      "sha256": "2f64f3c40940275a831c065ee2452712eeec0eee6f9ff861e4122aa5342bffe8",
+      "format": "git archive --format=zip",
+      "note": "Local prepared source archive; canonical source commit remains in GitHub"
+    }
+  },
+  "merge_approved": false,
+  "production_apply_approved": false,
+  "improvement_accepted": false,
+  "arkaon_worker_ack": null,
+  "screenshot_sha256": "71e1f4d44f3b7d6ed9f0b65d640167c8e5568c85264275b36c65d9b58acbb0d6"
+}
