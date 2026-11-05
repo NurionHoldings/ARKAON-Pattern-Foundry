@@ -1,0 +1,124 @@
+{
+  "schema_version": "apf.platform-foundation-browser/v1",
+  "tested_head": "daadc407c6588a4668ef72d0b5dd5cba06125a4d",
+  "run_id": "41952497839",
+  "rows": [
+    {
+      "preset": "dapanda",
+      "width": 360,
+      "background": "rgb(11, 11, 10)",
+      "overflow": false,
+      "columns": "300.625px",
+      "theme": "dapanda",
+      "hero": "linear-gradient(120deg, rgb(41, 37, 25), rgb(23, 22, 16) 70%)",
+      "outer_overflow": false,
+      "save_reopen": "PASS",
+      "account_reopen": "PASS",
+      "html_export": "PASS",
+      "status": "PASS",
+      "screenshot": {
+        "path": "dapanda-360.png",
+        "sha256": "eb8ac368230b8c5faf500a7f3276ba9e5be56a82adfebf70714578be026cbe95"
+      }
+    },
+    {
+      "preset": "dapanda",
+      "width": 390,
+      "background": "rgb(11, 11, 10)",
+      "overflow": false,
+      "columns": "327.625px",
+      "theme": "dapanda",
+      "hero": "linear-gradient(120deg, rgb(41, 37, 25), rgb(23, 22, 16) 70%)",
+      "outer_overflow": false,
+      "save_reopen": "PASS",
+      "account_reopen": "PASS",
+      "html_export": "PASS",
+      "status": "PASS",
+      "screenshot": {
+        "path": "dapanda-390.png",
+        "sha256": "91c24f35cdba558f65406138c17a705cf44c3f34f0cd9d61c9c5a1c8971441ef"
+      }
+    },
+    {
+      "preset": "dapanda",
+      "width": 1440,
+      "background": "rgb(11, 11, 10)",
+      "overflow": false,
+      "columns": "295.172px 295.172px 295.188px",
+      "theme": "dapanda",
+      "hero": "linear-gradient(120deg, rgb(41, 37, 25), rgb(23, 22, 16) 70%)",
+      "outer_overflow": false,
+      "save_reopen": "PASS",
+      "account_reopen": "PASS",
+      "html_export": "PASS",
+      "status": "PASS",
+      "screenshot": {
+        "path": "dapanda-1440.png",
+        "sha256": "0b740aef2e907d83d6d473155ca1a90b89c0f956fd7c980815b5e7f9e956c43a"
+      }
+    },
+    {
+      "preset": "arirang",
+      "width": 360,
+      "background": "rgb(243, 246, 252)",
+      "overflow": false,
+      "columns": "300.625px",
+      "theme": "arirang",
+      "hero": "linear-gradient(115deg, rgb(22, 59, 112), rgb(40, 89, 152))",
+      "outer_overflow": false,
+      "save_reopen": "PASS",
+      "account_reopen": "PASS",
+      "html_export": "PASS",
+      "status": "PASS",
+      "screenshot": {
+        "path": "arirang-360.png",
+        "sha256": "7f056a2736cc2d6f294309cd9730a99af28cb72be5fea2094dcfb1c253f8ba9f"
+      }
+    },
+    {
+      "preset": "arirang",
+      "width": 390,
+      "background": "rgb(243, 246, 252)",
+      "overflow": false,
+      "columns": "327.625px",
+      "theme": "arirang",
+      "hero": "linear-gradient(115deg, rgb(22, 59, 112), rgb(40, 89, 152))",
+      "outer_overflow": false,
+      "save_reopen": "PASS",
+      "account_reopen": "PASS",
+      "html_export": "PASS",
+      "status": "PASS",
+      "screenshot": {
+        "path": "arirang-390.png",
+        "sha256": "6384f485314f4bbc7d70f4085fa613e0f64f4931587afc0df0c62979ea5a512e"
+      }
+    },
+    {
+      "preset": "arirang",
+      "width": 1440,
+      "background": "rgb(243, 246, 252)",
+      "overflow": false,
+      "columns": "296.5px 296.516px 296.5px",
+      "theme": "arirang",
+      "hero": "linear-gradient(115deg, rgb(22, 59, 112), rgb(40, 89, 152))",
+      "outer_overflow": false,
+      "save_reopen": "PASS",
+      "account_reopen": "PASS",
+      "html_export": "PASS",
+      "status": "PASS",
+      "screenshot": {
+        "path": "arirang-1440.png",
+        "sha256": "80dadbfb40a1a33eae0626ef96f0ac1163a9b27bca34fb010730461c1b018117"
+      }
+    }
+  ],
+  "errors": [],
+  "implementation_actor": "ETERNIAN",
+  "arkaon_first_verification": "NOT_RUN",
+  "independent_audit": "NOT_RUN",
+  "improvement_accepted": false,
+  "merge_approved": false,
+  "production_apply_approved": false,
+  "chromium": "151.0.7922.34",
+  "status": "PASS"
+}
