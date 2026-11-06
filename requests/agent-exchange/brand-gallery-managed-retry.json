@@ -1,0 +1,32 @@
+{
+  "request_id": "brand-gallery-managed-workspace-retry-20261106",
+  "intent_dna": "자체 견본을 비교·선택하고 내용과 디자인을 깊이 다듬는 쉬운 제작 흐름",
+  "capability_gap": "에테르니언이 직접 보완한 12개 견본의 아르카온 원격 1차 검증 및 미비점 보완이 아직 미실행",
+  "evidence_refs": [
+    "https://github.com/NurionHoldings/ARKAON-Pattern-Foundry/pull/135",
+    "https://github.com/NurionHoldings/ARKAON-Pattern-Foundry/actions/runs/42152976085",
+    "https://app.netlify.com/projects/arkaonfoundry/agent-runs/6aed6e8190dc980edf8ee86c"
+  ],
+  "proposed_change": "기준 SHA183a4d9d850cd708d3dc5a4e84f8eba1c138c7aa의 Netlify 격리 작업공간에서 services/brand-*.js, services/brand-gallery.html, services/brand-gallery.css, services/logo-card.html, tests/brand-gallery*.cjs, docs/evidence/brand-gallery/ 안에서만 미비점을 보완한다. Git은 읽기 전용 확인만 하고 branch·commit·push는 Netlify가 관리한다. 문구·선택·연락처·저장 보존. docs/evidence/brand-gallery/managed-workspace-retry-20261106/manifest.json에 실제 시험명령·종료코드·파일 및 로그 SHA-256·환경·위험을 기록한다. 부족하면 HOLD. 최종 commit SHA는 호스트가 결과 파일 해시와 대조 후 별도 결속한다. 범위 확대·병합·운영배포·비밀정보·권한·과금 설정 변경 금지.",
+  "expected_benefit": "사용자가 12개 자체 견본을 비교하고 3~4개 후보 중 선택한 뒤 동일 project로 심화 편집·재오픈 가능. 실제 효과는 검증 후 판단.",
+  "risks": [
+    "편집한 문구·연락처 손실",
+    "모바일 잘림 및 선택 표시 불일치"
+  ],
+  "validation_plan": [
+    "기준 source SHA 확인 및 변경 경로 검사",
+    "Node tests/brand-gallery.test.cjs + 기존 brand tests",
+    "Chromium 12개 견본/3~4개선택/저장·재오픈·복귀/360·390·768·1440",
+    "독립 감사자는 별도 worker/근거로 검사. 개선 인정·병합·운영반영 자동 승인 금지"
+  ],
+  "source_tier": "PROPOSE_ONLY",
+  "schema_version": "apf.self-improvement-request/1.0",
+  "state": "INBOX_POSTED",
+  "scope_digest": "71ecc4ff092765ccae7cc2955a5d9b344dcafea434242b1d4f6626e04212828c",
+  "production_change_allowed": false,
+  "automatic_merge_allowed": false,
+  "deployment_allowed": false,
+  "detected_at": "2026-11-06T02:56:38.215673+00:00",
+  "updated_at": "2026-11-06T02:56:38.215690+00:00",
+  "revision": 1
+}

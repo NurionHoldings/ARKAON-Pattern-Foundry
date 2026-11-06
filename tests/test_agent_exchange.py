@@ -176,3 +176,50 @@ def test_remote_head_change_blocks_before_any_paid_call(tmp_path, monkeypatch):
     with pytest.raises(ValueError, match="REMOTE_HEAD_CHANGED"):
         submit(task, authorization(task), tmp_path, runner=lambda *a, **kw: pytest.fail("billable call"))
     assert not list(tmp_path.rglob("submission-claim.json"))
+
+
+def test_provider_keeps_required_node_proxy_setting(monkeypatch):
+    from apf.agent_exchange import provider_environment
+    monkeypatch.setenv("NODE_USE_ENV_PROXY", "1")
+    assert provider_environment()["NODE_USE_ENV_PROXY"] == "1"
+
+
+def test_actual_cli_state_field_is_supported(tmp_path, monkeypatch):
+    monkeypatch.setattr("apf.agent_exchange.shutil.which", lambda _: "/usr/bin/netlify")
+    runner = lambda *a, **kw: SimpleNamespace(returncode=0, stdout='{"id":"test-task","state":"running"}')
+    assert poll(build(), "test-task", tmp_path, runner=runner)["provider_status"] == "running"
+
+
+def test_provider_manages_branches_and_requires_workspace_evidence():
+    task = build()
+    assert task["workspace_strategy"] == "NETLIFY_MANAGED"
+    assert task["agent_git_writes_allowed"] is False
+    prompt = task["command"][3]
+    assert "Netlify manages result branches and commits" in prompt
+    assert "Do not run git switch" in prompt
+    assert "hash tested files and logs" in prompt
+    assert "Do not invent a final" in prompt
+
+
+def test_legacy_task_can_be_polled_but_cannot_be_billed(tmp_path, monkeypatch):
+    from apf.agent_exchange import validate_task
+    task = build()
+    task["schema_version"] = "apf.agent-exchange-task/v1"
+    task.pop("workspace_strategy")
+    task.pop("agent_git_writes_allowed")
+    task["task_digest"] = digest({k: v for k, v in task.items() if k != "task_digest"})
+    validate_task(task)
+    with pytest.raises(ValueError, match="legacy task"):
+        authorize_one(task, authorization(task), now=datetime.now(UTC))
+    monkeypatch.setattr("apf.agent_exchange.shutil.which", lambda _: "/usr/bin/netlify")
+    runner = lambda *a, **kw: SimpleNamespace(returncode=0, stdout='{"id":"historic","state":"done"}')
+    assert poll(task, "historic", tmp_path, runner=runner)["audit_accepted"] is False
+
+
+def test_workspace_strategy_cannot_be_changed_even_with_recomputed_digest():
+    from apf.agent_exchange import validate_task
+    task = build()
+    task["agent_git_writes_allowed"] = True
+    task["task_digest"] = digest({k: v for k, v in task.items() if k != "task_digest"})
+    with pytest.raises(ValueError, match="provider-managed"):
+        validate_task(task)
