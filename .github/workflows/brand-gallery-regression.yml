@@ -1,0 +1,37 @@
+name: Brand gallery regression
+on:
+  pull_request:
+    paths:
+      - 'services/brand-*.js'
+      - 'services/brand-*.css'
+      - 'services/brand-gallery.html'
+      - 'services/logo-card.html'
+      - 'tests/brand-gallery*.cjs'
+      - '.github/workflows/brand-gallery-regression.yml'
+permissions:
+  contents: read
+jobs:
+  gallery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: node --test tests/brand-gallery.test.cjs tests/brand-studio.test.cjs tests/brand-contrast-copy.test.cjs
+      - run: npm install --prefix /tmp/gallery-browser --no-package-lock playwright@1.65.0
+      - run: node /tmp/gallery-browser/node_modules/playwright/cli.js install --with-deps chromium
+      - run: node --test tests/brand-gallery-browser.test.cjs
+        env:
+          NODE_PATH: /tmp/gallery-browser/node_modules
+          APF_RUN_BROWSER: '1'
+          APF_GALLERY_EVIDENCE_DIR: '${{ runner.temp }}/gallery-evidence'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: brand-gallery-${{ github.sha }}
+          path: '${{ runner.temp }}/gallery-evidence'
+          retention-days: 14
