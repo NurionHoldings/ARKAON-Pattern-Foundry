@@ -1,0 +1,27 @@
+name: Agent exchange contracts
+on:
+  pull_request:
+    paths:
+      - 'src/apf/agent_exchange.py'
+      - 'tests/test_agent_exchange.py'
+      - 'orchestrator/arkaon-agent-exchange.ps1'
+      - '.github/workflows/agent-exchange-regression.yml'
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -e '.[dev]'
+      - run: pytest -q tests/test_agent_exchange.py
+      - shell: pwsh
+        run: |
+          $tokens = $null
+          $parseErrors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path 'orchestrator/arkaon-agent-exchange.ps1'), [ref]$tokens, [ref]$parseErrors) | Out-Null
+          if ($parseErrors.Count) { throw ($parseErrors | Out-String) }

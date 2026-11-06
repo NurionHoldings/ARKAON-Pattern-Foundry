@@ -1,0 +1,22 @@
+{
+  "schema_version": "apf.agent-trial-review/v1",
+  "record_kind": "HOST_REVIEW_OF_PROVIDER_REPORT",
+  "provider_task_id": "6aed6e8190dc980edf8ee86c",
+  "provider_report_url": "https://app.netlify.com/projects/arkaonfoundry/agent-runs/6aed6e8190dc980edf8ee86c",
+  "source_head": "183a4d9d850cd708d3dc5a4e84f8eba1c138c7aa",
+  "original_task_digest": "bc731a05733aa5b4418b2a74b51ba050b5966e13c67c6f9e46df2c1034388dbb",
+  "provider_state": "done",
+  "created_at": "2026-11-06T06:06:57.105Z",
+  "completed_at": "2026-11-06T06:07:29.312Z",
+  "status": "HOLD",
+  "tests_executed": false,
+  "changed_paths": [],
+  "result_branch": null,
+  "tested_head": null,
+  "finding": "Request required git switch -c; provider permitted read-only Git. Agent stopped before editing or testing.",
+  "evidence_limit": "Sanitized host transcription of official dashboard report and CLI metadata, not a byte-original provider transcript.",
+  "transport_reconciliation": "Earlier transport failed because NODE_USE_ENV_PROXY was omitted. Two CLI list checks found no task before manual resumption of the same approved submission. Exactly one actual provider task was observed.",
+  "improvement_accepted": false,
+  "merge_approved": false,
+  "production_apply_approved": false
+}
