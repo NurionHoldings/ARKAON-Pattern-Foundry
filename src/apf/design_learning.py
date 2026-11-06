@@ -356,6 +356,14 @@ def post_improvement_request(root: Path, bundle: dict, evidence_data: dict) -> s
     return str(path.relative_to(root))
 
 
+def semantic_job_digest(job: dict) -> str:
+    # Capture timestamps must not create another improvement request for identical evidence.
+    normalized = json.loads(json.dumps(job, allow_nan=False))
+    for name in ("reference", "baseline"):
+        normalized[name]["source"].pop("observed_at", None)
+    return digest(normalized)
+
+
 def cycle(root: Path) -> dict:
     """Consume bounded observation jobs; malformed jobs never starve later jobs."""
     inbox = root / "inbox/design-learning"
@@ -366,6 +374,8 @@ def cycle(root: Path) -> dict:
     out.mkdir(parents=True, exist_ok=True)
     processed = out / "processed"
     processed.mkdir(exist_ok=True)
+    semantic = out / "semantic-receipts"
+    semantic.mkdir(exist_ok=True)
     attempted = 0
     for path in sorted(inbox.glob("*.json")):
         if attempted >= 30:
@@ -382,6 +392,13 @@ def cycle(root: Path) -> dict:
                 attempted -= 1
                 continue
             job = json.loads(raw.decode("utf-8"))
+            semantic_receipt = semantic / (semantic_job_digest(job) + ".json")
+            if semantic_receipt.exists():
+                result["duplicate"] += 1
+                attempted -= 1
+                receipt.write_text(json.dumps({"status": "SEMANTIC_DUPLICATE",
+                                               "original": semantic_receipt.name}), encoding="utf-8")
+                continue
             choices = [propose(job["reference"], job["baseline"],
                                target_css=job["target_css"], direction_id=key)
                        for key in DIRECTIONS]
@@ -427,6 +444,8 @@ def cycle(root: Path) -> dict:
                                            "sandbox_path": sandbox_path,
                                            "evidence_review_required": request_path is None}),
                                encoding="utf-8")
+            semantic_receipt.write_text(json.dumps({"job_digest": bundle["job_digest"],
+                                                    "request_path": request_path}), encoding="utf-8")
         except (ValueError, KeyError, TypeError, OSError, AttributeError) as exc:
             result["blocked"].append({"file": path.name, "reason": str(exc)})
             if receipt is not None:

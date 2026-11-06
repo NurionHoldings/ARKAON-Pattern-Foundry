@@ -268,3 +268,18 @@ def test_failed_candidate_is_returned_to_improvement_request(tmp_path):
                              if p.name != "latest.json").read_text())
     assert bundle["evaluation"]["status"] == "FOLLOWUP_REQUIRED"
     assert bundle["evaluation"]["improvement_accepted"] is False
+
+
+def test_repeat_capture_time_does_not_create_another_request(tmp_path):
+    inbox = tmp_path / "inbox/design-learning"
+    inbox.mkdir(parents=True)
+    job = {"reference": observation(reference=True), "baseline": observation(),
+           "target_css": "services/demo.css"}
+    (inbox / "a.json").write_text(json.dumps(job))
+    assert cycle(tmp_path)["proposed"] == 1
+    job["reference"]["source"]["observed_at"] = "2026-11-06T05:00:00Z"
+    job["baseline"]["source"]["observed_at"] = "2026-11-06T05:00:00Z"
+    (inbox / "b.json").write_text(json.dumps(job))
+    assert cycle(tmp_path)["proposed"] == 0
+    bundles = [p for p in (tmp_path / "state/design-learning").glob("*.json") if p.name != "latest.json"]
+    assert len(bundles) == 1

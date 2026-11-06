@@ -61,3 +61,9 @@ node tools/capture-design-observation.cjs baseline.html roles.json after.json 39
 ## 측정 기준의 의미
 
 색 대비는 [W3C 일반 텍스트 대비 설명](https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum.html)을 참고한다. 현재 16px·행간 1.4·gap 8px 경계는 adapter의 제품 휴리스틱이며 WCAG 준수 인증 기준이 아니다. 특히 행간 기본값 1.4/1.6을 접근성 인증으로 표현하지 않는다. 측정 통과가 참조 디자인보다 미적으로 우수함을 증명하지 않는다. 원본 구성과 사용자 목적·실화면을 독립 검토해야 한다.
+
+## 견본과 감사 작업자 교신 — 후속 요구 (미구현)
+
+명함·로고는 충분한 자체 견본(첫 목표 12개) → 즐겨찾기 3~4개 → 최종 방향 선택 → 내용·서체·구성의 심화 편집으로 확장한다. 12개를 색상 치환만으로 채우지 않고 심벌·워드마크·정렬·명함 앞뒤 정보 구성의 차이를 확보해야 한다. 현 PR은 측정 CSS 방향 4개이며 이 견본 생성기가 아니다.
+
+기존 relay가 개선요청을 GitHub로 전달하는 경로는 재사용한다. 범용 코딩 작업자는 request_id/scope_digest/선택 방향 digest/base/head SHA에 결속된 구현·시험 manifest를 별도 제출하고, 감사 작업자는 독립 근거와 보완 요청 digest로 응답해야 한다. 보완 작업도 같은 request_id 아래 revision과 새 head로 기록한다. 이 채팅의 자동 기동이나 감사 AI의 상시 실행은 보장되지 않는다. 인증된 요청 소비·응답 기록·작업자 실행환경을 연결하기 전에는 사람/현재 세션의 검토와 구분한다. GitHub 코멘트 존재를 독립 감사 완료로 해석하지 않는다.
