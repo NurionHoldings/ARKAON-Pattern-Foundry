@@ -67,6 +67,7 @@ def test_expired_cost_permission_blocks():
 
 def test_submit_claim_prevents_a_second_billable_call(tmp_path, monkeypatch):
     monkeypatch.setattr("apf.agent_exchange.shutil.which", lambda _: "/usr/bin/netlify")
+    monkeypatch.setattr("apf.agent_exchange.verify_remote_head", lambda task: None)
     calls = []
     def runner(command, **kwargs):
         calls.append(command)
@@ -80,6 +81,7 @@ def test_submit_claim_prevents_a_second_billable_call(tmp_path, monkeypatch):
 
 def test_ambiguous_provider_response_is_not_silently_retried(tmp_path, monkeypatch):
     monkeypatch.setattr("apf.agent_exchange.shutil.which", lambda _: "/usr/bin/netlify")
+    monkeypatch.setattr("apf.agent_exchange.verify_remote_head", lambda task: None)
     task = build()
     runner = lambda *a, **kw: SimpleNamespace(returncode=0, stdout='{"unknown":true}', stderr="")
     assert submit(task, authorization(task), tmp_path, runner=runner)["status"].endswith("RECONCILIATION")
@@ -89,6 +91,7 @@ def test_ambiguous_provider_response_is_not_silently_retried(tmp_path, monkeypat
 
 def test_poll_done_never_means_independent_audit_pass(tmp_path, monkeypatch):
     monkeypatch.setattr("apf.agent_exchange.shutil.which", lambda _: "/usr/bin/netlify")
+    monkeypatch.setattr("apf.agent_exchange.verify_remote_head", lambda task: None)
     runner = lambda *a, **kw: SimpleNamespace(returncode=0, stdout='{"id":"test-task","status":"done"}')
     event = poll(build(), "test-task", tmp_path, runner=runner)
     assert event["status"] == "RESULT_REVIEW_PENDING"
@@ -162,3 +165,14 @@ def test_courier_skips_finished_history_and_reaches_new_task(tmp_path, monkeypat
     assert courier_cycle(tmp_path)["polled"] == 1
     assert (directory / "provider-terminal.json").exists()
     assert courier_cycle(tmp_path)["polled"] == 0
+
+
+def test_remote_head_change_blocks_before_any_paid_call(tmp_path, monkeypatch):
+    monkeypatch.setattr("apf.agent_exchange.shutil.which", lambda _: "/usr/bin/netlify")
+    def changed(task):
+        raise ValueError("REMOTE_HEAD_CHANGED")
+    monkeypatch.setattr("apf.agent_exchange.verify_remote_head", changed)
+    task = build()
+    with pytest.raises(ValueError, match="REMOTE_HEAD_CHANGED"):
+        submit(task, authorization(task), tmp_path, runner=lambda *a, **kw: pytest.fail("billable call"))
+    assert not list(tmp_path.rglob("submission-claim.json"))

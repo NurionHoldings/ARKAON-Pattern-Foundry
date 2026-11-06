@@ -16,6 +16,8 @@ import time
 from datetime import UTC, datetime
 from hashlib import sha256
 from pathlib import Path
+from urllib.parse import quote
+from urllib.request import Request, urlopen
 
 from .self_improvement_relay import validate_request
 
@@ -109,11 +111,22 @@ def provider_environment() -> dict[str, str]:
             "NETLIFY_TELEMETRY_DISABLED": "1"}
 
 
+def verify_remote_head(task: dict) -> None:
+    branch = quote(task["base_branch"], safe="/")
+    url = "https://api.github.com/repos/NurionHoldings/ARKAON-Pattern-Foundry/git/ref/heads/" + branch
+    request = Request(url, headers={"User-Agent": "ARKAON-agent-exchange", "Accept": "application/vnd.github+json"})
+    with urlopen(request, timeout=15) as response:
+        observed = json.load(response)
+    if observed.get("object", {}).get("sha") != task["expected_head"]:
+        raise ValueError("REMOTE_HEAD_CHANGED_REPREPARE_BEFORE_BILLING")
+
+
 def submit(task: dict, authorization: dict, root: Path, *, runner=subprocess.run) -> dict:
     authorize_one(task, authorization, now=datetime.now(UTC))
     executable = shutil.which("netlify")
     if not executable:
         raise ValueError("NETLIFY_CLI_MISSING")
+    verify_remote_head(task)
     # A crash or timeout leaves the claim intact: reconcile rather than pay twice.
     directory = root / "state/agent-exchange" / task["task_digest"]
     write_new(directory / "submission-claim.json", {"task_digest": task["task_digest"],

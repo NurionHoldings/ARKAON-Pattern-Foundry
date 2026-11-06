@@ -17,7 +17,7 @@
 ## 구현된 교신 코드
 
 - `apf.agent_exchange.prepare`: 기존 SELF_IMPROVEMENT_REQUEST의 request_id·scope_digest·기준 SHA를 결속한 원격 코딩/감사 작업과 정확한 Netlify CLI 명령 생성.
-- `submit`: `AUTHORIZE_ONE_BILLABLE_TASK`와 task/command digest·승인자·승인시각·만료시각이 일치하는 **단일 실행**만 시작. API 호출 없이 문서화된 `netlify agents:create` 사용. 원격 작업은 새 branch에 작성. 시간초과/응답 불명은 claim을 유지하며 재과금을 막기 위해 자동 재제출하지 않음.
+- `submit`: GitHub 원격 branch의 실제 HEAD를 API로 대조해 이동 시 과금 전에 중단한다. `AUTHORIZE_ONE_BILLABLE_TASK`와 task/command digest·승인자·승인시각·만료시각이 일치하는 **단일 실행**만 시작. API 호출 없이 문서화된 `netlify agents:create` 사용. 원격 작업은 새 branch에 작성. 시간초과/응답 불명은 claim을 유지하며 재과금을 막기 위해 자동 재제출하지 않음.
 - `poll`/`watch`: 문서화된 `netlify agents:show`로 확인하고 상태 변화만 inbox에 보존. 기본 15초. 완료된 작업은 다시 조회하지 않음. 구현자/감사자 역할 키·DB 비밀정보는 CLI 환경에서 제외.
 - `record`/`accept_result`: 역할별 host-side HMAC, 요청/scope/작업·실행 SHA·별도 worker·별도 증거 결속 확인. 인증된 제출물도 독립 감사 최종 승인으로 자동 인정하지 않음.
 - ARKAON은 Codex 실행, ETERNIAN_AUDIT_WORKER는 별도 Claude 실행으로 구분. 모델/계정 이름만으로 독립 감사를 인정하지 않음. 감사는 실제 구현 결과의 SHA·worker·근거를 확인한 뒤 준비.
