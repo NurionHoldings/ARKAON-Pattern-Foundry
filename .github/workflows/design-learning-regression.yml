@@ -1,0 +1,36 @@
+name: Design learning regression
+on:
+  pull_request:
+    paths:
+      - 'src/apf/design_learning.py'
+      - 'src/apf/collector_service.py'
+      - 'tools/capture-design-observation.cjs'
+      - 'tests/*design*learning*'
+      - '.github/workflows/design-learning-regression.yml'
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: pip install -e '.[dev]'
+      - run: npm install --prefix /tmp/design-browser playwright@1.65.0
+      - run: node /tmp/design-browser/node_modules/playwright/cli.js install --with-deps chromium
+      - run: node --test tests/design-learning-browser.test.cjs
+        env:
+          NODE_PATH: /tmp/design-browser/node_modules
+          APF_RUN_BROWSER: '1'
+          APF_DESIGN_EVIDENCE_DIR: '${{ runner.temp }}/design-evidence'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: design-learning-browser-${{ github.sha }}
+          path: '${{ runner.temp }}/design-evidence'
+          retention-days: 14
