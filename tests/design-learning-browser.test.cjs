@@ -39,6 +39,15 @@ test('four original directions, selected sandbox CSS, actual computed feedback a
   const page=await browser.newPage({viewport:{width:390,height:844},hasTouch:true});
   await page.goto(pathToFileURL(path.join(dir,filename.replace('.json','.html'))).href);
   assert.equal(await page.locator('button').count(),4);
+  for(let index=0;index<4;index++){
+    const element=await page.locator('iframe').nth(index).elementHandle();
+    const frame=await element.contentFrame();
+    await frame.locator('.content').waitFor({state:'visible'});
+    assert.match(await frame.locator('body').innerText(),/우리 사업의 가치/);
+    const size=await frame.locator('.content').evaluate(el=>parseFloat(getComputedStyle(el).fontSize));
+    assert.equal(size,bundle.choices[index].direction.font);
+    await page.locator('article').nth(index).screenshot({path:path.join(root,`direction-${index+1}.png`)});
+  }
   const download=page.waitForEvent('download');await page.locator('button').nth(2).click();
   const downloaded=await download;const selection=JSON.parse(fs.readFileSync(await downloaded.path(),'utf8'));
   selected=selection;assert.equal(selection.direction_id,'mobile');assert.equal(selection.proposal_digest,bundle.choices[2].proposal_digest);
