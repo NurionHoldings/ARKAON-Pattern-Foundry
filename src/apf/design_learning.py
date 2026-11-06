@@ -166,6 +166,8 @@ def select_direction(bundle: dict, selection: dict) -> dict:
             or selection.get("schema_version") != "apf.design-direction-selection/v1"
             or not selection.get("selected_at")):
         raise ValueError("explicit direction selection required")
+    if len({p["candidate_css_sha256"] for p in bundle["choices"]}) < 3:
+        raise ValueError("at least three distinct directions must be designed before selection")
     matches = [p for p in bundle["choices"]
                if p["proposal_digest"] == selection.get("proposal_digest")
                and p["direction_id"] == selection.get("direction_id")]
@@ -242,8 +244,16 @@ def evaluate(proposal: dict, after: dict, *, differentiation: dict) -> dict:
 
 def preview(bundle: dict) -> str:
     """Own neutral content in four sandboxed CSS previews, not external screenshots."""
+    if len({p["candidate_css_sha256"] for p in bundle["choices"]}) < 3:
+        return ("<!doctype html><html lang=ko><meta charset=utf-8><h1>시안을 더 설계하고 있습니다</h1>"
+                "<p>서로 다른 방향이 충분하지 않습니다. 같은 시안을 여러 개로 제시하지 않고 "
+                "추가 디자인·기능 개선 과제로 남깁니다.</p></html>")
     cards = []
+    seen = set()
     for choice in bundle["choices"]:
+        if choice["candidate_css_sha256"] in seen:
+            continue
+        seen.add(choice["candidate_css_sha256"])
         samples = choice["baseline"]["samples"]
         elements = []
         base_css = []
@@ -415,7 +425,8 @@ def cycle(root: Path) -> dict:
             bundle = {"schema_version": "apf.design-direction-choices/v1",
                       "job_digest": digest(job), "selection_required": True,
                       "capability_comparisons": comparisons,
-                      "choices": choices, "automatic_selection_allowed": False}
+                      "choices": choices, "automatic_selection_allowed": False,
+                      "distinct_direction_count": len({c["candidate_css_sha256"] for c in choices})}
             if job.get("after") is not None:
                 selected = select_direction(bundle, job.get("selection", {}))
                 bundle["evaluation"] = evaluate(selected, job["after"],

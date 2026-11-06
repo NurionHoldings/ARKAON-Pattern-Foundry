@@ -3,7 +3,15 @@ import json
 
 import pytest
 
-from apf.design_learning import cycle, digest, evaluate, materialize, propose, validate_observation
+from apf.design_learning import (
+    DIRECTIONS,
+    cycle,
+    digest,
+    evaluate,
+    materialize,
+    propose,
+    validate_observation,
+)
 
 
 def observation(*, reference=False):
@@ -187,7 +195,8 @@ def test_unqualified_material_never_becomes_authorized_improvement(tmp_path):
 def test_only_exact_direction_can_be_selected():
     from apf.design_learning import select_direction
     proposal = candidate()
-    bundle = {"schema_version": "apf.design-direction-choices/v1", "choices": [proposal]}
+    bundle = {"schema_version": "apf.design-direction-choices/v1", "choices": [propose(observation(reference=True), observation(),
+        target_css="services/demo.css", direction_id=key) for key in DIRECTIONS]}
     selection = {"schema_version": "apf.design-direction-selection/v1", "selected_at": "now",
                  "proposal_digest": proposal["proposal_digest"], "direction_id": "readable"}
     assert select_direction(bundle, selection) == proposal
@@ -215,7 +224,8 @@ def test_standing_authority_builds_selected_candidate_without_new_approval(tmp_p
     (tmp_path / "config").mkdir()
     (tmp_path / "config/arkaon-design-evolution-policy.json").write_bytes(policy.read_bytes())
     proposal = candidate()
-    bundle = {"schema_version": "apf.design-direction-choices/v1", "choices": [proposal]}
+    bundle = {"schema_version": "apf.design-direction-choices/v1", "choices": [propose(observation(reference=True), observation(),
+        target_css="services/demo.css", direction_id=key) for key in DIRECTIONS]}
     selection = {"schema_version": "apf.design-direction-selection/v1", "selected_at": "now",
                  "proposal_digest": proposal["proposal_digest"], "direction_id": "readable"}
     result = delegated_sandbox(tmp_path, bundle, selection)
@@ -283,3 +293,17 @@ def test_repeat_capture_time_does_not_create_another_request(tmp_path):
     assert cycle(tmp_path)["proposed"] == 0
     bundles = [p for p in (tmp_path / "state/design-learning").glob("*.json") if p.name != "latest.json"]
     assert len(bundles) == 1
+
+
+def test_identical_candidates_are_not_disguised_as_four_different_directions():
+    from apf.design_learning import preview, select_direction
+    base = observation(reference=True)
+    base["samples"][0]["foreground"] = "#aaaaaa"
+    choices = [propose(observation(reference=True), base, target_css="services/demo.css",
+                       direction_id=key) for key in DIRECTIONS]
+    bundle = {"schema_version": "apf.design-direction-choices/v1", "choices": choices}
+    assert "같은 시안을 여러 개로 제시하지 않고" in preview(bundle)
+    with pytest.raises(ValueError):
+        select_direction(bundle, {"schema_version": "apf.design-direction-selection/v1",
+            "selected_at": "now", "proposal_digest": choices[0]["proposal_digest"],
+            "direction_id": "readable"})
