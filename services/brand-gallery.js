@@ -40,7 +40,7 @@ function render(){
   const image=document.createElement('img');image.alt=`${c.name} 로고 견본`;image.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(studio.logo(brief));
   image.style.background=window.APFBrandEditing.presentation(brief).background;
   const frame=document.createElement('iframe');frame.title=`${c.name} 명함 앞뒷면`;frame.setAttribute('sandbox','');frame.loading='lazy';
-  frame.srcdoc=studio.render(brief)+'<style>body{padding:8px;background:#eef0ed}.logo,h2,body>p{display:none}.card{min-height:110px;padding:12px;border-radius:6px;margin:6px 0}.card svg{max-height:55px}.person{font-size:14px}.intro,.details,p{font-size:10px;line-height:1.5}.layout-signature .front{gap:8px}</style>';
+  frame.srcdoc=studio.render(brief)+'<style>body{padding:8px;background:#eef0ed}.logo,h2,body>p{display:none}.card{min-height:110px;padding:12px;border-radius:6px;margin:6px 0}.card svg{max-height:55px}.person{font-size:14px}p{margin:4px 0}.intro,.details,p{font-size:10px;line-height:1.5}.layout-signature .front{gap:8px}</style>';
   const reason=document.createElement('p');reason.textContent=c.meaning+' · '+({editorial:'정돈된 소개',split:'측면 강조',centered:'중앙 집중',signature:'역할 분할'}[c.galleryLayout]);
   const shortlist=document.createElement('button');shortlist.type='button';shortlist.dataset.shortlist=c.id;shortlist.addEventListener('click',()=>{try{ids=toggleShortlist(ids,c.id,all);if(!ids.includes(selected))selected='';selectionState();persist();}catch(e){status.textContent=e.message;}});
   const pick=document.createElement('button');pick.type='button';pick.textContent='이 견본 선택';pick.dataset.choose=c.id;pick.addEventListener('click',()=>{selected=c.id;selectionState();status.textContent=`${c.name}을 선택했습니다. 아래 버튼으로 문구·서체·구성을 이어서 다듬으세요.`;persist();});
