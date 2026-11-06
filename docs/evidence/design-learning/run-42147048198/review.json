@@ -1,0 +1,40 @@
+{
+  "schema_version": "apf.design-learning-review/v1",
+  "tested_head": "4537ed6a26f55a927da3f30a0c06b7cab0745df3",
+  "base_sha": "a26baa71e93f1971151c4bb93e537444e95850a1",
+  "browser_run_id": 42147048198,
+  "ci_run_id": 42147048235,
+  "container_run_id": 42147048451,
+  "artifact_id": 13469824171,
+  "archive_sha256": "2b8a2bbae88ba953f2af7d33d99adbe75cca4f95a980608a5b91407773781250",
+  "archive_bytes": 242036,
+  "archive_members": 45,
+  "checks": {
+    "zip_api_digest": "PASS",
+    "zip_crc": "PASS",
+    "four_direction_after_evaluations": "PASS",
+    "four_preview_frames": "PASS",
+    "mobile_selection": "PASS",
+    "selected_candidate_only": "PASS",
+    "python_passed": 924,
+    "python_skipped": 13,
+    "new_and_collector_tests_passed": 34
+  },
+  "fixture_kind": "SYNTHETIC_NOT_EXTERNAL_LEARNING",
+  "review_scope": "Implementation and synthetic browser regression; not independent product audit",
+  "improvement_accepted": false,
+  "independent_audit_status": "NOT_RUN",
+  "merge_allowed": false,
+  "deployment_allowed": false,
+  "remaining": [
+    "Real external capture producer/model integration",
+    "Full self-generated business card/logo examples",
+    "Authenticated Console selection API",
+    "General code-generation worker and authenticated audit-worker response loop"
+  ],
+  "superseded_browser_failure": {
+    "run_id": 42146240780,
+    "reason": "Candidate style capture timed out with addStyleTag under script-disabled context",
+    "remediation": "Inject candidate CSS into offline HTML before setContent; bound child and browser waits"
+  }
+}

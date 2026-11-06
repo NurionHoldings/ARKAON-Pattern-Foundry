@@ -1,0 +1,16 @@
+{
+  "schema_version": "apf.design-evolution-delegation/v1",
+  "owner": "최인석",
+  "authorization_basis": "2026-11-06 채팅: 현재 기능 차이·필요 구현·기대 효과·시험 기준을 기반으로 아르카온 스스로 개선하도록 권한 부여",
+  "enabled": true,
+  "discovery_scope": "OPEN_ENDED",
+  "user_direction_selection_required": true,
+  "autonomous_sandbox_css": true,
+  "autonomous_tests_and_followups": true,
+  "supported_adapter": "MEASURED_CSS_V1",
+  "additional_capabilities": "PRESERVE_AS_IMPLEMENTATION_BACKLOG",
+  "independent_review_required": true,
+  "automatic_improvement_acceptance": false,
+  "merge_allowed": false,
+  "deployment_allowed": false
+}

@@ -14,6 +14,7 @@ from urllib.parse import urlsplit
 from .collector_runtime import CollectorRuntime, load_policy
 from .collector_storage import HashChainedJsonLinesAuditSink, SQLiteContentHashStore
 from .continuous_collection import AssetizationBasis, CollectionCandidate
+from .design_learning import cycle as design_learning_cycle
 from .external_learning import SourceKind
 from .hourly_learning import (
     HourlyLearningSchedule,
@@ -153,6 +154,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.once:
         result = runtime.run_once()
+        design_learning_cycle(foundry_root)
         if schedule is not None:
             _record_hourly_cycle(schedule=schedule, foundry_root=foundry_root, result=result)
         return 0
@@ -167,6 +169,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     while not stop.is_set():
         result = runtime.run_once()
+        design_learning_cycle(foundry_root)
         if schedule is not None:
             _record_hourly_cycle(schedule=schedule, foundry_root=foundry_root, result=result)
         if stop.wait(runtime.policy.interval_seconds):
