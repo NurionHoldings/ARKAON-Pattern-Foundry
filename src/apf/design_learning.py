@@ -142,7 +142,7 @@ def propose(reference: dict, baseline: dict, *, target_css: str,
         "discovery_scope": "OPEN_ENDED", "additional_opportunities": backlog,
         "reference_role": "COMPARISON_BASELINE_ONLY",
         "differentiation_required": True,
-        "status": "OWNER_APPROVAL_PENDING" if changes else "RESEARCH_REQUIRED",
+        "status": "DIRECTION_SELECTION_PENDING" if changes else "RESEARCH_REQUIRED",
         "improvement_accepted": False, "merge_allowed": False, "deployment_allowed": False,
     }
     proposal["proposal_digest"] = digest(proposal)
@@ -186,7 +186,7 @@ def materialize(proposal: dict, approval: dict, output: Path) -> Path:
             or approval.get("target_css") != proposal["target_css"]
             or approval.get("decision") != "OWNER_APPROVED"
             or not approval.get("approver") or not approval.get("approved_at")
-            or proposal["status"] != "OWNER_APPROVAL_PENDING"):
+            or proposal["status"] != "DIRECTION_SELECTION_PENDING"):
         raise ValueError("exact proposal approval required")
     output.mkdir(parents=True, exist_ok=True)
     target = output / (proposal["proposal_digest"] + ".css")
@@ -371,6 +371,7 @@ def cycle(root: Path) -> dict:
         if attempted >= 30:
             break
         receipt = None
+        attempted += 1
         try:
             if path.is_symlink() or path.stat().st_size > 2_000_000:
                 raise ValueError("unsafe job file")
@@ -378,8 +379,8 @@ def cycle(root: Path) -> dict:
             receipt = processed / (sha256(raw).hexdigest() + ".json")
             if receipt.exists():
                 result["duplicate"] += 1
+                attempted -= 1
                 continue
-            attempted += 1
             job = json.loads(raw.decode("utf-8"))
             choices = [propose(job["reference"], job["baseline"],
                                target_css=job["target_css"], direction_id=key)

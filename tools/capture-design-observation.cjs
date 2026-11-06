@@ -3,7 +3,6 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
-const {pathToFileURL} = require('node:url');
 const hash = b => crypto.createHash('sha256').update(b).digest('hex');
 async function main() {
   const [html, mapping, output, widthArg='390', sourceUrl='http://localhost:8080/demo.html', css] = process.argv.slice(2);
@@ -16,9 +15,9 @@ async function main() {
   const browser = await chromium.launch({headless:true, ...(process.env.APF_CHROMIUM_EXECUTABLE ? {executablePath:process.env.APF_CHROMIUM_EXECUTABLE} : {})});
   try {
     const context = await browser.newContext({viewport:{width,height:844},serviceWorkers:'block',javaScriptEnabled:false,offline:true});
-    await context.route(/^https?:/, route=>route.abort());
+    await context.route('**/*', route=>route.abort());
     const page = await context.newPage();
-    await page.goto(pathToFileURL(path.resolve(html)).href);
+    await page.setContent(fs.readFileSync(html,'utf8')); 
     if (css) await page.addStyleTag({content:fs.readFileSync(css,'utf8')});
     await page.evaluate(()=>document.fonts.ready);
     const samples = await page.evaluate(roles=>roles.map(({role,selector})=>{
