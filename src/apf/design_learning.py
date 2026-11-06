@@ -420,6 +420,8 @@ def cycle(root: Path) -> dict:
                 request_path = None
             sandbox_path = None
             if job.get("selection") is not None:
+                if request_path is None:
+                    raise ValueError("qualified evidence required before delegated sandbox")
                 sandbox_path = delegated_sandbox(root, bundle, job["selection"])
             receipt.write_text(json.dumps({"status": "PROPOSED", "request_path": request_path,
                                            "sandbox_path": sandbox_path,

@@ -32,6 +32,7 @@ test('four original directions, selected sandbox CSS, actual computed feedback a
    const code=`import json;from apf.design_learning import evaluate;from pathlib import Path;p=Path(${JSON.stringify(root)});b=json.loads((p/'state/design-learning'/${JSON.stringify(filename)}).read_text());c=next(x for x in b['choices'] if x['direction_id']==${JSON.stringify(proposal.direction_id)});a=json.loads((p/${JSON.stringify(proposal.direction_id+'-after.json')}).read_text());r=evaluate(c,a,differentiation={'user_purpose':'읽기','original_composition':'자체 예시','beyond_color':'서체와 간격','evidence_ref':'synthetic-browser-run'});assert r['automated_check_passed'];assert not r['improvement_accepted'];(p/${JSON.stringify(proposal.direction_id+'-evaluation.json')}).write_text(json.dumps(r,ensure_ascii=False,indent=2))`;
    run(python,['-c',code]);
  }
+ let selected;
  const {chromium}=require('playwright');
  const browser=await chromium.launch({headless:true,...(process.env.APF_CHROMIUM_EXECUTABLE?{executablePath:process.env.APF_CHROMIUM_EXECUTABLE}:{})});
  try{
@@ -40,10 +41,18 @@ test('four original directions, selected sandbox CSS, actual computed feedback a
   assert.equal(await page.locator('button').count(),4);
   const download=page.waitForEvent('download');await page.locator('button').nth(2).click();
   const downloaded=await download;const selection=JSON.parse(fs.readFileSync(await downloaded.path(),'utf8'));
-  assert.equal(selection.direction_id,'mobile');assert.equal(selection.proposal_digest,bundle.choices[2].proposal_digest);
+  selected=selection;assert.equal(selection.direction_id,'mobile');assert.equal(selection.proposal_digest,bundle.choices[2].proposal_digest);
   assert.equal(await page.locator('button[aria-pressed=true]').count(),1);
   await page.screenshot({path:path.join(root,'choices-mobile.png'),fullPage:true});
   fs.writeFileSync(path.join(root,'selection.json'),JSON.stringify(selection,null,2));
  }finally{await browser.close();}
+ fs.mkdirSync(path.join(root,'config'),{recursive:true});
+ fs.copyFileSync('config/arkaon-design-evolution-policy.json',path.join(root,'config/arkaon-design-evolution-policy.json'));
+ job.selection=selected;
+ job.evidence={kind:'FIRST_PARTY_AUTHORIZED',provenance_complete:true,authorization_valid:true,license_compatible:true,consent_valid:true,independently_verified:false,fresh:true,contains_sensitive_data:false,confidence_percent:80};
+ fs.writeFileSync(path.join(root,'inbox/design-learning/selected.json'),JSON.stringify(job));
+ run(python,['-m','apf.design_learning','--foundry-root',root]);
+ assert.equal(fs.readFileSync(path.join(root,'state/design-learning/sandbox',selected.proposal_digest+'.css'),'utf8'),bundle.choices[2].candidate_css);
+ assert.equal(fs.readdirSync(path.join(root,'state/design-learning/sandbox')).filter(x=>x.endsWith('.css')).length,1);
  fs.writeFileSync(path.join(root,'browser-summary.json'),JSON.stringify({status:'PASS',directions:4,fixture_kind:'SYNTHETIC_NOT_EXTERNAL_LEARNING',improvement_accepted:false},null,2));
 });

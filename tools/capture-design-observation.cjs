@@ -17,8 +17,8 @@ async function main() {
     const context = await browser.newContext({viewport:{width,height:844},serviceWorkers:'block',javaScriptEnabled:false,offline:true});
     await context.route('**/*', route=>route.abort());
     const page = await context.newPage();
-    await page.setContent(fs.readFileSync(html,'utf8')); 
-    if (css) await page.addStyleTag({content:fs.readFileSync(css,'utf8')});
+    const extra = css ? '<style>'+fs.readFileSync(css,'utf8').replace(/</g,'\\3c ')+'</style>' : '';
+    await page.setContent(fs.readFileSync(html,'utf8')+extra);
     await page.waitForFunction(()=>document.fonts.status==='loaded',null,{timeout:10000});
     const samples = await page.evaluate(roles=>roles.map(({role,selector})=>{
       const el=document.querySelector(selector);if(!el)throw Error('role missing: '+role);
