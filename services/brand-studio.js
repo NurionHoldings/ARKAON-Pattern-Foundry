@@ -21,6 +21,8 @@ const fields = [
   'website',
   'address',
   'cardLayout',
+  'galleryLayout',
+  'shortlistedConceptIds',
   'style',
   'accent',
 ];
@@ -57,6 +59,8 @@ function normalize(raw) {
   b.accent = /^#[0-9a-f]{6}$/i.test(b.accent) ? b.accent : '#31594c';
   b.style = ['orbit', 'frame', 'wordmark'].includes(b.style) ? b.style : 'orbit';
   b.cardLayout = b.cardLayout === 'personal' ? 'personal' : 'company';
+  b.galleryLayout = ['editorial','split','centered','signature'].includes(b.galleryLayout)?b.galleryLayout:'editorial';
+  try { b.shortlistedConceptIds=JSON.stringify(JSON.parse(b.shortlistedConceptIds||'[]').filter(id=>typeof id==='string'&&/^[a-z-]+$/.test(id)).slice(0,4)); } catch { b.shortlistedConceptIds='[]'; }
   const initialSource = clip(raw.initials, 20) || b.businessName;
   b.initials = Array.from(initialSource).slice(0, 4).join('') || 'AB';
   Object.assign(b,editing.normalize(raw));
@@ -155,7 +159,7 @@ function render(raw) {
   const cardSurface=editing.presentation({...b,logoTone:'light'});
   const guidance=surface.adapted||cardSurface.adapted
     ? '<p class="contrast-note">밝은 브랜드색이 잘 보이도록 로고 영역에 어두운 배경을 적용했습니다. 브랜드색은 그대로입니다. 배경 비교에서 흰색·단색 로고도 살펴보세요.</p>' : '';
-  return `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>*{box-sizing:border-box}body{margin:0;padding:24px;font-family:system-ui,sans-serif;color:#253d35;background:#e6eadd}h2{font-size:12px;margin:24px 0 12px}.logo{background:${surface.background};padding:24px;border-radius:12px}svg{width:100%;max-width:500px;height:auto}.card-logo{padding:12px;border-radius:8px}.contrast-note{font-size:13px;line-height:1.6;background:#fff;padding:12px;border-radius:8px}.card{min-height:240px;border-radius:12px;padding:30px;background:#fff;display:flex;flex-direction:column;justify-content:space-between;overflow-wrap:anywhere;word-break:keep-all}.front{border-top:6px solid ${b.accent}}.back{background:#253d35;color:#fff}.back a{color:#c8e8d8}.person{font-size:23px;font-weight:700}.tagline{font-size:15px;font-weight:600}.intro{font-size:13px;line-height:1.6;opacity:.92}.details{display:grid;gap:8px;font-size:13px}p{font-size:13px;line-height:1.6}@media(max-width:450px){body{padding:14px}.card{padding:22px}.person{font-size:20px}}</style><p>${b.sample ? '가상 예시 · 실제 사업 정보 아님' : '작성 중인 브랜드 초안'} · 공개·인쇄 전 확인 필요 · 실적·인증·가격은 입력하지 않은 항목을 만들지 않습니다</p>${guidance}<h2>01 / LOGO</h2><div class="logo">${logo(b)}</div><h2>02 / 명함 앞면 (${b.cardLayout === 'personal' ? '개인' : '회사'})</h2>${cardFront(b)}<h2>03 / 명함 뒷면</h2>${cardBack(b)}</html>`;
+  return `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>.front,.back{position:relative}.layout-split .front{border-left:18px solid var(--brand-accent);border-top:0}.layout-centered .front{text-align:center;align-items:center}.layout-signature .front{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}.layout-signature .front .card-logo{grid-column:1/-1}.layout-editorial .front{border-bottom:1px solid var(--brand-accent)}*{box-sizing:border-box}body{margin:0;padding:24px;font-family:system-ui,sans-serif;color:#253d35;background:#e6eadd}h2{font-size:12px;margin:24px 0 12px}.logo{background:${surface.background};padding:24px;border-radius:12px}svg{width:100%;max-width:500px;height:auto}.card-logo{padding:12px;border-radius:8px}.contrast-note{font-size:13px;line-height:1.6;background:#fff;padding:12px;border-radius:8px}.card{min-height:240px;border-radius:12px;padding:30px;background:#fff;display:flex;flex-direction:column;justify-content:space-between;overflow-wrap:anywhere;word-break:keep-all}.front{border-top:6px solid ${b.accent}}.back{background:#253d35;color:#fff}.back a{color:#c8e8d8}.person{font-size:23px;font-weight:700}.tagline{font-size:15px;font-weight:600}.intro{font-size:13px;line-height:1.6;opacity:.92}.details{display:grid;gap:8px;font-size:13px}p{font-size:13px;line-height:1.6}@media(max-width:450px){body{padding:14px}.card{padding:22px}.person{font-size:20px}}</style><body class="layout-${b.galleryLayout}" style="--brand-accent:${b.accent}"><p>${b.sample ? '가상 예시 · 실제 사업 정보 아님' : '작성 중인 브랜드 초안'} · 공개·인쇄 전 확인 필요 · 실적·인증·가격은 입력하지 않은 항목을 만들지 않습니다</p>${guidance}<h2>01 / LOGO</h2><div class="logo">${logo(b)}</div><h2>02 / 명함 앞면 (${b.cardLayout === 'personal' ? '개인' : '회사'})</h2>${cardFront(b)}<h2>03 / 명함 뒷면</h2>${cardBack(b)}</html>`;
 }
 
 function collectGaps(b) {
@@ -177,9 +181,11 @@ function collectGaps(b) {
 if (typeof module !== 'undefined') {
   module.exports = { normalize, logo, render, suggestCopy, applyCopySuggestions, collectGaps };
 }
-if (typeof document === 'undefined') return;
+if(typeof window!=='undefined')window.APFBrandStudio={normalize,logo,render,suggestCopy,applyCopySuggestions,collectGaps};
+if (typeof document === 'undefined' || !document.getElementById('brand')) return;
 
 let id = new URLSearchParams(location.search).get('project');
+if(id&&document.getElementById('gallery-link'))document.getElementById('gallery-link').href='/services/brand-gallery.html?project='+encodeURIComponent(id);
 let url;
 let editHistory;
 function syncHistory(){document.getElementById('undo').disabled=!editHistory?.canUndo;document.getElementById('redo').disabled=!editHistory?.canRedo;}
@@ -236,7 +242,7 @@ function syncConceptSelection() {
 function showConcepts() {
   const root=document.getElementById('concept-options');
   root.replaceChildren();
-  creative.concepts(values()).forEach(c=>{
+  (creative.concepts(values()).some(c=>c.id===values().conceptId)?creative.concepts(values()):creative.allConcepts(values())).forEach(c=>{
     const button=document.createElement('button');button.type='button';button.className='concept';
     button.dataset.conceptId=c.id;
     const title=document.createElement('strong');title.textContent=c.name;
@@ -314,6 +320,7 @@ document.getElementById('brand')?.addEventListener('submit', (e) => {
       publish_ready: false,
     });
     id = saved.id;
+    if(document.getElementById('gallery-link'))document.getElementById('gallery-link').href='/services/brand-gallery.html?project='+encodeURIComponent(id);
     const q = new URLSearchParams();
     q.set('project', id);
     history.replaceState(null, '', `${location.pathname}?${q}`);

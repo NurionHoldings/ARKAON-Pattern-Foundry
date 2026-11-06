@@ -15,6 +15,8 @@ const RESTORE_FIELD_IDS = [
   'website',
   'address',
   'cardLayout',
+  'galleryLayout',
+  'shortlistedConceptIds',
   'conceptId',
   'conceptRound',
   'conceptRotation',
@@ -55,6 +57,8 @@ const STUDIO_PERSISTED_FIELDS = [
   'website',
   'address',
   'cardLayout',
+  'galleryLayout',
+  'shortlistedConceptIds',
   'style',
   'accent',
 ];
