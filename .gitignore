@@ -30,3 +30,7 @@ state/orchestrator-state.json
 state/orchestrator.run.lock
 quarantine/*.json
 knowledge/reflective-lessons/*.json
+
+# Host-local agent transport state and one-run billing authorizations
+state/agent-exchange/
+config/agent-execution-authorization.local.json
