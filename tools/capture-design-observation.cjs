@@ -19,7 +19,7 @@ async function main() {
     const page = await context.newPage();
     await page.setContent(fs.readFileSync(html,'utf8')); 
     if (css) await page.addStyleTag({content:fs.readFileSync(css,'utf8')});
-    await page.evaluate(()=>document.fonts.ready);
+    await page.waitForFunction(()=>document.fonts.status==='loaded',null,{timeout:10000});
     const samples = await page.evaluate(roles=>roles.map(({role,selector})=>{
       const el=document.querySelector(selector);if(!el)throw Error('role missing: '+role);
       const s=getComputedStyle(el);
@@ -33,7 +33,7 @@ async function main() {
         gap_px:s.gap==='normal'?0:parseFloat(s.rowGap),foreground:hex(s.color),background:background||'#ffffff',
         overflow_px:Math.max(0,el.scrollWidth-el.clientWidth)};
     }),roles);
-    const screenshot=await page.screenshot({fullPage:true});
+    const screenshot=await page.screenshot({fullPage:true,timeout:15000});
     fs.mkdirSync(path.dirname(path.resolve(output)),{recursive:true});
     fs.writeFileSync(output+'.png',screenshot);
     const observation={schema_version:'apf.design-observation/v1',source:{url:sourceUrl,usage:'PRINCIPLES_ONLY',

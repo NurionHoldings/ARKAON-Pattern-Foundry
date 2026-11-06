@@ -5,9 +5,9 @@ const os=require('node:os');
 const path=require('node:path');
 const {execFileSync}=require('node:child_process');
 const {pathToFileURL}=require('node:url');
-const run=(command,args)=>execFileSync(command,args,{cwd:process.cwd(),env:process.env,encoding:'utf8',stdio:'pipe'});
+const run=(command,args)=>execFileSync(command,args,{cwd:process.cwd(),env:process.env,encoding:'utf8',stdio:'pipe',timeout:45000});
 test('four original directions, selected sandbox CSS, actual computed feedback and touch selection',
- {skip:process.env.APF_RUN_BROWSER!=='1'},async()=>{
+ {skip:process.env.APF_RUN_BROWSER!=='1',timeout:180000},async()=>{
  const root=process.env.APF_DESIGN_EVIDENCE_DIR||fs.mkdtempSync(path.join(os.tmpdir(),'apf-design-'));
  fs.mkdirSync(root,{recursive:true});
  const python=process.env.APF_PYTHON||'python';
