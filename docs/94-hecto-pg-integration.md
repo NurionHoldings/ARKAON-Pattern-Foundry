@@ -81,3 +81,24 @@ API prefix `/v1/payments/hecto/{platform}`:
 - https://developers.hectofinancial.co.kr/docs/api/pg/credit-card/09-card-cancel
 - https://developers.hectofinancial.co.kr/docs/api/pg/sdk/01-sdk
 - 실제 SDK 확인: https://tbnpg.settlebank.co.kr/resources/js/v1/SettlePG_v1.2.js
+
+
+## 플랫폼별 공개 테스트 상점 설정 (2026-11-07 후속)
+
+`python -m apf.hecto_pg_setup seed`는 gitignore된 `private/hecto-pg/`에 sandbox.env와 platforms.local.json을 신규 작성한다. 이미 있는 디렉터리/값은 덮어쓰지 않는다. 공개된 일반 인증 카드 테스트 MID를 네 플랫폼의 서로 다른 환경변수 이름으로 구성한다. 서로 다른 실제 가맹점 계정을 발급한 것이 아니며 운영 매출·플랫폼별 독립 정산을 할 수 없다. 계좌이체/가상계좌/정기결제 MID로 전용하지 않는다.
+
+`python -m apf.hecto_pg_setup check`는 키 존재/길이·콜백 설정 여부만 보여준다. 키 원문은 출력하지 않는다. 설정 파일 생성은 원격 서버 환경변수 등록이 아니며, 키만 준비됐다는 이유로 결제 연동 완료로 표시하지 않는다.
+
+실제 API 서버 주소와 복귀 화면이 확정되면 다음 명령으로 **해당 플랫폼만** 로컬 sandbox 구성을 활성화한다. example 도메인을 실제 endpoint로 바꾼 뒤 실행한다.
+
+```sh
+python -m apf.hecto_pg_setup configure --platform arkaon \
+  --api-origin https://api.example.com \
+  --return-url https://app.example.com/payment-return \
+  --cancel-url https://app.example.com/payment-cancel
+python -m apf.hecto_pg_setup check
+```
+
+기존 install 함수의 config_path에 platforms.local.json을 전달하고 sandbox.env는 **실제 Python API 호스트**의 비공개 환경변수 입력 경로로 등록한다. 쉘에서 임의 `.env`를 source하거나 저장소로 올리지 않는다. 현 PR은 Netlify 정적 사이트의 환경변수/운영 배포를 바꾸지 않았다. Netlify 프론트에 설정해도 별도 Python 호스트로 자동 전달되지 않는다. 원격 API 호스트가 정해지기 전에는 callbacks/enabled를 비워 두며 실제 수신/결제 테스트가 완료된 것으로 표기하지 않는다.
+
+개별 발급 테스트 계정이 있다면 해당 호스트에서 공개 테스트 값을 그 계정의 값으로 교체한다. 운영 키는 절대 이 seed에 넣지 않는다. 실제 발급 키를 채팅이나 커밋으로 전달하지 않는다.
