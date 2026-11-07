@@ -1,0 +1,11 @@
+{
+  "schema_version": "apf.hecto-platform-map/v1",
+  "enabled": false,
+  "environment": "sandbox",
+  "platforms": {
+    "arkaon": {"purpose": "플랫폼 제작 이용권", "merchant_id_env": "HECTO_ARKAON_MCHT_ID", "hash_key_env": "HECTO_ARKAON_HASH_KEY", "aes_key_env": "HECTO_ARKAON_AES_KEY"},
+    "dapanda": {"purpose": "상품 주문", "merchant_id_env": "HECTO_DAPANDA_MCHT_ID", "hash_key_env": "HECTO_DAPANDA_HASH_KEY", "aes_key_env": "HECTO_DAPANDA_AES_KEY"},
+    "the-arirang": {"purpose": "상품 및 서비스 주문", "merchant_id_env": "HECTO_ARIRANG_MCHT_ID", "hash_key_env": "HECTO_ARIRANG_HASH_KEY", "aes_key_env": "HECTO_ARIRANG_AES_KEY"},
+    "ai-lawfriend": {"purpose": "서비스 이용권", "merchant_id_env": "HECTO_LAWFRIEND_MCHT_ID", "hash_key_env": "HECTO_LAWFRIEND_HASH_KEY", "aes_key_env": "HECTO_LAWFRIEND_AES_KEY"}
+  }
+}
