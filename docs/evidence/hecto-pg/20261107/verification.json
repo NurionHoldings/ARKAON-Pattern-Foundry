@@ -1,0 +1,37 @@
+{
+  "schema_version": "apf.hecto-offline-verification/v1",
+  "record_kind": "ETERNIAN_IMPLEMENTATION_SELF_CHECK",
+  "source_base": "a26baa71e93f1971151c4bb93e537444e95850a1",
+  "environment": "sandbox",
+  "actual_provider_payment_test": "NOT_RUN",
+  "independent_audit": "NOT_RUN",
+  "production_enabled": false,
+  "merge_approved": false,
+  "file_sha256": {
+    "docs/94-hecto-pg-integration.md": "698ff1bd0ac7c1027ca0bc8c45c5bda4046da20a151b10c0881136229ec7fd55",
+    "examples/hecto_pg/checkout.js": "d7936a2ade95afa95e8ceb44f12ed388da86a155e8d1da56f9bbb9c341da83da",
+    "examples/hecto_pg/integration.py": "bbe14009aa1b066f3775cb38b667eb053d5e65e755c392df220c75f82a4987bc",
+    "examples/hecto_pg/platforms.example.json": "d441f3eb0bf7eabbc5c82e4d5903cbbbceed5e40cb2a08da26d4f67e53b82ded",
+    "src/apf/hecto_pg.py": "bc77867ead923dfba6f075f35760b56b444e689fa8b6239cfa117f430400d6fd",
+    "src/apf/hecto_pg_config.py": "30cb2dc57135f12b8af3af89730ada62ce78763fbdaa438a1fc613d95865e169",
+    "src/apf/hecto_pg_http.py": "b1644ad4f8c76e4df793df049d073fc8cb60a0650455ecbbf15787c702a4738f",
+    "src/apf/hecto_pg_routes.py": "60ef8130016dd7ffed439f88035a5cd9627da52ecf49c25c02ec1b28ff2beb42",
+    "tests/test_hecto_pg.py": "35275255446976f7c54af87491053ab63bab86e1228f26ba5cc9461b84ac331a"
+  },
+  "commands": [
+    {
+      "command": "python -m pytest -q",
+      "result": "926 PASS / 13 SKIP",
+      "log_sha256": "5b0ba744c4aa5d91f3fd8bb682ba80a0af6a04a6b84636065b18a9aab1a4acd7"
+    },
+    {
+      "command": "ruff check src tests examples/hecto_pg/integration.py",
+      "result": "PASS"
+    },
+    {
+      "command": "node --input-type=module --check < examples/hecto_pg/checkout.js",
+      "result": "PASS"
+    }
+  ],
+  "evidence_limit": "Local self-check and TEST_DOUBLE provider responses; no actual checkout, approval, cancellation, billing or deployment was performed."
+}
