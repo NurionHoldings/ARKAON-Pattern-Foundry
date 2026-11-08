@@ -1,0 +1,26 @@
+name: 아르카온 작업 지시
+description: 필요한 기능을 아르카온에게 지시하고 에테르니언 검토용 PR을 받습니다.
+title: "[ARKAON] "
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: 필요한 기능 또는 고칠 문제
+      description: 현재 동작과 원하는 결과를 적어 주세요.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: 동작 확인 기준
+      description: 어떤 화면·입력·결과로 완료 여부를 확인할지 적어 주세요.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: 참고 자료
+      description: 공개 문서나 관련 이슈만 첨부하세요. 비밀번호·키·고객정보는 넣지 마세요.
+  - type: markdown
+    attributes:
+      value: "에테르니언이 변경 범위를 확정하고 작업에 할당한 뒤 실행합니다. 이슈 등록만으로 유료 실행·코드 변경이 시작되지는 않습니다."

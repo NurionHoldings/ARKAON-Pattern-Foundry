@@ -1,0 +1,32 @@
+{
+  "schema_version": "apf.github-coding-task/v1",
+  "task_id": "arkaon-github-smoke-20261108-01",
+  "issue_number": 140,
+  "repository": "NurionHoldings/ARKAON-Pattern-Foundry",
+  "state": "APPROVED_FOR_ONE_TASK",
+  "approved_by": "NurionHoldings via ETERNIAN",
+  "owner_instruction_ref": "2026-11-08 connect dedicated GitHub coding worker",
+  "base_branch": "main",
+  "baseline_sha": "99858de5712f809989011840e2e0ac593dffa6f2",
+  "expires_at": "2026-11-10T00:00:00+00:00",
+  "allowed_actors": [
+    "copilot-swe-agent[bot]",
+    "copilot-swe-agent",
+    "Copilot"
+  ],
+  "allowed_paths": [
+    "services/co-create.html",
+    "services/services.js",
+    "tests/static_services_security.cjs"
+  ],
+  "expected_file_blobs": {
+    "services/co-create.html": "12f6c5d594c9c8325b369e742d4950cb1890cc75",
+    "services/services.js": "ca3b2601cd65e91956a462d96854248ddcee19af",
+    "tests/static_services_security.cjs": "3b0e40d5836c35bed8829783cb38fb0ce49071c5"
+  },
+  "max_changed_files": 3,
+  "max_changed_lines": 500,
+  "automatic_merge_allowed": false,
+  "production_deploy_allowed": false,
+  "delegation_or_extra_paid_tasks_allowed": false
+}
