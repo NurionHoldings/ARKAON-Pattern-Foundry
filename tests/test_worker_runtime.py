@@ -6,6 +6,7 @@ from apf.development_orchestrator import (
     Worker,
     task_contract,
 )
+from apf.improvement_permissions import ImprovementGrantAuthority
 from apf.worker_runtime import (
     ArkaonWorkerPool,
     ArkaonWorkerRuntime,
@@ -32,17 +33,23 @@ def runtime(executor):
             TaskKind.BUILD,
             intent_fingerprint="a" * 64,
             objective="build feature",
-            allowed_paths=("src/", "tests/"),
+            allowed_paths=("src/feature.py", "tests/test_feature.py"),
+            requested_operations=("WRITE_WORKTREE", "RUN_TESTS"),
             expected_artifacts=("implementation.patch",),
         )
     )
     receipts = MemoryReceiptSink()
+    authority = ImprovementGrantAuthority(
+        worktree_root="/tmp/arkaon-worktree", owner_instruction_ref="test-owner-request",
+    )
+    token, _ = authority.issue(task, worker_id="arkaon-builder")
     worker_runtime = ArkaonWorkerRuntime(
         orchestrator,
         Worker("arkaon-builder", frozenset({TaskKind.BUILD})),
         executor,
         receipts,
         worktree_root="/tmp/arkaon-worktree",
+        grant_authority=authority, grant_token=token, assigned_task_id=task.task_id,
     )
     return task, receipts, worker_runtime
 
@@ -105,7 +112,8 @@ def test_worker_pool_claims_independent_tasks_without_duplicate_execution():
                 TaskKind.BUILD,
                 intent_fingerprint="a" * 64,
                 objective=f"build-{index}",
-                allowed_paths=("src/",),
+                allowed_paths=("src/feature.py",),
+                requested_operations=("WRITE_WORKTREE", "RUN_TESTS"),
                 expected_artifacts=("implementation.patch",),
             )
         )
@@ -116,16 +124,18 @@ def test_worker_pool_claims_independent_tasks_without_duplicate_execution():
         TaskResult(("implementation.patch",), ("pytest",), "PASS"),
         ("src/feature.py",),
     )
-    workers = tuple(
-        ArkaonWorkerRuntime(
-            orchestrator,
-            Worker(f"arkaon-builder-{index}", frozenset({TaskKind.BUILD})),
-            Executor(execution),
-            receipts,
-            worktree_root="/tmp/arkaon-worktree",
-        )
-        for index in range(2)
+    authority = ImprovementGrantAuthority(
+        worktree_root="/tmp/arkaon-worktree", owner_instruction_ref="test-owner-request",
     )
-    completed = ArkaonWorkerPool(workers).run_available()
+    workers = []
+    for index, task in enumerate(tasks):
+        worker_id = f"arkaon-builder-{index}"
+        token, _ = authority.issue(task, worker_id=worker_id)
+        workers.append(ArkaonWorkerRuntime(
+            orchestrator, Worker(worker_id, frozenset({TaskKind.BUILD})),
+            Executor(execution), receipts, worktree_root="/tmp/arkaon-worktree",
+            grant_authority=authority, grant_token=token, assigned_task_id=task.task_id,
+        ))
+    completed = ArkaonWorkerPool(tuple(workers)).run_available()
     assert len(completed) == 2
     assert {receipt.task_id for receipt in completed} == {task.task_id for task in tasks}

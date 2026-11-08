@@ -86,6 +86,7 @@ def test_manual_investigation_selects_catalog_source_without_hourly_filter(tmp_p
     assert report['result']['collected'] == 1
     assert report['production_change_allowed'] is False
     assert report['model_training_performed'] is False
+    assert report['next_step'] == 'IMPLEMENT_AND_VERIFY_WITHIN_OWNER_REQUESTED_SCOPE'
     assert len(list((tmp_path / 'state/manual-learning').glob('*.json'))) == 1
     assert json.loads(config_path.read_text()) == config
 

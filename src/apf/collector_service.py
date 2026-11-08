@@ -201,7 +201,7 @@ def main(argv: list[str] | None = None) -> int:
                 "model_training_performed": False,
                 "automatic_implement_allowed": False,
                 "production_change_allowed": False,
-                "next_step": "ETERNIAN_REPORT_THEN_OWNER_MODIFICATION_INSTRUCTION",
+                "next_step": "IMPLEMENT_AND_VERIFY_WITHIN_OWNER_REQUESTED_SCOPE",
             }
             report_root = foundry_root / "state" / "manual-learning"
             report_root.mkdir(parents=True, exist_ok=True)
