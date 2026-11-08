@@ -71,8 +71,10 @@
     @media(prefers-reduced-motion:reduce){.entry-screen{display:none!important}}
     body.entry-active{overflow:hidden;touch-action:none}
   </style>
+  <link rel="stylesheet" href="/assets/cosmos.css">
 </head>
 <body>
+  <a class="skip-link" href="#main">본문으로 건너뛰기</a>
   <div id="entryScreen" class="entry-screen" role="dialog" aria-modal="true" aria-label="ARKAON 진입 영상">
     <div class="entry-stage">
       <video id="entryVideo" autoplay playsinline webkit-playsinline muted preload="auto" aria-label="ARKAON 로고 진입 영상" src="/assets/arkaon-entry-v17.mp4"></video>
@@ -80,15 +82,22 @@
     <div class="entry-controls"><span class="entry-brand">ARKAON</span><button type="button" id="skipEntry">홈으로 들어가기 <span aria-hidden="true">→</span></button></div>
   </div>
 
-  <header><div class="shell header-inner"><div class="brand" aria-label="ARKAON"><video id="brandLogoVideo" class="brand-logo" playsinline webkit-playsinline muted loop preload="metadata" aria-hidden="true" tabindex="-1"></video><span class="brand-mark">ARKAON</span></div><div class="tag">아르카온 · 디지털 제작 공간</div></div></header>
-  <main class="shell">
-    <div class="eyebrow">AI와 함께하는 창작</div>
-    <h1><span class="hero-line">상상에서 완성까지.</span><span class="hero-line">사람과 AI가 함께 만듭니다.</span></h1>
-    <p class="intro">로고와 명함부터 영상, 홈페이지, 디지털 서비스까지. 필요한 작업을 한곳에서 준비하고 관리하세요.</p>
-    <div class="notice" role="status">아래 서비스 카드를 눌러 바로 시작할 수 있습니다. 실제 과금·운영 배포·Foundry API 연동은 <a href="/services/account.html">계정</a>과 <a href="/services/admin.html">관리자</a> 안내에 따릅니다. 아르카온은 <a href="/services/self-heal.html">자가치유</a>로 미비점을 범·관리자에게 요청할 수 있습니다.</div>
-    <section aria-label="서비스 안내">
-      <h2>아르카온 서비스</h2>
-      <p class="intro" style="margin-bottom:20px;font-size:.95rem"><a href="/services/">전체 서비스 목록</a></p>
+  <header><div class="shell header-inner"><div class="brand" aria-label="ARKAON"><video id="brandLogoVideo" class="brand-logo" playsinline webkit-playsinline muted loop preload="metadata" aria-hidden="true" tabindex="-1"></video><span class="brand-mark">ARKAON</span></div><nav class="main-nav" aria-label="주 메뉴"><a href="#services">창작 공간</a><a href="/services/co-create.html">함께 작업</a><a href="/services/account.html">내 작업 <span aria-hidden="true">↗</span></a></nav></div></header>
+  <main class="shell" id="main">
+    <div class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="signal" aria-hidden="true"></span> THE ORIGIN OF YOUR NEXT CREATION</div>
+        <h1><span class="hero-line">상상이 깨어나는 곳,</span><span class="hero-line"><em>아르카온.</em></span></h1>
+        <p class="intro">당신의 생각에, 새로운 생명력을.<br>사람의 상상과 AI의 가능성이 만나<br>브랜드와 디지털 공간으로 피어납니다.</p>
+        <div class="hero-actions"><a class="primary-action" href="/services/co-create.html">함께 만들기 <span aria-hidden="true">↗</span></a><a class="secondary-action" href="#services">창작 공간 둘러보기 <span aria-hidden="true">↓</span></a></div>
+        <p class="hero-note">작은 아이디어 하나로 시작하세요.</p>
+      </div>
+      <div class="cosmos" aria-hidden="true"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="orbit orbit-three"></div><div class="core-halo"></div><div class="core"></div><span class="star star-one"></span><span class="star star-two"></span><span class="star star-three"></span><div class="cosmos-caption">A R K A O N <span>가능성의 중심에서</span></div></div>
+    </div>
+    <div class="pathway"><span class="pathway-label">YOUR CREATIVE JOURNEY</span><p>생각을 꺼내고 <span aria-hidden="true">→</span> 함께 다듬고 <span aria-hidden="true">→</span> 세상에 펼치세요</p><a href="/services/self-heal.html">아르카온에 개선 제안 <span aria-hidden="true">↗</span></a></div>
+    <section id="services" aria-label="서비스 안내">
+      <div class="section-heading"><div><div class="eyebrow">EXPLORE THE POSSIBILITIES</div><h2>무엇에 생명력을 불어넣을까요?</h2></div><a href="/services/">전체 서비스 ↗</a></div>
+      <div class="service-filters" role="group" aria-label="서비스 분류"><button type="button" data-filter="all" aria-pressed="true">모든 공간</button><button type="button" data-filter="create" aria-pressed="false">브랜드·콘텐츠</button><button type="button" data-filter="together" aria-pressed="false">공동 작업·게시</button><button type="button" data-filter="manage" aria-pressed="false">작업 관리</button></div><p id="filterStatus" class="sr-only" role="status"></p>
       <div class="grid" id="serviceGrid">
         <a class="card" href="/services/logo-card.html"><h3>로고·명함 만들기</h3><span class="state state-live">이용 가능</span><p>브랜드에 어울리는 로고와 명함을 디자인합니다.</p></a>
         <a class="card" href="/services/ai-video.html"><h3>AI 영상 만들기</h3><span class="state state-live">이용 가능</span><p>진입·브랜드 영상과 진입 효과 스튜디오로 제작합니다.</p></a>
@@ -98,11 +107,14 @@
         <a class="card" href="/services/publish.html"><h3>홈페이지 게시하기</h3><span class="state state-live">이용 가능</span><p>저장한 페이지를 내보내고 게시 절차를 안내합니다.</p></a>
         <a class="card" href="/services/account.html"><h3>내 계정과 결제</h3><span class="state state-live">이용 가능</span><p>브라우저에 저장된 작업과 API 설정을 관리합니다.</p></a>
         <a class="card" href="/services/admin.html"><h3>관리자 메뉴</h3><span class="state state-admin">관리자 · 권한 필요</span><p>작업 현황과 승인 콘솔로 이동합니다.</p></a>
+        <a class="card" href="/services/self-heal.html"><h3>아르카온 개선 제안</h3><span class="state state-live">이용 가능</span><p>불편한 점과 아이디어를 남기고 더 나은 공간을 함께 만듭니다.</p></a>
       </div>
     </section>
+    <aside class="notice">작업은 각 서비스에서 시작할 수 있습니다. 실제 과금·API 연결·운영 배포 조건은 <a href="/services/account.html">계정 안내</a>와 <a href="/services/admin.html">관리자 안내</a>에서 확인하세요.</aside>
   </main>
-  <footer>© ARKAON · 함께 만드는 디지털 공간</footer>
+  <footer><span class="footer-brand">ARKAON</span><span>상상에 형태를. 가능성에 생명력을.</span><a href="/services/admin.html">관리자</a></footer>
 
+<script src="/assets/cosmos.js" defer></script>
 <script>
 (()=>{
   const ENTRY_SRC='/assets/arkaon-entry-v17.mp4';
