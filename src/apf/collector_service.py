@@ -6,10 +6,12 @@ import json
 import signal
 import socket
 import urllib.request
+from dataclasses import asdict
 from datetime import UTC, datetime
 from pathlib import Path
 from threading import Event
 from urllib.parse import urlsplit
+from uuid import uuid4
 
 from .collector_runtime import CollectorRuntime, load_policy
 from .collector_storage import HashChainedJsonLinesAuditSink, SQLiteContentHashStore
@@ -21,6 +23,7 @@ from .hourly_learning import (
     resolve_active_topic,
     write_hourly_learning_state,
 )
+from .learning_safety import LearningSafetyViolation, require_safe_learning_payload
 
 
 class JsonCandidateProvider:
@@ -85,21 +88,41 @@ class _SafeRedirectHandler(urllib.request.HTTPRedirectHandler):
         return super().redirect_request(req, fp, code, msg, headers, newurl)
 
 
+class SelectedCandidateProvider:
+    """Manual work may narrow the approved catalog, never grant new source rights."""
+
+    def __init__(self, provider: JsonCandidateProvider, source_ids: list[str]) -> None:
+        candidates = tuple(provider.candidates())
+        requested = set(source_ids)
+        if requested - {item.source_id for item in candidates}:
+            raise ValueError("MANUAL_SOURCE_NOT_IN_APPROVED_CATALOG")
+        self.selected = tuple(
+            item for item in candidates if not requested or item.source_id in requested
+        )
+
+    def candidates(self):
+        return iter(self.selected)
+
+
 def _build_runtime(args: argparse.Namespace) -> tuple[CollectorRuntime, HourlyLearningSchedule | None, Path]:
     policy = load_policy(args.config)
     foundry_root = Path(args.foundry_root).resolve()
     schedule = None
     topic_filter = None
-    if args.schedule:
+    manual_topic = getattr(args, "manual_topic", None)
+    if args.schedule and manual_topic is None:
         schedule = HourlyLearningSchedule.load(args.schedule)
 
         def topic_filter(candidate: CollectionCandidate) -> bool:
             topic = resolve_active_topic(schedule, now=datetime.now(UTC))
             return candidate_matches_topic(candidate, topic)
 
+    provider = JsonCandidateProvider(args.config)
+    if manual_topic is not None:
+        provider = SelectedCandidateProvider(provider, args.source_id or [])
     runtime = CollectorRuntime(
         policy,
-        JsonCandidateProvider(args.config),
+        provider,
         SafeHttpsFetcher(),
         HashChainedJsonLinesAuditSink(args.audit),
         content_hashes=SQLiteContentHashStore(args.state),
@@ -141,7 +164,21 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--foundry-root", default=".")
     parser.add_argument("--once", action="store_true")
+    parser.add_argument("--manual-topic", help="owner-requested investigation topic; requires --once")
+    parser.add_argument("--source-id", action="append", help="approved catalog source ID; repeatable")
     args = parser.parse_args(argv)
+    if args.manual_topic is not None:
+        args.manual_topic = args.manual_topic.strip()
+        if not args.once or not args.manual_topic or len(args.manual_topic) > 200:
+            parser.error("--manual-topic requires --once and a topic of 1-200 characters")
+        if not args.source_id:
+            parser.error("manual investigations require at least one explicit --source-id")
+        try:
+            require_safe_learning_payload({"topic": args.manual_topic}, ())
+        except LearningSafetyViolation:
+            parser.error("manual topic failed learning safety checks")
+    elif args.source_id:
+        parser.error("--source-id requires --manual-topic")
 
     foundry_root = Path(args.foundry_root).resolve()
     if args.schedule is None:
@@ -153,6 +190,25 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.once:
         result = runtime.run_once()
+        if args.manual_topic is not None:
+            report = {
+                "schema_version": "apf.manual-learning-investigation/v1",
+                "topic": args.manual_topic,
+                "source_ids": sorted(set(args.source_id)),
+                "requested_at": datetime.now(UTC).isoformat(),
+                "result": asdict(result),
+                "mode": "COLLECTION_ONLY",
+                "model_training_performed": False,
+                "automatic_implement_allowed": False,
+                "production_change_allowed": False,
+                "next_step": "ETERNIAN_REPORT_THEN_OWNER_MODIFICATION_INSTRUCTION",
+            }
+            report_root = foundry_root / "state" / "manual-learning"
+            report_root.mkdir(parents=True, exist_ok=True)
+            target = report_root / f"{uuid4().hex}.json"
+            target.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n",
+                              encoding="utf-8")
+            print(json.dumps(report, ensure_ascii=False))
         if schedule is not None:
             _record_hourly_cycle(schedule=schedule, foundry_root=foundry_root, result=result)
         return 0
