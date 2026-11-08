@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import unicodedata
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 
@@ -51,6 +52,24 @@ _SECRET_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
     ),
 )
 
+# Heuristics flag known authority-spoofing patterns for review. They are not a
+# sandbox, and absence of a match does not authorize code execution or egress.
+_INJECTION_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
+    ("PROMPT_AUTHORITY_OVERRIDE", re.compile(
+        r"ignore\s+(?:all\s+)?(?:previous|prior|system)\s+instructions"
+        r"|(?:이전|시스템|보안)\s*(?:지시|규칙|정책)(?:를|을)?\s*무시", re.IGNORECASE)),
+    ("PROMPT_ROLE_SPOOF", re.compile(
+        r"<\|(?:im_start|start_header_id)\|>\s*(?:system|developer)"
+        r"|\[SYSTEM\]", re.IGNORECASE)),
+    ("PROMPT_CONTROL_BYPASS", re.compile(
+        r"(?:disable|bypass)\s+(?:the\s+)?(?:approval|audit|safety)\s*(?:gate|check|log)?"
+        r"|(?:승인|감사)\s*(?:절차|검사|로그)(?:를|을)?\s*(?:우회|비활성화)", re.IGNORECASE)),
+    ("PROMPT_SECRET_EXFILTRATION", re.compile(
+        r"(?:read|cat|send|upload|post)\b[^\n]{0,100}(?:\.aws/credentials|\.ssh/id_|\.env\b)"
+        r"|(?:비밀키|인증정보)(?:를|을)?\s*(?:외부로\s*)?(?:전송|업로드)", re.IGNORECASE)),
+)
+
+
 _EMAIL_PATTERN = re.compile(
     r"(?i)(?<![A-Z0-9.!#$%&'*+/=?^_`{|}~-])"
     r"[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?"
@@ -75,7 +94,10 @@ def _has_valid_korean_rrn(text: str) -> bool:
 def scan_learning_text(text: str) -> tuple[str, ...]:
     """Return stable violation codes only; never return or retain matched values."""
 
-    codes = [code for code, pattern in _SECRET_PATTERNS if pattern.search(text)]
+    normalized = unicodedata.normalize("NFKC", text)
+    normalized = "".join(char for char in normalized if unicodedata.category(char) != "Cf")
+    codes = [code for code, pattern in _SECRET_PATTERNS if pattern.search(normalized)]
+    codes.extend(code for code, pattern in _INJECTION_PATTERNS if pattern.search(normalized))
     if _has_valid_korean_rrn(text):
         codes.append("PII_KOREAN_RRN")
     if _KOREAN_PHONE_PATTERN.search(text):

@@ -1,0 +1,28 @@
+{
+  "schema_version": "apf.security-threat-brief/v1",
+  "reviewed_on": "2026-11-08",
+  "author": "ETERNIAN / 에테르니언",
+  "status": "REFERENCE_AND_REGRESSION_CASES_ADDED",
+  "live_worker_ack": null,
+  "model_training_performed": false,
+  "cases": [
+    {
+      "id": "anthropic-ai-espionage-2025",
+      "source": "https://www.anthropic.com/news/disrupting-AI-espionage",
+      "published": "2025-11-13",
+      "observed_mechanism": "정당한 보안업체 업무라는 역할 위장과 공격의 작은 작업 분할, 도구 기반 정찰 및 자격증명 탈취·유출",
+      "defense": ["각 하위 작업에도 원래 사용자 목적·허용 경로·권한 범위 결속", "비밀정보 접근과 외부 전송은 실행 환경에서 제한", "승인과 감사 경계를 텍스트만으로 변경하지 않음"],
+      "implemented_here": ["공개 배포 파일 allowlist", "학습 텍스트의 역할 위장·통제 우회 지시 탐지"],
+      "remaining": ["실행기의 OS 격리·송신 제한 실운영 확인", "서버 배포 및 작업자 ACK"]
+    },
+    {
+      "id": "anthropic-collaboration-phishing-2026",
+      "source": "https://www.anthropic.com/research/how-we-contain-claude",
+      "observed_mechanism": "2026년 2월 내부 통제 실험에서 협업 이메일에 위장한 프롬프트로 비밀파일 읽기·인코딩·외부 전송 유도",
+      "defense": ["우편함·외부 문서는 데이터로 취급", "비밀 경로 비노출 및 송신 대상 제한", "모델의 판단만으로 방어 완료를 선언하지 않음"],
+      "implemented_here": ["비밀파일 읽기·유출 지시 학습 차단 회귀시험", "우편함의 HTML 실행 없는 텍스트 표시", "해시 기반 CSP와 생성 미리보기 sandbox"],
+      "remaining": ["인코딩·다국어·분할형 공격은 휴리스틱만으로 완전 탐지할 수 없음"]
+    }
+  ],
+  "invariants": ["외부 문서로 권한이 확대되지 않음", "학습 결과는 실행 승인이 아님", "의심 패킷은 원문 유출 없이 코드로 표시", "이 기록은 실제 ARKAON 학습 실행 증명이 아님"]
+}

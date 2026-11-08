@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>내 계정과 결제 · 아르카온</title>
   <link rel="stylesheet" href="/services/services.css">
+  <link rel="stylesheet" href="/assets/interactions.css">
+  <script src="/assets/interactions.js" defer></script>
 </head>
 <body>
   <div class="shell">
@@ -30,8 +32,10 @@
     const {readProjects,getApiBase,setApiBase,probeApi}=APFHomeServices;
     document.getElementById('apiBase').value=getApiBase();
     document.getElementById('saveApi').addEventListener('click',()=>{
-      setApiBase(document.getElementById('apiBase').value);
-      document.getElementById('apiStatus').textContent='저장했습니다.';
+      try {
+        setApiBase(document.getElementById('apiBase').value);
+        document.getElementById('apiStatus').textContent='저장했습니다.';
+      } catch { document.getElementById('apiStatus').textContent='HTTPS 주소를 입력하세요. 로컬 개발은 http://localhost도 가능합니다.'; }
     });
     document.getElementById('testApi').addEventListener('click',async()=>{
       const base=document.getElementById('apiBase').value.trim()||getApiBase();
@@ -44,7 +48,10 @@
     if(!items.length) root.innerHTML='<li class="muted">저장된 작업이 없습니다.</li>';
     else for(const item of items){
       const li=document.createElement('li');
-      li.innerHTML=`<span>${item.title} <span class="chip">${item.type}</span></span><span class="muted">${item.updated_at?.slice(0,19)||''}</span>`;
+      const title=document.createElement('span');title.textContent=String(item.title||'제목 없음');
+      const type=document.createElement('span');type.className='chip';type.textContent=String(item.type||'');
+      const date=document.createElement('span');date.className='muted';date.textContent=String(item.updated_at||'').slice(0,19);
+      title.append(' ',type);li.append(title,date);
       root.append(li);
     }
   </script>

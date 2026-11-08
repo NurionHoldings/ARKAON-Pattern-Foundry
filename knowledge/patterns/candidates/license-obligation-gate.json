@@ -27,8 +27,8 @@
     "external_material_included": false
   },
   "evidence_hashes": {
-    "src/apf/learning_safety.py": "a109a1d246a05f80a04e6c05d6d0a1f533283c3fc72b2dab3ca8fbbb64bf7db4",
-    "tests/test_learning_safety.py": "8e27901fb2c391c1f928a052d9c6163c232be2fa5c9544001aaec8e96b2a480c"
+    "src/apf/learning_safety.py": "9567f5607449f580ad5efc77e366a6ccbb44b0adf790a362ed302e6e7ccad851",
+    "tests/test_learning_safety.py": "477edd7e11b8e3eb5d7cd0ad88fd55faccd500545b377a95b1da334ea1d66824"
   },
   "source_refs": [
     "src/apf/learning_safety.py"
@@ -53,5 +53,5 @@
   "status": "ETHERNIAN_REVIEW_REQUIRED",
   "owned_asset": false,
   "semantic_fingerprint": "a2bd5db423a10554a1d6ac36cb49d8866f71598e2e0b1216833d3f35cdd27d77",
-  "package_hash": "7a0d7d3122e36b60bc76a14d2d0d16b54c6ff982068a45c72ff2ca9877b9ef84"
+  "package_hash": "fb47a99c8225e7fa5b33bb5671059a23cf1db323d300f4b07fab49b362840d5e"
 }

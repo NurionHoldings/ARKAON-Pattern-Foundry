@@ -72,6 +72,9 @@
     body.entry-active{overflow:hidden;touch-action:none}
   </style>
   <link rel="stylesheet" href="/assets/cosmos.css">
+  <link rel="stylesheet" href="/assets/interactions.css">
+  <script src="/assets/interactions.js" defer></script>
+  <noscript><style>.entry-screen{display:none!important}</style></noscript>
 </head>
 <body>
   <a class="skip-link" href="#main">본문으로 건너뛰기</a>
@@ -83,7 +86,7 @@
   </div>
 
   <header><div class="shell header-inner"><div class="brand" aria-label="ARKAON"><video id="brandLogoVideo" class="brand-logo" playsinline webkit-playsinline muted loop preload="metadata" aria-hidden="true" tabindex="-1"></video><span class="brand-mark">ARKAON</span></div><nav class="main-nav" aria-label="주 메뉴"><a href="#services">창작 공간</a><a href="/services/co-create.html">함께 작업</a><a href="/services/account.html">내 작업 <span aria-hidden="true">↗</span></a></nav></div></header>
-  <main class="shell" id="main">
+  <main class="shell" id="main" tabindex="-1">
     <div class="hero">
       <div class="hero-copy">
         <div class="eyebrow"><span class="signal" aria-hidden="true"></span> THE ORIGIN OF YOUR NEXT CREATION</div>
@@ -112,7 +115,7 @@
     </section>
     <aside class="notice">작업은 각 서비스에서 시작할 수 있습니다. 실제 과금·API 연결·운영 배포 조건은 <a href="/services/account.html">계정 안내</a>와 <a href="/services/admin.html">관리자 안내</a>에서 확인하세요.</aside>
   </main>
-  <footer><span class="footer-brand">ARKAON</span><span>상상에 형태를. 가능성에 생명력을.</span><a href="/services/admin.html">관리자</a></footer>
+  <footer><span class="footer-brand">ARKAON</span><span>상상에 형태를. 가능성에 생명력을.</span><a href="/services/mailbox.html">제안 우편함</a><a href="/services/admin.html">관리자</a></footer>
 
 <script src="/assets/cosmos.js" defer></script>
 <script>
@@ -135,26 +138,35 @@
   const screen=document.getElementById('entryScreen');
   const video=document.getElementById('entryVideo');
   const skip=document.getElementById('skipEntry');
+  const background=[...document.querySelectorAll('body > header,body > main,body > footer,.skip-link')];
   let dismissed=false;
   const close=()=>{
     if(dismissed)return;
     dismissed=true;
+    try { sessionStorage.setItem('apf.entry.seen','1'); } catch { /* storage may be unavailable */ }
     video.pause();
     screen.hidden=true;
     document.body.classList.remove('entry-active');
-    skip.blur();
+    for(const el of background) el.inert=false;
+    document.getElementById('main').focus({preventScroll:true});
     if(brandVideo&&!reduced)playMuted(brandVideo);
   };
   skip.addEventListener('click',close);
+  screen.addEventListener('keydown',e=>{if(e.key==='Tab'){e.preventDefault();skip.focus();}});
   video.addEventListener('ended',close);
   window.addEventListener('keydown',e=>{if(!screen.hidden&&e.key==='Escape')close();});
-  if(reduced){
+  let seen=false;
+  try { seen=sessionStorage.getItem('apf.entry.seen')==='1'; } catch { /* optional */ }
+  if(reduced || window.location.pathname !== '/' || seen){
     screen.hidden=true;
+    if(brandVideo&&!reduced)playMuted(brandVideo);
     return;
   }
   if(brandVideo)brandVideo.pause();
+  for(const el of background) el.inert=true;
+  skip.focus();
   document.body.classList.add('entry-active');
-  const fallback=setTimeout(close,120000);
+  const fallback=setTimeout(close,15000);
   const end=()=>clearTimeout(fallback);
   video.addEventListener('ended',end,{once:true});
   skip.addEventListener('click',end,{once:true});
