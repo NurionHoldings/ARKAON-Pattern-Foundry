@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <title>아르카온 자가치유 · ARKAON</title>
   <link rel="stylesheet" href="/services/services.css">
+  <link rel="stylesheet" href="/assets/interactions.css">
+  <script src="/assets/interactions.js" defer></script>
 </head>
 <body>
   <div class="shell">
@@ -58,7 +60,12 @@
       for (const item of items) {
         const li = document.createElement('li');
         const who = { beom: '범', eternian: '에테르니언', admin: '관리자' }[item.assignee] || item.assignee;
-        li.innerHTML = `<span><span class="chip">${item.severity}</span> <strong>${item.gap_code}</strong><br>${item.summary}<br><span class="muted">요청 대상: ${who} — ${item.needed_from_admin}</span></span>`;
+        const wrap = document.createElement('span');
+        const severity = document.createElement('span');severity.className='chip';severity.textContent=item.severity;
+        const code = document.createElement('strong');code.textContent=item.gap_code;
+        const request = document.createElement('span');request.className='muted';request.textContent=`요청 대상: ${who} — ${item.needed_from_admin}`;
+        wrap.append(severity,' ',code,document.createElement('br'),String(item.summary),document.createElement('br'),request);
+        li.append(wrap);
         list.append(li);
       }
     }

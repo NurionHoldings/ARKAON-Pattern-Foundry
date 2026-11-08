@@ -14,7 +14,8 @@
   function readProjects() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? JSON.parse(raw) : [];
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed.filter(item => item && typeof item === 'object' && !Array.isArray(item)) : [];
     } catch {
       return [];
     }
@@ -65,7 +66,10 @@
       .filter(Boolean)
       .map((line) => {
         const [label, url] = line.includes('|') ? line.split('|').map((x) => x.trim()) : [line, line];
-        const href = escapeHtml(url);
+        let parsed;
+        try { parsed = new URL(url); } catch { return ''; }
+        if (!['https:', 'http:'].includes(parsed.protocol) || parsed.username || parsed.password) return '';
+        const href = escapeHtml(parsed.href);
         return `<li><a href="${href}" rel="noopener noreferrer">${escapeHtml(label)}</a></li>`;
       })
       .join('');
@@ -77,18 +81,31 @@
     return `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(businessName)} 명함</title><style>body{margin:0;display:grid;place-items:center;min-height:100svh;background:#0a1220;font-family:system-ui,sans-serif}.card{width:min(420px,92vw);aspect-ratio:1.75;border-radius:16px;padding:28px;background:linear-gradient(145deg,#101e30,#0a1524);border:1px solid ${color};color:#eef3ff}h1{margin:0 0 8px;font-size:1.5rem;color:${color}}p{margin:4px 0;color:#b8c8de}a{color:${color}}</style><article class="card"><h1>${escapeHtml(businessName)}</h1><p>${escapeHtml(role || '')}</p><p>${email ? `<a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a>` : ''}</p><p>${escapeHtml(phone || '')}</p></article></html>`;
   }
 
+  function validateApiBase(value) {
+    if (!value) return '';
+    try {
+      const url = new URL(String(value).trim());
+      const local = ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname);
+      if (url.protocol !== 'https:' && !(local && url.protocol === 'http:')) return '';
+      if (url.username || url.password || url.search || url.hash) return '';
+      return url.href.replace(/\/$/, '');
+    } catch { return ''; }
+  }
+
   function getApiBase() {
     const stored = localStorage.getItem(API_KEY);
-    return stored ? stored.replace(/\/$/, '') : '';
+    return validateApiBase(stored);
   }
 
   function setApiBase(value) {
-    const trimmed = String(value || '').trim().replace(/\/$/, '');
+    const trimmed = validateApiBase(value);
+    if (String(value || '').trim() && !trimmed) throw new Error('API_URL_INVALID');
     if (trimmed) localStorage.setItem(API_KEY, trimmed);
     else localStorage.removeItem(API_KEY);
   }
 
   async function probeApi(base) {
+    base = validateApiBase(base);
     if (!base) return { ok: false, reason: 'not_configured' };
     try {
       const response = await fetch(`${base}/health`, { method: 'GET', credentials: 'omit' });
@@ -125,6 +142,7 @@
   }
 
   function downloadDataUrl(filename, dataUrl) {
+    if (!/^data:video\/[a-zA-Z0-9.+-]+;base64,/.test(String(dataUrl))) throw new Error('VIDEO_URL_INVALID');
     const anchor = document.createElement('a');
     anchor.href = dataUrl;
     anchor.download = filename;

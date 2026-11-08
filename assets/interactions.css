@@ -1,0 +1,15 @@
+/* Native navigation remains intact: history, downloads and modified clicks work normally. */
+@view-transition{navigation:auto}
+::view-transition-old(root){animation:portal-out .16s ease-in both}
+::view-transition-new(root){animation:portal-in .3s cubic-bezier(.2,.7,.2,1) both}
+@keyframes portal-out{to{opacity:0;transform:translateY(-6px)}}
+@keyframes portal-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+a,button{ -webkit-tap-highlight-color:transparent }
+a.card,.btn,button,.primary-action,.secondary-action,.svc-home,.main-nav a{position:relative;isolation:isolate;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease,background-color .18s ease}
+a.card:active,.btn:active,button:active,.primary-action:active,.svc-home:active{transform:scale(.975)}
+button[hidden],a[hidden]{display:none!important}
+.click-wave{position:absolute;inset:0;border-radius:inherit;border:2px solid #e6d5ff;box-shadow:0 0 18px #c1a2ff70;pointer-events:none;animation:click-wave .48s ease-out forwards;z-index:2}
+@keyframes click-wave{from{opacity:.9;transform:scale(.94)}to{opacity:0;transform:scale(1.08)}}
+.service-filters button[aria-pressed=true]{box-shadow:0 0 24px #ac86ff20}
+@media(prefers-reduced-motion:no-preference){body>.shell,body>main{animation:portal-in .35s ease-out both}.main-nav a:hover,.svc-home:hover{box-shadow:0 4px 22px #b799ff22}}
+@media(prefers-reduced-motion:reduce){@view-transition{navigation:none}::view-transition-old(root),::view-transition-new(root){animation:none}.click-wave{display:none}a,button{transition:none!important}a:active,button:active{transform:none!important}}

@@ -1,0 +1,3 @@
+[build]
+  command = "python scripts/build_static.py"
+  publish = "dist"
