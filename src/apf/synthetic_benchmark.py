@@ -20,6 +20,7 @@ from .development_orchestrator import (
     TaskStatus,
     Worker,
 )
+from .improvement_permissions import ImprovementGrantAuthority
 from .learning_safety import LearningSafetyViolation, scan_learning_text
 from .role_benchmark import BenchmarkReport, BenchmarkRole, BenchmarkThresholds
 from .worker_runtime import (
@@ -268,6 +269,7 @@ def _task_for(scenario: SyntheticScenario, phase: CampaignPhase) -> TaskContract
         intent_fingerprint=SYNTHETIC_INTENT,
         objective=scenario.objective,
         allowed_paths=(f"synthetic/{scenario.role.value.lower()}",),
+        requested_operations=("READ_WORKTREE", "GENERATE_ARTIFACT"),
         expected_artifacts=(scenario.expected_artifact,),
     )
 
@@ -284,12 +286,18 @@ def execute_synthetic_run(
     task = orchestrator.submit(_task_for(scenario, phase))
     observations = ObservationLog(clock)
     receipts = MemoryReceiptSink()
+    worker_id = f"arkaon-{scenario.role.value.lower()}"
+    authority = ImprovementGrantAuthority(
+        worktree_root="/tmp/apf-027-synthetic", owner_instruction_ref="synthetic-benchmark-only",
+    )
+    token, _ = authority.issue(task, worker_id=worker_id)
     runtime = ArkaonWorkerRuntime(
         orchestrator,
-        Worker(f"arkaon-{scenario.role.value.lower()}", frozenset({task.kind})),
+        Worker(worker_id, frozenset({task.kind})),
         SyntheticExecutor(scenario, observations),
         receipts,
         worktree_root="/tmp/apf-027-synthetic",
+        grant_authority=authority, grant_token=token, assigned_task_id=task.task_id,
     )
     started_at = wall_clock()
     receipt = runtime.run_once()

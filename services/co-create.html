@@ -12,6 +12,18 @@
   <div class="shell">
     <div class="svc-top"><h1>아르카온과 함께 작업하기</h1><a class="svc-home" href="/">← 홈</a></div>
     <p class="muted">요청을 이 브라우저에 저장하고, Foundry API가 연결되면 공동 창작 채팅으로 전달할 수 있습니다.</p>
+    <section class="panel feature-search-panel" aria-labelledby="featureSearchHeading">
+      <div class="eyebrow">LEARN → BUILD</div>
+      <h2 id="featureSearchHeading">필요한 기능을 찾아 바로 작업에 연결하세요</h2>
+      <p class="muted">검토한 구현 가이드에서 방법을 찾고, 현재 요청에 적용하세요.</p>
+      <form id="featureSearch" role="search">
+        <label for="featureQuery">어떤 기능이 필요한가요?</label>
+        <div class="feature-search-row"><input id="featureQuery" type="search" maxlength="160" placeholder="예: 모바일 화면, 버튼 전환, 안전한 미리보기"><button type="submit">구현 방법 찾기</button></div>
+      </form>
+      <div class="feature-shortcuts" role="group" aria-label="빠른 기능 검색"><button type="button" data-feature-query="전환">버튼 전환</button><button type="button" data-feature-query="모바일">모바일 구성</button><button type="button" data-feature-query="검증">입력 검증</button><button type="button" data-feature-query="보안">안전한 미리보기</button></div>
+      <p id="featureStatus" class="muted" role="status"></p>
+      <div id="featureResults" class="feature-results"></div>
+    </section>
     <form class="panel" id="form">
       <h2>작업 요청</h2>
       <label>제목<input id="title" required maxlength="120"></label>
@@ -26,6 +38,8 @@
     <div class="panel"><h2>최근 요청</h2><ul class="list" id="requests"></ul></div>
   </div>
   <script src="/services/services.js"></script>
+  <script src="/services/feature-guides.js"></script>
+  <script src="/services/feature-search.js" defer></script>
   <script>
     const {saveProject,readProjects,getApiBase}=APFHomeServices;
     function renderList(){
@@ -36,7 +50,7 @@
         const li=document.createElement('li');
         const wrap=document.createElement('span');
         const strong=document.createElement('strong');strong.textContent=item.title;
-        const meta=document.createElement('span');meta.className='muted';meta.textContent=`${item.scope} · ${(item.updated_at||'').slice(0,10)}`;
+        const meta=document.createElement('span');meta.className='muted';meta.textContent=`${item.scope} · ${String(item.updated_at||'').slice(0,10)}`;
         wrap.append(strong,document.createElement('br'),meta);
         li.append(wrap);root.append(li);
       }
@@ -46,9 +60,13 @@
       const title=document.getElementById('title').value.trim();
       const message=document.getElementById('message').value.trim();
       const scope=document.getElementById('scope').value;
-      saveProject({type:'work-request',title,message,scope});
-      document.getElementById('status').textContent='요청을 저장했습니다. 계정 화면에서 API를 연결하면 Foundry로 보낼 수 있습니다.';
-      document.getElementById('form').reset();renderList();
+      try {
+        saveProject({type:'work-request',title,message,scope});
+        document.getElementById('status').textContent='요청을 저장했습니다. 계정 화면에서 API를 연결하면 Foundry로 보낼 수 있습니다.';
+        document.getElementById('form').reset();renderList();
+      } catch {
+        document.getElementById('status').textContent='저장 공간이 부족하거나 브라우저 저장을 사용할 수 없습니다. 작성 내용은 유지했습니다. 내용을 복사해 보관한 뒤 다시 시도해 주세요.';
+      }
     });
     const base=getApiBase();
     const sendBtn=document.getElementById('sendApi');

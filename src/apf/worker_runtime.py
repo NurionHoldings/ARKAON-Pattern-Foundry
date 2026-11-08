@@ -14,6 +14,7 @@ from .development_orchestrator import (
     Worker,
 )
 from .execution_sandbox import prepare_execution_sandbox, verify_attestation
+from .improvement_permissions import ImprovementGrantAuthority, ImprovementPermissionDenied
 
 
 @dataclass(frozen=True)
@@ -35,6 +36,7 @@ class ExecutionReceipt:
     touched_paths: tuple[str, ...]
     checks: tuple[str, ...]
     failure_code: str | None = None
+    delegation_id: str | None = None
 
 
 class ReceiptSink(Protocol):
@@ -58,18 +60,32 @@ class ArkaonWorkerRuntime:
         receipts: ReceiptSink,
         *,
         worktree_root: str | Path,
+        grant_authority: ImprovementGrantAuthority | None = None,
+        grant_token: str | None = None,
+        assigned_task_id: UUID | None = None,
     ) -> None:
         self.orchestrator = orchestrator
         self.worker = worker
         self.executor = executor
         self.receipts = receipts
         self.worktree_root = Path(worktree_root)
+        self.grant_authority = grant_authority
+        self.grant_token = grant_token
+        self.assigned_task_id = assigned_task_id
 
     def run_once(self) -> ExecutionReceipt | None:
-        task = self.orchestrator.claim(self.worker)
+        task = self.orchestrator.claim(self.worker, task_id=self.assigned_task_id)
         if task is None:
             return None
+        delegation_id = None
         try:
+            if self.grant_authority is None:
+                raise ImprovementPermissionDenied("DELEGATION_REQUIRED")
+            grant = self.grant_authority.consume(
+                self.grant_token, task, worker_id=self.worker.worker_id,
+                worktree_root=self.worktree_root,
+            )
+            delegation_id = grant.grant_id
             policy, attestation = prepare_execution_sandbox(
                 task, worktree_root=self.worktree_root
             )
@@ -94,7 +110,8 @@ class ArkaonWorkerRuntime:
             )
             touched_paths = execution.touched_paths
         except (OSError, ValueError) as exc:
-            failure_code = f"EXECUTOR_ERROR:{type(exc).__name__}"
+            failure_code = (exc.code if isinstance(exc, ImprovementPermissionDenied)
+                            else f"EXECUTOR_ERROR:{type(exc).__name__}")
             completed = self.orchestrator.complete(
                 task.task_id,
                 task.lease_token,
@@ -111,6 +128,7 @@ class ArkaonWorkerRuntime:
             touched_paths=touched_paths,
             checks=result.checks,
             failure_code=failure_code,
+            delegation_id=delegation_id,
         )
         self.receipts.record(receipt)
         return receipt

@@ -102,7 +102,7 @@ class DevelopmentOrchestrator:
             self._tasks[contract.task_id] = contract
         return contract
 
-    def claim(self, worker: Worker) -> TaskContract | None:
+    def claim(self, worker: Worker, *, task_id: UUID | None = None) -> TaskContract | None:
         if worker.capabilities & HUMAN_ONLY:
             raise OrchestrationDenied("HUMAN_ONLY_CAPABILITY_NOT_DELEGABLE")
         with self._lock:
@@ -114,6 +114,7 @@ class DevelopmentOrchestrator:
                     task
                     for task in self._tasks.values()
                     if task.status == TaskStatus.QUEUED
+                    and (task_id is None or task.task_id == task_id)
                     and task.kind not in HUMAN_ONLY
                     and task.kind in worker.capabilities
                     and set(task.dependencies) <= completed
