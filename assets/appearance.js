@@ -1,10 +1,11 @@
 /* Browser-local appearance preferences, restricted to validated color values. */
 (() => {
+  document.body.classList.add('appearance-workspace');
   const key='apf.appearance.v1';
-  const defaults={background:'#f4f1ea',panel:'#fffdf8',button:'#194e4a'};
+  const defaults={background:'#f4f1ea',page:'#f4f1ea',panel:'#fffdf8',button:'#194e4a'};
   const valid=value=>typeof value==='string'&&/^#[0-9a-f]{6}$/i.test(value);
   const ink=color=>{const v=color.slice(1).match(/../g).map(x=>parseInt(x,16)/255).map(x=>x<=.04045?x/12.92:((x+.055)/1.055)**2.4);const l=v[0]*.2126+v[1]*.7152+v[2]*.0722;return (l+.05)/.05>=1.05/(l+.05)?'#000000':'#ffffff';};
-  function sanitize(value){if(!value||typeof value!=='object')return null;return Object.keys(defaults).every(k=>valid(value[k]))?Object.fromEntries(Object.keys(defaults).map(k=>[k,value[k]])):null;}
+  function sanitize(value){if(!value||typeof value!=='object')return null;return ['background','panel','button'].every(k=>valid(value[k]))?Object.fromEntries(Object.keys(defaults).map(k=>[k,valid(value[k])?value[k]:value.background])):null;}
   let saved=null;try{saved=sanitize(JSON.parse(localStorage.getItem(key)));}catch{/* optional storage */}
   function apply(colors){const root=document.documentElement;root.toggleAttribute('data-custom-appearance',!!colors);if(!colors)return;for(const [name,color]of Object.entries(colors)){root.style.setProperty(`--appearance-${name}`,color);root.style.setProperty(`--appearance-${name}-ink`,ink(color));}}
   apply(saved);
@@ -13,7 +14,7 @@
   const heading=document.createElement('h2');heading.id='appearanceHeading';heading.textContent='나만의 화면 색상';
   const note=document.createElement('p');note.textContent='이 브라우저의 아르카온 화면에 적용합니다. 제작물의 색상은 제작 화면에서 별도로 선택하세요.';
   const inputs={};dialog.append(heading,note);
-  for(const [name,labelText]of Object.entries({background:'전체 배경',panel:'패널·메뉴 영역',button:'메뉴·실행 버튼'})){const label=document.createElement('label');label.textContent=labelText;const input=document.createElement('input');input.type='color';input.value=(saved||defaults)[name];input.id=`appearance-${name}`;label.append(input);dialog.append(label);inputs[name]=input;}
+  for(const [name,labelText]of Object.entries({background:'플랫폼 전체 바탕',page:'페이지 작업 배경',panel:'패널·메뉴 영역',button:'메뉴·실행 버튼'})){const label=document.createElement('label');label.textContent=labelText;const input=document.createElement('input');input.type='color';input.value=(saved||defaults)[name];input.id=`appearance-${name}`;label.append(input);dialog.append(label);inputs[name]=input;}
   const status=document.createElement('p');status.setAttribute('role','status');
   const actions=document.createElement('div');actions.className='appearance-actions';
   for(const [text,handler]of [
