@@ -1,0 +1,33 @@
+{
+  "schema": "apf.nurion-holdings-evidence-manifest/v1",
+  "run_id": "asia-cinema-pr-a-20261025-01",
+  "step": "pr-a-input-validation",
+  "branch": "feat/asia-cinema-pr-a-input-schema",
+  "artifacts": [
+    {
+      "role": "validation_report",
+      "path": "inbox/eternian-review/asia-cinema-pr-a-20261025-01/validation-report.json",
+      "sha256": "788a14dacc45bf70482e36185e4f9fc54a78d6f5a71a34de2c4fa5c6ad84448a"
+    },
+    {
+      "role": "input_manifest",
+      "path": "inbox/eternian-review/asia-cinema-pr-a-20261025-01/input.manifest.json",
+      "sha256": "7161dcda645fa3d104dcb51b7e35535db296aaac43dfa092682974d992199c65"
+    },
+    {
+      "role": "code",
+      "path": "modules/asia_cinema/validate_inputs.py",
+      "sha256": "f6386d411135cf5a2b085c57f56af88c0674fb0949386af552e9d726f83e8f56"
+    },
+    {
+      "role": "code",
+      "path": "modules/asia_cinema/config/input.manifest.schema.json",
+      "sha256": "66ce108e7cd00e65d67aa8c9fce2681a60a71a9a0d6ea8b25395bbb160d1aa34"
+    },
+    {
+      "role": "code",
+      "path": "tests/test_asia_cinema_validate_inputs.py",
+      "sha256": "c3864f132db46f06eb1e8e85b77898c6edfe0a5694b2c8902fcc4308aed25eaa"
+    }
+  ]
+}
