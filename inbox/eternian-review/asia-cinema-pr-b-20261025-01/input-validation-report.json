@@ -1,0 +1,47 @@
+{
+  "schema": "apf.asia-cinema-validation-report/v1",
+  "run_id": "asia-cinema-pr-b-20261025-01",
+  "created_at": "2026-11-09T03:52:00.630658+00:00",
+  "ok": true,
+  "render_allowed": true,
+  "issues": [],
+  "checked": {
+    "slogan_registration_status": "approved",
+    "asset_asia_holdings_reference": {
+      "path_ref": "<asset:asia_holdings_reference.png>",
+      "expected_sha256": "7f558d7a25680a459692446661d0b337ebe8a0fa3e22b55b8fb50086f426b900",
+      "actual_sha256": "7f558d7a25680a459692446661d0b337ebe8a0fa3e22b55b8fb50086f426b900"
+    },
+    "asset_asia_a_symbol_mask": {
+      "path_ref": "<asset:asia_holdings_A_symbol_mask.png>",
+      "expected_sha256": "05b4c6ebb25b6391f112f330e4b2e9f09553d8dc967a4f956f67010911cb0b1d",
+      "actual_sha256": "05b4c6ebb25b6391f112f330e4b2e9f09553d8dc967a4f956f67010911cb0b1d"
+    },
+    "asset_asia_a_symbol_trace": {
+      "path_ref": "<asset:a_symbol_trace.v1.json>",
+      "expected_sha256": "52f6b2201ac38ee4f0d503e0f2287c3b97d1ca32ed2473b74c9dc30f3d78bd31",
+      "actual_sha256": "52f6b2201ac38ee4f0d503e0f2287c3b97d1ca32ed2473b74c9dc30f3d78bd31"
+    },
+    "asset_asia_bg_plate": {
+      "path_ref": "<asset:asia_bg_plate.jpg>",
+      "expected_sha256": "987b206a6bce63f2e439e662d13ff5df65e628e1192420fa03ac5b9fbedd6dbd",
+      "actual_sha256": "987b206a6bce63f2e439e662d13ff5df65e628e1192420fa03ac5b9fbedd6dbd"
+    },
+    "asset_font_en": {
+      "path_ref": "<asset:Cinzel-Bold.ttf>",
+      "expected_sha256": "0c23ec565db45c5508ee95889c60ad87debd167ca07167a43a5d68572b4e2eac",
+      "actual_sha256": "0c23ec565db45c5508ee95889c60ad87debd167ca07167a43a5d68572b4e2eac"
+    },
+    "asset_font_ko": {
+      "path_ref": "<asset:Pretendard-SemiBold.otf>",
+      "expected_sha256": "c89bc43027dc7cde5726e96223376f8eec09302b2fc1f8147fd5b57cfc376118",
+      "actual_sha256": "c89bc43027dc7cde5726e96223376f8eec09302b2fc1f8147fd5b57cfc376118"
+    },
+    "slogan_ko": {
+      "path_ref": "<asset:asia_holdings_slogan_ko.approved.utf8.txt>",
+      "expected_sha256": "e9cc11036d72e2b6216b118d1dce41e3abcf345be7d98cdcffd1b05e16bc19a8",
+      "actual_sha256": "e9cc11036d72e2b6216b118d1dce41e3abcf345be7d98cdcffd1b05e16bc19a8"
+    },
+    "slogan_text_length": 25
+  }
+}

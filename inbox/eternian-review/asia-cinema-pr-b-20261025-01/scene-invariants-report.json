@@ -1,0 +1,20 @@
+{
+  "schema": "apf.asia-cinema-scene-invariants/v1",
+  "ok": true,
+  "issues": [],
+  "checked": {
+    "fps": 24,
+    "frame_range": [
+      1,
+      384
+    ],
+    "locked_objects": [
+      "CAM_RIG",
+      "CAM_Main",
+      "GRP_Logo",
+      "BG_Plate"
+    ],
+    "object_count": 11
+  },
+  "run_id": "asia-cinema-pr-b-20261025-01"
+}

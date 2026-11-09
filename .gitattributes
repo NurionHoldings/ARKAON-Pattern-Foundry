@@ -1,0 +1,2 @@
+# SHA-256 pinned inputs must be byte-identical on every checkout.
+modules/asia_cinema/config/*.json text eol=lf
