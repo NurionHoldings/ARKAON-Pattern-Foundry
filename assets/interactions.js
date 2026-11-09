@@ -59,3 +59,15 @@
   enhance(document.body);
   observer.observe(document.body, {subtree:true,childList:true,characterData:true});
 })();
+
+/* Direct entries and new tabs have useful ordinary-link fallbacks. */
+document.addEventListener('click', event => {
+  const back = event.target.closest('a[data-service-back]');
+  if (!back || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  let internalPrevious = false;
+  try { internalPrevious = new URL(document.referrer).origin === window.location.origin; } catch { /* no referring page */ }
+  if (internalPrevious && window.history.length > 1) {
+    event.preventDefault();
+    window.history.back();
+  }
+});

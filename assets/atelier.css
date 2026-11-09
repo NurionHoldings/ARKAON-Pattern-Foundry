@@ -48,3 +48,7 @@ a.card{background:#fffdf8;border:1px solid #ddded4;border-radius:6px;min-height:
  .atelier-home .sample-card{padding:16px}.atelier-home .sample-label{letter-spacing:.08em;overflow-wrap:anywhere}.atelier-home .sample small{line-height:1.7}
 }
 @media(max-width:380px){.atelier-home .atelier-display{gap:12px;grid-template-columns:1fr 1fr}.atelier-home .sample-brand{padding:16px}.atelier-home .sample-card{padding:13px}.atelier-home .sample-web{padding:12px}.atelier-home .sample-brand strong{font-size:2rem}.atelier-home .mini-window{padding:8px}.atelier-home .mini-window strong{font-size:1.1rem}}
+/* Return controls stay together and remain comfortable on small screens. */
+.svc-return-nav{display:flex;flex-wrap:wrap;gap:10px;align-items:center;flex-shrink:0}
+.svc-return-nav .svc-home{font-family:Pretendard,"Apple SD Gothic Neo","Noto Sans CJK KR","Malgun Gothic",sans-serif;font-size:.875rem;min-height:44px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;text-decoration:none}
+@media(max-width:600px){.atelier-workspace .svc-top h1{flex-basis:100%}.svc-return-nav{width:100%}.svc-return-nav .svc-home{flex:1 1 0;padding:10px 16px}}
