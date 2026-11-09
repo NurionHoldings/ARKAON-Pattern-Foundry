@@ -17,7 +17,7 @@
   "observed_candidate": {
     "status": "superseded_by_operator_approval",
     "text_literal": "세상을 연결하는 가치, 더 큰 내일을 만듭니다",
-    "observed_from": "D:\\보관자료\\Clearance-sale\\asia_logo_engine_v3_windows\\asia_logo_engine_v3\\config.json",
+    "observed_from": "<operator-local:config.json>",
     "observed_from_sha256": "5824e58d32e1991ade37f57affa4dbf0a59d6ffc28f19d69cefd493f8290fe8d",
     "also_visible_on": "input/asia_holdings_reference.png",
     "step6_run_id": "asia-cinema-step6-asset-registration-prep-20261025-01"

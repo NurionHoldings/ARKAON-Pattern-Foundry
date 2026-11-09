@@ -6,13 +6,13 @@
     {
       "id": "asia_holdings_reference",
       "role": "composite_reference_poster",
-      "path": "D:\\보관자료\\Clearance-sale\\asia_logo_engine_v3_windows\\asia_logo_engine_v3\\input\\asia_holdings_reference.png",
+      "path": "<operator-local:asia_holdings_reference.png>",
       "sha256": "7f558d7a25680a459692446661d0b337ebe8a0fa3e22b55b8fb50086f426b900"
     },
     {
       "id": "asia_a_symbol_mask",
       "role": "a_symbol_mask_trial",
-      "path": "D:\\보관자료\\Clearance-sale\\asia_logo_engine_v3_windows\\asia_logo_engine_v3\\input\\asia_holdings_A_symbol_mask.png",
+      "path": "<operator-local:asia_holdings_A_symbol_mask.png>",
       "sha256": "05b4c6ebb25b6391f112f330e4b2e9f09553d8dc967a4f956f67010911cb0b1d"
     }
   ],

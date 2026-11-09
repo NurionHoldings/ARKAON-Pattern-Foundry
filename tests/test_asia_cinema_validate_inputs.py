@@ -145,16 +145,10 @@ def test_wrong_company_literal_blocked():
 
 def test_public_report_never_leaks_windows_absolute_paths():
     """Regression: Linux CI public JSON must not contain operator Windows paths from manifest."""
-    win_ref = (
-        r"D:\보관자료\Clearance-sale\asia_logo_engine_v3_windows"
-        r"\asia_logo_engine_v3\input\asia_holdings_reference.png"
-    )
-    win_mask = (
-        r"D:\보관자료\Clearance-sale\asia_logo_engine_v3_windows"
-        r"\asia_logo_engine_v3\input\asia_a_symbol_mask.png"
-    )
-    win_slogan = r"D:\보관자료\Clearance-sale\asia_logo_engine_v3_windows\asia_logo_engine_v3\input\slogan_ko.txt"
-    win_reg = r"D:\ARKAON_Pattern Foundry\inbox\eternian-review\asia-holdings-slogan-ko-operator-registration.json"
+    win_ref = r"D:\운영자자료\private-vault\engine\input\asia_holdings_reference.png"
+    win_mask = r"D:\운영자자료\private-vault\engine\input\asia_a_symbol_mask.png"
+    win_slogan = r"D:\운영자자료\private-vault\engine\input\slogan_ko.txt"
+    win_reg = r"D:\operator-repo\inbox\eternian-review\asia-holdings-slogan-ko-operator-registration.json"
     bundle = {
         "schema": "apf.asia-cinema-input-bundle/v1",
         "run_id": "redact-win-paths-001",
@@ -171,14 +165,14 @@ def test_public_report_never_leaks_windows_absolute_paths():
     }
     report = validate_input_bundle(bundle)
     pub = json.dumps(report.to_public_dict(), ensure_ascii=False)
-    for secret in (win_ref, win_mask, win_slogan, win_reg, "보관자료", "Clearance-sale", "D:\\", "D:/"):
+    for secret in (win_ref, win_mask, win_slogan, win_reg, "운영자자료", "private-vault", "D:\\", "D:/"):
         assert secret not in pub
     assert "<asset:asia_holdings_reference.png>" in pub
     assert "<asset:slogan_ko.txt>" in pub
     assert win_reg not in pub
     for issue in report.issues:
         blob = json.dumps({"code": issue.code, "message": issue.message}, ensure_ascii=False)
-        for secret in (win_ref, "보관자료", "D:\\", "D:/"):
+        for secret in (win_ref, "운영자자료", "D:\\", "D:/"):
             assert secret not in blob
 
 
