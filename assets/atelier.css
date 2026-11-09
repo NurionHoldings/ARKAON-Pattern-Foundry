@@ -52,3 +52,33 @@ a.card{background:#fffdf8;border:1px solid #ddded4;border-radius:6px;min-height:
 .svc-return-nav{display:flex;flex-wrap:wrap;gap:10px;align-items:center;flex-shrink:0}
 .svc-return-nav .svc-home{font-family:Pretendard,"Apple SD Gothic Neo","Noto Sans CJK KR","Malgun Gothic",sans-serif;font-size:.875rem;min-height:44px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;text-decoration:none}
 @media(max-width:600px){.atelier-workspace .svc-top h1{flex-basis:100%}.svc-return-nav{width:100%}.svc-return-nav .svc-home{flex:1 1 0;padding:10px 16px}}
+/* Distinct service rooms share one calm atelier material system. */
+.atelier-workspace{--room-accent:#365c4d;--room-tint:#e9eee7;--room-label:'관리 · 검토';background:linear-gradient(135deg,var(--room-tint),#f4f1ea 58%)}
+[data-space=brand]{--room-accent:#80612f;--room-tint:#f0e9db;--room-label:'BRAND ATELIER · 브랜드 제작'}
+[data-space=motion]{--room-accent:#745168;--room-tint:#eee7ed;--room-label:'MOTION STUDIO · 영상과 움직임'}
+[data-space=web]{--room-accent:#265e59;--room-tint:#e4eeea;--room-label:'DIGITAL SPACE · 웹 제작'}
+[data-space=collaboration]{--room-accent:#3b5275;--room-tint:#e7ebf2;--room-label:'CO-CREATION · 함께 만드는 작업'}
+[data-space=menu]{--room-accent:#365c4d;--room-tint:#e9eee7;--room-label:'CHOOSE YOUR SPACE · 제작 공간 선택'}
+.atelier-workspace .svc-top{background:var(--room-tint);border:1px solid #d6d9cf;border-left:3px solid var(--room-accent);padding:24px 28px;border-radius:8px;gap:14px 24px;box-shadow:0 8px 28px #263a2e05}
+.atelier-workspace .svc-top::before{content:var(--room-label);flex-basis:100%;font-size:.66rem;letter-spacing:.12em;color:var(--room-accent);font-weight:600;line-height:1.7}
+.atelier-workspace .svc-top h1{color:var(--room-accent)}
+.atelier-workspace .svc-return-nav{padding:6px;border:1px solid #ffffffb0;border-radius:999px;background:#ffffff60}
+.atelier-workspace .svc-return-nav .svc-home{background:#fffdf8;border-color:#c7cec1;color:#365346}
+.atelier-workspace form.panel,.atelier-workspace .panel:has(>label){background:#fffefa;border-top:3px solid var(--room-accent)}
+.atelier-workspace .preview{background:var(--room-tint);border:1px solid #cbd4c4;box-shadow:inset 0 0 0 6px #ffffff45}
+.atelier-workspace .panel h2{padding-bottom:14px;border-bottom:1px solid #e1e4d9}
+.atelier-workspace .btn-row{margin-top:22px;padding:16px;background:#f0f2eb;border:1px solid #dce2d4;border-radius:7px;gap:12px}
+.atelier-workspace button,.atelier-workspace .btn{background:#fffefa;color:#194e4a;border-color:#a8bbaa;transition:background-color .25s,border-color .25s,box-shadow .25s,transform .25s}
+.atelier-workspace .btn-row>:first-child,.atelier-workspace button[type=submit]{background:#194e4a;color:#fff;border-color:#194e4a;box-shadow:0 4px 12px #194e4a12}
+.atelier-workspace button:hover,.atelier-workspace .btn:hover{background:#e8eee3;color:#194e4a;border-color:#6f8c77;box-shadow:0 5px 16px #21453012}
+.atelier-workspace .btn-row>:first-child:hover,.atelier-workspace button[type=submit]:hover{background:#123b37;color:#fff}
+.atelier-workspace .feature-shortcuts button{background:var(--room-tint);color:var(--room-accent);border-color:#cbd5c7}
+[data-space=menu] #serviceList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:30px}
+[data-space=menu] #serviceList li{background:#fffefa;border:1px solid #d9dfd2;border-left:3px solid #5d7f71;border-radius:7px;padding:22px;align-items:center;gap:14px;transition:transform .3s,box-shadow .3s}
+[data-space=menu] #serviceList li:has(a[href*='logo-card']){border-left-color:#80612f}
+[data-space=menu] #serviceList li:has(a[href*='ai-video']){border-left-color:#745168}
+[data-space=menu] #serviceList li:has(a[href*='co-create']){border-left-color:#3b5275}
+[data-space=menu] #serviceList li a{display:block;flex:1 1 180px;font-weight:600;min-height:44px;align-content:center}
+[data-space=menu] #serviceList li:hover{transform:translateY(-3px);box-shadow:0 12px 24px #2440310c}
+@media(max-width:600px){.atelier-workspace .svc-top{padding:20px 18px;gap:12px}.atelier-workspace .svc-return-nav{border-radius:7px;padding:5px;gap:8px}.atelier-workspace .btn-row{padding:12px;gap:10px}.atelier-workspace .svc-top::before{font-size:.6rem;letter-spacing:.08em}[data-space=menu] #serviceList{grid-template-columns:1fr;gap:12px}[data-space=menu] #serviceList li{padding:18px}}
+@media(prefers-reduced-motion:reduce){.atelier-workspace button,.atelier-workspace .btn,[data-space=menu] #serviceList li{transition:none}[data-space=menu] #serviceList li:hover{transform:none}}
