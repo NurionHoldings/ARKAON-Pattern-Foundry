@@ -21,7 +21,10 @@ FRAME_START = 1
 FRAME_END = 384
 SYMBOL_HEIGHT = 2.0
 LOGO_LIFT = 0.45
-REQUIRED_ASSETS = ("asia_a_symbol_trace", "asia_bg_plate", "font_en", "font_ko")
+REQUIRED_ASSETS = ("asia_a_symbol_trace", "asia_bg_plate", "font_en", "font_ko", "earth_color", "earth_lights")
+GLOBE_SPIN_DEG = 120.0
+# Starts over the Pacific and spins eastward so East Asia faces camera during the S3 hold.
+GLOBE_START_DEG = -275.0
 
 
 def _args() -> argparse.Namespace:
@@ -127,10 +130,19 @@ def build_symbol(trace_path: Path, parent, navy, gold):
     return ob, {"center_px": (cx, cy), "scale": scale}
 
 
-def build_globe(parent, symbol_frame):
+def _socket(sockets, identifier: str):
+    """ShaderNodeMix repeats socket names per data type; address them by identifier."""
+    for s in sockets:
+        if s.identifier == identifier:
+            return s
+    raise KeyError(identifier)
+
+
+def build_globe(parent, symbol_frame, color_path: Path, lights_path: Path):
+    """Navy-tinted NASA surface with gold-tinted city lights, spinning about its own Z axis."""
     cx, cy = symbol_frame["center_px"]
     s = symbol_frame["scale"]
-    bpy.ops.mesh.primitive_uv_sphere_add(segments=96, ring_count=48, radius=118 * s)
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=128, ring_count=64, radius=118 * s)
     ob = bpy.context.object
     ob.name = "Globe"
     ob.location = ((845 - cx) * s, -0.05, -(540 - cy) * s)
@@ -140,41 +152,54 @@ def build_globe(parent, symbol_frame):
     mat.use_nodes = True
     nt = mat.node_tree
     b = nt.nodes["Principled BSDF"]
-    b.inputs["Base Color"].default_value = (0.02, 0.1, 0.38, 1.0)
-    b.inputs["Roughness"].default_value = 0.25
-    b.inputs["Coat Weight"].default_value = 0.6
-    coord = nt.nodes.new("ShaderNodeTexCoord")
-    land = nt.nodes.new("ShaderNodeTexNoise")
-    land.inputs["Scale"].default_value = 2.2
-    land.inputs["Detail"].default_value = 8.0
-    land_ramp = nt.nodes.new("ShaderNodeValToRGB")
-    land_ramp.color_ramp.elements[0].position = 0.48
-    land_ramp.color_ramp.elements[1].position = 0.52
-    lights = nt.nodes.new("ShaderNodeTexVoronoi")
-    lights.inputs["Scale"].default_value = 90.0
-    light_ramp = nt.nodes.new("ShaderNodeValToRGB")
-    light_ramp.color_ramp.elements[0].color = (1.0, 1.0, 1.0, 1.0)
-    light_ramp.color_ramp.elements[1].position = 0.22
-    light_ramp.color_ramp.elements[1].color = (0.0, 0.0, 0.0, 1.0)
-    mul = nt.nodes.new("ShaderNodeVectorMath")
-    mul.operation = "MULTIPLY"
-    tint = nt.nodes.new("ShaderNodeVectorMath")
-    tint.operation = "MULTIPLY"
-    tint.inputs[1].default_value = (1.0, 0.62, 0.25)
-    nt.links.new(coord.outputs["Object"], land.inputs["Vector"])
-    nt.links.new(coord.outputs["Object"], lights.inputs["Vector"])
-    nt.links.new(land.outputs["Fac"], land_ramp.inputs["Fac"])
-    nt.links.new(lights.outputs["Distance"], light_ramp.inputs["Fac"])
-    nt.links.new(land_ramp.outputs["Color"], mul.inputs[0])
-    nt.links.new(light_ramp.outputs["Color"], mul.inputs[1])
-    nt.links.new(mul.outputs["Vector"], tint.inputs[0])
-    nt.links.new(tint.outputs["Vector"], b.inputs["Emission Color"])
-    b.inputs["Emission Strength"].default_value = 4.0
+    b.inputs["Roughness"].default_value = 0.35
+    b.inputs["Coat Weight"].default_value = 0.2
+    uv = nt.nodes.new("ShaderNodeTexCoord")
+    surface = nt.nodes.new("ShaderNodeTexImage")
+    surface.image = bpy.data.images.load(str(color_path), check_existing=True)
+    lights = nt.nodes.new("ShaderNodeTexImage")
+    lights.image = bpy.data.images.load(str(lights_path), check_existing=True)
+    lights.image.colorspace_settings.name = "Non-Color"
+    # Oceans are blue with a low red channel, so red separates land from sea.
+    split = nt.nodes.new("ShaderNodeSeparateColor")
+    land = nt.nodes.new("ShaderNodeValToRGB")
+    land.color_ramp.elements[0].position = 0.1
+    land.color_ramp.elements[1].position = 0.2
+    base = nt.nodes.new("ShaderNodeMix")
+    base.data_type = "RGBA"
+    _socket(base.inputs, "A_Color").default_value = (0.004, 0.035, 0.22, 1.0)
+    _socket(base.inputs, "B_Color").default_value = (0.16, 0.09, 0.025, 1.0)
+    # The lights map has a grey land base (~0.1-0.17); cut it so only cities glow.
+    city_cut = nt.nodes.new("ShaderNodeValToRGB")
+    city_cut.color_ramp.elements[0].position = 0.2
+    city_cut.color_ramp.elements[1].position = 0.75
+    city = nt.nodes.new("ShaderNodeMath")
+    city.operation = "MULTIPLY"
+    city.inputs[1].default_value = 12.0
+    glow = nt.nodes.new("ShaderNodeMath")
+    glow.operation = "MULTIPLY_ADD"
+    glow.inputs[1].default_value = 0.1
+    gold = nt.nodes.new("ShaderNodeVectorMath")
+    gold.operation = "SCALE"
+    gold.inputs[0].default_value = (1.0, 0.6, 0.22)
+    nt.links.new(uv.outputs["UV"], surface.inputs["Vector"])
+    nt.links.new(uv.outputs["UV"], lights.inputs["Vector"])
+    nt.links.new(surface.outputs["Color"], split.inputs["Color"])
+    nt.links.new(split.outputs["Red"], land.inputs["Fac"])
+    nt.links.new(land.outputs["Color"], _socket(base.inputs, "Factor_Float"))
+    nt.links.new(_socket(base.outputs, "Result_Color"), b.inputs["Base Color"])
+    nt.links.new(lights.outputs["Color"], city_cut.inputs["Fac"])
+    nt.links.new(city_cut.outputs["Color"], city.inputs[0])
+    nt.links.new(land.outputs["Color"], glow.inputs[0])
+    nt.links.new(city.outputs["Value"], glow.inputs[2])
+    nt.links.new(glow.outputs["Value"], gold.inputs["Scale"])
+    nt.links.new(gold.outputs["Vector"], b.inputs["Emission Color"])
+    b.inputs["Emission Strength"].default_value = 1.0
     ob.data.materials.append(mat)
     ob.parent = parent
-    ob.rotation_euler = (0.0, 0.0, 0.0)
+    ob.rotation_euler = (0.0, 0.0, math.radians(GLOBE_START_DEG))
     ob.keyframe_insert("rotation_euler", index=2, frame=FRAME_START)
-    ob.rotation_euler[2] = math.radians(180)
+    ob.rotation_euler[2] = math.radians(GLOBE_START_DEG + GLOBE_SPIN_DEG)
     ob.keyframe_insert("rotation_euler", index=2, frame=FRAME_END)
     _linear(ob)
     return ob
@@ -322,6 +347,23 @@ def _pick_engine(scene) -> str:
     raise SystemExit("no supported render engine")
 
 
+def build_glare(scene) -> str:
+    """FX_Flare: bloom on emissive gold/lights via the Blender 5.x node-group compositor."""
+    tree = bpy.data.node_groups.new("FX_Flare", "CompositorNodeTree")
+    tree.interface.new_socket("Image", in_out="OUTPUT", socket_type="NodeSocketColor")
+    layers = tree.nodes.new("CompositorNodeRLayers")
+    glare = tree.nodes.new("CompositorNodeGlare")
+    glare.inputs["Type"].default_value = "Bloom"
+    glare.inputs["Threshold"].default_value = 0.9
+    glare.inputs["Strength"].default_value = 0.5
+    glare.inputs["Size"].default_value = 0.55
+    out = tree.nodes.new("NodeGroupOutput")
+    tree.links.new(layers.outputs["Image"], glare.inputs["Image"])
+    tree.links.new(glare.outputs["Image"], out.inputs[0])
+    scene.compositing_node_group = tree
+    return "bloom"
+
+
 def build(inputs: dict) -> dict:
     bpy.ops.wm.read_factory_settings(use_empty=True)
     scene = bpy.context.scene
@@ -355,13 +397,14 @@ def build(inputs: dict) -> dict:
     text_white = _principled("TXT_White", (0.9, 0.92, 1.0), 0.0, 0.4, emission=(0.85, 0.9, 1.0), strength=1.0)
 
     _, symbol_frame = build_symbol(inputs["paths"]["asia_a_symbol_trace"], grp, navy, gold)
-    build_globe(grp, symbol_frame)
+    build_globe(grp, symbol_frame, inputs["paths"]["earth_color"], inputs["paths"]["earth_lights"])
     build_orbit(grp)
     build_text("TXT_Company", inputs["company"], inputs["paths"]["font_en"], 0.42, -1.42, grp, text_gold)
     build_text("TXT_Slogan_KO", inputs["slogan"], inputs["paths"]["font_ko"], 0.17, -1.86, grp, text_white)
     build_background(inputs["paths"]["asia_bg_plate"], cam_rig, cam, distance=21.0)
     build_lights()
-    return {"engine": engine}
+    glare = build_glare(scene)
+    return {"engine": engine, "glare": glare}
 
 
 def main() -> None:
