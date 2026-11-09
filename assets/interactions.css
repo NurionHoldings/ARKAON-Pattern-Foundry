@@ -13,3 +13,12 @@ button[hidden],a[hidden]{display:none!important}
 .service-filters button[aria-pressed=true]{box-shadow:0 0 24px #ac86ff20}
 @media(prefers-reduced-motion:no-preference){body>.shell,body>main{animation:portal-in .35s ease-out both}.main-nav a:hover,.svc-home:hover{box-shadow:0 4px 22px #b799ff22}}
 @media(prefers-reduced-motion:reduce){@view-transition{navigation:none}::view-transition-old(root),::view-transition-new(root){animation:none}.click-wave{display:none}a,button{transition:none!important}a:active,button:active{transform:none!important}}
+
+/* The name keeps its inherited type and contrast; only its light breathes. */
+.arkaon-living{display:inline-block;position:relative;white-space:nowrap;font:inherit;letter-spacing:inherit;color:inherit;vertical-align:baseline;animation:arkaon-breath 5.6s ease-in-out infinite}
+.arkaon-living::after{content:'';position:absolute;pointer-events:none;inset:auto 4% -.08em;height:1px;background:linear-gradient(90deg,transparent,#b39a67,transparent);transform-origin:center;animation:arkaon-light 5.6s ease-in-out infinite;opacity:.35}
+@keyframes arkaon-breath{0%,100%{text-shadow:0 0 0 transparent;transform:translateY(0)}50%{text-shadow:0 0 14px #b39a6750;transform:translateY(-.035em)}}
+@keyframes arkaon-light{0%,100%{opacity:.2;transform:scaleX(.45)}50%{opacity:.8;transform:scaleX(1)}}
+@media(prefers-reduced-motion:reduce){.arkaon-living{animation:none;text-shadow:none;transform:none}.arkaon-living::after{animation:none;opacity:.4;transform:none}}
+@media(forced-colors:active){.arkaon-living{animation:none;text-shadow:none}.arkaon-living::after{display:none}}
+@media print{.arkaon-living{animation:none;text-shadow:none;transform:none}.arkaon-living::after{display:none}}
