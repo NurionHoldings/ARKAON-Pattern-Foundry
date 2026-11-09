@@ -20,3 +20,31 @@ a.card{background:#fffdf8;border:1px solid #ddded4;border-radius:6px;min-height:
 .atelier-symbol{font-family:Georgia,serif;animation:atelier-glow 6s ease-in-out infinite}
 @keyframes atelier-glow{50%{opacity:.7;transform:rotate(12deg)}}
 @media(prefers-reduced-motion:reduce){.atelier-symbol{animation:none}}
+/* Atelier typography: editorial headings, practical Korean UI text. */
+.atelier-workspace{font-family:Pretendard,"Apple SD Gothic Neo","Noto Sans CJK KR","Malgun Gothic",sans-serif;font-size:16px;line-height:1.8;letter-spacing:-.015em}
+.atelier-workspace .svc-top h1,.atelier-workspace .panel h2{font-family:"Noto Serif CJK KR","AppleMyungjo","Batang",serif;font-weight:500;letter-spacing:-.035em;line-height:1.5;text-wrap:pretty}
+.atelier-workspace .svc-top h1{font-size:clamp(1.65rem,3.2vw,2.25rem)}
+.atelier-workspace .panel h2{font-size:clamp(1.15rem,2vw,1.4rem);margin-bottom:22px}
+.atelier-workspace p{line-height:1.85}.atelier-workspace .shell>p{max-width:72ch;margin-block:0 22px}
+.atelier-workspace label{font-size:.875rem;font-weight:500;line-height:1.65;letter-spacing:0;gap:8px;margin-bottom:18px}
+.atelier-workspace input,.atelier-workspace textarea,.atelier-workspace select{font-family:inherit;font-size:1rem;font-weight:400;line-height:1.65;letter-spacing:0;max-width:100%;min-width:0}
+.atelier-workspace button,.atelier-workspace .btn{font-size:.875rem;font-weight:600;line-height:1.5;letter-spacing:0;white-space:normal;text-align:center;min-height:46px}
+.atelier-workspace .muted{font-size:.9rem}.atelier-workspace .chip{line-height:1.5;letter-spacing:0}.atelier-workspace .feature-result h3{line-height:1.65;font-weight:600}
+/* Small screens: natural wrapping, generous touch areas, no canvas overflow. */
+.atelier-workspace .panel,.atelier-workspace .preview,.atelier-workspace .list li,.atelier-workspace .feature-result{min-width:0}
+.atelier-workspace .list li>*{max-width:100%;overflow-wrap:anywhere}
+.atelier-workspace .svc-home{flex-shrink:0;min-height:44px;display:inline-flex;align-items:center}
+@media(max-width:600px){
+ .atelier-workspace .shell{padding-inline:20px;padding-bottom:40px}
+ .atelier-workspace .svc-top{align-items:flex-start;gap:12px;padding-bottom:20px;margin-bottom:22px}
+ .atelier-workspace .svc-top h1{font-size:1.65rem;flex:1 1 190px;line-height:1.55}
+ .atelier-workspace .panel{padding:20px 18px}.atelier-workspace .panel h2{margin-bottom:20px}
+ .atelier-workspace .btn-row{gap:10px}.atelier-workspace .btn-row>*{flex:1 1 100%;width:100%}
+ .atelier-workspace .feature-shortcuts{gap:8px}.atelier-workspace .feature-shortcuts button{min-height:44px;padding:9px 13px}
+ .atelier-workspace .preview{padding:14px}.atelier-workspace .preview iframe{min-height:360px}
+ .atelier-workspace .feature-search-row button{width:100%}.atelier-workspace .feature-result .btn-row{gap:12px}
+ .atelier-home .service-filters button{min-height:44px}.atelier-home .hero-actions a{min-height:44px;display:inline-flex;align-items:center}
+ .atelier-home .sample{min-width:0}.atelier-home .atelier-display{padding-inline:6px}.atelier-home .sample-brand{padding:20px;min-height:285px}
+ .atelier-home .sample-card{padding:16px}.atelier-home .sample-label{letter-spacing:.08em;overflow-wrap:anywhere}.atelier-home .sample small{line-height:1.7}
+}
+@media(max-width:380px){.atelier-home .atelier-display{gap:12px;grid-template-columns:1fr 1fr}.atelier-home .sample-brand{padding:16px}.atelier-home .sample-card{padding:13px}.atelier-home .sample-web{padding:12px}.atelier-home .sample-brand strong{font-size:2rem}.atelier-home .mini-window{padding:8px}.atelier-home .mini-window strong{font-size:1.1rem}}
