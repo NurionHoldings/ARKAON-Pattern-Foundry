@@ -1,12 +1,12 @@
 (() => {
   const {downloadText,saveProject,readProjects}=APFHomeServices;
   const {compose,normalize,presets}=APFDesignComposer;
-  const fields=['title','tagline','body','email','phone','accent','style','layout','motion'];
+  const fields=['title','tagline','body','email','phone','accent','style','layout','motion','background','buttonColor'];
   const status=document.getElementById('designStatus');
   const values=()=>Object.fromEntries(fields.map(id=>[id,document.getElementById(id).value]));
   const render=()=>{document.getElementById('preview').srcdoc=compose(values());};
   fields.forEach(id=>document.getElementById(id).addEventListener('input',()=>{
-    if(id==='style')document.getElementById('accent').value=presets[document.getElementById('style').value].accent;
+    if(id==='style'){const p=presets[document.getElementById('style').value];document.getElementById('accent').value=p.accent;document.getElementById('background').value=p.background;document.getElementById('buttonColor').value=p.accent;}
     render();
     status.textContent='선택한 설정을 미리보기에 반영했습니다. 저장하면 같은 HTML을 내보냅니다.';
   }));

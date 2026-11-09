@@ -26,3 +26,6 @@ el('style').value='midnight';el('style').handlers.input();assert.equal(el('body'
 el('title').value=' \t ';submit();assert.equal(downloads.length,1);
 el('title').value='저장 실패';c.localStorage.setItem=()=>{throw Error('quota');};submit();assert.equal(downloads.length,1);assert.equal(el('title').value,'저장 실패');
 console.log('PASS: 18 design combinations, escaping, defaults, preview/save parity, reload, content preservation, empty title and quota failure');
+
+for(const background of ['#000000','#ffffff']){const html=composer.compose({background,buttonColor:background});assert.ok(html.includes('background-color:'+background));assert.ok(html.includes('color:'+(background==='#000000'?'#ffffff':'#000000')+';background:'+background));}
+assert.ok(!composer.compose({background:'red;bad()',buttonColor:'url(https://bad.test)'}).includes('bad.test'));
