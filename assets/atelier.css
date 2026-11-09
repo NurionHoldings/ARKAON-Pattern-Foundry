@@ -16,3 +16,7 @@ a.card{background:#fffdf8;border:1px solid #ddded4;border-radius:6px;min-height:
 @media(max-width:900px){.hero{gap:28px;min-height:600px}.hero h1{font-size:3rem}.sample-brand{padding:20px;min-height:280px}.sample-card{padding:17px}.atelier-display{gap:12px}.atelier-studio{grid-template-columns:1fr}.atelier-studio>form,.atelier-studio>.preview{grid-column:1;grid-row:auto;position:static}}
 @media(max-width:600px){.header-inner{padding-block:20px}.hero{grid-template-columns:1fr;gap:0}.hero-copy{padding:48px 0 18px}.hero h1{font-size:clamp(2.5rem,10vw,3.7rem)}.atelier-display{max-width:440px;justify-self:center;width:100%;padding-top:26px;gap:16px}.sample-brand{min-height:310px;padding:24px}.sample-card{padding:20px}.hero-actions{gap:18px}.pathway{margin-top:28px}.atelier-workspace .shell{padding-top:24px}.preview{padding:16px}.preview iframe{min-height:340px}.atelier-return{padding-block:20px 40px}.entry-screen .entry-controls{gap:12px}}
 @media(prefers-reduced-motion:reduce){.sample{transition:none;transform:none}.sample:hover{transform:none}}
+/* The decorative mark uses text presentation; movement is optional. */
+.atelier-symbol{font-family:Georgia,serif;animation:atelier-glow 6s ease-in-out infinite}
+@keyframes atelier-glow{50%{opacity:.7;transform:rotate(12deg)}}
+@media(prefers-reduced-motion:reduce){.atelier-symbol{animation:none}}
