@@ -1,0 +1,19 @@
+{
+  "schema": "apf.asia-cinema-a-symbol-trace/v1",
+  "status": "generated_by_agent",
+  "method": "manual control-point trace of the operator reference poster (1536x1024 px); swoosh and globe are separate PR-B objects",
+  "canvas_px": [1536, 1024],
+  "pieces": {
+    "a_top": [
+      [765, 112], [895, 349], [787, 388], [720, 250], [637, 447], [554, 482]
+    ],
+    "a_lower_left_blade": [
+      [685, 486], [647, 515], [615, 550], [585, 600], [565, 655],
+      [430, 655], [470, 600], [522, 550], [570, 515], [610, 500]
+    ],
+    "a_lower_right_leg": [
+      [905, 402], [935, 396], [1010, 500], [1060, 590], [1137, 672],
+      [1025, 667], [990, 648], [967, 620], [977, 580], [977, 530], [960, 480], [925, 430]
+    ]
+  }
+}

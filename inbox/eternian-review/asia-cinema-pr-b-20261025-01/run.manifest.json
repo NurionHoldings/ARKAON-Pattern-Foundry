@@ -1,0 +1,42 @@
+{
+  "schema": "apf.asia-cinema-pr-b-run/v1",
+  "run_id": "asia-cinema-pr-b-20261025-01",
+  "branch": "feat/asia-cinema-pr-b-blender-scene",
+  "blender": "5.2",
+  "engine": "BLENDER_EEVEE",
+  "inputs": {
+    "manifest_ref": "<operator-local:input.manifest.pr-b.operator-local.json>",
+    "manifest_sha256": "f65cad6031a22a93aae213c703b76faaf5d9e1d2b32919f16c630dc3b84fa2a6",
+    "input_validation_report": "input-validation-report.json",
+    "asset_approval": "asset-approval.json"
+  },
+  "scene": {
+    "blend_ref": "<operator-local:asia_holdings_cinema_v1.blend>",
+    "blend_sha256": "b89feab66320e7b3d109cff1ed7e66d02704997bf7174c46ed94b3b0493f89e1",
+    "committed": false,
+    "reason": "approved background/fonts are operator-local; .blend is rebuilt from the manifest by modules/asia_cinema/blender/build_scene.py",
+    "invariants_report": "scene-invariants-report.json",
+    "invariants_ok": true
+  },
+  "preview": {
+    "profile": "960x540 @ 24fps",
+    "frame_count": 384,
+    "expected_frame_count": 384,
+    "frame_sizes": [
+      [
+        960,
+        540
+      ]
+    ],
+    "sequence_sha256": "f0c09533331a1d14d50ab1d0eb145407d46ecd4d4b527d5e83c71172ea436538",
+    "render_seconds": 109,
+    "sample_frames": {
+      "frame_0001.png": "ab5311bc7b16fc8a5750c76a7d621bf371f6695df4cd07e79b154191e5bed994",
+      "frame_0096.png": "4576efb798273c8aaffe291454e9884798e537dc02427e297ca8cbe78f0bf261",
+      "frame_0192.png": "7fe4fce70d08195bbed81d45fadf8becf83511c2feb70756df86e1212f75b345",
+      "frame_0288.png": "4461a721bd88dcbb4e3573a6193a11e5cc209f2a72e16a282ebc65e3d7a8337f",
+      "frame_0384.png": "e5e1b61f6b5bd460b0cffc933aee32946ec35ddb9a3dcb7dec1a806a51bd13c9"
+    },
+    "location": "<operator-local:pr-b-build/preview_960x540/>"
+  }
+}

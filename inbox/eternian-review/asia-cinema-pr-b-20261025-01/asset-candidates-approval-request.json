@@ -1,0 +1,72 @@
+{
+  "schema": "apf.asia-cinema-asset-candidates-approval-request/v1",
+  "run_id": "asia-cinema-pr-b-20261025-01",
+  "track": "PR-B",
+  "branch": "feat/asia-cinema-pr-b-blender-scene",
+  "status": "decided",
+  "decision": "inbox/eternian-review/asia-cinema-pr-b-20261025-01/asset-approval.json",
+  "created_at": "2026-11-09T04:00:00+00:00",
+  "policy": {
+    "generated_assets_status": "generated_by_agent",
+    "pin_only_after_operator_approval": true,
+    "candidate_files_location": "private/asia-cinema/pr-b-candidates/ (git-ignored, operator machine only)",
+    "pr125_pr124_step5_step6_evidence_untouched": true
+  },
+  "candidates": {
+    "a_symbol": {
+      "recommended": "agent_trace_v1",
+      "options": {
+        "step6_trial_mask": {
+          "verdict": "not_recommended",
+          "reason": "left leg too thin without tail, right leg inner edge too far in, open chevron instead of the small upper counter"
+        },
+        "agent_trace_v1": {
+          "method": "manual control-point trace of the operator reference poster, 3 pieces (a_top, a_lower_left_blade, a_lower_right_leg); swoosh and globe are separate 3D objects",
+          "trace_file": "modules/asia_cinema/config/a_symbol_trace.v1.json",
+          "trace_sha256": "0aa0ef1f482f0ea493b044ab60e2145f98f8d43bba78338c6cdcfdb02c43da8e",
+          "svg": {"file": "asia_a_symbol.candidate.svg", "sha256": "70aba52a7e64a5fdb514acf32c4efffce9cc14cc1ca374038a6de1c99cc6bb6f"},
+          "compare_sheet": {"file": "asia_a_symbol.compare.png", "sha256": "3051767cc3ab92764d0c4a84171b56730e70ee6a50f76193a6afffd94c39928c"},
+          "silhouette": {"file": "asia_a_symbol.silhouette.png", "sha256": "a75534da30ddd13ee163e69c6f9c8d2b31286ceaa3331ff4a3158b1f39a3e5d6"},
+          "known_limits": "curved edges are polyline segments; smoothed in Blender with bevel/subdivision"
+        }
+      },
+      "source_pins": {
+        "reference_sha256": "7f558d7a25680a459692446661d0b337ebe8a0fa3e22b55b8fb50086f426b900",
+        "mask_sha256": "05b4c6ebb25b6391f112f330e4b2e9f09553d8dc967a4f956f67010911cb0b1d"
+      }
+    },
+    "background": {
+      "options": {
+        "A_city_night": {
+          "file": "asia_bg_candidate_A_city_night.jpg",
+          "sha256": "987b206a6bce63f2e439e662d13ff5df65e628e1192420fa03ac5b9fbedd6dbd",
+          "size_px": [1280, 720],
+          "origin": "AI image generation (Cursor GenerateImage)"
+        },
+        "B_orbit_earth": {
+          "file": "asia_bg_candidate_B_orbit_earth.jpg",
+          "sha256": "3a87f7d0e5a72a62c6bd84c450c04a468c9f3edf27b0db205c3794ba5dee4348",
+          "size_px": [1280, 720],
+          "origin": "AI image generation (Cursor GenerateImage)"
+        }
+      },
+      "known_limits": "1280x720 is enough for the PR-B 960x540 preview; PR-C 1920x1080 final needs upscale or a re-generated plate",
+      "deferred": "Blender procedural plate (candidate C) dropped this round: floor reflections did not render in Blender 5.2 Cycles"
+    },
+    "fonts": {
+      "sample_sheet": {"file": "asia_font_candidates.sheet.png", "sha256": "34ba135f17f8d3c2edb79bb687ece26d1e64bbed3ea3b5b36faeafa3f7e643b5"},
+      "options": {
+        "EN-1": {"family": "Cinzel Bold", "file": "fonts/Cinzel-Bold.ttf", "sha256": "0c23ec565db45c5508ee95889c60ad87debd167ca07167a43a5d68572b4e2eac", "license": "SIL OFL 1.1", "license_sha256": "a46624198eeb4c2e442c38b0ff3bd8f52caeefd76675c36f410e2fb69014a239", "source": "github.com/NDISCOVER/Cinzel"},
+        "EN-2": {"family": "Montserrat SemiBold", "file": "fonts/Montserrat-SemiBold.ttf", "sha256": "b4e1563393d73fdff491a869441245aef31add2ec03d9c97a6dae4de07c52fd0", "license": "SIL OFL 1.1", "license_sha256": "8b7141c03fa4f8d44e6345d5d4931709290f0f67875e452e95ac1fd3a027802e", "source": "github.com/JulietaUla/Montserrat"},
+        "KO-1": {"family": "Pretendard SemiBold", "file": "fonts/Pretendard-SemiBold.otf", "sha256": "c89bc43027dc7cde5726e96223376f8eec09302b2fc1f8147fd5b57cfc376118", "license": "SIL OFL 1.1", "license_sha256": "82e9c8a4b203261f10ddba1296422d64914ff3d4b7bd8a12896d03f0f088d70a", "source": "github.com/orioncactus/pretendard"},
+        "KO-2": {"family": "Noto Serif KR (variable, SemiBold instance)", "file": "fonts/NotoSerifKR-wght.ttf", "sha256": "11f8d5de6f1b79195efba3828aaa2ec95c1178f5ae976fb23c8d53250a9938f3", "license": "SIL OFL 1.1", "license_sha256": "5e0da210fb04058a8c0087985d2d456b931c2579811a49655721d3cf0c36b6d6", "source": "github.com/google/fonts ofl/notoserifkr"}
+      }
+    }
+  },
+  "operator_decisions_required": [
+    "a_symbol: approve agent_trace_v1 (or request corrections)",
+    "background: choose A or B (or request re-generation)",
+    "fonts: choose one EN and one KO",
+    "commit policy: whether approved fonts/background are committed to the public repo or stay operator-local with SHA pins only"
+  ]
+}

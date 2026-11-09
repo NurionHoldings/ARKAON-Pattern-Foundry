@@ -1,0 +1,46 @@
+{
+  "schema": "apf.asia-cinema-asset-approval/v1",
+  "run_id": "asia-cinema-pr-b-20261025-01",
+  "status": "approved",
+  "approved_at": "2026-11-09T04:10:00+00:00",
+  "approved_by": "operator",
+  "approval_channel": "cursor_chat_askquestion_20261109",
+  "request": "inbox/eternian-review/asia-cinema-pr-b-20261025-01/asset-candidates-approval-request.json",
+  "commit_policy": "local_only — approved background and font files stay operator-local; only SHA pins are recorded",
+  "approved": {
+    "a_symbol": {
+      "choice": "agent_trace_v1",
+      "trace_file": "modules/asia_cinema/config/a_symbol_trace.v1.json",
+      "trace_sha256": "52f6b2201ac38ee4f0d503e0f2287c3b97d1ca32ed2473b74c9dc30f3d78bd31",
+      "pin_revision": {
+        "previous_sha256": "0aa0ef1f482f0ea493b044ab60e2145f98f8d43bba78338c6cdcfdb02c43da8e",
+        "reason": "line endings normalized CRLF -> LF and locked via .gitattributes so CI and local checkouts hash identically; control points unchanged"
+      }
+    },
+    "background": {
+      "choice": "A_city_night",
+      "file_ref": "<operator-local:asia_bg_candidate_A_city_night.jpg>",
+      "sha256": "987b206a6bce63f2e439e662d13ff5df65e628e1192420fa03ac5b9fbedd6dbd"
+    },
+    "font_en": {
+      "choice": "EN-1",
+      "family": "Cinzel Bold",
+      "file_ref": "<operator-local:Cinzel-Bold.ttf>",
+      "sha256": "0c23ec565db45c5508ee95889c60ad87debd167ca07167a43a5d68572b4e2eac",
+      "license": "SIL OFL 1.1"
+    },
+    "font_ko": {
+      "choice": "KO-1",
+      "family": "Pretendard SemiBold",
+      "file_ref": "<operator-local:Pretendard-SemiBold.otf>",
+      "sha256": "c89bc43027dc7cde5726e96223376f8eec09302b2fc1f8147fd5b57cfc376118",
+      "license": "SIL OFL 1.1"
+    }
+  },
+  "rejected": {
+    "a_symbol": "step6_trial_mask",
+    "background": "B_orbit_earth",
+    "font_en": "EN-2 Montserrat SemiBold",
+    "font_ko": "KO-2 Noto Serif KR"
+  }
+}
