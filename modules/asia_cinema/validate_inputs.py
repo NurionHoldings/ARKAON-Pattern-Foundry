@@ -119,8 +119,11 @@ def _sha256_file(path: Path) -> str:
 
 
 def _redact_path(path: str) -> str:
-    """Never emit full local paths in public reports."""
-    name = Path(path).name
+    """Never emit full local paths in public reports (POSIX CI must not leak Windows paths)."""
+    normalized = path.replace("\\", "/").rstrip("/")
+    name = normalized.rsplit("/", 1)[-1] if normalized else "asset"
+    if name.endswith(":") or not name:
+        name = "asset"
     return f"<asset:{name}>"
 
 

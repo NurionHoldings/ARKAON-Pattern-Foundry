@@ -5,11 +5,12 @@ from hashlib import sha256
 from pathlib import Path
 
 import pytest
+from pydantic import ValidationError
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "modules"))
 
-from asia_cinema.validate_inputs import (  # noqa: E402
+from asia_cinema.validate_inputs import (
     InputBundle,
     validate_input_bundle,
 )
@@ -130,7 +131,7 @@ def test_slogan_text_tamper_blocked(tmp_path: Path):
 
 
 def test_wrong_company_literal_blocked():
-    with pytest.raises(Exception):
+    with pytest.raises(ValidationError):
         InputBundle.model_validate(
             {
                 "schema": "apf.asia-cinema-input-bundle/v1",
@@ -140,6 +141,45 @@ def test_wrong_company_literal_blocked():
                 "slogan_ko": {"path": "a", "sha256": "a" * 64, "registration_path": "b"},
             }
         )
+
+
+def test_public_report_never_leaks_windows_absolute_paths():
+    """Regression: Linux CI public JSON must not contain operator Windows paths from manifest."""
+    win_ref = (
+        r"D:\보관자료\Clearance-sale\asia_logo_engine_v3_windows"
+        r"\asia_logo_engine_v3\input\asia_holdings_reference.png"
+    )
+    win_mask = (
+        r"D:\보관자료\Clearance-sale\asia_logo_engine_v3_windows"
+        r"\asia_logo_engine_v3\input\asia_a_symbol_mask.png"
+    )
+    win_slogan = r"D:\보관자료\Clearance-sale\asia_logo_engine_v3_windows\asia_logo_engine_v3\input\slogan_ko.txt"
+    win_reg = r"D:\ARKAON_Pattern Foundry\inbox\eternian-review\asia-holdings-slogan-ko-operator-registration.json"
+    bundle = {
+        "schema": "apf.asia-cinema-input-bundle/v1",
+        "run_id": "redact-win-paths-001",
+        "company_name_literal": "ASIA HOLDINGS",
+        "assets": [
+            {"id": "asia_holdings_reference", "path": win_ref, "sha256": "a" * 64},
+            {"id": "asia_a_symbol_mask", "path": win_mask, "sha256": "b" * 64},
+        ],
+        "slogan_ko": {
+            "path": win_slogan,
+            "sha256": "c" * 64,
+            "registration_path": win_reg,
+        },
+    }
+    report = validate_input_bundle(bundle)
+    pub = json.dumps(report.to_public_dict(), ensure_ascii=False)
+    for secret in (win_ref, win_mask, win_slogan, win_reg, "보관자료", "Clearance-sale", "D:\\", "D:/"):
+        assert secret not in pub
+    assert "<asset:asia_holdings_reference.png>" in pub
+    assert "<asset:slogan_ko.txt>" in pub
+    assert win_reg not in pub
+    for issue in report.issues:
+        blob = json.dumps({"code": issue.code, "message": issue.message}, ensure_ascii=False)
+        for secret in (win_ref, "보관자료", "D:\\", "D:/"):
+            assert secret not in blob
 
 
 def test_public_report_redacts_paths(tmp_path: Path):
