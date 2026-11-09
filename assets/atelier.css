@@ -104,3 +104,5 @@ html[data-custom-appearance] :is(button,.btn,.primary-action,.svc-home):hover{fi
 html[data-custom-appearance] .panel .feature-result,html[data-custom-appearance] .panel .chip{background:var(--appearance-panel)}
 @media(max-width:600px){.appearance-toggle{right:14px;bottom:14px}.atelier-workspace .shell{padding-bottom:100px}.appearance-dialog{padding:22px}.appearance-actions button{flex:1 1 auto}}
 @media print{.appearance-toggle,.appearance-dialog{display:none}}
+html[data-custom-appearance] body:is(.atelier-workspace,.atelier-home) :is(button,.btn,.primary-action,.svc-home,.main-nav a,.service-filters button[aria-pressed=true]){background:var(--appearance-button);color:var(--appearance-button-ink);border-color:var(--appearance-button)}
+html[data-custom-appearance] body:is(.atelier-workspace,.atelier-home) :is(button,.btn,.primary-action,.svc-home):hover{background:var(--appearance-button);color:var(--appearance-button-ink)}
