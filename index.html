@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#080f1d">
+  <meta name="theme-color" content="#F4F1EA">
   <meta name="description" content="아르카온에서 로고, 명함, 영상, 홈페이지를 만들고 작업을 관리하세요.">
   <title>아르카온 | 함께 만드는 디지털 공간</title>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -73,10 +73,11 @@
   </style>
   <link rel="stylesheet" href="/assets/cosmos.css">
   <link rel="stylesheet" href="/assets/interactions.css">
+  <link rel="stylesheet" href="/assets/atelier.css">
   <script src="/assets/interactions.js" defer></script>
   <noscript><style>.entry-screen{display:none!important}</style></noscript>
 </head>
-<body>
+<body class="atelier-home">
   <a class="skip-link" href="#main">본문으로 건너뛰기</a>
   <div id="entryScreen" class="entry-screen" role="dialog" aria-modal="true" aria-label="ARKAON 진입 영상">
     <div class="entry-stage">
@@ -89,17 +90,23 @@
   <main class="shell" id="main" tabindex="-1">
     <div class="hero">
       <div class="hero-copy">
-        <div class="eyebrow"><span class="signal" aria-hidden="true"></span> THE ORIGIN OF YOUR NEXT CREATION</div>
-        <h1><span class="hero-line">상상이 깨어나는 곳,</span><span class="hero-line"><em>아르카온.</em></span></h1>
-        <p class="intro">당신의 생각에, 새로운 생명력을.<br>사람의 상상과 AI의 가능성이 만나<br>브랜드와 디지털 공간으로 피어납니다.</p>
-        <div class="hero-actions"><a class="primary-action" href="/services/co-create.html">함께 만들기 <span aria-hidden="true">↗</span></a><a class="secondary-action" href="#services">창작 공간 둘러보기 <span aria-hidden="true">↓</span></a></div>
-        <p class="hero-note">작은 아이디어 하나로 시작하세요.</p>
+        <div class="eyebrow"><span class="signal" aria-hidden="true"></span> ARKAON · CREATIVE ATELIER</div>
+        <h1><span class="hero-line">당신의 생각이,</span><span class="hero-line"><em>작품이 되는 곳.</em></span></h1>
+        <p class="intro">작은 아이디어부터, 나다운 브랜드까지.<br>아르카온과 함께 만들고 다듬으며<br>당신만의 결과물을 완성하세요.</p>
+        <div class="hero-actions"><a class="primary-action" href="/services/co-create.html">새 작업 시작하기 <span aria-hidden="true">↗</span></a><a class="secondary-action" href="#services">제작 도구 둘러보기 <span aria-hidden="true">↓</span></a></div>
+        <p class="hero-note">아이디어를 꺼내는 순간, 창작이 시작됩니다.</p>
       </div>
-      <div class="cosmos" aria-hidden="true"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="orbit orbit-three"></div><div class="core-halo"></div><div class="core"></div><span class="star star-one"></span><span class="star star-two"></span><span class="star star-three"></span><div class="cosmos-caption">A R K A O N <span>가능성의 중심에서</span></div></div>
+      <div class="atelier-display" aria-label="브랜드·명함·웹페이지의 디자인 방향 예시">
+        <div class="display-label">A STUDY IN POSSIBILITY <span>01 — 03</span></div>
+        <a class="sample sample-brand" href="/services/logo-card.html"><span class="sample-label">BRAND IDENTITY</span><span class="atelier-symbol" aria-hidden="true">✳︎</span><strong>오롯</strong><span>온전히, 나다운 시작.</span><small>로고·명함 제작하기 ↗</small></a>
+        <a class="sample sample-card" href="/services/logo-card.html"><span class="sample-label">THE PERSONAL EDITION</span><strong>서연<br><i>Creative director</i></strong><span>여백에서 시작되는 새로운 시선.</span><small>나만의 명함 만들기 ↗</small></a>
+        <a class="sample sample-web" href="/services/site-builder.html"><span class="sample-label">DIGITAL SPACE</span><div class="mini-window" aria-hidden="true"><span>STUDIO / 03</span><strong>Less, but<br>meaningful.</strong><div class="mini-landscape"></div></div><small>홈페이지 제작하기 ↗</small></a>
+        <p class="display-note">디자인 방향을 보여주는 구성 예시입니다.</p>
+      </div>
     </div>
-    <div class="pathway"><span class="pathway-label">YOUR CREATIVE JOURNEY</span><p>생각을 꺼내고 <span aria-hidden="true">→</span> 함께 다듬고 <span aria-hidden="true">→</span> 세상에 펼치세요</p><a href="/services/self-heal.html">아르카온에 개선 제안 <span aria-hidden="true">↗</span></a></div>
+    <div class="pathway"><span class="pathway-label">MAKE IT YOURS</span><p>생각을 꺼내고 <span aria-hidden="true">→</span> 함께 다듬고 <span aria-hidden="true">→</span> 세상에 펼치세요</p><a href="/services/self-heal.html">아르카온에 개선 제안 <span aria-hidden="true">↗</span></a></div>
     <section id="services" aria-label="서비스 안내">
-      <div class="section-heading"><div><div class="eyebrow">EXPLORE THE POSSIBILITIES</div><h2>무엇에 생명력을 불어넣을까요?</h2></div><a href="/services/">전체 서비스 ↗</a></div>
+      <div class="section-heading"><div><div class="eyebrow">CHOOSE YOUR CANVAS</div><h2>오늘은 무엇을 만들어 볼까요?</h2></div><a href="/services/">전체 서비스 ↗</a></div>
       <div class="service-filters" role="group" aria-label="서비스 분류"><button type="button" data-filter="all" aria-pressed="true">모든 공간</button><button type="button" data-filter="create" aria-pressed="false">브랜드·콘텐츠</button><button type="button" data-filter="together" aria-pressed="false">공동 작업·게시</button><button type="button" data-filter="manage" aria-pressed="false">작업 관리</button></div><p id="filterStatus" class="sr-only" role="status"></p>
       <div class="grid" id="serviceGrid">
         <a class="card" href="/services/logo-card.html"><h3>로고·명함 만들기</h3><span class="state state-live">이용 가능</span><p>브랜드에 어울리는 로고와 명함을 디자인합니다.</p></a>
@@ -115,6 +122,7 @@
     </section>
     <aside class="notice">작업은 각 서비스에서 시작할 수 있습니다. 실제 과금·API 연결·운영 배포 조건은 <a href="/services/account.html">계정 안내</a>와 <a href="/services/admin.html">관리자 안내</a>에서 확인하세요.</aside>
   </main>
+  <div class="atelier-return shell"><span>어제의 아이디어를, 오늘의 완성으로.</span><a href="/services/account.html">저장한 작업 이어가기 ↗</a></div>
   <footer><span class="footer-brand">ARKAON</span><span>상상에 형태를. 가능성에 생명력을.</span><a href="/services/mailbox.html">제안 우편함</a><a href="/services/admin.html">관리자</a></footer>
 
 <script src="/assets/cosmos.js" defer></script>
@@ -138,7 +146,7 @@
   const screen=document.getElementById('entryScreen');
   const video=document.getElementById('entryVideo');
   const skip=document.getElementById('skipEntry');
-  const background=[...document.querySelectorAll('body > header,body > main,body > footer,.skip-link')];
+  const background=[...document.querySelectorAll('body > header,body > main,body > footer,.skip-link,.atelier-return')];
   let dismissed=false;
   const close=()=>{
     if(dismissed)return;
