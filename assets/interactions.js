@@ -12,3 +12,50 @@
     setTimeout(() => wave.remove(), 600);
   });
 })();
+
+/* Keep the visible name alive without changing text, labels or form values. */
+(() => {
+  const excluded = 'script,style,noscript,textarea,input,select,option,code,pre,svg,math,.arkaon-living,[data-arkaon-static]';
+  const enhance = root => {
+    if (!root || !root.isConnected) return;
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    if (root.nodeType === Node.TEXT_NODE) nodes.push(root);
+    else while (walker.nextNode()) nodes.push(walker.currentNode);
+    for (const node of nodes) {
+      const parent = node.parentElement;
+      if (!parent || parent.isContentEditable || parent.closest(excluded) || !node.data.includes('아르카온')) continue;
+      const pieces = node.data.split('아르카온');
+      const fragment = document.createDocumentFragment();
+      pieces.forEach((piece, index) => {
+        if (index) {
+          const name = document.createElement('span');
+          name.className = 'arkaon-living';
+          name.textContent = '아르카온';
+          fragment.append(name);
+        }
+        if (piece) fragment.append(document.createTextNode(piece));
+      });
+      node.replaceWith(fragment);
+    }
+  };
+  let scheduled = false;
+  const pending = new Set();
+  const observer = new MutationObserver(records => {
+    for (const record of records) {
+      if (record.type === 'characterData') pending.add(record.target);
+      else record.addedNodes.forEach(node => pending.add(node));
+    }
+    if (scheduled || !pending.size) return;
+    scheduled = true;
+    requestAnimationFrame(() => {
+      scheduled = false;
+      observer.disconnect();
+      for (const root of pending) enhance(root);
+      pending.clear();
+      observer.observe(document.body, {subtree:true,childList:true,characterData:true});
+    });
+  });
+  enhance(document.body);
+  observer.observe(document.body, {subtree:true,childList:true,characterData:true});
+})();
