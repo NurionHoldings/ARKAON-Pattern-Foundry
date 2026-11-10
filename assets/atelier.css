@@ -130,3 +130,13 @@ html[data-custom-appearance] body.appearance-workspace .mini-brand,html[data-cus
 .atelier-home footer{background:#eef4e4;border-color:#d7e0c9;color:#52624e}
 .atelier-home .atelier-display::before{background:radial-gradient(ellipse at 50% 38%,#f8e8b94d,transparent 70%);border-color:#ccba8850}
 @media(max-width:600px){.atelier-home::after{opacity:.1}.atelier-home .pathway{padding-inline:12px}}
+/* Company information is readable on every platform service page. */
+footer.company-footer{display:block;background:#eef4e4;color:#405443;border-top:1px solid #cddac4;padding:36px clamp(20px,4vw,48px) 30px;margin-top:20px;text-align:left}
+.company-footer-inner{max-width:1200px;margin:auto;display:grid;grid-template-columns:1fr 1.6fr auto;gap:24px 40px;align-items:start}
+.company-footer-brand{display:flex;flex-direction:column;gap:12px;font:700 1.25rem/1.4 system-ui,sans-serif;letter-spacing:.18em;text-decoration:none;color:inherit}
+.company-footer-brand span{font:400 .8rem/1.8 Pretendard,"Malgun Gothic",sans-serif;letter-spacing:0;color:inherit}
+.company-details{font-size:.85rem;line-height:1.9;overflow-wrap:anywhere}.company-details strong{display:block;font-size:1rem;margin-bottom:8px;font-weight:650}.company-details address{font:inherit;font-style:normal;margin:0}.company-details p{font:inherit;color:inherit;margin:4px 0 0}
+.company-footer-nav{display:flex;flex-direction:column;gap:8px;align-items:flex-start}.company-footer-nav a{font-size:.8rem;color:inherit;text-decoration:none;min-height:32px;display:inline-flex;align-items:center}.company-footer-nav a:hover{text-decoration:underline;text-underline-offset:4px}
+.company-copyright{grid-column:1/-1;padding-top:20px;border-top:1px solid #b7c8ad80;font-size:.73rem;color:inherit;margin:0}
+@media(max-width:800px){.company-footer-inner{grid-template-columns:1fr 1.6fr;gap:24px}.company-footer-nav{grid-column:1/-1;flex-direction:row;flex-wrap:wrap;gap:12px 22px}}
+@media(max-width:600px){footer.company-footer{padding:30px 20px 90px}.company-footer-inner{grid-template-columns:1fr;gap:22px}.company-footer-nav a{min-height:44px}.company-details{font-size:.82rem}.company-footer-brand{font-size:1.15rem}.company-copyright{padding-top:18px}}
