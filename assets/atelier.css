@@ -180,3 +180,9 @@ body.atelier-workspace>.company-footer{flex-shrink:0;width:100%;margin-top:auto}
 @media(max-width:600px){.company-footer-brand .footer-logo-picture{width:144px;height:81px}}
 @media(prefers-reduced-motion:reduce){.company-footer-brand .mini-brand-video{display:none}}
 @media print{.company-footer-brand .mini-brand-video{display:none}}
+/* Let the footer film's light sit directly on the footer, without a card. */
+.company-footer-brand .footer-logo-picture{background:transparent;border:0;border-radius:0;box-shadow:none;overflow:visible}
+.company-footer-brand .footer-logo-picture .mini-brand-video{border-radius:0;mix-blend-mode:screen;mask-image:radial-gradient(ellipse farthest-side at center,#000 76%,transparent 100%);-webkit-mask-image:radial-gradient(ellipse farthest-side at center,#000 76%,transparent 100%)}
+.company-footer-brand .footer-logo-picture:has(video:not([hidden])) .mini-brand-emblem{visibility:hidden}
+@media(prefers-reduced-motion:reduce){.company-footer-brand .footer-logo-picture:has(video:not([hidden])) .mini-brand-emblem{visibility:visible}}
+@media print{.company-footer-brand .footer-logo-picture:has(video:not([hidden])) .mini-brand-emblem{visibility:visible}}
