@@ -193,3 +193,7 @@ body.atelier-workspace>.company-footer{flex-shrink:0;width:100%;margin-top:auto}
 html[data-custom-appearance] .mini-brand .mini-brand-video{filter:var(--appearance-logo-filter,invert(1) hue-rotate(180deg));mix-blend-mode:var(--appearance-logo-blend,multiply)}
 @media(prefers-reduced-motion:reduce){.mini-brand .mini-brand-picture:has(video:not([hidden])) .mini-brand-emblem{visibility:visible}}
 @media print{.mini-brand .mini-brand-picture:has(video:not([hidden])) .mini-brand-emblem{visibility:visible}}
+/* Default header: home base #ccc8c0 mixed with 23% black (sRGB). */
+html:not([data-custom-appearance]) .atelier-home header,html:not([data-custom-appearance]) .atelier-workspace .svc-top{background:#9d9a94;border-color:#827f78;color:#14332e}
+html:not([data-custom-appearance]) :is(.atelier-home header,.atelier-workspace .svc-top) .mini-brand,html:not([data-custom-appearance]) :is(.atelier-home header,.atelier-workspace .svc-top) .mini-brand-copy strong,html:not([data-custom-appearance]) .atelier-workspace .svc-top h1{color:#14332e}
+html:not([data-custom-appearance]) :is(.atelier-home header,.atelier-workspace .svc-top) .mini-brand-copy small,html:not([data-custom-appearance]) .atelier-workspace .svc-top::before{color:#293b32}
