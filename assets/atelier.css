@@ -170,3 +170,13 @@ body.atelier-workspace>.company-footer{flex-shrink:0;width:100%;margin-top:auto}
 @media(prefers-reduced-motion:reduce){.company-footer .company-details strong{animation:none;background-position:50% 50%}}
 @media(forced-colors:active){.company-footer .company-details strong{background:none;color:CanvasText;animation:none}.company-footer .company-details strong .arkaon-living{color:CanvasText;-webkit-text-fill-color:CanvasText}}
 @media print{.company-footer .company-details strong{background:none;color:#000;animation:none}.company-footer .company-details strong .arkaon-living{color:#000;-webkit-text-fill-color:#000}}
+
+/* The footer home link shares the quiet, viewport-aware header logo film. */
+.company-footer-brand .footer-logo-picture{width:160px;height:90px;border-radius:9px}
+.company-footer-brand .footer-logo-picture .mini-brand-emblem{font:500 36px Georgia,serif;color:#d8c49b}
+.company-footer-brand .mini-brand-video{display:block;position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:contain;border-radius:8px;pointer-events:none}
+.company-footer-brand .mini-brand-video[hidden]{display:none}
+.company-footer-brand:focus-visible{outline:2px solid #f4dca5;outline-offset:6px;border-radius:9px}
+@media(max-width:600px){.company-footer-brand .footer-logo-picture{width:144px;height:81px}}
+@media(prefers-reduced-motion:reduce){.company-footer-brand .mini-brand-video{display:none}}
+@media print{.company-footer-brand .mini-brand-video{display:none}}
