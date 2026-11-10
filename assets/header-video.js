@@ -13,6 +13,11 @@
   };
   const observer=new IntersectionObserver(entries=>{for(const entry of entries){if(entry.isIntersecting)visible.add(entry.target);else visible.delete(entry.target);update(entry.target);}});
   for(const video of videos){
+    video.controls=false;
+    video.removeAttribute('controls');
+    video.disablePictureInPicture=true;
+    video.disableRemotePlayback=true;
+    video.setAttribute('controlslist','nodownload nofullscreen noremoteplayback');
     video.addEventListener('error',()=>{video.hidden=true;});
     observer.observe(video);
   }
