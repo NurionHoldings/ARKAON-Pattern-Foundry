@@ -140,3 +140,7 @@ footer.company-footer{display:block;background:#eef4e4;color:#405443;border-top:
 .company-copyright{grid-column:1/-1;padding-top:20px;border-top:1px solid #b7c8ad80;font-size:.73rem;color:inherit;margin:0}
 @media(max-width:800px){.company-footer-inner{grid-template-columns:1fr 1.6fr;gap:24px}.company-footer-nav{grid-column:1/-1;flex-direction:row;flex-wrap:wrap;gap:12px 22px}}
 @media(max-width:600px){footer.company-footer{padding:30px 20px 90px}.company-footer-inner{grid-template-columns:1fr;gap:22px}.company-footer-nav a{min-height:44px}.company-details{font-size:.82rem}.company-footer-brand{font-size:1.15rem}.company-copyright{padding-top:18px}}
+/* A clearly bounded closing area beneath the light atelier pages. */
+footer.company-footer{background:linear-gradient(120deg,#163d38,#234e43);color:#edf3e6;border-top:3px solid #b59b65;box-shadow:0 -8px 28px #173a3510}
+.company-footer .company-footer-brand,.company-footer .company-footer-brand span,.company-footer .company-details,.company-footer .company-details p,.company-footer .company-footer-nav a,.company-footer .company-copyright{color:inherit}
+.company-footer .company-details strong{color:#fff9e8}.company-footer .company-copyright{border-color:#e5edda30;color:#cbd9cb}.company-footer .company-footer-nav a:hover{color:#f4dca5}
