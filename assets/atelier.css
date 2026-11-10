@@ -93,3 +93,15 @@ a.card{background:#fffdf8;border:1px solid #ddded4;border-radius:6px;min-height:
 .atelier-display{position:relative}.atelier-display::before{content:'';position:absolute;inset:0 -15px;border:1px solid #b8ae8d45;border-radius:48% 48% 4px 4px;transform:rotate(8deg);z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 50% 38%,#d8c69d30,transparent 70%)}
 @media(max-width:600px){.atelier-home,.atelier-workspace{background-size:100% 100%;background-attachment:scroll}.atelier-display::before{inset:12px 0}.atelier-home::after,.atelier-workspace::after{opacity:.25}}
 @media print{.atelier-home::after,.atelier-workspace::after{display:none}}
+/* A small film frame and a legible wordmark form one consistent brand header. */
+.mini-brand{display:inline-flex;align-items:center;gap:16px;color:#194e4a;text-decoration:none;max-width:100%;min-height:64px}
+.mini-brand-picture{position:relative;display:grid;place-items:center;flex:0 0 auto;width:112px;height:64px;overflow:hidden;border:1px solid #b9a77980;border-radius:8px;background:#080b16;box-shadow:0 5px 16px #1a302612}
+.mini-brand-emblem{color:#d8c49b;font:500 32px Georgia,serif;letter-spacing:.05em}
+.mini-brand .mini-brand-video{display:block!important;position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:contain;border-radius:7px;pointer-events:none}
+.mini-brand .mini-brand-video[hidden]{display:none!important}
+.mini-brand-copy{display:flex;flex-direction:column;gap:5px}.mini-brand-copy strong{font:700 1.35rem/1.2 system-ui,sans-serif;letter-spacing:.2em}.mini-brand-copy small{font:500 .58rem/1.5 system-ui,sans-serif;letter-spacing:.18em;color:#667363}
+.atelier-workspace .svc-top>.mini-brand{order:0;flex-basis:100%;padding-bottom:20px;border-bottom:1px solid #b5bfad65}.atelier-workspace .svc-top:before{order:1}.atelier-workspace .svc-top>h1,.atelier-workspace .svc-top>.svc-return-nav{order:2}
+html[data-custom-appearance] body.appearance-workspace .mini-brand,html[data-custom-appearance] body.appearance-workspace .mini-brand-copy :is(strong,small){color:var(--appearance-panel-ink)}
+@media(max-width:600px){.mini-brand{gap:12px;min-height:50px}.mini-brand-picture{width:88px;height:50px}.mini-brand-copy strong{font-size:1.1rem;letter-spacing:.15em}.mini-brand-copy small{font-size:.53rem;letter-spacing:.12em}.atelier-workspace .svc-top>.mini-brand{padding-bottom:16px}.atelier-home .header-inner{gap:18px}}
+@media(prefers-reduced-motion:reduce){.mini-brand .mini-brand-video{display:none!important}}
+@media print{.mini-brand .mini-brand-video{display:none!important}}
