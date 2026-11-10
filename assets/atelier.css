@@ -144,3 +144,14 @@ footer.company-footer{display:block;background:#eef4e4;color:#405443;border-top:
 footer.company-footer{background:linear-gradient(120deg,#163d38,#234e43);color:#edf3e6;border-top:3px solid #b59b65;box-shadow:0 -8px 28px #173a3510}
 .company-footer .company-footer-brand,.company-footer .company-footer-brand span,.company-footer .company-details,.company-footer .company-details p,.company-footer .company-footer-nav a,.company-footer .company-copyright{color:inherit}
 .company-footer .company-details strong{color:#fff9e8}.company-footer .company-copyright{border-color:#e5edda30;color:#cbd9cb}.company-footer .company-footer-nav a:hover{color:#f4dca5}
+/* Home is organized into three clear surfaces: introduction, menu, company. */
+.atelier-home .hero{background:radial-gradient(ellipse at 90% 15%,#f7dfb075,transparent 55%),linear-gradient(120deg,#fffaf0,#fff3dd);border:1px solid #e6d5b5;border-radius:18px;padding-inline:32px;margin-top:28px;box-shadow:0 12px 36px #7b63310a}
+.atelier-home .hero-copy{padding-block:56px}.atelier-home .hero .atelier-display{padding-right:6px}
+.atelier-home .pathway{margin-top:24px;background:#f6f8ed;border:1px solid #d6dec6;padding:22px;border-radius:10px}
+.atelier-home #services{background:linear-gradient(140deg,#e3eee3,#edf3e8);border:1px solid #bdcfbc;border-radius:18px;padding:32px;box-shadow:0 12px 32px #234e4310}
+.atelier-home #services .section-heading{border-bottom:1px solid #c1d1be;padding-bottom:24px}
+.atelier-home #services .service-filters{background:#f7faf1;border:1px solid #ccdac4;border-radius:12px;padding:14px;margin-bottom:24px}
+.atelier-home #services a.card{background:#fffef8;border-color:#cddbc4;box-shadow:0 4px 14px #2e553c08}
+.atelier-home .main-nav{background:#edf2e7;border:1px solid #c9d5bd;border-radius:999px;padding:8px;gap:12px}
+@media(max-width:900px){.atelier-home .hero{padding-inline:24px;gap:24px}.atelier-home #services{padding:26px}}
+@media(max-width:600px){.atelier-home .hero{padding-inline:20px;margin-top:18px;border-radius:12px}.atelier-home .hero-copy{padding-top:32px;padding-bottom:8px}.atelier-home .hero h1{font-size:clamp(2rem,9vw,2.8rem)}.atelier-home #services{padding:22px 16px;border-radius:12px}.atelier-home #services .service-filters{padding:10px;gap:8px}.atelier-home #services .service-filters button{flex:1 1 calc(50% - 8px);padding:10px 8px}.atelier-home .pathway{padding:18px}.atelier-home .main-nav{border-radius:12px;padding:8px;gap:8px}.atelier-home .main-nav a{padding:9px 10px}.atelier-home .main-nav a:last-child{padding:9px 10px}}

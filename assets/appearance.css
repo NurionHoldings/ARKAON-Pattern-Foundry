@@ -36,3 +36,7 @@ html[data-custom-appearance] body.appearance-workspace:after{display:none}
 html[data-custom-appearance] body.atelier-home .service-filters button:not([aria-pressed=true]){background:var(--appearance-panel);color:var(--appearance-panel-ink);border-color:var(--appearance-button);box-shadow:inset 0 0 0 1px var(--appearance-button)}
 @supports(background:color-mix(in srgb,white,black)){html[data-custom-appearance] body.atelier-home .service-filters button:not([aria-pressed=true]){background:color-mix(in srgb,var(--appearance-button) 12%,var(--appearance-panel))}}
 html[data-custom-appearance] body.atelier-home .service-filters button[aria-pressed=true]{background:#194e4a;color:#fff;border-color:#194e4a;box-shadow:0 5px 14px #194e4a20}
+/* User-selected page/panel colors also cover the new home section surfaces. */
+html[data-custom-appearance] body.atelier-home .hero{background:var(--appearance-page);color:var(--appearance-page-ink);border-color:var(--appearance-button)}
+html[data-custom-appearance] body.atelier-home :is(#services,#services .service-filters,.main-nav,.pathway){background:var(--appearance-panel);color:var(--appearance-panel-ink);border-color:var(--appearance-button)}
+html[data-custom-appearance] body.atelier-home #services .section-heading :is(h2,a,.eyebrow),html[data-custom-appearance] body.atelier-home .pathway :is(p,a,span){color:var(--appearance-panel-ink)}
