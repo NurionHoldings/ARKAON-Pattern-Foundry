@@ -155,3 +155,8 @@ footer.company-footer{background:linear-gradient(120deg,#163d38,#234e43);color:#
 .atelier-home .main-nav{background:#edf2e7;border:1px solid #c9d5bd;border-radius:999px;padding:8px;gap:12px}
 @media(max-width:900px){.atelier-home .hero{padding-inline:24px;gap:24px}.atelier-home #services{padding:26px}}
 @media(max-width:600px){.atelier-home .hero{padding-inline:20px;margin-top:18px;border-radius:12px}.atelier-home .hero-copy{padding-top:32px;padding-bottom:8px}.atelier-home .hero h1{font-size:clamp(2rem,9vw,2.8rem)}.atelier-home #services{padding:22px 16px;border-radius:12px}.atelier-home #services .service-filters{padding:10px;gap:8px}.atelier-home #services .service-filters button{flex:1 1 calc(50% - 8px);padding:10px 8px}.atelier-home .pathway{padding:18px}.atelier-home .main-nav{border-radius:12px;padding:8px;gap:8px}.atelier-home .main-nav a{padding:9px 10px}.atelier-home .main-nav a:last-child{padding:9px 10px}}
+/* Short service pages still fill the screen, with a full-width footer. */
+body.atelier-workspace{display:flex;flex-direction:column;min-height:100vh;min-height:100svh;min-height:100dvh}
+body.atelier-workspace>.shell{flex:1 0 auto;width:100%}
+body.atelier-workspace>.company-footer{flex-shrink:0;width:100%;margin-top:auto}
+.atelier-home header,.atelier-home .company-footer{width:100%;box-sizing:border-box}

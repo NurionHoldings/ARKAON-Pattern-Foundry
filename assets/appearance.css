@@ -40,3 +40,11 @@ html[data-custom-appearance] body.atelier-home .service-filters button[aria-pres
 html[data-custom-appearance] body.atelier-home .hero{background:var(--appearance-page);color:var(--appearance-page-ink);border-color:var(--appearance-button)}
 html[data-custom-appearance] body.atelier-home :is(#services,#services .service-filters,.main-nav,.pathway){background:var(--appearance-panel);color:var(--appearance-panel-ink);border-color:var(--appearance-button)}
 html[data-custom-appearance] body.atelier-home #services .section-heading :is(h2,a,.eyebrow),html[data-custom-appearance] body.atelier-home .pathway :is(p,a,span){color:var(--appearance-panel-ink)}
+/* Paint the viewport itself, including gutters, short pages and overscroll. */
+html{min-height:100%;background-color:#f4f1ea}
+html:has(body.atelier-home){background-color:#fffaf0}
+html:has(body.appearance-workspace:not(.atelier-home):not(.atelier-workspace)){background-color:#080f1d}
+body.appearance-workspace{margin:0;min-height:100vh;min-height:100svh;min-height:100dvh;box-sizing:border-box}
+html[data-custom-appearance]{background-color:var(--appearance-background)}
+html[data-custom-appearance]:has(body.appearance-workspace){background-color:var(--appearance-background)}
+@supports(height:100dvh){html{min-height:100dvh}}
