@@ -83,11 +83,11 @@ a.card{background:#fffdf8;border:1px solid #ddded4;border-radius:6px;min-height:
 @media(max-width:600px){.atelier-workspace .svc-top{padding:20px 18px;gap:12px}.atelier-workspace .svc-return-nav{border-radius:7px;padding:5px;gap:8px}.atelier-workspace .btn-row{padding:12px;gap:10px}.atelier-workspace .svc-top::before{font-size:.6rem;letter-spacing:.08em}[data-space=menu] #serviceList{grid-template-columns:1fr;gap:12px}[data-space=menu] #serviceList li{padding:18px}}
 @media(prefers-reduced-motion:reduce){.atelier-workspace button,.atelier-workspace .btn,[data-space=menu] #serviceList li{transition:none}[data-space=menu] #serviceList li:hover{transform:none}}
 /* Layered light and fine material: visible depth around quiet work surfaces. */
-.atelier-home,.atelier-workspace{isolation:isolate;background-color:#f4f1ea;background-image:radial-gradient(ellipse at 93% 4%,#d7bd8b70 0,transparent 36%),radial-gradient(ellipse at 0 42%,#9dbfb15e 0,transparent 40%),radial-gradient(ellipse at 90% 90%,#d8c5b94f 0,transparent 38%),linear-gradient(135deg,#f8f5ee,#efefe5 65%,#f5eee3);background-repeat:no-repeat}
+.atelier-home,.atelier-workspace{isolation:isolate;background-color:#c3c1bb;background-image:radial-gradient(ellipse at 93% 4%,#ac976f70 0,transparent 36%),radial-gradient(ellipse at 0 42%,#7e998e5e 0,transparent 40%),radial-gradient(ellipse at 90% 90%,#ad9e944f 0,transparent 38%),linear-gradient(135deg,#c6c4be,#bfbfb7 65%,#c4beb6);background-repeat:no-repeat}
 .atelier-home::after,.atelier-workspace::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.42;background-image:repeating-linear-gradient(0deg,transparent 0 3px,#866d3d08 3px 4px),repeating-linear-gradient(90deg,transparent 0 79px,#ffffff50 79px 80px);mask-image:linear-gradient(90deg,#000,transparent 40%,transparent 60%,#000)}
-[data-space=motion]{background-image:radial-gradient(ellipse at 95% 4%,#bd9eaf70,transparent 40%),radial-gradient(ellipse at 0 60%,#c5bdde60,transparent 40%),linear-gradient(135deg,#f8f3f5,#eee8ec 65%,#f4f1ea)}
-[data-space=collaboration]{background-image:radial-gradient(ellipse at 95% 4%,#aabbd770,transparent 40%),radial-gradient(ellipse at 0 65%,#c3b6d65c,transparent 40%),linear-gradient(135deg,#f5f5f7,#e9edf1 65%,#f4f1ea)}
-[data-space=web]{background-image:radial-gradient(ellipse at 95% 4%,#a7c5b780,transparent 40%),radial-gradient(ellipse at 0 65%,#d6bf8c60,transparent 40%),linear-gradient(135deg,#f4f7f0,#e9eee6 65%,#f5eee3)}
+[data-space=motion]{background-image:radial-gradient(ellipse at 95% 4%,#977e8c70,transparent 40%),radial-gradient(ellipse at 0 60%,#9e97b260,transparent 40%),linear-gradient(135deg,#c6c2c4,#bebabd 65%,#c3c1bb)}
+[data-space=collaboration]{background-image:radial-gradient(ellipse at 95% 4%,#8896ac70,transparent 40%),radial-gradient(ellipse at 0 65%,#9c92ab5c,transparent 40%),linear-gradient(135deg,#c4c4c6,#babec1 65%,#c3c1bb)}
+[data-space=web]{background-image:radial-gradient(ellipse at 95% 4%,#869e9280,transparent 40%),radial-gradient(ellipse at 0 65%,#ab997060,transparent 40%),linear-gradient(135deg,#c3c6c0,#babeb8 65%,#c4beb6)}
 .atelier-workspace .svc-top{background:radial-gradient(ellipse at 95% 15%,#ffffffc0,transparent 55%),linear-gradient(115deg,var(--room-tint),#fffdf875);border-color:#bfc7b480;box-shadow:0 12px 36px #4a4a2b09,inset 0 1px 0 #fff}
 .atelier-workspace .preview{background-image:radial-gradient(ellipse at 80% 5%,#ffffffb0,transparent 60%),repeating-linear-gradient(45deg,transparent 0 14px,#ffffff25 14px 15px),linear-gradient(140deg,var(--room-tint),#e4e6d9);box-shadow:inset 0 0 0 6px #ffffff45,0 15px 40px #3a4d3610}
 .atelier-display{position:relative}.atelier-display::before{content:'';position:absolute;inset:0 -15px;border:1px solid #b8ae8d45;border-radius:48% 48% 4px 4px;transform:rotate(8deg);z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 50% 38%,#d8c69d30,transparent 70%)}
@@ -121,7 +121,7 @@ html[data-custom-appearance] body.appearance-workspace .mini-brand,html[data-cus
 /* Keep decorative rotated artwork and transition veils inside the mobile viewport. */
 .atelier-home{overflow-x:hidden;overflow-x:clip}
 /* A brighter home: warm daylight instead of a grey wash, with quiet color depth. */
-.atelier-home{background-color:#fffaf0;background-image:radial-gradient(ellipse at 92% 7%,#f7dfaa80 0,transparent 43%),radial-gradient(ellipse at 0 45%,#cce9d770 0,transparent 44%),radial-gradient(ellipse at 88% 94%,#f7ddc960 0,transparent 42%),linear-gradient(135deg,#fffcf5,#f6faef 62%,#fff6e9);background-repeat:no-repeat}
+.atelier-home{background-color:#ccc8c0;background-image:radial-gradient(ellipse at 92% 7%,#c6b28880 0,transparent 43%),radial-gradient(ellipse at 0 45%,#a3baac70 0,transparent 44%),radial-gradient(ellipse at 88% 94%,#c6b1a160 0,transparent 42%),linear-gradient(135deg,#cccac4,#c5c8bf 62%,#ccc5ba);background-repeat:no-repeat}
 .atelier-home::after{opacity:.16}
 .atelier-home header{background:#fffcf5f5;border-color:#dce2cf}
 .atelier-home .pathway{background:#ffffff45;border-color:#cbd6bf;border-radius:6px;padding-inline:18px}
@@ -160,3 +160,13 @@ body.atelier-workspace{display:flex;flex-direction:column;min-height:100vh;min-h
 body.atelier-workspace>.shell{flex:1 0 auto;width:100%}
 body.atelier-workspace>.company-footer{flex-shrink:0;width:100%;margin-top:auto}
 .atelier-home header,.atelier-home .company-footer{width:100%;box-sizing:border-box}
+/* Rainbow light travels across the company name without flashing. */
+@supports (background-clip:text){
+.company-footer .company-details strong{width:fit-content;background:linear-gradient(100deg,#ffb3ba,#ffd49b,#fff3a3,#a8edc1,#9fdcff,#c7b7ff,#f6b7ed,#ffb3ba);background-size:300% 100%;background-clip:text;-webkit-background-clip:text;color:transparent;animation:company-rainbow 9s linear infinite}
+.company-footer .company-details strong .arkaon-living{color:transparent;-webkit-text-fill-color:transparent;text-shadow:none;animation:none}
+.company-footer .company-details strong .arkaon-living::after{display:none}
+}
+@keyframes company-rainbow{from{background-position:0% 50%}to{background-position:100% 50%}}
+@media(prefers-reduced-motion:reduce){.company-footer .company-details strong{animation:none;background-position:50% 50%}}
+@media(forced-colors:active){.company-footer .company-details strong{background:none;color:CanvasText;animation:none}.company-footer .company-details strong .arkaon-living{color:CanvasText;-webkit-text-fill-color:CanvasText}}
+@media print{.company-footer .company-details strong{background:none;color:#000;animation:none}.company-footer .company-details strong .arkaon-living{color:#000;-webkit-text-fill-color:#000}}

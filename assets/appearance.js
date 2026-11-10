@@ -2,7 +2,7 @@
 (() => {
   document.body.classList.add('appearance-workspace');
   const key='apf.appearance.v1';
-  const defaults={background:'#f4f1ea',page:'#f4f1ea',panel:'#fffdf8',button:'#194e4a'};
+  const defaults={background:'#c3c1bb',page:'#c3c1bb',panel:'#fffdf8',button:'#194e4a'};
   const valid=value=>typeof value==='string'&&/^#[0-9a-f]{6}$/i.test(value);
   const ink=color=>{const v=color.slice(1).match(/../g).map(x=>parseInt(x,16)/255).map(x=>x<=.04045?x/12.92:((x+.055)/1.055)**2.4);const l=v[0]*.2126+v[1]*.7152+v[2]*.0722;return (l+.05)/.05>=1.05/(l+.05)?'#000000':'#ffffff';};
   function sanitize(value){if(!value||typeof value!=='object')return null;return ['background','panel','button'].every(k=>valid(value[k]))?Object.fromEntries(Object.keys(defaults).map(k=>[k,valid(value[k])?value[k]:value.background])):null;}
