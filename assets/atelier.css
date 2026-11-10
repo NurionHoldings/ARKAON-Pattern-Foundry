@@ -120,3 +120,13 @@ html[data-custom-appearance] body.appearance-workspace .mini-brand,html[data-cus
 @media(max-width:600px){.atelier-home .service-filters{gap:8px}.atelier-home .service-filters button{font-size:.76rem;padding:10px 14px}.atelier-home .main-nav a{padding:9px 13px}}
 /* Keep decorative rotated artwork and transition veils inside the mobile viewport. */
 .atelier-home{overflow-x:hidden;overflow-x:clip}
+/* A brighter home: warm daylight instead of a grey wash, with quiet color depth. */
+.atelier-home{background-color:#fffaf0;background-image:radial-gradient(ellipse at 92% 7%,#f7dfaa80 0,transparent 43%),radial-gradient(ellipse at 0 45%,#cce9d770 0,transparent 44%),radial-gradient(ellipse at 88% 94%,#f7ddc960 0,transparent 42%),linear-gradient(135deg,#fffcf5,#f6faef 62%,#fff6e9);background-repeat:no-repeat}
+.atelier-home::after{opacity:.16}
+.atelier-home header{background:#fffcf5f5;border-color:#dce2cf}
+.atelier-home .pathway{background:#ffffff45;border-color:#cbd6bf;border-radius:6px;padding-inline:18px}
+.atelier-home a.card{background:#fffef9;border-color:#d5dfca;box-shadow:0 5px 18px #43603d06}
+.atelier-home .notice{background:#f0f6e6;border-color:#d8e3c9;color:#4f614c}
+.atelier-home footer{background:#eef4e4;border-color:#d7e0c9;color:#52624e}
+.atelier-home .atelier-display::before{background:radial-gradient(ellipse at 50% 38%,#f8e8b94d,transparent 70%);border-color:#ccba8850}
+@media(max-width:600px){.atelier-home::after{opacity:.1}.atelier-home .pathway{padding-inline:12px}}
