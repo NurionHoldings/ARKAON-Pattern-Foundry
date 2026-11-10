@@ -13,6 +13,16 @@
   };
   const observer=new IntersectionObserver(entries=>{for(const entry of entries){if(entry.isIntersecting)visible.add(entry.target);else visible.delete(entry.target);update(entry.target);}});
   for(const video of videos){
+    video.muted=true;
+    video.defaultMuted=true;
+    video.volume=0;
+    video.setAttribute('muted','');
+    video.addEventListener('volumechange',()=>{if(!video.muted)video.muted=true;if(video.volume!==0)video.volume=0;});
+    video.controls=false;
+    video.removeAttribute('controls');
+    video.disablePictureInPicture=true;
+    video.disableRemotePlayback=true;
+    video.setAttribute('controlslist','nodownload nofullscreen noremoteplayback');
     video.addEventListener('error',()=>{video.hidden=true;});
     observer.observe(video);
   }

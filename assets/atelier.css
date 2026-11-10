@@ -105,3 +105,5 @@ html[data-custom-appearance] body.appearance-workspace .mini-brand,html[data-cus
 @media(max-width:600px){.mini-brand{gap:12px;min-height:50px}.mini-brand-picture{width:88px;height:50px}.mini-brand-copy strong{font-size:1.1rem;letter-spacing:.15em}.mini-brand-copy small{font-size:.53rem;letter-spacing:.12em}.atelier-workspace .svc-top>.mini-brand{padding-bottom:16px}.atelier-home .header-inner{gap:18px}}
 @media(prefers-reduced-motion:reduce){.mini-brand .mini-brand-video{display:none!important}}
 @media print{.mini-brand .mini-brand-video{display:none!important}}
+/* Decorative header films never expose native playback chrome. */
+.mini-brand-video::-webkit-media-controls,.mini-brand-video::-webkit-media-controls-enclosure,.mini-brand-video::-webkit-media-controls-panel,.mini-brand-video::-webkit-media-controls-start-playback-button{display:none!important;-webkit-appearance:none}
