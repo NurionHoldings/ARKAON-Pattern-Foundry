@@ -202,10 +202,10 @@ html:not([data-custom-appearance]) :is(.atelier-home header,.atelier-workspace .
 html:not([data-custom-appearance]) body:is(.atelier-home,.atelier-workspace){--muted:#39463c}
 html:not([data-custom-appearance]) .atelier-workspace .shell>p,html:not([data-custom-appearance]) .atelier-home :is(.hero-note,.atelier-return){color:#39463c}
 /* Restrained room accents distinguish services without changing shared surfaces. */
-html:not([data-custom-appearance]) .atelier-workspace{--room-accent:#294735}
-html:not([data-custom-appearance]) [data-space=brand]{--room-accent:#513b15}
-html:not([data-custom-appearance]) [data-space=motion]{--room-accent:#4f3047}
-html:not([data-custom-appearance]) [data-space=web]{--room-accent:#17443d}
-html:not([data-custom-appearance]) [data-space=collaboration]{--room-accent:#263c5d}
+html:not([data-custom-appearance]) .atelier-workspace{--room-accent:#20382a}
+html:not([data-custom-appearance]) [data-space=brand]{--room-accent:#403010}
+html:not([data-custom-appearance]) [data-space=motion]{--room-accent:#3e2638}
+html:not([data-custom-appearance]) [data-space=web]{--room-accent:#10362f}
+html:not([data-custom-appearance]) [data-space=collaboration]{--room-accent:#1c2e48}
 html:not([data-custom-appearance]) .atelier-workspace .svc-top{border-left-color:var(--room-accent)}
 html:not([data-custom-appearance]) .atelier-workspace .svc-top::before{color:var(--room-accent)}
