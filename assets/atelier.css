@@ -186,3 +186,10 @@ body.atelier-workspace>.company-footer{flex-shrink:0;width:100%;margin-top:auto}
 .company-footer-brand .footer-logo-picture:has(video:not([hidden])) .mini-brand-emblem{visibility:hidden}
 @media(prefers-reduced-motion:reduce){.company-footer-brand .footer-logo-picture:has(video:not([hidden])) .mini-brand-emblem{visibility:visible}}
 @media print{.company-footer-brand .footer-logo-picture:has(video:not([hidden])) .mini-brand-emblem{visibility:visible}}
+/* A frameless header mark: invert the dark film matte for light surfaces. */
+.mini-brand .mini-brand-picture{background:transparent;border:0;border-radius:0;box-shadow:none;overflow:visible}
+.mini-brand .mini-brand-video{border-radius:0;filter:invert(1) hue-rotate(180deg);mix-blend-mode:multiply;mask-image:radial-gradient(ellipse farthest-side at center,#000 76%,transparent 100%);-webkit-mask-image:radial-gradient(ellipse farthest-side at center,#000 76%,transparent 100%)}
+.mini-brand .mini-brand-picture:has(video:not([hidden])) .mini-brand-emblem{visibility:hidden}
+html[data-custom-appearance] .mini-brand .mini-brand-video{filter:var(--appearance-logo-filter,invert(1) hue-rotate(180deg));mix-blend-mode:var(--appearance-logo-blend,multiply)}
+@media(prefers-reduced-motion:reduce){.mini-brand .mini-brand-picture:has(video:not([hidden])) .mini-brand-emblem{visibility:visible}}
+@media print{.mini-brand .mini-brand-picture:has(video:not([hidden])) .mini-brand-emblem{visibility:visible}}

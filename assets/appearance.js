@@ -7,7 +7,7 @@
   const ink=color=>{const v=color.slice(1).match(/../g).map(x=>parseInt(x,16)/255).map(x=>x<=.04045?x/12.92:((x+.055)/1.055)**2.4);const l=v[0]*.2126+v[1]*.7152+v[2]*.0722;return (l+.05)/.05>=1.05/(l+.05)?'#000000':'#ffffff';};
   function sanitize(value){if(!value||typeof value!=='object')return null;return ['background','panel','button'].every(k=>valid(value[k]))?Object.fromEntries(Object.keys(defaults).map(k=>[k,valid(value[k])?value[k]:value.background])):null;}
   let saved=null;try{saved=sanitize(JSON.parse(localStorage.getItem(key)));}catch{/* optional storage */}
-  function apply(colors){const root=document.documentElement;root.toggleAttribute('data-custom-appearance',!!colors);if(!colors)return;for(const [name,color]of Object.entries(colors)){root.style.setProperty(`--appearance-${name}`,color);root.style.setProperty(`--appearance-${name}-ink`,ink(color));}}
+  function apply(colors){const root=document.documentElement;root.toggleAttribute('data-custom-appearance',!!colors);if(!colors)return;const lightPanel=ink(colors.panel)==='#000000';root.style.setProperty('--appearance-logo-filter',lightPanel?'invert(1) hue-rotate(180deg)':'none');root.style.setProperty('--appearance-logo-blend',lightPanel?'multiply':'screen');for(const [name,color]of Object.entries(colors)){root.style.setProperty(`--appearance-${name}`,color);root.style.setProperty(`--appearance-${name}-ink`,ink(color));}}
   apply(saved);
   const button=document.createElement('button');button.type='button';button.className='appearance-toggle';button.textContent='화면 색상';button.setAttribute('aria-haspopup','dialog');
   const dialog=document.createElement('dialog');dialog.className='appearance-dialog';dialog.setAttribute('aria-labelledby','appearanceHeading');
