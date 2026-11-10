@@ -193,7 +193,19 @@ body.atelier-workspace>.company-footer{flex-shrink:0;width:100%;margin-top:auto}
 html[data-custom-appearance] .mini-brand .mini-brand-video{filter:var(--appearance-logo-filter,invert(1) hue-rotate(180deg));mix-blend-mode:var(--appearance-logo-blend,multiply)}
 @media(prefers-reduced-motion:reduce){.mini-brand .mini-brand-picture:has(video:not([hidden])) .mini-brand-emblem{visibility:visible}}
 @media print{.mini-brand .mini-brand-picture:has(video:not([hidden])) .mini-brand-emblem{visibility:visible}}
-/* Default header: home base #ccc8c0 mixed with 23% black (sRGB). */
-html:not([data-custom-appearance]) .atelier-home header,html:not([data-custom-appearance]) .atelier-workspace .svc-top{background:#9d9a94;border-color:#827f78;color:#14332e}
+/* Harmonized default header: a quiet sage-grey at the established depth. */
+html:not([data-custom-appearance]) .atelier-home header,html:not([data-custom-appearance]) .atelier-workspace .svc-top{background:#989e91;border-color:#77816f;color:#14332e}
 html:not([data-custom-appearance]) :is(.atelier-home header,.atelier-workspace .svc-top) .mini-brand,html:not([data-custom-appearance]) :is(.atelier-home header,.atelier-workspace .svc-top) .mini-brand-copy strong,html:not([data-custom-appearance]) .atelier-workspace .svc-top h1{color:#14332e}
-html:not([data-custom-appearance]) :is(.atelier-home header,.atelier-workspace .svc-top) .mini-brand-copy small,html:not([data-custom-appearance]) .atelier-workspace .svc-top::before{color:#293b32}
+html:not([data-custom-appearance]) :is(.atelier-home header,.atelier-workspace .svc-top) .mini-brand-copy small,html:not([data-custom-appearance]) .atelier-workspace .svc-top::before{color:#20382c}
+
+/* Keep explanations readable over the deeper page backgrounds. */
+html:not([data-custom-appearance]) body:is(.atelier-home,.atelier-workspace){--muted:#39463c}
+html:not([data-custom-appearance]) .atelier-workspace .shell>p,html:not([data-custom-appearance]) .atelier-home :is(.hero-note,.atelier-return){color:#39463c}
+/* Restrained room accents distinguish services without changing shared surfaces. */
+html:not([data-custom-appearance]) .atelier-workspace{--room-accent:#294735}
+html:not([data-custom-appearance]) [data-space=brand]{--room-accent:#513b15}
+html:not([data-custom-appearance]) [data-space=motion]{--room-accent:#4f3047}
+html:not([data-custom-appearance]) [data-space=web]{--room-accent:#17443d}
+html:not([data-custom-appearance]) [data-space=collaboration]{--room-accent:#263c5d}
+html:not([data-custom-appearance]) .atelier-workspace .svc-top{border-left-color:var(--room-accent)}
+html:not([data-custom-appearance]) .atelier-workspace .svc-top::before{color:var(--room-accent)}
