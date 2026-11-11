@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import handler from '../netlify/functions/operator-session.mjs';
+let secret;
+globalThis.Netlify={env:{get:()=>secret}};
+const origin='https://arkaon.example';
+const req=(method='GET',body,cookie,customOrigin=origin)=>new Request(origin+'/api/operator-session',{method,headers:{Origin:customOrigin,'Content-Type':'application/json',...(cookie?{Cookie:cookie}:{})},...(body?{body:JSON.stringify(body)}:{})});
+assert.equal((await handler(req())).status,503);
+secret='test-password-only-12345';
+assert.equal((await handler(req())).status,401);
+assert.equal((await handler(req('POST',{password:'wrong'}))).status,401);
+assert.equal((await handler(req('POST',{password:secret},null,'https://attacker.example'))).status,403);
+const r=await handler(req('POST',{password:secret}));assert.equal(r.status,204);
+const cookie=r.headers.get('set-cookie').split(';')[0];assert.match(r.headers.get('set-cookie'),/HttpOnly; Secure; SameSite=Strict/);
+assert.equal((await handler(req('GET',null,cookie))).status,204);
+assert.equal((await handler(req('GET',null,cookie+'tamper'))).status,401);
+secret='changed-password-only-12345';assert.equal((await handler(req('GET',null,cookie))).status,401);
+assert.equal((await handler(req('DELETE'))).status,204);
+console.log('PASS: missing secret, password, CSRF origin, signed session, tampering, password rotation and logout');
