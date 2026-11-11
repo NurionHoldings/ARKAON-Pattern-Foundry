@@ -282,3 +282,20 @@ html:not([data-custom-appearance]) .atelier-home #services a.card .card-icon{bac
 @media(max-width:600px){.atelier-home #serviceGrid a.card::before,[data-space=menu] #serviceList li::before{animation-duration:26s}}
 @media(prefers-reduced-motion:reduce){.atelier-home #serviceGrid a.card::before,[data-space=menu] #serviceList li::before{animation:none;transform:none;opacity:.35}}
 @media print{.atelier-home #serviceGrid a.card::before,[data-space=menu] #serviceList li::before{display:none}}
+
+/* Detail workspaces share the living current, with distinct functional surfaces. */
+.atelier-workspace:not([data-space=menu]){--detail-panel:#d5e1d8;--detail-line:#779585;--detail-alt:#e3ddcc}
+.atelier-workspace[data-space=brand]{--detail-panel:#ecdfbf;--detail-line:#a18a54;--detail-alt:#dde5ce}
+.atelier-workspace[data-space=motion]{--detail-panel:#e4d5e7;--detail-line:#9a7ca2;--detail-alt:#d6dfed}
+.atelier-workspace[data-space=web]{--detail-panel:#cfe3dc;--detail-line:#6f9a8b;--detail-alt:#d9e3ef}
+.atelier-workspace[data-space=collaboration]{--detail-panel:#dcd8ee;--detail-line:#8c81ac;--detail-alt:#d3e4e1}
+.atelier-workspace:not([data-space=menu]) .panel{position:relative;isolation:isolate;overflow:hidden;--detail-surface:var(--detail-panel)}
+.atelier-workspace:not([data-space=menu]) .panel:nth-of-type(even){--detail-surface:var(--detail-alt)}
+html:not([data-custom-appearance]) .atelier-workspace:not([data-space=menu]) .panel{background:var(--detail-surface);border-color:var(--detail-line);border-top:3px solid var(--detail-line);box-shadow:inset 0 1px 0 #ffffff80,0 8px 24px #22382d0c}
+.atelier-workspace:not([data-space=menu]) .panel::before{content:"";position:absolute;inset:-60% -45%;z-index:-1;pointer-events:none;border-radius:42% 58% 62% 38%;background:radial-gradient(ellipse at 25% 30%,#ffffff80,transparent 45%),radial-gradient(ellipse at 75% 68%,#ffffff55,transparent 48%),linear-gradient(135deg,transparent 25%,#ffffff30 48%,transparent 70%);animation:arkaon-service-current 24s ease-in-out infinite alternate;animation-delay:-5s}
+.atelier-workspace:not([data-space=menu]) .panel:nth-of-type(even)::before{animation-direction:alternate-reverse;animation-delay:-13s;animation-duration:29s}
+.atelier-workspace .panel :is(input:not([type=color]),textarea,select){position:relative}
+.atelier-workspace .panel.preview iframe{position:relative}
+@media(max-width:600px){.atelier-workspace:not([data-space=menu]) .panel::before{animation-duration:32s}}
+@media(prefers-reduced-motion:reduce){.atelier-workspace:not([data-space=menu]) .panel::before{animation:none;transform:none;opacity:.3}}
+@media print{.atelier-workspace:not([data-space=menu]) .panel::before{display:none}}
