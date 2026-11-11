@@ -209,3 +209,32 @@ html:not([data-custom-appearance]) [data-space=web]{--room-accent:#10362f}
 html:not([data-custom-appearance]) [data-space=collaboration]{--room-accent:#1c2e48}
 html:not([data-custom-appearance]) .atelier-workspace .svc-top{border-left-color:var(--room-accent)}
 html:not([data-custom-appearance]) .atelier-workspace .svc-top::before{color:var(--room-accent)}
+
+/* Desktop uses available width; prose stays comfortably readable. */
+@media(min-width:1100px){
+ .atelier-home .shell,body.atelier-workspace>.shell{width:100%;max-width:none;padding-inline:clamp(28px,2.5vw,64px)}
+ .atelier-home .header-inner{padding-block:18px}
+ .atelier-home .hero{min-height:540px;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:32px;margin-top:22px;padding-inline:32px}
+ .atelier-home .hero-copy{padding-block:32px}.atelier-home .intro{max-width:44ch}
+ .atelier-home .atelier-display{width:100%;max-width:720px;justify-self:center;padding-block:24px 16px}
+ .atelier-home section{margin-top:36px}.atelier-home #services{padding:28px}
+ .atelier-home #services .section-heading{padding-bottom:18px}.atelier-home #services .service-filters{margin-bottom:18px}
+ .atelier-home a.card{min-height:200px}.atelier-home .card p{max-width:42ch}
+ .atelier-home .pathway{margin-top:20px;padding-block:18px}
+ .atelier-workspace .svc-top{padding:20px 24px;margin-bottom:20px}
+ .atelier-workspace .svc-top>.mini-brand{padding-bottom:12px}
+ .atelier-workspace .shell>p,.atelier-workspace .panel>p{max-width:72ch}
+ .atelier-workspace .atelier-studio{grid-template-columns:minmax(340px,.8fr) minmax(0,1.2fr);column-gap:24px}
+ .atelier-studio>.preview iframe{min-height:600px;height:72vh;height:72dvh}
+ .atelier-workspace .desktop-panels{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;align-content:start;align-items:start}
+ .desktop-panels>.svc-top,.desktop-panels>p,.desktop-panels>.feature-search-panel{grid-column:1/-1}
+ .desktop-panels>.panel{margin-top:0;min-width:0}
+ .desktop-panels>.svc-top{margin-bottom:0}.desktop-panels>p{margin-bottom:0}
+ .mailbox-workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:start}
+ .mailbox-inbox,.mailbox-report{min-width:0}.mailbox-report{padding-left:28px;border-left:1px solid #c3cbbd}
+ .mailbox-report>.btn-row:first-child{margin-top:0}.mailbox-report textarea{min-height:360px}
+ .company-footer-inner{max-width:none;grid-template-columns:minmax(220px,1fr) minmax(300px,1.6fr) auto}
+}
+@media(min-width:1280px){[data-space=menu] #serviceList{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(min-width:1600px){.atelier-home #serviceGrid{grid-template-columns:repeat(4,minmax(0,1fr))}.atelier-home .hero{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+@media(min-width:1800px){[data-space=menu] #serviceList{grid-template-columns:repeat(4,minmax(0,1fr))}}
