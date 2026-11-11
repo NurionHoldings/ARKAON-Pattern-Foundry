@@ -51,3 +51,7 @@ html[data-custom-appearance]:has(body.appearance-workspace){background-color:var
 
 /* Preserve the company rainbow over user-selected footer palettes too. */
 @supports(background-clip:text){html[data-custom-appearance] body.appearance-workspace .company-footer .company-details strong .arkaon-living{color:transparent;-webkit-text-fill-color:transparent}}
+/* User palettes remain primary, with a subtle service-specific tint. */
+@supports(background:color-mix(in srgb,white,black)){
+ html[data-custom-appearance] body.atelier-home #services a.card,html[data-custom-appearance] body[data-space=menu] #serviceList li{background:color-mix(in srgb,var(--appearance-panel) 88%,var(--service-bg,var(--appearance-panel)));border-top:4px solid var(--appearance-button)}
+}
