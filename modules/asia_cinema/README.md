@@ -46,6 +46,22 @@ python -m modules.asia_cinema.validate_inputs --manifest $m --repo-root . --repo
 - `vectorize_symbol.py` (needs `opencv-python`, operator machine only) regenerates the A-symbol
   comparison sheet from `config/a_symbol_trace.v1.json`.
 
+## PR-C — encode, verify, SHA chain
+
+One command runs the whole chain (inputs -> `.blend` -> invariants -> PNG sequence -> MP4 -> verify -> chain):
+
+```powershell
+pwsh -File modules/asia_cinema/harness/run_local.ps1 -Profile preview -Manifest $m -RunId <run_id>
+pwsh -File modules/asia_cinema/harness/run_local.ps1 -Profile final   -Manifest $m -RunId <run_id>
+```
+
+- `final` (1920x1080, CRF 18) asks for the approval string `APPROVE ASIA FINAL RENDER` unless `-Approve` passes it.
+- `pipeline/encode_mp4.py`: libx264, yuv420p, `+faststart`, 24 fps, 384 frames, no audio.
+- `pipeline/verify_output.py`: ffprobe checks resolution, codec, pix_fmt, fps, frame count, 16 s duration,
+  no audio, `moov` before `mdat`, and that the output is not the NURION reference MP4. Rules are pure and unit-tested.
+- `pipeline/chain_manifest.py` writes `run.manifest.<profile>.json` with the input manifest, `.blend`,
+  PNG sequence and MP4 SHA-256. Videos and frames stay under `private/` (local only).
+
 ## Policy
 
 - Does not modify source assets or inbox evidence (#125/#124).

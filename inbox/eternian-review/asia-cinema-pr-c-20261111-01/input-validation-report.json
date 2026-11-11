@@ -1,0 +1,57 @@
+{
+  "schema": "apf.asia-cinema-validation-report/v1",
+  "run_id": "asia-cinema-pr-b2-20261109-01",
+  "created_at": "2026-11-11T01:18:36.395479+00:00",
+  "ok": true,
+  "render_allowed": true,
+  "issues": [],
+  "checked": {
+    "slogan_registration_status": "approved",
+    "asset_asia_holdings_reference": {
+      "path_ref": "<asset:asia_holdings_reference.png>",
+      "expected_sha256": "7f558d7a25680a459692446661d0b337ebe8a0fa3e22b55b8fb50086f426b900",
+      "actual_sha256": "7f558d7a25680a459692446661d0b337ebe8a0fa3e22b55b8fb50086f426b900"
+    },
+    "asset_asia_a_symbol_mask": {
+      "path_ref": "<asset:asia_holdings_A_symbol_mask.png>",
+      "expected_sha256": "05b4c6ebb25b6391f112f330e4b2e9f09553d8dc967a4f956f67010911cb0b1d",
+      "actual_sha256": "05b4c6ebb25b6391f112f330e4b2e9f09553d8dc967a4f956f67010911cb0b1d"
+    },
+    "asset_asia_a_symbol_trace": {
+      "path_ref": "<asset:a_symbol_trace.v1.json>",
+      "expected_sha256": "52f6b2201ac38ee4f0d503e0f2287c3b97d1ca32ed2473b74c9dc30f3d78bd31",
+      "actual_sha256": "52f6b2201ac38ee4f0d503e0f2287c3b97d1ca32ed2473b74c9dc30f3d78bd31"
+    },
+    "asset_asia_bg_plate": {
+      "path_ref": "<asset:asia_bg_plate_1080p.png>",
+      "expected_sha256": "13c3b0e1899145e52d730fdc74889faf109c0c5358b74a512f4eedd2d27c22ea",
+      "actual_sha256": "13c3b0e1899145e52d730fdc74889faf109c0c5358b74a512f4eedd2d27c22ea"
+    },
+    "asset_font_en": {
+      "path_ref": "<asset:Cinzel-Bold.ttf>",
+      "expected_sha256": "0c23ec565db45c5508ee95889c60ad87debd167ca07167a43a5d68572b4e2eac",
+      "actual_sha256": "0c23ec565db45c5508ee95889c60ad87debd167ca07167a43a5d68572b4e2eac"
+    },
+    "asset_font_ko": {
+      "path_ref": "<asset:Pretendard-SemiBold.otf>",
+      "expected_sha256": "c89bc43027dc7cde5726e96223376f8eec09302b2fc1f8147fd5b57cfc376118",
+      "actual_sha256": "c89bc43027dc7cde5726e96223376f8eec09302b2fc1f8147fd5b57cfc376118"
+    },
+    "asset_earth_color": {
+      "path_ref": "<asset:earth_color_4096.jpg>",
+      "expected_sha256": "633e70a7d6ca342f48fa48fad213a38743e63cef450cc4d66944a985a4c95173",
+      "actual_sha256": "633e70a7d6ca342f48fa48fad213a38743e63cef450cc4d66944a985a4c95173"
+    },
+    "asset_earth_lights": {
+      "path_ref": "<asset:earth_lights_4096.jpg>",
+      "expected_sha256": "a6ab3bb6da54fc7c7ab8a57d1f96c8b46b3e7e0a40555de5433b7f2621520866",
+      "actual_sha256": "a6ab3bb6da54fc7c7ab8a57d1f96c8b46b3e7e0a40555de5433b7f2621520866"
+    },
+    "slogan_ko": {
+      "path_ref": "<asset:asia_holdings_slogan_ko.approved.utf8.txt>",
+      "expected_sha256": "e9cc11036d72e2b6216b118d1dce41e3abcf345be7d98cdcffd1b05e16bc19a8",
+      "actual_sha256": "e9cc11036d72e2b6216b118d1dce41e3abcf345be7d98cdcffd1b05e16bc19a8"
+    },
+    "slogan_text_length": 25
+  }
+}
