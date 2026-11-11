@@ -1,0 +1,20 @@
+{
+  "schema": "apf.asia-cinema-output-verification/v1",
+  "profile": "preview",
+  "ok": true,
+  "issues": [],
+  "checked": {
+    "width": 960,
+    "height": 540,
+    "codec": "h264",
+    "pix_fmt": "yuv420p",
+    "fps": "24",
+    "frame_count": 384,
+    "duration_sec": 16.0,
+    "audio_streams": 0,
+    "faststart": true,
+    "video_sha256": "1a8771468c112eadd33f5da7ea6461c57dd8cb9777944b878c6f3287a566d9e7",
+    "differs_from_nurion_reference": true
+  },
+  "video_ref": "<operator-local:asia_holdings_cinema_preview.mp4>"
+}

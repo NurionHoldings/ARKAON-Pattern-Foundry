@@ -1,0 +1,48 @@
+{
+  "schema": "apf.asia-cinema-pr-c-run/v1",
+  "run_id": "asia-cinema-pr-c-20261111-01",
+  "profile": "final",
+  "chain": [
+    {
+      "step": "input_manifest",
+      "sha256": "b64ebe3ba8c0570d4aceb7d1b19c08eabb03f6accc41cebbe8eac6d2a1094742"
+    },
+    {
+      "step": "scene_blend",
+      "sha256": "c94a955a1c9b410f5e4430a57cee8eee6d295bff5f3f57a82bef8d52340e03b4"
+    },
+    {
+      "step": "png_sequence",
+      "frame_count": 384,
+      "sha256": "aa6633aa84f082245363f70b3c198f1a4e49b06df4f15ed5a4d3a9fbb638be01"
+    },
+    {
+      "step": "mp4",
+      "sha256": "5b11327d1b5ac82e7a57b8f1b1f8d7e8f76b543f68425e9a69e1d6847ae7f00a"
+    }
+  ],
+  "frame_count_ok": true,
+  "nurion_reference_sha256": "550fffe4bf0f30d157ceabe776c10238d16f8465b37e201acf4d047909395c62",
+  "differs_from_nurion_reference": true,
+  "reports": {
+    "input-validation-report.json": {
+      "ok": true,
+      "sha256": "f4b335f7375e2e31b6859f19538717d318970d4d65c1b841b911b573b205de10"
+    },
+    "scene-invariants-report.json": {
+      "ok": true,
+      "sha256": "ac65e5a44494c459f4a7b565b23e48b998ae1af3e21d5d6fdc2be92905b70adf"
+    },
+    "output-verification-final.json": {
+      "ok": true,
+      "sha256": "4e3ba8cf34dad9a3b59b9f7437d5f169679418fb794da0dd6429752b0346b67b"
+    }
+  },
+  "artifacts": {
+    "manifest_ref": "<operator-local:input.manifest.pr-b2.operator-local.json>",
+    "blend_ref": "<operator-local:asia_holdings_cinema.blend>",
+    "frames_ref": "<operator-local:frames_final/>",
+    "video_ref": "<operator-local:asia_holdings_cinema_final.mp4>",
+    "committed": false
+  }
+}
