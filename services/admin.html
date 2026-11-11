@@ -15,6 +15,9 @@
 <body class="atelier-workspace" data-space="manage">
   <div class="shell desktop-panels">
     <div class="svc-top"><a class="mini-brand" href="/" aria-label="아르카온 홈"><span class="mini-brand-picture" aria-hidden="true"><span class="mini-brand-emblem">A</span><video class="mini-brand-video" data-header-video muted loop playsinline preload="none" tabindex="-1"></video></span><span class="mini-brand-copy"><strong>ARKAON</strong><small>CREATIVE ATELIER</small></span></a><h1>관리자 메뉴</h1><nav class="svc-return-nav" aria-label="페이지 이동"><a class="svc-home" href="/services/" data-service-back>← 이전</a><a class="svc-home" href="/services/">메뉴홈 ↗</a></nav></div>
+<section class="panel" id="operatorGate"><h2>운영자 인증</h2><p id="operatorGateStatus" role="status">접근 권한을 확인하고 있습니다.</p><div class="btn-row"><a class="btn" id="operatorLogin" hidden>운영자 로그인</a><button type="button" id="operatorRecheck">인증 다시 확인</button><a class="btn" href="/services/account.html">서버 연결 설정</a></div><noscript>운영자 인증에는 자바스크립트가 필요합니다. 내부 데이터는 서버 인증으로 보호됩니다.</noscript></section>
+<div id="operatorProtected" hidden>
+
     <p class="muted">운영·승인·공동 창작 API는 Foundry 서버에서 제공됩니다. 권한이 있는 세션으로만 접근할 수 있습니다.</p>
     <div class="panel" id="console">
       <h2>운영 콘솔</h2>
@@ -30,8 +33,10 @@
       <p class="muted">저장소에서 API를 실행한 뒤 <code>/console/dev/session</code>으로 역할 세션을 만든 다음 콘솔을 이용합니다. 자동 병합·운영 배포는 콘솔에서도 허용되지 않습니다.</p>
       <p><a href="/services/account.html">API 기준 URL 설정</a></p>
     </div>
+</div>
   </div>
   <script src="/services/services.js"></script>
+<script src="/services/operator-access.js"></script>
   <script>
     (async()=>{
       const base=APFHomeServices.getApiBase();
