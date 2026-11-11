@@ -314,3 +314,4 @@ html:not([data-custom-appearance]) .atelier-workspace:not([data-space=menu]) .pa
 .atelier-studio>.brand-portfolio{grid-column:1/-1}.brand-portfolio>.brand-sample-gallery{width:min(100%,640px);margin:20px auto}.brand-portfolio h2{margin-top:0}
 @media(hover:hover){.card:hover .brand-sample-gallery img,.brand-portfolio:hover .brand-sample-gallery img{animation-play-state:paused}}
 @media(prefers-reduced-motion:reduce){.brand-sample-gallery img{animation:none;opacity:0}.brand-sample-gallery img:first-child{opacity:1}}
+@media(min-width:901px){.atelier-studio:has(>.brand-portfolio)>.brand-portfolio{grid-row:3}.atelier-studio:has(>.brand-portfolio)>form,.atelier-studio:has(>.brand-portfolio)>.preview{grid-row:4}}
