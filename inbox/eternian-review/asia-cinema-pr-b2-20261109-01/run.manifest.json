@@ -1,0 +1,43 @@
+{
+  "schema": "apf.asia-cinema-pr-b-run/v1",
+  "run_id": "asia-cinema-pr-b2-20261109-01",
+  "branch": "feat/asia-cinema-visual-refine",
+  "supersedes_run": "asia-cinema-pr-b-20261025-01",
+  "blender": "5.2",
+  "engine": "BLENDER_EEVEE",
+  "compositor": "FX_Flare bloom",
+  "inputs": {
+    "manifest_ref": "<operator-local:input.manifest.pr-b2.operator-local.json>",
+    "manifest_sha256": "b64ebe3ba8c0570d4aceb7d1b19c08eabb03f6accc41cebbe8eac6d2a1094742",
+    "input_validation_report": "input-validation-report.json",
+    "asset_approval": "asset-approval.json"
+  },
+  "scene": {
+    "blend_ref": "<operator-local:asia_holdings_cinema_v2.blend>",
+    "blend_sha256": "00378d923594b6df7660601e57055dabb624e0e22811995aaff44194e51f5ee0",
+    "committed": false,
+    "invariants_report": "scene-invariants-report.json",
+    "invariants_ok": true
+  },
+  "preview": {
+    "profile": "960x540 @ 24fps",
+    "frame_count": 384,
+    "expected_frame_count": 384,
+    "frame_sizes": [
+      [
+        960,
+        540
+      ]
+    ],
+    "sequence_sha256": "7dea0966dccb45c276d8c3e5fc2fe23ed6682ff9a3569872e9697f4b27559643",
+    "render_seconds": 109,
+    "location": "<operator-local:pr-b2-build/preview_960x540/>"
+  },
+  "stills_1080p": {
+    "frame_0001.png": "0f78aae205d8f572da444d968ae77adfbfb8e37a19c0d7beb30b2908499ef508",
+    "frame_0096.png": "bde156146ac54386b09c0d9306246b38d776ded23d97c1e3106471a41fca734c",
+    "frame_0192.png": "4f6f1711326089161d83b46f0de0e220610c90b2d4af755e17d0d6816ac1db15",
+    "frame_0288.png": "14f1c145a2bd4217588755bd1745227d764fb8d5f4ff3840720c0af589f16ce7",
+    "frame_0384.png": "9416b2236716a34721e958ff3c667098ce9c644ba2d4c2370cbbabe27cf4d85d"
+  }
+}

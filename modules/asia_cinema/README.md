@@ -23,9 +23,10 @@ paths lives under `private/` (git-ignored) on the operator machine only.
 
 ## PR-B — fixed-camera Blender scene
 
-Requires Blender 5.2. The PR-B manifest adds `asia_a_symbol_trace`, `asia_bg_plate`, `font_en`, `font_ko`
-to the PR-A bundle; approved background and fonts stay operator-local (`private/`), so the `.blend`
-is rebuilt from the manifest instead of being committed.
+Requires Blender 5.2. The PR-B manifest adds `asia_a_symbol_trace`, `asia_bg_plate` (1920x1080),
+`font_en`, `font_ko`, `earth_color`, `earth_lights` (NASA public-domain maps) to the PR-A bundle;
+approved background, fonts and earth maps stay operator-local (`private/`), so the `.blend` is rebuilt
+from the manifest instead of being committed. The scene includes an `FX_Flare` bloom compositor.
 
 ```powershell
 $blender = "C:\Program Files\Blender Foundation\Blender 5.2\blender.exe"

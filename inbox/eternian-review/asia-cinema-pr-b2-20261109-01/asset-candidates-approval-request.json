@@ -1,0 +1,69 @@
+{
+  "schema": "apf.asia-cinema-asset-candidates-approval-request/v1",
+  "run_id": "asia-cinema-pr-b2-20261109-01",
+  "track": "PR-B2 visual refine (before PR-C)",
+  "branch": "feat/asia-cinema-visual-refine",
+  "status": "pending_operator_approval",
+  "created_at": "2026-11-09T09:30:00+00:00",
+  "policy": {
+    "generated_assets_status": "generated_by_agent",
+    "pin_only_after_operator_approval": true,
+    "commit_policy": "local_only (same as PR-B)",
+    "candidate_files_location": "private/asia-cinema/pr-b2-candidates/ (git-ignored)"
+  },
+  "candidates": {
+    "asia_bg_plate_1080p_esrgan": {
+      "file": "asia_bg_plate_1080p_esrgan.png",
+      "sha256": "13c3b0e1899145e52d730fdc74889faf109c0c5358b74a512f4eedd2d27c22ea",
+      "size_px": [1920, 1080],
+      "derived_from": {"asset": "asia_bg_plate (approved A_city_night)", "sha256": "987b206a6bce63f2e439e662d13ff5df65e628e1192420fa03ac5b9fbedd6dbd"},
+      "method": "Real-ESRGAN realesrgan-x4plus (ncnn-vulkan v0.2.5.0, BSD-3-Clause) to 5120x2880, then Lanczos down to 1920x1080",
+      "known_limits": "faint background stars are smoothed away as noise",
+      "replaces": "rejected Lanczos upscale (asia_bg_plate_1080p.jpg)"
+    },
+    "asia_bg_plate_1080p": {
+      "decision": "rejected by operator — remake requested",
+      "file": "asia_bg_plate_1080p.jpg",
+      "sha256": "3029dbd6f205ca0bbd0af3accb86000312db49dea84cee57ddad14c6bb650023",
+      "size_px": [1920, 1080],
+      "derived_from": {"asset": "asia_bg_plate (approved A_city_night)", "sha256": "987b206a6bce63f2e439e662d13ff5df65e628e1192420fa03ac5b9fbedd6dbd"},
+      "method": "Lanczos 1.5x upscale + mild unsharp mask (radius 1.6, 60%)",
+      "replaces": "asia_bg_plate for 1080p final render"
+    },
+    "earth_color": {
+      "file": "earth_color_4096.jpg",
+      "sha256": "633e70a7d6ca342f48fa48fad213a38743e63cef450cc4d66944a985a4c95173",
+      "size_px": [4096, 2048],
+      "use": "land/sea mask only (navy ocean, gold land); original colors are not shown",
+      "source": {
+        "title": "Whole world - land and oceans (NASA)",
+        "url": "https://commons.wikimedia.org/wiki/File:Whole_world_-_land_and_oceans.jpg",
+        "license": "Public domain",
+        "original_sha256": "c55ba82eac6530bf5c907aae1a04afe7db412632d68bea31d3a4ad9fbe6283d3",
+        "original_size_px": [8192, 4096]
+      }
+    },
+    "earth_lights": {
+      "file": "earth_lights_4096.jpg",
+      "sha256": "a6ab3bb6da54fc7c7ab8a57d1f96c8b46b3e7e0a40555de5433b7f2621520866",
+      "size_px": [4096, 2048],
+      "use": "gold city-light emission (thresholded at 0.2)",
+      "source": {
+        "title": "Earth's City Lights by DMSP, 1994-1995 (NASA/NOAA)",
+        "url": "https://commons.wikimedia.org/wiki/File:Earth_lights_lrg.jpg",
+        "license": "Public domain",
+        "original_sha256": "fa4d5790b46eee73893efd42a92dce82c25bdeef417dc3f56423102bceb886ba",
+        "original_size_px": [4800, 2400]
+      }
+    }
+  },
+  "scene_changes": [
+    "Globe: NASA-based navy ocean / gold land with glowing city lights (was procedural noise)",
+    "Globe spin: starts over the Pacific, East Asia faces camera during S3 hold (frames 288-384)",
+    "FX_Flare: Bloom glare via Blender 5.2 node-group compositor (threshold 0.9, strength 0.5)",
+    "Background: 1080p plate for the final 1920x1080 render"
+  ],
+  "comparison_sheet": "<operator-local:pr-b2-build/before_after.png>",
+  "unchanged": ["A-symbol trace", "fonts (Cinzel Bold, Pretendard SemiBold)", "company literal", "slogan", "camera and invariants"],
+  "notes": "NASA eoimages.gsfc.nasa.gov was unreachable; the same public-domain NASA images were taken from Wikimedia Commons. The 1080p background is an upscale, not a native 1080p render."
+}

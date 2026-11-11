@@ -1,0 +1,27 @@
+{
+  "schema": "apf.asia-cinema-asset-approval/v1",
+  "run_id": "asia-cinema-pr-b2-20261109-01",
+  "status": "approved",
+  "approved_at": "2026-11-09T09:40:00+00:00",
+  "background_approved_at": "2026-11-09T09:55:00+00:00",
+  "approved_by": "operator",
+  "approval_channel": "cursor_chat_askquestion_20261109",
+  "request": "inbox/eternian-review/asia-cinema-pr-b2-20261109-01/asset-candidates-approval-request.json",
+  "commit_policy": "local_only",
+  "approved": {
+    "earth_color": {"sha256": "633e70a7d6ca342f48fa48fad213a38743e63cef450cc4d66944a985a4c95173", "license": "Public domain (NASA)"},
+    "earth_lights": {"sha256": "a6ab3bb6da54fc7c7ab8a57d1f96c8b46b3e7e0a40555de5433b7f2621520866", "license": "Public domain (NASA/NOAA)"},
+    "asia_bg_plate_1080p_esrgan": {
+      "sha256": "13c3b0e1899145e52d730fdc74889faf109c0c5358b74a512f4eedd2d27c22ea",
+      "method": "Real-ESRGAN realesrgan-x4plus x4, Lanczos down to 1920x1080",
+      "replaces_in_manifest": "asia_bg_plate"
+    },
+    "scene_changes": ["globe NASA material and spin", "FX_Flare bloom", "1080p background plate"]
+  },
+  "rejected": {
+    "asia_bg_plate_1080p": {
+      "sha256": "3029dbd6f205ca0bbd0af3accb86000312db49dea84cee57ddad14c6bb650023",
+      "reason": "operator requested a remade 1080p background instead of the Lanczos upscale"
+    }
+  }
+}
