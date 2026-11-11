@@ -243,3 +243,30 @@ html:not([data-custom-appearance]) .atelier-workspace .svc-top::before{color:var
 @media(min-width:1100px){.desktop-panels>#operatorProtected{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;align-items:start}.desktop-panels>#operatorGate{grid-column:1/-1;max-width:720px}.desktop-panels>#operatorProtected>p{grid-column:1/-1;max-width:72ch}.desktop-panels>#operatorProtected>.panel{margin-top:0}}
 
 #operatorPasswordForm[hidden],#operatorLogout[hidden]{display:none!important}#operatorPasswordForm{max-width:420px}#operatorLogout{margin-block:12px}
+/* Nine recognizable service colors, repeated in the full service menu. */
+.atelier-home a.card[href*='/logo-card'],[data-space=menu] #serviceList li:has(a[href*='/logo-card']){--service-bg:#ead5ab;--service-accent:#735322}
+.atelier-home a.card[href*='/ai-video'],[data-space=menu] #serviceList li:has(a[href*='/ai-video']){--service-bg:#dfc9e5;--service-accent:#694275}
+.atelier-home a.card[href*='/site-builder'],[data-space=menu] #serviceList li:has(a[href*='/site-builder']){--service-bg:#badbd1;--service-accent:#255e53}
+.atelier-home a.card[href*='/personal-page'],[data-space=menu] #serviceList li:has(a[href*='/personal-page']){--service-bg:#c8d9ef;--service-accent:#3d587b}
+.atelier-home a.card[href*='/co-create'],[data-space=menu] #serviceList li:has(a[href*='/co-create']){--service-bg:#d1cbed;--service-accent:#514977}
+.atelier-home a.card[href*='/publish'],[data-space=menu] #serviceList li:has(a[href*='/publish']){--service-bg:#cbdba9;--service-accent:#4b622c}
+.atelier-home a.card[href*='/account'],[data-space=menu] #serviceList li:has(a[href*='/account']){--service-bg:#edcbb9;--service-accent:#78482f}
+.atelier-home a.card[href*='/admin'],[data-space=menu] #serviceList li:has(a[href*='/admin']){--service-bg:#c4d2ce;--service-accent:#344e45}
+.atelier-home a.card[href*='/self-heal'],[data-space=menu] #serviceList li:has(a[href*='/self-heal']){--service-bg:#e5c6cf;--service-accent:#774455}
+html:not([data-custom-appearance]) .atelier-home #services a.card,html:not([data-custom-appearance]) [data-space=menu] #serviceList li{background:var(--service-bg,#e2e9df);border-color:var(--service-accent,#46634e);border-top:4px solid var(--service-accent,#46634e);box-shadow:inset 0 1px 0 #ffffff70,0 5px 16px #234e430c}
+html:not([data-custom-appearance]) .atelier-home #services a.card h3{color:#22352d}
+html:not([data-custom-appearance]) .atelier-home #services a.card p{color:#35453b}
+html:not([data-custom-appearance]) .atelier-home #services a.card .state-live{color:#244e37}
+html:not([data-custom-appearance]) .atelier-home #services a.card .state-admin{color:#503e22}
+html:not([data-custom-appearance]) .atelier-home #services a.card .card-icon{background:#ffffff65;color:var(--service-accent);border-color:var(--service-accent)}
+@media(min-width:1100px){
+ .atelier-home .shell,body.atelier-workspace>.shell{padding-inline:clamp(16px,1.2vw,32px)}
+ .atelier-home .hero{padding-inline:28px;gap:24px;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr)}
+ .atelier-home .atelier-display{max-width:none;gap:20px}
+ .atelier-home #services{padding:24px 20px;margin-top:24px}
+ .atelier-home #serviceGrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+ .atelier-home #services a.card{min-height:190px;padding:24px}
+ .atelier-home .pathway{margin-top:16px}
+ .atelier-workspace .svc-top{padding-inline:22px}
+ footer.company-footer{padding-inline:clamp(16px,1.2vw,32px)}
+}
