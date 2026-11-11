@@ -270,3 +270,15 @@ html:not([data-custom-appearance]) .atelier-home #services a.card .card-icon{bac
  .atelier-workspace .svc-top{padding-inline:22px}
  footer.company-footer{padding-inline:clamp(16px,1.2vw,32px)}
 }
+
+/* Living water: a quiet, translucent current behind service content. */
+.atelier-home #serviceGrid a.card,[data-space=menu] #serviceList li{position:relative;isolation:isolate;overflow:hidden;--flow-delay:0s}
+.atelier-home #serviceGrid a.card::before,[data-space=menu] #serviceList li::before{content:"";position:absolute;inset:-65% -45%;z-index:-1;pointer-events:none;border-radius:43% 57% 62% 38%;background:radial-gradient(ellipse at 30% 35%,#ffffff85 0,transparent 44%),radial-gradient(ellipse at 70% 65%,#ffffff55 0,transparent 48%),linear-gradient(125deg,transparent 25%,#ffffff38 46%,transparent 68%);transform-origin:50% 50%;animation:arkaon-service-current 18s ease-in-out infinite alternate;animation-delay:var(--flow-delay)}
+.atelier-home #serviceGrid a.card:nth-child(3n+2),[data-space=menu] #serviceList li:nth-child(3n+2){--flow-delay:-6s}
+.atelier-home #serviceGrid a.card:nth-child(3n),[data-space=menu] #serviceList li:nth-child(3n){--flow-delay:-12s}
+.atelier-home #serviceGrid a.card:nth-child(even)::before,[data-space=menu] #serviceList li:nth-child(even)::before{animation-direction:alternate-reverse;animation-duration:23s}
+@keyframes arkaon-service-current{0%{transform:translate(-9%,-7%) rotate(-12deg) scale(.9);opacity:.46}50%{transform:translate(7%,4%) rotate(12deg) scale(1.07);opacity:.72}100%{transform:translate(-3%,10%) rotate(30deg) scale(.96);opacity:.5}}
+@media(hover:hover){.atelier-home #serviceGrid a.card:hover::before,[data-space=menu] #serviceList li:hover::before{filter:brightness(1.12)}}
+@media(max-width:600px){.atelier-home #serviceGrid a.card::before,[data-space=menu] #serviceList li::before{animation-duration:26s}}
+@media(prefers-reduced-motion:reduce){.atelier-home #serviceGrid a.card::before,[data-space=menu] #serviceList li::before{animation:none;transform:none;opacity:.35}}
+@media print{.atelier-home #serviceGrid a.card::before,[data-space=menu] #serviceList li::before{display:none}}
