@@ -304,3 +304,13 @@ html:not([data-custom-appearance]) .atelier-workspace:not([data-space=menu]) .pa
 .atelier-home #services .service-motion{display:block;width:160px;max-width:65%;aspect-ratio:16/9;margin-bottom:16px;border-radius:8px;overflow:hidden;background:var(--service-bg,#d5e1d8);box-shadow:0 3px 12px #20382a15;pointer-events:none}
 .service-motion video{display:block;width:100%;height:100%;object-fit:cover;pointer-events:none}
 @media(max-width:600px){.atelier-home #services .service-motion{width:144px;margin-bottom:14px}}
+
+/* Four original finished design samples, crossfading every four seconds. */
+.brand-sample-gallery{position:relative;display:block;aspect-ratio:16/9;overflow:hidden;border-radius:8px;background:#173f38}
+.brand-sample-gallery img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;animation:brand-sample-cycle 16s linear infinite;animation-delay:calc(var(--sample-index)*4s)}
+.brand-sample-gallery img:first-child{opacity:1}
+@keyframes brand-sample-cycle{0%,22%{opacity:1}25%,97%{opacity:0}100%{opacity:1}}
+.atelier-home #services .service-motion.brand-sample-gallery{width:224px;max-width:80%}
+.atelier-studio>.brand-portfolio{grid-column:1/-1}.brand-portfolio>.brand-sample-gallery{width:min(100%,640px);margin:20px auto}.brand-portfolio h2{margin-top:0}
+@media(hover:hover){.card:hover .brand-sample-gallery img,.brand-portfolio:hover .brand-sample-gallery img{animation-play-state:paused}}
+@media(prefers-reduced-motion:reduce){.brand-sample-gallery img{animation:none;opacity:0}.brand-sample-gallery img:first-child{opacity:1}}
