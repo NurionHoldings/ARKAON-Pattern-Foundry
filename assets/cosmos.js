@@ -21,6 +21,18 @@
     const preview = document.createElement('span');
     preview.className = 'service-motion';
     preview.setAttribute('aria-hidden', 'true');
+    if (slug === 'logo-card') {
+      preview.classList.add('brand-sample-gallery');
+      ['orot','lumen','wave','bloom'].forEach((name, i) => {
+        const image = document.createElement('img');
+        image.src = `/assets/brand-samples/${name}.svg`;
+        image.alt = ''; image.width = 640; image.height = 360;
+        image.style.setProperty('--sample-index', i);
+        preview.append(image);
+      });
+      card.prepend(preview);
+      return;
+    }
     const video = document.createElement('video');
     video.dataset.src = `/assets/service-clips/${slug}.mp4`;
     video.poster = `/assets/service-clips/${slug}.png`;
