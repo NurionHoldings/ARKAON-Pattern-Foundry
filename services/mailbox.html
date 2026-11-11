@@ -14,17 +14,17 @@
 <body class="atelier-workspace" data-space="manage"><main class="shell">
   <div class="svc-top"><a class="mini-brand" href="/" aria-label="아르카온 홈"><span class="mini-brand-picture" aria-hidden="true"><span class="mini-brand-emblem">A</span><video class="mini-brand-video" data-header-video muted loop playsinline preload="none" tabindex="-1"></video></span><span class="mini-brand-copy"><strong>ARKAON</strong><small>CREATIVE ATELIER</small></span></a><h1>수정·진화 제안 우편함</h1><nav class="svc-return-nav" aria-label="페이지 이동"><a class="svc-home" href="/services/" data-service-back>← 이전</a><a class="svc-home" href="/services/">메뉴홈 ↗</a></nav></div>
   <p class="muted">아르카온이 남긴 제안을 읽고 다음 작업을 검토하는 공간입니다.</p>
-  <section class="panel"><h2>제안 확인</h2>
+  <section class="panel mailbox-workspace"><div class="mailbox-inbox"><h2>제안 확인</h2>
     <p id="mailboxStatus" role="status">운영 서버 연결 상태를 확인해 주세요.</p>
     <div class="btn-row"><button type="button" id="refreshMailbox">우편함 열기</button><a class="btn" href="/services/account.html">연결 설정</a><a class="btn" id="mailboxConsole" href="/services/admin.html">운영 콘솔</a></div>
     <ul class="list" id="mailboxItems"></ul>
-    <div class="btn-row"><button type="button" id="copyMailboxReport" disabled>검토 보고서 복사</button></div>
+    </div><div class="mailbox-report"><div class="btn-row"><button type="button" id="copyMailboxReport" disabled>검토 보고서 복사</button></div>
     <label for="mailboxReport">에테르니언에게 전달할 검토 보고서</label>
     <textarea id="mailboxReport" rows="10" readonly placeholder="우편함 조회에 성공하면 보고서가 표시됩니다."></textarea>
     <p id="mailboxCopyStatus" role="status"></p>
     <p class="muted">보고서에는 표시된 제안의 요약이 포함됩니다. 개인정보·내부 자료를 확인한 뒤 필요한 부분만 대화에 붙여 넣어 주세요. 자동 전송·승인·수정은 수행하지 않습니다.</p>
     <p class="muted">제안 내용은 검토 자료입니다. 읽기만으로 승인되거나 실행되지 않습니다.</p>
-  </section>
+  </div></section>
 </main>
 <script src="/services/services.js"></script>
 <script src="/services/mailbox.js"></script>
