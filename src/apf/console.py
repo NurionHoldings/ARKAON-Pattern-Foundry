@@ -302,6 +302,10 @@ def install_console(
         ):
             raise HTTPException(status_code=403, detail="CSRF verification failed")
 
+    from .operator_login import install_operator_login
+
+    operator_guard = install_operator_login(application, security, principal, csrf_guard)
+
     def repo(request: Request) -> TargetRepository:
         return request.app.state.repository
 
@@ -359,7 +363,7 @@ def install_console(
 
     @application.get("/console", response_class=HTMLResponse, include_in_schema=False)
     def console_home(actor: Annotated[ConsolePrincipal, Depends(principal)]) -> HTMLResponse:
-        del actor
+        operator_guard(actor)
         html_path = Path(__file__).with_name("console_ui.html")
         return HTMLResponse(
             html_path.read_text(encoding="utf-8"),
@@ -1234,10 +1238,12 @@ def install_console(
 
     @application.get("/v1/console/mailbox")
     def mailbox_items(
+        response: Response,
         actor: Annotated[ConsolePrincipal, Depends(principal)],
         status: Annotated[str | None, Query()] = None,
     ) -> list[dict[str, object]]:
-        del actor
+        operator_guard(actor)
+        response.headers["Cache-Control"] = "no-store"
         from .arkaon_mailbox import ArkaonMailbox, MailboxItemStatus
 
         mailbox = ArkaonMailbox(foundry_root=foundry_root())
