@@ -1,0 +1,42 @@
+{
+  "schema": "apf.asia-cinema-release-decision/v1",
+  "run_id": "asia-cinema-pr-c-20261111-01",
+  "decided_at": "2026-11-11T01:35:00+00:00",
+  "decided_by": "operator",
+  "approval_channel": "cursor_chat_askquestion_20261111",
+  "final_video": {
+    "status": "approved",
+    "video_ref": "<operator-local:asia_holdings_cinema_final.mp4>",
+    "sha256": "5b11327d1b5ac82e7a57b8f1b1f8d7e8f76b543f68425e9a69e1d6847ae7f00a",
+    "verification": "output-verification-final.json"
+  },
+  "merged": {
+    "pr_152_visual_refine": "f55450f50aa3d7ad87ef012386111e4b115e7a40",
+    "pr_169_pr_c": "6e6f7d65b13783e74bf6c40788ccafbf4378ac5f"
+  },
+  "deploy_target": {
+    "choice": "brand_studio_integration",
+    "finding": "No brand studio exists on main; it lives only in draft PR #121 (unmerged since 2026-10-24). Closest services on main: services/ai-video.html, services/logo-card.html. Publishing on the static site requires a public MP4, which conflicts with the local-only commit policy.",
+    "follow_up_decision": {
+      "choice": "ai_video_showcase",
+      "detail": "Show the approved pilot as a completed example on services/ai-video.html; only the final MP4 and its poster become public (assets/showcase/). Background, fonts, earth maps, .blend and frames stay local-only.",
+      "published": {
+        "assets/showcase/asia-holdings-cinema-16s.mp4": "5b11327d1b5ac82e7a57b8f1b1f8d7e8f76b543f68425e9a69e1d6847ae7f00a",
+        "assets/showcase/asia-holdings-cinema-poster.jpg": "8839924a3908ec155f25f84afe5caf656c0e7f4276bbd91b1fee81c317e6934f"
+      }
+    }
+  },
+  "platform_production_deploy": {
+    "choice": "proceed",
+    "status": "blocked_by_issue_76",
+    "follow_up_decision": "investigate_only — record findings; no /ready PR and no Railway changes in this round",
+    "finding": {
+      "platform": "Railway project capable-surprise / production (service ARKAON-Pattern-Foundry), auto deploy disabled",
+      "last_deployments": "2026-09-26 and 2026-09-27 ended in failure",
+      "code_gap": "healthcheck path is /ready but src/apf/api.py only serves /health",
+      "operator_gap": "APF_CONSOLE_SESSION_SECRET missing on Railway; 4 pending Railway setting changes not applied",
+      "governance": "knowledge/readiness/v0.1-readiness.json: PRODUCT_IMPLEMENT_HOLD, deployment=false",
+      "static_frontend": "Netlify publishes only assets/services/examples allowlist; ASIA module and inbox evidence are not published"
+    }
+  }
+}
