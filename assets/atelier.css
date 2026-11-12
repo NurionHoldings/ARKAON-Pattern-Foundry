@@ -344,3 +344,6 @@ html:not([data-custom-appearance]) .business-card-workspace .panel :is(input:not
 .business-card-workspace .card-sample-categories button{padding:9px 13px;border-radius:999px;background:#fffdf7;color:#244438;border:1px solid #97a99d;font-size:14px}
 .business-card-workspace .card-sample-categories button[aria-pressed=true]{background:#194e4a;color:#fff;border-color:#194e4a}
 #cardSampleSearch{width:min(100%,620px);box-sizing:border-box}
+/* Long catalog names stay below thumbnails instead of squeezing beside them. */
+.business-card-workspace .card-sample-grid button{display:block;min-width:0}
+.business-card-workspace .card-sample-grid button span{white-space:normal;overflow-wrap:anywhere}
