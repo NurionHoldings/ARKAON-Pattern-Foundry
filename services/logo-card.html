@@ -16,16 +16,22 @@
   <div class="shell atelier-studio">
     <div class="svc-top"><a class="mini-brand" href="/" aria-label="아르카온 홈"><span class="mini-brand-picture" aria-hidden="true"><span class="mini-brand-emblem">A</span><video class="mini-brand-video" data-header-video muted loop playsinline preload="none" tabindex="-1"></video></span><span class="mini-brand-copy"><strong>ARKAON</strong><small>CREATIVE ATELIER</small></span></a><h1>로고·명함 만들기</h1><nav class="svc-return-nav" aria-label="페이지 이동"><a class="svc-home" href="/services/" data-service-back>← 이전</a><a class="svc-home" href="/services/">메뉴홈 ↗</a></nav></div>
     <p class="muted">브랜드 이름과 연락처로 명함 HTML을 만들고, 진입·로고 모션은 스튜디오에서 다듬을 수 있습니다.</p>
-    <section class="panel brand-portfolio" aria-label="로고·명함 디자인 견본"><h2>로고와 명함, 완성된 모습으로 만나보세요</h2><p class="muted">아르카온이 구성한 디자인 견본 4종입니다. 실제 고객 납품 사례가 아닌 스타일 예시입니다.</p><div class="brand-sample-gallery" aria-hidden="true"><img src="/assets/brand-samples/orot.svg" alt="" width="640" height="360" style="--sample-index:0"><img src="/assets/brand-samples/lumen.svg" alt="" width="640" height="360" style="--sample-index:1"><img src="/assets/brand-samples/wave.svg" alt="" width="640" height="360" style="--sample-index:2"><img src="/assets/brand-samples/bloom.svg" alt="" width="640" height="360" style="--sample-index:3"></div><p class="muted">OROT · LUMEN · WAVE · BLOOM</p></section>
+    <section class="panel brand-portfolio" aria-label="명함 견본 선택"><h2>견본을 선택하고 나만의 명함으로 다듬으세요</h2><p class="muted">아르카온 기본 견본 12종입니다. 견본을 누르면 아래 작업창에 디자인이 적용됩니다. 입력한 상호와 연락처는 견본을 바꿔도 유지됩니다.</p><div id="cardSampleGrid" class="card-sample-grid"></div><noscript>견본 선택과 편집에는 자바스크립트가 필요합니다.</noscript></section>
     <form class="panel" id="form">
-      <h2>브랜드 정보</h2>
-      <label>상호·이름<input id="businessName" required maxlength="80" value="ARKAON"></label>
-      <label>한 줄 소개<input id="role" maxlength="120" value="디지털 제작 공간"></label>
-      <label>이메일<input id="email" type="email" maxlength="120"></label>
+      <h2>명함 수정 작업</h2><p id="selectedSampleName"></p><p id="cardEditorStatus" role="status" aria-live="polite"></p>
+      <label>상호<input id="businessName" required maxlength="80" value="(주)아르카온"></label>
+      <label>이름<input id="personName" required maxlength="40" value="홍길동"></label>
+      <label>직함<input id="role" maxlength="60" value="담당자"></label>
+      <label>한 줄 소개<input id="tagline" maxlength="80" value="상상에 형태를. 가능성에 생명력을."></label>
+      <label>홈페이지<input id="website" maxlength="100" value="www.아르카온.com"></label>
+      <label>주소<input id="address" maxlength="100" value="서울 서초구 방배동 952-2"></label>
+      <label>상세 주소<input id="addressDetail" maxlength="80" value="디엠그레이스서초 1102호"></label>
+      <label>이메일<input id="email" type="email" maxlength="100"></label>
       <label>전화<input id="phone" maxlength="40"></label>
-      <label>강조색<input id="accent" type="color" value="#75d8f9"></label>
+      <div class="card-color-fields"><label>명함 배경색<input id="background" type="color" value="#ffffff"></label><label>글자색<input id="ink" type="color" value="#203c55"></label><label>강조색<input id="accent" type="color" value="#2686a4"></label></div>
+      <p class="muted">현재 작업창은 앞·뒷면 디자인 견본입니다. 인쇄 주문 전 재단·도련·글꼴 규격 확인이 필요합니다.</p>
       <div class="btn-row">
-        <button type="submit">명함 HTML 저장</button>
+        <button type="submit" data-card-save disabled>내 작업·HTML 저장</button><button type="button" id="saveCardSvg" data-card-save disabled>편집용 SVG 저장</button>
         <a class="btn" href="/examples/entry-effects-studio.html">진입 효과 스튜디오</a>
         <a class="btn" href="/examples/arirang-text-effects.html">텍스트 효과 예제</a>
       </div>
@@ -33,16 +39,8 @@
     <div class="panel preview"><iframe sandbox id="preview" title="명함 미리보기"></iframe></div>
   </div>
   <script src="/services/services.js"></script>
-  <script>
-    const {businessCardHtml,downloadText,saveProject}=APFHomeServices;
-    const fields=['businessName','role','email','phone','accent'];
-    function values(){return Object.fromEntries(fields.map(id=>[id,document.getElementById(id).value]));}
-    function render(){document.getElementById('preview').srcdoc=businessCardHtml(values());}
-    fields.forEach(id=>document.getElementById(id).addEventListener('input',render));
-    document.getElementById('form').addEventListener('submit',e=>{e.preventDefault();const v=values();const html=businessCardHtml(v);
-      saveProject({type:'logo-card',title:v.businessName,html});downloadText(`${v.businessName}-card.html`,html);});
-    render();
-  </script>
+  <script src="/services/business-card-template.js"></script>
+  <script src="/services/business-card-editor.js"></script>
 <footer class="company-footer">
   <div class="company-footer-inner">
     <a class="company-footer-brand" href="/" aria-label="아르카온 홈"><span class="mini-brand-picture footer-logo-picture" aria-hidden="true"><span class="mini-brand-emblem">A</span><video class="mini-brand-video" data-header-video muted loop playsinline preload="none" tabindex="-1"></video></span><span>상상에 형태를. 가능성에 생명력을.</span></a>

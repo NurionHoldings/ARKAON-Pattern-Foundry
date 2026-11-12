@@ -315,3 +315,14 @@ html:not([data-custom-appearance]) .atelier-workspace:not([data-space=menu]) .pa
 @media(hover:hover){.card:hover .brand-sample-gallery img,.brand-portfolio:hover .brand-sample-gallery img{animation-play-state:paused}}
 @media(prefers-reduced-motion:reduce){.brand-sample-gallery img{animation:none;opacity:0}.brand-sample-gallery img:first-child{opacity:1}}
 @media(min-width:901px){.atelier-studio:has(>.brand-portfolio)>.brand-portfolio{grid-row:3}.atelier-studio:has(>.brand-portfolio)>form,.atelier-studio:has(>.brand-portfolio)>.preview{grid-row:4}}
+
+/* Choose a complete design, then edit its actual SVG in the work area. */
+.card-sample-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:20px}
+.card-sample-grid button{padding:7px;border:2px solid transparent;border-radius:10px;background:#fffdf7;color:#243b33;overflow:hidden;text-align:left;font:inherit;cursor:pointer;box-shadow:0 3px 12px #20382a0d}
+.card-sample-grid button img{display:block;width:100%;height:auto;aspect-ratio:3/2;object-fit:contain;background:#d8d7d2;border-radius:5px}
+.card-sample-grid button span{display:block;padding:10px 6px;font-size:.84rem}
+.card-sample-grid button[aria-pressed=true]{border-color:#194e4a;box-shadow:0 0 0 2px #194e4a30}
+.card-sample-grid button:focus-visible{outline:3px solid #194e4a;outline-offset:3px}
+.card-color-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media(max-width:900px){.card-sample-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:600px){.card-sample-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.card-sample-grid button span{font-size:.75rem}.card-color-fields{gap:6px}}
