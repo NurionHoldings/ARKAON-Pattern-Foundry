@@ -86,3 +86,5 @@ html:not([data-custom-appearance]) body.business-card-workspace .svc-top{backgro
 .business-card-workspace .studio-showcase-back{top:21%;right:3%}
 .business-card-workspace .studio-showcase-front{top:46%;left:2%}
 @media(max-width:760px){.business-card-workspace .studio-showcase-back{top:18%}.business-card-workspace .studio-showcase-front{top:43%}.business-card-workspace .svc-top>.mini-brand{gap:7px}}
+
+.business-card-workspace :is(.panel h2,.studio-editor-heading h2){font-family:"Noto Sans KR","Noto Sans CJK KR","Malgun Gothic",sans-serif!important}

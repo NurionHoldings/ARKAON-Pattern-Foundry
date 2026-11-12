@@ -7,7 +7,14 @@
   let selected=0,template='',generation=0;
   const values=()=>Object.fromEntries(fields.map(id=>[id,document.getElementById(id).value]));
   const svg=()=>APFCardTemplate.compose(template,values(),palettes[selected]);
-  function render(){if(template)preview.srcdoc=APFCardTemplate.documentHtml(svg());document.getElementById('cardSidesHint').textContent=document.getElementById('sides').value==='single'?'단면: 상호·이름·연락처를 한 면에 배치합니다.':'양면: 브랜드 앞면과 정보 뒷면을 구분합니다.';document.getElementById('saveCardBack').disabled=!template||document.getElementById('sides').value!=='double';document.getElementById('saveCardFront').textContent=document.getElementById('sides').value==='single'?'단면 SVG 저장':'앞면 SVG 저장';}
+  function sizePreview(){
+    if(!template)return;
+    const width=Number(template.match(/data-face-width="(\d+)"/)?.[1])||550,height=Number(template.match(/data-face-height="(\d+)"/)?.[1])||305;
+    const count=document.getElementById('sides').value==='single'?1:2;
+    preview.style.height=`${Math.min(1100,Math.max(280,56+count*((Math.max(180,preview.clientWidth-56)*height/width)+53)))}px`;
+  }
+  new ResizeObserver(sizePreview).observe(preview);
+  function render(){sizePreview();if(template)preview.srcdoc=APFCardTemplate.documentHtml(svg());document.getElementById('cardSidesHint').textContent=document.getElementById('sides').value==='single'?'단면: 상호·이름·연락처를 한 면에 배치합니다.':'양면: 브랜드 앞면과 정보 뒷면을 구분합니다.';document.getElementById('saveCardBack').disabled=!template||document.getElementById('sides').value!=='double';document.getElementById('saveCardFront').textContent=document.getElementById('sides').value==='single'?'단면 SVG 저장':'앞면 SVG 저장';}
   async function choose(index,move=true){
     const current=++generation;template='';selected=index;
     document.querySelectorAll('[data-card-sample]').forEach((button,i)=>button.setAttribute('aria-pressed',String(i===index)));
