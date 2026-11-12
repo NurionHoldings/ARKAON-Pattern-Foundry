@@ -9,34 +9,44 @@
   <link rel="stylesheet" href="/assets/atelier.css">
   <script src="/assets/interactions.js" defer></script>
   <link rel="stylesheet" href="/assets/appearance.css">
+  <link rel="stylesheet" href="/assets/card-studio.css">
   <script src="/assets/appearance.js" defer></script>
   <script src="/assets/header-video.js" defer></script>
 </head>
 <body class="atelier-workspace business-card-workspace" data-space="brand">
   <div class="shell atelier-studio">
-    <div class="svc-top"><a class="mini-brand" href="/" aria-label="아르카온 홈"><span class="mini-brand-picture" aria-hidden="true"><span class="mini-brand-emblem">A</span><video class="mini-brand-video" data-header-video muted loop playsinline preload="none" tabindex="-1"></video></span><span class="mini-brand-copy"><strong>ARKAON</strong><small>CREATIVE ATELIER</small></span></a><h1>로고·명함 만들기</h1><nav class="svc-return-nav" aria-label="페이지 이동"><a class="svc-home" href="/services/" data-service-back>← 이전</a><a class="svc-home" href="/services/">메뉴홈 ↗</a></nav></div>
-    <p class="muted">브랜드 이름과 연락처로 명함 HTML을 만들고, 진입·로고 모션은 스튜디오에서 다듬을 수 있습니다.</p>
-    <section class="panel brand-portfolio" aria-label="명함 견본 선택"><h2>견본을 선택하고 나만의 명함으로 다듬으세요</h2><p class="muted">아르카온 기본 견본 100종입니다. 견본을 누르면 아래 작업창에 디자인이 적용됩니다. 입력한 상호와 연락처는 견본을 바꿔도 유지됩니다.</p><label for="cardSampleSearch">견본 이름·번호 검색</label><input id="cardSampleSearch" type="search" maxlength="100" placeholder="예: 세로, IT, 카페, 100"><div id="cardSampleCategories" class="card-sample-categories" role="group" aria-label="견본 분류"></div><p id="cardSampleCount" role="status"></p><div id="cardSampleGrid" class="card-sample-grid"></div><noscript>견본 선택과 편집에는 자바스크립트가 필요합니다.</noscript></section>
+    <div class="svc-top"><a class="mini-brand" href="/" aria-label="아르카온 홈"><span class="mini-brand-picture" aria-hidden="true"><span class="mini-brand-emblem">A</span><video class="mini-brand-video" data-header-video muted loop playsinline preload="none" tabindex="-1"></video></span><span class="mini-brand-copy"><strong>ARKAON</strong><small>CREATIVE ATELIER</small></span></a><span class="studio-nav-title">브랜드 디자인 스튜디오</span><nav class="svc-return-nav" aria-label="페이지 이동"><a class="svc-home" href="/services/" data-service-back>← 이전</a><a class="svc-home" href="/services/">메뉴홈 ↗</a></nav></div>
+    <section class="card-studio-hero" aria-labelledby="studioTitle">
+      <div class="studio-hero-copy"><p class="studio-kicker">ARKAON / BUSINESS CARD ATELIER</p><h1 id="studioTitle">작은 한 장에,<br>브랜드의 깊이를.</h1><p class="studio-lead">첫인상을 남기는 명함, 아르카온과 함께.<br>취향에 맞는 견본을 고르고 나만의 브랜드로 완성하세요.</p><div class="studio-hero-actions"><a class="studio-primary" href="#cardCollection">100종 견본 둘러보기 <span aria-hidden="true">↗</span></a><a class="studio-text-link" href="#cardWorkspace">바로 편집하기 →</a></div><div class="studio-facts"><span><b>100</b> 편집 가능한 견본</span><span><b>01 / 02</b> 단면·양면 제작</span><span><b>SVG</b> 벡터 파일 저장</span></div></div>
+      <div class="studio-hero-art" aria-label="블랙 골드와 청록 브랜드 명함 디자인 견본"><span class="studio-art-caption">THE ART OF FIRST IMPRESSIONS</span><div class="studio-art-orbit" aria-hidden="true"></div><img class="studio-showcase studio-showcase-back" src="/assets/business-card-templates/arkaon-03.svg" width="1200" height="800" alt="청록색과 금빛 포인트의 양면 명함 견본"><img class="studio-showcase studio-showcase-front" src="/assets/business-card-templates/arkaon-02.svg" width="1200" height="800" alt="검정 바탕에 금빛 글자를 배치한 명함 견본"><span class="studio-art-signature">ARKAON <small>DESIGN COLLECTION — 100</small></span></div>
+    </section>
+    <ol class="studio-process" aria-label="명함 제작 순서"><li><span>01</span><div><strong>디자인 선택</strong><small>브랜드에 어울리는 한 장</small></div></li><li><span>02</span><div><strong>나만의 정보로 편집</strong><small>글자·색상·제작 면수 조정</small></div></li><li><span>03</span><div><strong>확인하고 저장</strong><small>HTML·SVG 파일로 소장</small></div></li></ol>
+    <section class="panel brand-portfolio" id="cardCollection" aria-label="명함 견본 선택">
+      <div class="studio-section-heading"><div><p class="studio-kicker">01 / DESIGN COLLECTION</p><h2>어떤 첫인상을 남기고 싶으세요?</h2><p class="muted">견본을 선택하면 아래 편집기에 적용됩니다. 작성한 상호와 연락처는 그대로 유지됩니다.</p></div><span class="studio-collection-badge">100 <small>DESIGNS</small></span></div>
+      <div class="studio-collection-toolbar"><div id="cardSampleCategories" class="card-sample-categories" role="group" aria-label="견본 분류"></div><div class="studio-search"><label for="cardSampleSearch">견본 검색</label><input id="cardSampleSearch" type="search" maxlength="100" placeholder="이름 또는 번호 검색"></div></div>
+      <div class="studio-results-heading"><p id="cardSampleCount" role="status"></p><span>선택 후 자유롭게 수정하세요</span></div><div id="cardSampleGrid" class="card-sample-grid"></div><p id="cardSampleEmpty" hidden>일치하는 견본이 없습니다. 검색어를 바꾸거나 전체 분류를 선택해 주세요.</p><nav class="studio-pagination" aria-label="견본 목록 페이지"><button type="button" id="cardPagePrev">← 이전 견본</button><span id="cardPageLabel" role="status"></span><button type="button" id="cardPageNext">다음 견본 →</button></nav><noscript>견본 선택과 편집에는 자바스크립트가 필요합니다.</noscript>
+    </section>
+    <div class="studio-editor-heading" id="cardWorkspace"><p class="studio-kicker">02 / MAKE IT YOURS</p><h2>이제, 당신의 브랜드를 담아보세요.</h2><p>정보를 바꾸면 오른쪽 미리보기에 바로 반영됩니다.</p></div>
     <form class="panel" id="form">
-      <h2>명함 수정 작업</h2><label for="sides">제작 면수</label><select id="sides"><option value="single">단면 제작 · 한 면에 전체 정보</option><option value="double" selected>양면 제작 · 앞면과 뒷면</option></select><p id="cardSidesHint" role="status"></p><p id="selectedSampleName"></p><p id="cardEditorStatus" role="status" aria-live="polite"></p>
-      <label>상호<input id="businessName" required maxlength="80" value="(주)아르카온"></label>
+      <div class="studio-form-heading"><h2>명함 수정 작업</h2><span>DETAILS & COLORS</span></div><label for="sides">제작 면수</label><select id="sides"><option value="single">단면 제작 · 한 면에 전체 정보</option><option value="double" selected>양면 제작 · 앞면과 뒷면</option></select><p id="cardSidesHint" role="status"></p><p id="selectedSampleName"></p><p id="cardEditorStatus" role="status" aria-live="polite"></p>
+      <fieldset class="studio-fieldset"><legend>브랜드와 이름</legend><div class="studio-field-grid"><label>상호<input id="businessName" required maxlength="80" value="(주)아르카온"></label>
       <label>이름<input id="personName" required maxlength="40" value="홍길동"></label>
       <label>직함<input id="role" maxlength="60" value="담당자"></label>
       <label>한 줄 소개<input id="tagline" maxlength="80" value="상상에 형태를. 가능성에 생명력을."></label>
-      <label>홈페이지<input id="website" maxlength="100" value="www.아르카온.com"></label>
+      </div></fieldset><fieldset class="studio-fieldset"><legend>연락처와 주소</legend><div class="studio-field-grid"><label>홈페이지<input id="website" maxlength="100" value="www.아르카온.com"></label>
       <label>주소<input id="address" maxlength="100" value="서울 서초구 방배동 952-2"></label>
       <label>상세 주소<input id="addressDetail" maxlength="80" value="디엠그레이스서초 1102호"></label>
       <label>이메일<input id="email" type="email" maxlength="100"></label>
       <label>전화<input id="phone" maxlength="40"></label>
-      <div class="card-color-fields"><label>명함 배경색<input id="background" type="color" value="#ffffff"></label><label>글자색<input id="ink" type="color" value="#203c55"></label><label>강조색<input id="accent" type="color" value="#2686a4"></label></div>
-      <p class="muted">선택한 제작 면수에 맞는 디자인 견본입니다. 인쇄 주문 전 재단·도련·글꼴 규격 확인이 필요합니다.</p>
+      </div></fieldset><fieldset class="studio-fieldset"><legend>브랜드 컬러</legend><div class="card-color-fields"><label>명함 배경색<input id="background" type="color" value="#ffffff"></label><label>글자색<input id="ink" type="color" value="#203c55"></label><label>강조색<input id="accent" type="color" value="#2686a4"></label></div>
+      </fieldset><p class="studio-print-note">선택한 제작 면수에 맞는 디자인 견본입니다. 인쇄 주문 전 재단·도련·글꼴 규격 확인이 필요합니다.</p>
       <div class="btn-row">
         <button type="submit" data-card-save disabled>내 작업·HTML 저장</button><button type="button" id="saveCardSvg" data-card-save disabled>전체 SVG 저장</button><button type="button" id="saveCardFront" data-card-save disabled>앞면 SVG 저장</button><button type="button" id="saveCardBack" data-card-save disabled>뒷면 SVG 저장</button>
         <a class="btn" href="/examples/entry-effects-studio.html">진입 효과 스튜디오</a>
         <a class="btn" href="/examples/arirang-text-effects.html">텍스트 효과 예제</a>
       </div>
     </form>
-    <div class="panel preview"><iframe sandbox id="preview" title="명함 미리보기"></iframe></div>
+    <section class="panel preview" aria-label="실시간 명함 미리보기"><div class="studio-preview-heading"><div><span class="studio-kicker">YOUR DESIGN</span><h2>명함 미리보기</h2></div><span class="studio-live-indicator">실시간 반영</span></div><iframe sandbox id="preview" title="명함 미리보기"></iframe><p class="studio-preview-note">미리보기의 앞면·뒷면을 확인한 후 저장하세요.<br>입력한 정보는 저장 버튼을 누를 때 내 작업에 보관됩니다.</p></section>
   </div>
   <script src="/services/services.js"></script>
   <script src="/services/business-card-template.js"></script>

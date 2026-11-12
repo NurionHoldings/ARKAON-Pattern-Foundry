@@ -32,7 +32,7 @@
   function documentHtml(svg){
     const mode=svg.match(/data-card-sides="(single|double)"/)?.[1];
     const content=mode?['front',...(mode==='double'?['back']:[])].map(side=>`<section><h2>${mode==='single'?'단면 · 정보면':side==='front'?'앞면':'뒷면'}</h2>${faceSvg(svg,side)}</section>`).join(''):svg;
-    return `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>명함 디자인</title><style>body{margin:0;background:#e1e3df;color:#263b33;font-family:"Noto Sans CJK KR","Malgun Gothic",sans-serif}.art{width:min(100%,1000px);margin:auto;padding:18px;box-sizing:border-box}section{margin-bottom:24px}h2{font-size:17px;font-weight:700;margin:0 0 10px}svg{display:block;width:100%;height:auto}@media print{body{background:white}.art{padding:0}section{break-after:page}h2{display:none}}</style><main class="art">${content}</main></html>`;
+    return `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>명함 디자인</title><style>body{margin:0;background:#e6ebe2;color:#263b33;font-family:"Noto Sans CJK KR","Malgun Gothic",sans-serif}.art{width:min(100%,1000px);margin:auto;padding:28px;box-sizing:border-box}section{margin-bottom:28px}h2{font-size:11px;font-weight:550;letter-spacing:.1em;margin:0 0 12px;color:#52694f}svg{display:block;width:100%;height:auto;box-shadow:0 12px 28px #243c3315}@media print{body{background:white}.art{padding:0}section{break-after:page}h2{display:none}}</style><main class="art">${content}</main></html>`;
   }
   return {compose,documentHtml,faceSvg};
 });
