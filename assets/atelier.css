@@ -326,3 +326,17 @@ html:not([data-custom-appearance]) .atelier-workspace:not([data-space=menu]) .pa
 .card-color-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 @media(max-width:900px){.card-sample-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:600px){.card-sample-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.card-sample-grid button span{font-size:.75rem}.card-color-fields{gap:6px}}
+
+/* Crisp Korean sans typography throughout the business card workspace. */
+.business-card-workspace,.business-card-workspace :is(h1,h2,h3,p,label,input,select,textarea,button){font-family:"Noto Sans KR","Noto Sans CJK KR","Malgun Gothic","Apple SD Gothic Neo",sans-serif;font-kerning:normal}
+.business-card-workspace .svc-top h1{font-size:clamp(28px,3vw,44px);font-weight:750;letter-spacing:-.025em;line-height:1.35}
+.business-card-workspace .panel h2{font-size:23px;font-weight:700;line-height:1.5;letter-spacing:-.015em}
+.business-card-workspace .panel :is(p,label){font-size:15px;line-height:1.75}
+.business-card-workspace .panel label{font-weight:650}
+.business-card-workspace .panel :is(input:not([type=color]),select,textarea){font-size:17px;font-weight:500;line-height:1.65;padding:11px 13px}
+.business-card-workspace .card-sample-grid button span{font-size:14px;font-weight:650;line-height:1.5}
+.business-card-workspace .panel button{font-weight:650}
+html:not([data-custom-appearance]) .business-card-workspace .panel :is(h2,h3,label){color:#182f29}
+html:not([data-custom-appearance]) .business-card-workspace .panel p{color:#30483f}
+html:not([data-custom-appearance]) .business-card-workspace .panel :is(input:not([type=color]),select,textarea){color:#172e29;background:#fffefa;border-color:#7d9185}
+@media(max-width:600px){.business-card-workspace .panel h2{font-size:21px}.business-card-workspace .card-sample-grid button span{font-size:13px}}
