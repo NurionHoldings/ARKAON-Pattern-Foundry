@@ -26,3 +26,25 @@ for(const item of catalog){
  for(const sides of ['single','double']){const rendered=compose(source,{...values,sides},item.palette);assert.equal((rendered.match(/data-card-rendered=/g)||[]).length,sides==='single'?1:2);assert.ok(rendered.includes('회사 &lt;테스트&gt;'));assert.ok(faceSvg(rendered,sides==='single'?'front':'back').includes('test@example.test'));assert.ok(documentHtml(rendered).includes('홍길동'));}
 }
 console.log('PASS: 100 unique catalog entries, all 200 single/double compositions and exports');
+const fonts=require('../services/business-card-fonts.js');
+assert.throws(()=>fonts.inspect(new Uint8Array([0,0,0,0]),'bad.ttf'));
+assert.throws(()=>fonts.inspect(new Uint8Array([119,79,70,50]),'bad.exe'));
+assert.throws(()=>fonts.inspect(new Uint8Array(fonts.maxBytes+1),'huge.ttf'));
+assert.equal(fonts.inspect(new Uint8Array([79,84,84,79]),'type.otf'),'opentype');
+assert.equal(fonts.inspect(new Uint8Array([0,1,0,0]),'type.ttf'),'truetype');
+assert.equal(fonts.inspect(new Uint8Array([119,79,70,70]),'type.woff'),'woff');
+assert.equal(fonts.style({format:'woff2',dataUrl:'https://evil.test/font.woff2'}),'');
+assert.equal(fonts.style({format:'woff2',dataUrl:'data:font/woff2;base64,AAAA"}</style><script>'}), '');
+for(const preset of fonts.presets.filter(x=>x.file)){
+ const bytes=fs.readFileSync(`assets/card-fonts/${preset.file}`);assert.equal(fonts.inspect(bytes,preset.file),'woff2');
+ const cardFont={format:'woff2',dataUrl:`data:font/woff2;base64,${bytes.toString('base64')}`,name:'bad </style><script>name',bundled:true,license:'OFL <license> & copyright'};
+ assert.ok(fonts.valid(cardFont));
+ const item=catalog[0],source=fs.readFileSync('assets/business-card-templates/arkaon-01.svg','utf8');
+ for(const sides of ['single','double']){
+ const composed=compose(source,{...item.palette,businessName:'회사',personName:'이름',sides,cardFont},item.palette);
+ assert.ok(composed.includes('@font-face'));assert.ok(composed.includes('text{font-family:APFCardFont'));assert.ok(!composed.includes('<script>'));assert.ok(composed.includes('OFL &lt;license&gt; &amp; copyright'));
+ for(const side of ['front',...(sides==='double'?['back']:[])]){const out=faceSvg(composed,side);assert.ok(out.includes(cardFont.dataUrl));assert.ok(out.includes('data-card-font-license'));}
+ assert.ok(documentHtml(composed).includes(cardFont.dataUrl));
+ }
+}
+console.log('PASS: bundled font signatures, upload limits, hostile CSS rejection, embedded fonts and license across all exports');

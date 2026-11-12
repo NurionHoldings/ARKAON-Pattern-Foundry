@@ -1,7 +1,7 @@
 /* Trusted local SVG layouts; all editable text is XML-escaped before insertion. */
 (function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.APFCardTemplate=api;})(typeof window==='undefined'?globalThis:window,()=>{
   const escape=value=>String(value||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  function compose(template,input,palette){
+  function composeBase(template,input,palette){
     const text={
       '(주)아르카온':input.businessName,'홍길동':input.personName,
       '담당자 · 이름 표기 예시':input.role,'상상에 형태를. 가능성에 생명력을.':input.tagline,
@@ -24,10 +24,18 @@
     return `<svg xmlns="http://www.w3.org/2000/svg" font-family="Noto Sans CJK KR,Malgun Gothic,sans-serif" width="${(width+30)*faces.length+20}" height="${height+65}" viewBox="0 0 ${(width+30)*faces.length+20} ${height+65}" data-card-sides="${input.sides}" data-face-width="${width}" data-face-height="${height}">${faces.map((face,i)=>`<text x="${20+i*(width+30)}" y="23" font-size="14" font-family="Noto Sans CJK KR,sans-serif" fill="#263b33">${face.label}</text><g data-card-rendered="${face.name}" transform="translate(${20+i*(width+30)} 40)">${face.body}</g>`).join('')}</svg>`;
 
   }
+  function compose(template,input,palette){
+    const svg=composeBase(template,input,palette),font=input.cardFont;
+    const fonts=typeof module==='object'&&module.exports?require('./business-card-fonts.js'):APFCardFonts;
+    const style=fonts.style(font);if(!style)return svg;
+    const license=font.bundled?'<metadata data-card-font-license="true">'+escape(font.license||'')+'</metadata>':'';
+    return svg.replace(/(<svg\b[^>]*>)/,'$1'+`<defs data-card-font="true"><style>${style}</style>${license}</defs>`);
+  }
   function faceSvg(svg,side){
     const width=Number(svg.match(/data-face-width="(\d+)"/)?.[1])||550,height=Number(svg.match(/data-face-height="(\d+)"/)?.[1])||305;
     const body=svg.match(new RegExp(`<g data-card-rendered="${side}"[^>]*>([\\s\\S]*?)</g>`))?.[1];
-    return body?`<svg xmlns="http://www.w3.org/2000/svg" font-family="Noto Sans CJK KR,Malgun Gothic,sans-serif" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">${body}</svg>`:'';
+    const fontDefs=svg.match(/<defs data-card-font="true">[\s\S]*?<\/defs>/)?.[0]||'';
+    return body?`<svg xmlns="http://www.w3.org/2000/svg" font-family="Noto Sans CJK KR,Malgun Gothic,sans-serif" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">${fontDefs}${body}</svg>`:'';
   }
   function documentHtml(svg){
     const mode=svg.match(/data-card-sides="(single|double)"/)?.[1];

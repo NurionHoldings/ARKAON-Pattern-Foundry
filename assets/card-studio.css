@@ -88,3 +88,7 @@ html:not([data-custom-appearance]) body.business-card-workspace .svc-top{backgro
 @media(max-width:760px){.business-card-workspace .studio-showcase-back{top:18%}.business-card-workspace .studio-showcase-front{top:43%}.business-card-workspace .svc-top>.mini-brand{gap:7px}}
 
 .business-card-workspace :is(.panel h2,.studio-editor-heading h2){font-family:"Noto Sans KR","Noto Sans CJK KR","Malgun Gothic",sans-serif!important}
+.business-card-workspace .studio-font-sample{padding:18px;background:#f1f4ed;color:#244639;border:1px solid #dbe2d4;border-radius:6px;font-size:23px!important;line-height:1.8;overflow-wrap:anywhere}
+.business-card-workspace .studio-font-controls input[type=file]{width:100%;min-width:0;font-size:12px!important;padding:10px!important;overflow:hidden}
+.studio-font-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px;min-width:0}.studio-font-actions span{font-size:11px;overflow-wrap:anywhere;min-width:0}.business-card-workspace .studio-font-actions button{font-size:11px;padding:6px 10px;min-height:36px;background:#eef2e9;color:#365548;border:1px solid #cdd8c6}.studio-font-actions button[hidden]{display:none!important}
+.business-card-workspace .panel :is(#cardFontHelp,#cardFontStatus){font-size:11px;line-height:1.8;overflow-wrap:anywhere}.studio-font-license{font-size:11px}.business-card-workspace .panel #cardFontSample{font-family:inherit}
