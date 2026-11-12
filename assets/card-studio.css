@@ -76,4 +76,4 @@ html[data-custom-appearance] .business-card-workspace .panel.preview{background:
 @keyframes studio-paper-flow{from{background-position:0% 25%}to{background-position:100% 75%}}
 html[data-custom-appearance] .business-card-workspace .brand-portfolio{background:var(--appearance-panel)!important;animation:none}
 html[data-custom-appearance] .business-card-workspace .card-studio-hero::before,html[data-custom-appearance] .business-card-workspace .studio-hero-art::after{display:none}
-@media(prefers-reduced-motion:reduce){.business-card-workspace .card-studio-hero::before,.business-card-workspace .studio-hero-art::after,.business-card-workspace .brand-portfolio{animation:none;will-change:auto}}
+
