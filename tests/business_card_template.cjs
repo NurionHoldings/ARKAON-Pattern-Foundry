@@ -19,3 +19,10 @@ for(let i=0;i<24;i++){
  if(i===20||i===21)assert.ok(faceSvg(double,'back').includes('viewBox="0 0 305 550"'));
 }
 console.log('PASS: 24 layouts, single/double face counts, contact retention, separate exports, portrait dimensions');
+const catalog=require('../services/business-card-catalog.js');assert.equal(catalog.length,100);assert.equal(new Set(catalog.map(x=>x.id)).size,100);assert.equal(new Set(catalog.map(x=>x.name)).size,100);
+for(const item of catalog){
+ const source=fs.readFileSync(`assets/business-card-templates/arkaon-${String(item.id).padStart(2,'0')}.svg`,'utf8');
+ const values={...item.palette,businessName:'회사 <테스트>',personName:'홍길동',role:'담당자',tagline:'한 줄 소개',website:'example.test',address:'서울',addressDetail:'주소',email:'test@example.test',phone:'010-0000-0000'};
+ for(const sides of ['single','double']){const rendered=compose(source,{...values,sides},item.palette);assert.equal((rendered.match(/data-card-rendered=/g)||[]).length,sides==='single'?1:2);assert.ok(rendered.includes('회사 &lt;테스트&gt;'));assert.ok(faceSvg(rendered,sides==='single'?'front':'back').includes('test@example.test'));assert.ok(documentHtml(rendered).includes('홍길동'));}
+}
+console.log('PASS: 100 unique catalog entries, all 200 single/double compositions and exports');
