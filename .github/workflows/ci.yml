@@ -73,3 +73,4 @@ jobs:
       - run: node tests/operations_api.mjs
       - run: node tests/simple_operator_auth.mjs
       - run: node tests/static_services_security.cjs
+      - run: node tests/business_card_template.cjs
