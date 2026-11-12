@@ -61,3 +61,15 @@ jobs:
           tests/test_audit_bot_internal.py
           tests/test_self_improvement_execution.py
           tests/test_self_improvement_relay.py
+  operations-api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: node tests/operations_api.mjs
+      - run: node tests/simple_operator_auth.mjs
+      - run: node tests/static_services_security.cjs

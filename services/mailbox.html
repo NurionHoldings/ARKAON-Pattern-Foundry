@@ -18,6 +18,7 @@
 <div id="operatorProtected" hidden>
 
   <p class="muted">아르카온이 남긴 제안을 읽고 다음 작업을 검토하는 공간입니다.</p>
+<section class="panel"><h2>함께 검토할 제안 등록</h2><p>여기서 등록한 제안은 기본 운영 우편함에 보관됩니다. 외부 Foundry 우편함과는 별도로 관리됩니다.</p><form id="proposalForm"><label>제목<input name="summary" maxlength="2000" required></label><label>검토 내용<textarea name="details" maxlength="8000" rows="5" required></textarea></label><label><input type="checkbox" name="review" required> 에테르니언과 함께 검토하기 위해 등록합니다. 등록은 수정·배포 승인이 아닙니다.</label><div class="btn-row"><button type="submit">검토 제안 저장</button></div></form><p id="proposalStatus" role="status"></p></section>
   <section class="panel mailbox-workspace"><div class="mailbox-inbox"><h2>제안 확인</h2>
     <p id="mailboxStatus" role="status">운영 서버 연결 상태를 확인해 주세요.</p>
     <div class="btn-row"><button type="button" id="refreshMailbox">우편함 열기</button><a class="btn" href="/services/account.html">연결 설정</a><a class="btn" id="mailboxConsole" href="/services/admin.html">운영 콘솔</a></div>
