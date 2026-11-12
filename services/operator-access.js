@@ -20,7 +20,7 @@
       const response=await fetch(endpoint,{credentials:'include',redirect:'error',cache:'no-store',signal:AbortSignal.timeout(10000)});
       if(response.status!==204){lock(response.status===503?'Netlify에 관리자 비밀번호를 한 번 설정해 주세요.':'관리자 비밀번호를 입력해 주세요.');return;}
       gate.hidden=true;content.hidden=false;logout.hidden=false;
-      if(!base){const hint=document.getElementById('consoleHint');if(hint)hint.textContent='간편 관리자 모드입니다. 실제 운영 콘솔·제안 데이터 조회는 Foundry 서버 연결 후 사용할 수 있습니다.';}
+      if(!base){const hint=document.getElementById('consoleHint');if(hint)hint.textContent='기본 운영 API가 연결되어 있습니다. 제안 저장·조회는 우편함에서 사용할 수 있습니다. Foundry 실행 콘솔은 별도 서버 연결이 필요합니다.';}
     }catch{lock('인증 서버에 연결할 수 없습니다. 잠시 후 다시 시도해 주세요.');}
   }
   form.addEventListener('submit',async e=>{
@@ -31,6 +31,13 @@
   });
   logout.addEventListener('click',async()=>{try{const response=await fetch('/api/operator-session',{method:'DELETE',credentials:'same-origin'});lock(response.ok?'로그아웃했습니다.':'로그아웃 확인에 실패했습니다. 다시 시도해 주세요.');}catch{lock('서버 연결을 확인해 주세요.');}});
   document.getElementById('operatorRecheck').addEventListener('click',check);
+  document.getElementById('checkOperations')?.addEventListener('click',async event=>{
+    const button=event.currentTarget,output=document.getElementById('operationsHealth');button.disabled=true;output.textContent='인증과 저장소 연결을 확인하고 있습니다…';
+    try{const response=await fetch('/api/operations/health',{credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(15000)});
+      if(!response.ok)throw new Error([401,403].includes(response.status)?'관리자 인증을 다시 확인해 주세요.':'운영 저장소 연결에 실패했습니다. 잠시 후 다시 확인해 주세요.');
+      const data=await response.json();output.textContent=data.storage==='connected'?'정상 연결 · 제안 저장·조회 사용 가능 · Foundry 실행 서버는 별도 연결 필요':'저장소 상태를 확인하지 못했습니다.';
+    }catch(error){output.textContent=error.message;}finally{button.disabled=false;}
+  });
   window.addEventListener('focus',check);
   window.addEventListener('pagehide',()=>lock('인증을 다시 확인해 주세요.'));
   document.addEventListener('visibilitychange',()=>{if(document.hidden)lock('인증을 다시 확인해 주세요.');else check();});
