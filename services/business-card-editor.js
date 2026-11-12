@@ -1,6 +1,7 @@
 (() => {
-  const labels=['기업 기본형','블랙 골드','청록 브랜드','화이트 미니멀','타이포그래피','코발트 테크','세로 포인트','버건디 클래식','오렌지 액센트','라벤더 스튜디오','내추럴 페이퍼','모노그램 프리미엄','센터 심벌','사이드 밴드','상단 리본','에디토리얼','테크 그리드','소프트 아치','건축 라인','시그니처','세로 화이트','세로 다크','볼드 하프','넘버 인덱스'];
-  const palettes=[['#ffffff','#203c55','#2686a4'],['#171b23','#f1dfb9','#bd9551'],['#194e4a','#fff9eb','#c5b27d'],['#faf8f1','#222b31','#697d80'],['#e5e8ed','#192534','#4774aa'],['#16366a','#ffffff','#68d9f0'],['#ffffff','#293b43','#399899'],['#542e3b','#f7eede','#c1a57e'],['#fffaf3','#34312c','#e78335'],['#e6dcef','#423554','#8a6eab'],['#e8dfcd','#434b39','#839174'],['#eeeae2','#20282b','#8b806e'],['#f7f8fa','#22324a','#536cb7'],['#ffffff','#273b39','#246f61'],['#fff9ee','#493c2f','#c47540'],['#eee9df','#2d302c','#8d7160'],['#101d31','#edf5ff','#73aeda'],['#e3e9e2','#314c40','#7c9b87'],['#f5f5f2','#27313a','#9b8863'],['#fffaf6','#5b3944','#a86c7d'],['#ffffff','#273747','#4685a4'],['#1d2928','#f2eee4','#c8af7b'],['#233c53','#ffffff','#9fc5cb'],['#f2eee5','#252f30','#b16a48']].map(([background,ink,accent])=>({background,ink,accent}));
+  const catalog=APFCardCatalog;
+  const labels=catalog.map(item=>item.name);
+  const palettes=catalog.map(item=>item.palette);
   const fields=['businessName','personName','role','tagline','website','address','addressDetail','email','phone','sides','background','ink','accent'];
   const grid=document.getElementById('cardSampleGrid'),status=document.getElementById('cardEditorStatus'),preview=document.getElementById('preview');
   let selected=0,template='',generation=0;
@@ -22,6 +23,15 @@
       if(move){const editor=document.getElementById('form');editor.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});document.getElementById('businessName').focus({preventScroll:true});}
     }catch{if(current===generation){status.textContent='견본을 불러오지 못했습니다. 다른 견본을 선택하거나 다시 시도해 주세요.';preview.srcdoc='<p>견본을 불러오지 못했습니다.</p>';}}
   }
+  let category='all';
+  const categories={all:'전체',corporate:'기업·비즈니스',tech:'IT·테크',creative:'디자인·감성',service:'매장·서비스',premium:'프리미엄',portrait:'세로형'};
+  function filter(){
+    const query=document.getElementById('cardSampleSearch').value.trim().toLowerCase();let count=0;
+    document.querySelectorAll('[data-card-sample]').forEach((button,index)=>{const item=catalog[index];button.hidden=!((category==='all'||item.category===category)&&`${item.id} ${item.name}`.toLowerCase().includes(query));if(!button.hidden)count++;});
+    document.getElementById('cardSampleCount').textContent=`전체 ${catalog.length}종 · 현재 ${count}종 표시`;
+  }
+  Object.entries(categories).forEach(([key,label])=>{const button=document.createElement('button');button.type='button';button.textContent=label;button.setAttribute('aria-pressed',String(key==='all'));button.addEventListener('click',()=>{category=key;document.querySelectorAll('#cardSampleCategories button').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));filter();});document.getElementById('cardSampleCategories').append(button);});
+  document.getElementById('cardSampleSearch').addEventListener('input',filter);
   labels.forEach((label,index)=>{
     const button=document.createElement('button');button.type='button';button.dataset.cardSample=index;button.setAttribute('aria-pressed','false');
     const image=document.createElement('img');image.src=`/assets/business-card-templates/arkaon-${String(index+1).padStart(2,'0')}.svg`;image.alt='';image.width=1200;image.height=800;image.loading='lazy';
@@ -35,5 +45,6 @@
   });
   document.getElementById('saveCardSvg').addEventListener('click',()=>{if(template)APFHomeServices.downloadText('arkaon-business-card.svg',svg(),'image/svg+xml;charset=utf-8');});
   for(const [id,side] of [['saveCardFront','front'],['saveCardBack','back']])document.getElementById(id).addEventListener('click',()=>{if(template&&document.getElementById('form').reportValidity()){const face=APFCardTemplate.faceSvg(svg(),side);if(face)APFHomeServices.downloadText(`arkaon-card-${side}.svg`,face,'image/svg+xml;charset=utf-8');}});
+  filter();
   choose(0,false);
 })();

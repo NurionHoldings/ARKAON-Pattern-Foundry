@@ -340,3 +340,7 @@ html:not([data-custom-appearance]) .business-card-workspace .panel :is(h2,h3,lab
 html:not([data-custom-appearance]) .business-card-workspace .panel p{color:#30483f}
 html:not([data-custom-appearance]) .business-card-workspace .panel :is(input:not([type=color]),select,textarea){color:#172e29;background:#fffefa;border-color:#7d9185}
 @media(max-width:600px){.business-card-workspace .panel h2{font-size:21px}.business-card-workspace .card-sample-grid button span{font-size:13px}}
+.card-sample-categories{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.business-card-workspace .card-sample-categories button{padding:9px 13px;border-radius:999px;background:#fffdf7;color:#244438;border:1px solid #97a99d;font-size:14px}
+.business-card-workspace .card-sample-categories button[aria-pressed=true]{background:#194e4a;color:#fff;border-color:#194e4a}
+#cardSampleSearch{width:min(100%,620px);box-sizing:border-box}
