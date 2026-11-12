@@ -19,7 +19,8 @@
     const x=Number(template.match(/data-contact-x="(\d+)"/)?.[1])||305,y=Number(template.match(/data-contact-y="(\d+)"/)?.[1])||196;
     const contacts=`<text x="${x}" y="${y}" fill="${ink}" font-family="Noto Sans CJK KR,sans-serif" font-size="11">${escape(input.email)}</text><text x="${x}" y="${y+25}" fill="${ink}" font-family="Noto Sans CJK KR,sans-serif" font-size="11">${escape(input.phone)}</text>`;
     const front=find('front'),back=find('back')+contacts;
-    const faces=input.sides==='single'?[{name:'front',label:'단면 · 정보면',body:back}]:[{name:'front',label:'앞면',body:front},{name:'back',label:'뒷면',body:back}];
+    const singleTagline=`<text x="35" y="${height-12}" fill="${ink}" font-family="Noto Sans CJK KR,sans-serif" font-size="9">${escape(input.tagline)}</text>`;
+    const faces=input.sides==='single'?[{name:'front',label:'단면 · 정보면',body:back+singleTagline}]:[{name:'front',label:'앞면',body:front},{name:'back',label:'뒷면',body:back}];
     return `<svg xmlns="http://www.w3.org/2000/svg" font-family="Noto Sans CJK KR,Malgun Gothic,sans-serif" width="${(width+30)*faces.length+20}" height="${height+65}" viewBox="0 0 ${(width+30)*faces.length+20} ${height+65}" data-card-sides="${input.sides}" data-face-width="${width}" data-face-height="${height}">${faces.map((face,i)=>`<text x="${20+i*(width+30)}" y="23" font-size="14" font-family="Noto Sans CJK KR,sans-serif" fill="#263b33">${face.label}</text><g data-card-rendered="${face.name}" transform="translate(${20+i*(width+30)} 40)">${face.body}</g>`).join('')}</svg>`;
 
   }
