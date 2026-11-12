@@ -45,7 +45,7 @@ def build(destination: Path) -> None:
             if source.is_symlink():
                 raise ValueError("symlinks cannot be published")
             if not source.is_file() or source.suffix.lower() not in {
-                ".html", ".css", ".js", ".mp4", ".webm", ".svg", ".png", ".jpg", ".webp",
+                ".html", ".css", ".js", ".mp4", ".webm", ".svg", ".png", ".jpg", ".webp", ".woff2",
             }:
                 continue
             target = destination / source.relative_to(ROOT)

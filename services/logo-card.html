@@ -33,7 +33,7 @@
       <label>이름<input id="personName" required maxlength="40" value="홍길동"></label>
       <label>직함<input id="role" maxlength="60" value="담당자"></label>
       <label>한 줄 소개<input id="tagline" maxlength="80" value="상상에 형태를. 가능성에 생명력을."></label>
-      </div></fieldset><fieldset class="studio-fieldset"><legend>연락처와 주소</legend><div class="studio-field-grid"><label>홈페이지<input id="website" maxlength="100" value="www.아르카온.com"></label>
+      </div></fieldset><fieldset class="studio-fieldset studio-font-controls"><legend>명함 서체</legend><label for="cardFontSelect">기본 서체 선택</label><select id="cardFontSelect"></select><p id="cardFontSample" class="studio-font-sample">아르카온 · 브랜드의 첫인상<br>ARKAON 0123456789</p><label for="cardFontUpload">내 글꼴 업로드</label><input id="cardFontUpload" type="file" accept=".ttf,.otf,.woff,.woff2" aria-describedby="cardFontHelp"><div class="studio-font-actions"><span id="cardFontName">기본 고딕 사용 중</span><button type="button" id="cardFontReset" hidden>업로드 글꼴 제거</button></div><p id="cardFontStatus" role="status" aria-live="polite"></p><p id="cardFontHelp">TTF·OTF·WOFF·WOFF2 / 최대 10MB. 글꼴은 서버에 전송되지 않으며 이 브라우저에서만 처리합니다. 저장 파일에는 글꼴이 포함됩니다. 업로드 시 상업 사용·파일 포함이 허용된 글꼴을 선택해 주세요. 글꼴에 없는 문자는 기본 서체로 표시됩니다.</p><a class="studio-font-license" href="/assets/card-fonts/NanumGothic-Regular-OFL.html" target="_blank" rel="noopener">기본 제공 글꼴 라이선스 ↗</a></fieldset><fieldset class="studio-fieldset"><legend>연락처와 주소</legend><div class="studio-field-grid"><label>홈페이지<input id="website" maxlength="100" value="www.아르카온.com"></label>
       <label>주소<input id="address" maxlength="100" value="서울 서초구 방배동 952-2"></label>
       <label>상세 주소<input id="addressDetail" maxlength="80" value="디엠그레이스서초 1102호"></label>
       <label>이메일<input id="email" type="email" maxlength="100"></label>
@@ -49,6 +49,7 @@
     <section class="panel preview" aria-label="실시간 명함 미리보기"><div class="studio-preview-heading"><div><span class="studio-kicker">YOUR DESIGN</span><h2>명함 미리보기</h2></div><span class="studio-live-indicator">실시간 반영</span></div><iframe sandbox id="preview" title="명함 미리보기"></iframe><p class="studio-preview-note">미리보기의 앞면·뒷면을 확인한 후 저장하세요.<br>입력한 정보는 저장 버튼을 누를 때 내 작업에 보관됩니다.</p></section>
   </div>
   <script src="/services/services.js"></script>
+  <script src="/services/business-card-fonts.js"></script>
   <script src="/services/business-card-template.js"></script>
   <script src="/services/business-card-catalog.js"></script>
   <script src="/services/business-card-editor.js"></script>
