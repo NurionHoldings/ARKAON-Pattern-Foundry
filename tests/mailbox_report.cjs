@@ -23,7 +23,7 @@ function setup(base = 'https://example.test') {
   const app=setup();
   app.response([{status:'PENDING',summary:'<script>steal()</script>',private_token:'SECRET'}, {status:'COMPLETED',summary:'done'}]);
   await app.refresh();
-  assert.match(app.get('mailboxReport').value,/전체 2건 · 검토 대상 1건 · 보고서 1건/);
+  assert.match(app.get('mailboxReport').value,/조회 2건 · 검토 대상 1건 · 보고서 1건/);
   assert.ok(!app.get('mailboxReport').value.includes('SECRET'));
   assert.equal(app.get('mailboxItems').children[0].children[0].textContent,'<script>steal()</script>');
   await app.copy();assert.equal(app.copied(),app.get('mailboxReport').value);
@@ -35,8 +35,9 @@ function setup(base = 'https://example.test') {
   assert.ok(app.get('mailboxReport').value.length<65000);
   app.response(null,401);await app.refresh();
   assert.equal(app.get('mailboxReport').value,'');assert.equal(app.get('copyMailboxReport').disabled,true);
-  app.response([]);await app.refresh();assert.match(app.get('mailboxReport').value,/전체 0건/);
-  const disconnected=setup('');await disconnected.refresh();
-  assert.equal(disconnected.get('mailboxReport').value,'');assert.match(disconnected.get('mailboxStatus').textContent,/0건을 뜻하지/);
+  app.response([]);await app.refresh();assert.match(app.get('mailboxReport').value,/조회 0건/);
+  const local=setup('');local.response({items:[{summary:'운영 제안',status:'PENDING_REVIEW',details:'검토 내용'}],truncated:false});await local.refresh();
+  assert.match(local.get('mailboxReport').value,/조회 1건/);assert.equal(local.get('mailboxItems').children[0].children[2].textContent,'검토 내용');
+  local.response(null,503);await local.refresh();assert.equal(local.get('mailboxReport').value,'');assert.match(local.get('mailboxStatus').textContent,/아직 확인되지/);
   console.log('Mailbox report: successful/empty/truncated/error/disconnected responses, text-only rendering, clipboard fallback PASS');
 })().catch(error=>{console.error(error);process.exitCode=1;});
