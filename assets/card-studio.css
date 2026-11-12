@@ -77,3 +77,12 @@ html[data-custom-appearance] .business-card-workspace .panel.preview{background:
 html[data-custom-appearance] .business-card-workspace .brand-portfolio{background:var(--appearance-panel)!important;animation:none}
 html[data-custom-appearance] .business-card-workspace .card-studio-hero::before,html[data-custom-appearance] .business-card-workspace .studio-hero-art::after{display:none}
 
+/* Keep compact navigation on one row despite shared service header rules. */
+html:not([data-custom-appearance]) body.business-card-workspace .svc-top{background:transparent!important}
+.business-card-workspace .svc-top>.mini-brand{flex:0 0 auto;padding:0;border:0;min-height:44px;order:0}
+.business-card-workspace .svc-top>.studio-nav-title{order:1}
+.business-card-workspace .svc-top>.svc-return-nav{order:2;flex:0 0 auto;width:auto}
+.business-card-workspace .studio-showcase{width:76%;border-radius:3px}
+.business-card-workspace .studio-showcase-back{top:21%;right:3%}
+.business-card-workspace .studio-showcase-front{top:46%;left:2%}
+@media(max-width:760px){.business-card-workspace .studio-showcase-back{top:18%}.business-card-workspace .studio-showcase-front{top:43%}.business-card-workspace .svc-top>.mini-brand{gap:7px}}
