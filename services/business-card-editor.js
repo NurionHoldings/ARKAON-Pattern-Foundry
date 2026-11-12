@@ -7,7 +7,14 @@
   let selected=0,template='',generation=0;
   const values=()=>Object.fromEntries(fields.map(id=>[id,document.getElementById(id).value]));
   const svg=()=>APFCardTemplate.compose(template,values(),palettes[selected]);
-  function render(){if(template)preview.srcdoc=APFCardTemplate.documentHtml(svg());document.getElementById('cardSidesHint').textContent=document.getElementById('sides').value==='single'?'단면: 상호·이름·연락처를 한 면에 배치합니다.':'양면: 브랜드 앞면과 정보 뒷면을 구분합니다.';document.getElementById('saveCardBack').disabled=!template||document.getElementById('sides').value!=='double';document.getElementById('saveCardFront').textContent=document.getElementById('sides').value==='single'?'단면 SVG 저장':'앞면 SVG 저장';}
+  function sizePreview(){
+    if(!template)return;
+    const width=Number(template.match(/data-face-width="(\d+)"/)?.[1])||550,height=Number(template.match(/data-face-height="(\d+)"/)?.[1])||305;
+    const count=document.getElementById('sides').value==='single'?1:2;
+    preview.style.height=`${Math.min(1100,Math.max(280,56+count*((Math.max(180,preview.clientWidth-56)*height/width)+53)))}px`;
+  }
+  new ResizeObserver(sizePreview).observe(preview);
+  function render(){sizePreview();if(template)preview.srcdoc=APFCardTemplate.documentHtml(svg());document.getElementById('cardSidesHint').textContent=document.getElementById('sides').value==='single'?'단면: 상호·이름·연락처를 한 면에 배치합니다.':'양면: 브랜드 앞면과 정보 뒷면을 구분합니다.';document.getElementById('saveCardBack').disabled=!template||document.getElementById('sides').value!=='double';document.getElementById('saveCardFront').textContent=document.getElementById('sides').value==='single'?'단면 SVG 저장':'앞면 SVG 저장';}
   async function choose(index,move=true){
     const current=++generation;template='';selected=index;
     document.querySelectorAll('[data-card-sample]').forEach((button,i)=>button.setAttribute('aria-pressed',String(i===index)));
@@ -20,22 +27,32 @@
       template=source;for(const id of ['background','ink','accent'])document.getElementById(id).value=palettes[index][id];
       render();status.textContent=`${labels[index]} 견본을 적용했습니다. 입력 내용을 바꾸면 작업창에 바로 반영됩니다.`;
       document.querySelectorAll('[data-card-save]').forEach(b=>b.disabled=false);render();
-      if(move){const editor=document.getElementById('form');editor.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});document.getElementById('businessName').focus({preventScroll:true});}
+      if(move){const editor=document.getElementById('cardWorkspace');editor.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});document.getElementById('businessName').focus({preventScroll:true});}
     }catch{if(current===generation){status.textContent='견본을 불러오지 못했습니다. 다른 견본을 선택하거나 다시 시도해 주세요.';preview.srcdoc='<p>견본을 불러오지 못했습니다.</p>';}}
   }
-  let category='all';
+  let category='all',page=0;
+  const pageSize=12;
   const categories={all:'전체',corporate:'기업·비즈니스',tech:'IT·테크',creative:'디자인·감성',service:'매장·서비스',premium:'프리미엄',portrait:'세로형'};
-  function filter(){
-    const query=document.getElementById('cardSampleSearch').value.trim().toLowerCase();let count=0;
-    document.querySelectorAll('[data-card-sample]').forEach((button,index)=>{const item=catalog[index];button.hidden=!((category==='all'||item.category===category)&&`${item.id} ${item.name}`.toLowerCase().includes(query));if(!button.hidden)count++;});
-    document.getElementById('cardSampleCount').textContent=`전체 ${catalog.length}종 · 현재 ${count}종 표시`;
+  function filter(reset=true){
+    if(reset)page=0;
+    const query=document.getElementById('cardSampleSearch').value.trim().toLowerCase();
+    const matches=catalog.map((item,index)=>({item,index})).filter(({item})=>(category==='all'||item.category===category)&&`${item.id} ${item.name}`.toLowerCase().includes(query));
+    const pages=Math.max(1,Math.ceil(matches.length/pageSize));page=Math.min(page,pages-1);
+    const visible=new Set(matches.slice(page*pageSize,(page+1)*pageSize).map(({index})=>index));
+    document.querySelectorAll('[data-card-sample]').forEach((button,index)=>{button.hidden=!visible.has(index);});
+    document.getElementById('cardSampleCount').textContent=`전체 ${catalog.length}종 · 검색 결과 ${matches.length}종`;
+    document.getElementById('cardPageLabel').textContent=`${page+1} / ${pages}`;
+    document.getElementById('cardPagePrev').disabled=page===0;
+    document.getElementById('cardPageNext').disabled=page===pages-1;
+    document.getElementById('cardSampleEmpty').hidden=matches.length!==0;
   }
+  for(const [id,delta] of [['cardPagePrev',-1],['cardPageNext',1]])document.getElementById(id).addEventListener('click',()=>{page+=delta;filter(false);document.getElementById('cardCollection').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});});
   Object.entries(categories).forEach(([key,label])=>{const button=document.createElement('button');button.type='button';button.textContent=label;button.setAttribute('aria-pressed',String(key==='all'));button.addEventListener('click',()=>{category=key;document.querySelectorAll('#cardSampleCategories button').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));filter();});document.getElementById('cardSampleCategories').append(button);});
   document.getElementById('cardSampleSearch').addEventListener('input',filter);
   labels.forEach((label,index)=>{
     const button=document.createElement('button');button.type='button';button.dataset.cardSample=index;button.setAttribute('aria-pressed','false');
     const image=document.createElement('img');image.src=`/assets/business-card-templates/arkaon-${String(index+1).padStart(2,'0')}.svg`;image.alt='';image.width=1200;image.height=800;image.loading='lazy';
-    const title=document.createElement('span');title.textContent=`${String(index+1).padStart(2,'0')} · ${label}`;button.append(image,title);button.addEventListener('click',()=>choose(index));grid.append(button);
+    const title=document.createElement('span');title.textContent=`${String(index+1).padStart(2,'0')} · ${label}`;const hint=document.createElement('small');hint.className='studio-card-hint';hint.textContent='이 디자인으로 시작 →';button.append(image,title,hint);button.addEventListener('click',()=>choose(index));grid.append(button);
   });
   fields.forEach(id=>document.getElementById(id).addEventListener('input',render));
   document.getElementById('form').addEventListener('submit',event=>{
